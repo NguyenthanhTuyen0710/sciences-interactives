@@ -1,0 +1,31 @@
+# Démo complète en une commande :  docker compose up --build   →   http://localhost:3000
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: edu
+      POSTGRES_PASSWORD: edu
+      POSTGRES_DB: eduplateforme
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edu -d eduplateforme"]
+      interval: 2s
+      retries: 30
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://edu:edu@db:5432/eduplateforme
+      AUTH_SECRET: demo-secret-a-changer-en-production-0123456789
+      TEACHER_INVITE_CODE: PROF-2026
+      INSECURE_COOKIES: "1"   # démo en http ; à retirer derrière HTTPS
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/public/uploads
+volumes:
+  pgdata:
+  uploads:
