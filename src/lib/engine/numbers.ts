@@ -91,7 +91,9 @@ export function parseNumber(input: string): ParsedNumber | null {
     .replace(/[−–]/g, "-")
     .replace(/,/g, ".")
     .replace(/[×x*·]10\^?\(?([+-]?\d+)\)?$/i, "e$1")
-    .replace(/^10\^\(?([+-]?\d+)\)?$/, "1e$1");
+    .replace(/^10\^\(?([+-]?\d+)\)?$/, "1e$1")
+    // un relatif écrit entre parenthèses, « (−3) », est accepté
+    .replace(/^\(([^()]*)\)$/, "$1");
   if (!s) return null;
   const frac = s.match(/^([+-]?\d+(?:\.\d+)?)\/([+-]?\d+(?:\.\d+)?)$/);
   if (frac) {

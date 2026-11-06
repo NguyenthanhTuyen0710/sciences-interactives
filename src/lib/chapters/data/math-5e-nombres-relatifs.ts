@@ -12,7 +12,7 @@ const P = (x: number) => (x < 0 ? `(${T(x)})` : T(x));
 const r1 = (x: number) => Math.round(x * 10) / 10;
 const r2 = (x: number) => Math.round(x * 100) / 100;
 const nz = (rng: Rng, a: number, b: number) => { let v = 0; while (v === 0) v = rng.int(a, b); return v; };
-const num = (value: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "numerique", answer: { value } }, mistakes });
+const num = (value: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "numerique", answer: { value } }, mistakes: mistakes.filter((m) => Number(m.match.replace(",", ".")) !== value) });
 const qcm = (options: string[], answer: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "qcm", options, answer: [answer] }, mistakes });
 /** Mélange des options en conservant la bonne réponse et les diagnostics (indices d'origine). */
 function shuffledQcm(rng: Rng, options: string[], answer: number, diag: Record<number, string> = {}, prompt?: string): ChapterPart {
@@ -22,24 +22,25 @@ function shuffledQcm(rng: Rng, options: string[], answer: number, diag: Record<n
 const SIGN_SUM_NEG = "La somme de deux nombres négatifs est **négative** : deux baisses successives font encore baisser la température.";
 
 const O = {
-  "M5-REL-01": "Définir un nombre relatif : un signe et une distance à zéro.",
+  "M5-REL-01": "Définir les nombres relatifs.",
   "M5-REL-02": "Définir et déterminer l'opposé d'un nombre ; savoir que $-a$ n'est pas toujours négatif.",
-  "M5-REL-03": "Connaître le terme « valeur absolue » (distance à zéro) et l'utiliser pour comparer.",
-  "M5-REL-04": "Distinguer positif, strictement positif, négatif, strictement négatif (cas de 0).",
-  "M5-REL-05": "Utiliser les relatifs pour représenter des grandeurs pouvant être inférieures à zéro (température, altitude, temps…).",
-  "M5-REL-06": "Lire l'abscisse d'un point et placer un point d'abscisse donnée sur une droite graduée.",
-  "M5-REL-07": "Lire et placer des points dans un repère orthogonal du plan (coordonnées relatives).",
+  "M5-REL-03": "Définir la valeur absolue d'un nombre.",
+  "M5-REL-04": "Définir positif, strictement positif, négatif, strictement négatif.",
+  "M5-REL-05": "Utiliser les nombres relatifs pour représenter des grandeurs qui peuvent être inférieures à zéro (température, temps, altitude…).",
+  "M5-REL-06": "Lire l'abscisse d'un nombre relatif sur une droite graduée ; placer un nombre relatif d'abscisse donnée.",
+  "M5-REL-07": "Dans un plan muni d'un repère orthogonal, lire les coordonnées d'un point et placer un point de coordonnées données.",
   "M5-REL-08": "Comparer et ranger des décimaux relatifs.",
   "M5-REL-09": "Additionner deux décimaux relatifs.",
-  "M5-REL-10": "Additionner plusieurs décimaux relatifs en regroupant astucieusement les termes.",
-  "M5-REL-11": "Soustraire deux décimaux relatifs : soustraire un nombre revient à ajouter son opposé.",
-  "M5-REL-12": "Savoir quand les parenthèses sont indispensables ; distinguer les trois rôles du signe « − ».",
+  "M5-REL-10": "Additionner plusieurs nombres décimaux relatifs.",
+  "M5-REL-11": "Soustraire deux nombres décimaux relatifs.",
+  "M5-REL-12": "Connaître et justifier les situations où les parenthèses sont indispensables.",
   "M5-REL-13": "Simplifier l'écriture d'une somme comportant des parenthèses.",
   "M5-REL-14": "Enchaîner additions et soustractions de décimaux relatifs.",
-  "M5-REL-15": "Résoudre des problèmes mettant en jeu additions et soustractions de relatifs (états et variations).",
+  "M5-REL-15": "Résoudre des problèmes mobilisant l'addition et la soustraction de nombres décimaux relatifs.",
 } as const;
 type Obj = keyof typeof O;
-const SRC = "Programme de mathématiques du cycle 4 (annexe 2, BO n° 10 du 5 mars 2026), classe de 5e, « Nombres et calculs – Nombres relatifs »";
+const SRC = "Programme de mathématiques du cycle 4 (annexe 2, BO n° 10 du 5 mars 2026), 5e, « Nombres et calculs – Nombres relatifs », p. 7-8";
+const SRC_REP = "Programme de mathématiques du cycle 4 (annexe 2, BO n° 10 du 5 mars 2026), 5e, « Espace et géométrie – Repérage sur une droite et dans le plan », p. 12";
 
 // ───────────────────────── Exercices ─────────────────────────
 const ex = (e: Omit<ChapterExercise, "objectives"> & { objectives: Obj[] }): ChapterExercise => e;
@@ -49,9 +50,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "rel5-01", title: "Lire une température négative", niveau: 1, objectives: ["M5-REL-01", "M5-REL-05"], time: 45,
     statement: "Un matin d'hiver, la météo annonce : « Il fait 4 degrés **sous zéro**. » Quel nombre relatif représente cette température (en °C) ?",
-    parts: [qcm(["$-4$", "$4$", "$+4$", "$0{,}4$"], 0, [
-      { match: "1", feedback: "4 °C, c'est 4 degrés **au-dessus** de zéro. « Sous zéro » se traduit par un nombre négatif." },
-      { match: "2", feedback: "$+4$ et $4$ désignent le même nombre positif. « Sous zéro » se traduit par le signe −." },
+    parts: [qcm(["$4$", "$+4$", "$-4$", "$0{,}4$"], 2, [
+      { match: "0", feedback: "4 °C, c'est 4 degrés **au-dessus** de zéro. « Sous zéro » se traduit par un nombre négatif." },
+      { match: "1", feedback: "$+4$ et $4$ désignent le même nombre positif. « Sous zéro » se traduit par le signe −." },
     ])],
     solution: ["« Sous zéro » signifie inférieur à 0 : la température est négative.", "Sa distance à zéro est 4, d'où le nombre $-4$ (on lit « moins quatre »)."],
     reasoning: "Un nombre relatif est formé d'un signe et d'une distance à zéro : le signe − indique « en dessous de 0 ».",
@@ -109,7 +110,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["La distance entre deux points n'est jamais négative."],
   }),
   ex({
-    id: "rel5-07", title: "L'ascenseur", niveau: 1, objectives: ["M5-REL-05", "M5-REL-01"], time: 45,
+    id: "rel5-07", title: "L'ascenseur", niveau: 1, objectives: ["M5-REL-05", "M5-REL-11"], time: 45,
     statement: "Dans un immeuble, le rez-de-chaussée correspond à l'étage $0$. Inès part du 3e étage et descend de 5 étages pour aller au parking. À quel étage arrive-t-elle ?",
     parts: [num(-2, [{ match: "2", feedback: "Le parking est **sous** le rez-de-chaussée : l'étage est négatif." }, { match: "8", feedback: "Elle **descend** : il faut retirer 5 étages, pas en ajouter." }], "Étage d'arrivée :")],
     solution: ["En descendant de 3 étages, elle arrive au rez-de-chaussée (étage 0).", "Il reste 2 étages à descendre : elle arrive à l'étage $-2$ (2e sous-sol).", "En calcul : $3 - 5 = -2$."],
@@ -249,14 +250,17 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       const base = rng.int(1, 4);
       const set = new Set<number>([-(base + 0.5), -(base + 0.15), -(base + 0.05), -base, -(base - 1 + 0.9), r2(rng.int(1, 9) / 10), -(base + 1)]);
-      const vals = rng.shuffle([...set].map(r2)).slice(0, 6);
-      const order = vals.map((_, i) => i).sort((i, j) => vals[i] - vals[j]);
-      if (order.every((v, i) => v === i)) vals.reverse();
-      const ord = vals.map((_, i) => i).sort((i, j) => vals[i] - vals[j]);
+      const all = [...set].map(r2);
+      const pos = all.filter((v) => v > 0);
+      const vals = rng.shuffle([...pos, ...rng.shuffle(all.filter((v) => v < 0)).slice(0, 6 - pos.length)]);
+      const up = rng.next() < 0.6;
+      const sorted = () => vals.map((_, i) => i).sort((i, j) => (up ? vals[i] - vals[j] : vals[j] - vals[i]));
+      if (sorted().every((v, i) => v === i)) vals.reverse();
+      const ord = sorted();
       return {
-        statement: "Ranger ces nombres dans l'**ordre croissant** (du plus petit au plus grand).",
-        parts: [{ interaction: { kind: "ordonner", items: vals.map((v) => `$${T(v)}$`), answer: ord, hint: "Du plus petit (en haut) au plus grand (en bas)" } }],
-        solution: ["Les négatifs sont plus petits que les positifs.", "Entre deux négatifs, le plus petit est celui qui a la plus grande distance à zéro (comparer en complétant par des zéros, par exemple $-2{,}50$ et $-2{,}15$).", `Ordre croissant : $${ord.map((i) => T(vals[i])).join(" < ")}$.`],
+        statement: up ? "Ranger ces nombres dans l'**ordre croissant** (du plus petit au plus grand)." : "Ranger ces nombres dans l'**ordre décroissant** (du plus grand au plus petit).",
+        parts: [{ interaction: { kind: "ordonner", items: vals.map((v) => `$${T(v)}$`), answer: ord, hint: up ? "Du plus petit (en haut) au plus grand (en bas)" : "Du plus grand (en haut) au plus petit (en bas)" } }],
+        solution: ["Les nombres strictement négatifs sont plus petits que les positifs.", "Entre deux négatifs, le plus petit est celui qui a la plus grande valeur absolue (comparer en complétant par des zéros, par exemple $-2{,}50$ et $-2{,}15$).", `Ordre ${up ? "croissant" : "décroissant"} : $${ord.map((i) => T(vals[i])).join(up ? " < " : " > ")}$.`],
       };
     },
     reasoning: "On compare d'abord les signes, puis les distances à zéro ; pour des négatifs, l'ordre des distances est inversé.",
@@ -298,7 +302,8 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "rel5-19", title: "Table d'addition de relatifs", niveau: 3, objectives: ["M5-REL-09"], time: 150,
     vary: (rng) => {
-      const cols = [-nz(rng, 2, 9), nz(rng, 2, 9), -rng.int(11, 49) / 10];
+      const c3 = rng.int(11, 49);
+      const cols = [-nz(rng, 2, 9), nz(rng, 2, 9), -(c3 % 10 === 0 ? c3 + 1 : c3) / 10];
       const rows = [rng.int(2, 9), -rng.int(2, 9)];
       return {
         statement: "Compléter la table : chaque case contient la **somme** du nombre de sa ligne et du nombre de sa colonne.",
@@ -312,7 +317,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "rel5-20", title: "Soustraire des relatifs", niveau: 3, objectives: ["M5-REL-11"], time: 50,
     vary: (rng) => {
-      const a = rng.sign() * rng.int(2, 15), b = -rng.int(2, 15);
+      const b = -rng.int(2, 15);
+      let a = rng.sign() * rng.int(2, 15);
+      if (a === b) a = -a;
       const d = a - b;
       return {
         statement: `Calculer $${T(a)} - ${P(b)}$.`,
@@ -358,9 +365,11 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 4 : Approfondissement ──
   ex({
-    id: "rel5-24", title: "Simplifier une écriture", niveau: 4, objectives: ["M5-REL-13"], time: 75,
+    id: "rel5-24", title: "Simplifier une écriture", niveau: 4, objectives: ["M5-REL-13", "M5-REL-11"], time: 75,
     vary: (rng) => {
-      const [a, b, c, d] = [rng.int(2, 9), rng.int(2, 9), rng.int(2, 9), rng.int(2, 9)];
+      const [a, b, c] = [rng.int(2, 9), rng.int(2, 9), rng.int(2, 9)];
+      let d = rng.int(2, 9);
+      if (d === c) d = c === 9 ? 2 : c + 1;
       const opts = [`$-${a} - ${b} - ${c} + ${d}$`, `$-${a} - ${b} + ${c} - ${d}$`, `$-${a} - ${b} - ${c} - ${d}$`, `$${a} + ${b} - ${c} + ${d}$`];
       return {
         statement: `Quelle est l'écriture simplifiée de $(-${a}) + (-${b}) - (+${c}) - (-${d})$ ?`,
@@ -372,7 +381,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Commence par écrire la somme sans aucune soustraction.", "Que devient $-(-x)$ ?"],
   }),
   ex({
-    id: "rel5-25", title: "Enchaîner additions et soustractions", niveau: 4, objectives: ["M5-REL-14", "M5-REL-10"], time: 150,
+    id: "rel5-25", title: "Enchaîner additions et soustractions", niveau: 4, objectives: ["M5-REL-14", "M5-REL-10", "M5-REL-13"], time: 150,
     vary: (rng) => {
       const v = [rng.int(2, 12), -rng.int(2, 12), rng.int(2, 12), -rng.int(2, 12), rng.int(2, 12)];
       const expr = `${v[0]} - ${P(-v[1])} + ${P(v[2])} - ${P(-v[3])} - ${P(-v[4])}`;
@@ -437,7 +446,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule séparément les deux membres de chaque égalité.", "Pour une affirmation « toujours », un seul contre-exemple suffit à la rendre fausse."],
   }),
   ex({
-    id: "rel5-30", title: "Du sommet à la fosse", niveau: 4, objectives: ["M5-REL-15"], time: 90,
+    id: "rel5-30", title: "Du sommet à la fosse", niveau: 4, objectives: ["M5-REL-15", "M5-REL-11"], time: 90,
     vary: (rng) => {
       const h = rng.int(8, 30) * 50, d = -rng.int(3, 40) * 10;
       return {
@@ -452,7 +461,7 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 5 : Défi ──
   ex({
-    id: "rel5-31", title: "Carré magique à somme nulle", niveau: 5, objectives: ["M5-REL-10", "M5-REL-14"], time: 240,
+    id: "rel5-31", title: "Carré magique à somme nulle", niveau: 5, objectives: ["M5-REL-10", "M5-REL-02"], time: 240,
     vary: (rng) => {
       const k = rng.pick([1, 2, 5]) * rng.sign();
       const base = [[-3, 2, 1], [4, 0, -4], [-1, -2, 3]].map((r) => r.map((v) => v * k));
@@ -469,9 +478,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "rel5-32", title: "Le nombre mystère", niveau: 5, objectives: ["M5-REL-08", "M5-REL-03", "M5-REL-04"], time: 150,
     statement: "Je suis un nombre **strictement négatif**. Ma distance à zéro est comprise entre 2 et 3. Je suis **supérieur** à $-2{,}5$. Je m'écris avec un seul chiffre après la virgule et mon chiffre des dixièmes est 2. Qui suis-je ?",
-    parts: [qcm(["$-2{,}2$", "$-2{,}6$", "$2{,}2$", "$-1{,}2$", "$-2{,}8$"], 0, [
-      { match: "1", feedback: "$-2{,}6 < -2{,}5$ : il n'est pas supérieur à $-2{,}5$ (il est plus loin de 0)." },
-      { match: "2", feedback: "$2{,}2$ est positif, or le nombre est strictement négatif." },
+    parts: [qcm(["$-2{,}6$", "$2{,}2$", "$-2{,}2$", "$-1{,}2$", "$-2{,}8$"], 2, [
+      { match: "0", feedback: "$-2{,}6 < -2{,}5$ : il n'est pas supérieur à $-2{,}5$ (il est plus loin de 0)." },
+      { match: "1", feedback: "$2{,}2$ est positif, or le nombre est strictement négatif." },
       { match: "3", feedback: "La distance à zéro de $-1{,}2$ est $1{,}2$, elle n'est pas comprise entre 2 et 3." },
       { match: "4", feedback: "$-2{,}8 < -2{,}5$ et son chiffre des dixièmes est 8." },
     ])],
@@ -489,7 +498,8 @@ const EXERCISES: ChapterExercise[] = [
         { s: "Ainsi, ajouter $3 + 5 = 8$ à $-3$ donne $5$ : $5 - (-3) = 8 = 5 + 3$.", j: 0 },
       ];
       const OPTS = ["Définition de la différence", "Deux nombres opposés ont une somme nulle", "On peut regrouper les termes d'une somme", "La somme de deux nombres négatifs est négative"];
-      const order = rng.shuffle([0, 1, 2, 3]);
+      let order = rng.shuffle([0, 1, 2, 3]);
+      while (order.every((v, i) => v === i)) order = rng.shuffle([0, 1, 2, 3]);
       const shown = order.map((i) => steps[i]);
       return {
         statement: "Remettre dans l'ordre les étapes qui prouvent que $5 - (-3) = 5 + 3$, et choisir la justification de chaque étape.",
@@ -558,16 +568,17 @@ export const math5eNombresRelatifs: ChapterContent = {
   grade: "5e",
   subject: "mathematiques",
   treeChapterId: "m5-relatifs",
-  // Correspondance avec l'inventaire A1 : M5-NC-10…14 → M5-REL-01…08 ; M5-NC-15…18 → M5-REL-09…15.
-  curriculumChapterIds: ["math-5e-nombres-relatifs", "math-5e-relatifs-addition-soustraction"],
+  // Correspondance avec l'inventaire A1 : M5-NC-10…14 → M5-REL-01…06 et 08 ; M5-NC-15…18 → M5-REL-09…15 ;
+  // M5-EG-01, M5-EG-02 (Repérage) → M5-REL-06, M5-REL-07.
+  curriculumChapterIds: ["math-5e-nombres-relatifs", "math-5e-relatifs-addition-soustraction", "math-5e-reperage"],
   curriculumVersion: "2026-2027",
   title: "Nombres relatifs",
-  officialObjectives: (Object.keys(O) as Obj[]).map((id) => ({ id, text: O[id], source: SRC })),
+  officialObjectives: (Object.keys(O) as Obj[]).map((id) => ({ id, text: O[id], source: id === "M5-REL-07" ? SRC_REP : id === "M5-REL-06" ? `${SRC} ; ${SRC_REP}` : SRC })),
   prerequisites: [
     { text: "Repérer et placer un nombre décimal sur une demi-droite graduée (6e).", chapterId: "m6-nombres" },
-    { text: "Comparer et ranger des nombres décimaux, utiliser les symboles $<$, $>$, $\\leqslant$, $\\geqslant$ (6e).", chapterId: "m6-nombres" },
+    { text: "Comparer et ranger des nombres décimaux en utilisant les symboles $=$, $<$ et $>$ (6e).", chapterId: "m6-nombres" },
     { text: "Additionner et soustraire des nombres décimaux ; sens de la soustraction comme écart et comme complément (cycle 3).", chapterId: "m6-calculs" },
-    { text: "Lire un graphique et placer des points dans un repère (premier quart du plan, cycle 3)." },
+    { text: "Lire et produire des points dans un repère en gestion de données, avec des valeurs positives (cycle 3)." },
   ],
   sources: [
     { id: "R2", title: "Annexe 2 — Programme de mathématiques pour le cycle 4 (BO n° 10 du 5 mars 2026), reproduction académie de Corse", url: "https://sites.ac-corse.fr/maths/2026/03/05/nouveau-programme-pour-le-cycle-4/", kind: "official", note: "texte de référence ; la page du BO n'était pas accessible automatiquement (403)" },
@@ -578,26 +589,26 @@ export const math5eNombresRelatifs: ChapterContent = {
   lesson: {
     introduction: "Il fait $3$ °C le soir et la température baisse de $5$ degrés pendant la nuit. Avec les nombres connus jusqu'ici, le calcul $3 - 5$ est impossible ! Pourtant le thermomètre indique bien une température : **2 degrés sous zéro**, que l'on note $-2$ °C.\nLes **nombres relatifs** (positifs et négatifs) permettent de décrire tout ce qui peut passer « sous zéro » : températures, altitudes sous le niveau de la mer, étages en sous-sol, dettes… Ils rendent toutes les soustractions possibles.\nLe savais-tu ? Des calculs avec des quantités négatives apparaissent déjà dans un ouvrage chinois ancien, *Les Neuf Chapitres*, et le mathématicien indien Brahmagupta en énonce des règles vers l'an 600 ; mais en Europe certains savants refusaient encore de les considérer comme des nombres au XVIIe siècle.",
     definitions: [
-      { term: "Nombre relatif", text: "Un nombre relatif est formé d'un **signe** ($+$ ou $-$) et d'une **distance à zéro**. Les nombres précédés de $-$ sont **négatifs**, ceux précédés de $+$ (que l'on peut omettre : $+3 = 3$) sont **positifs**.\nExemples : $-4{,}5$ a pour signe $-$ et pour distance à zéro $4{,}5$ ; $7$ a pour signe $+$ et pour distance à zéro $7$." },
-      { term: "Positif, négatif, strictement", text: "Un nombre est **positif** s'il est supérieur ou égal à $0$, **strictement positif** s'il est supérieur à $0$.\nUn nombre est **négatif** s'il est inférieur ou égal à $0$, **strictement négatif** s'il est inférieur à $0$.\n$0$ est le seul nombre à la fois positif et négatif ; il n'est ni strictement positif, ni strictement négatif." },
+      { term: "Nombres relatifs", text: "Les **nombres relatifs** sont les nombres positifs et leurs opposés, les nombres négatifs. Un nombre relatif s'écrit avec un **signe** ($+$ ou $-$) et une **partie numérique**. Les nombres précédés de $-$ sont **négatifs** ; ceux précédés de $+$ (que l'on peut omettre : $+3 = 3$) sont **positifs**.\nExemples : $-4{,}5$ a pour signe $-$ et pour partie numérique $4{,}5$ ; $7$ a pour signe $+$ et pour partie numérique $7$." },
+      { term: "Positif, négatif, strictement", text: "Un nombre est **positif** s'il est supérieur ou égal à $0$ (on note $a \\geqslant 0$), **strictement positif** s'il est supérieur à $0$ ($a > 0$).\nUn nombre est **négatif** s'il est inférieur ou égal à $0$ (on note $a \\leqslant 0$), **strictement négatif** s'il est inférieur à $0$ ($a < 0$).\n$0$ est le seul nombre à la fois positif et négatif ; il n'est ni strictement positif, ni strictement négatif." },
       { term: "Droite graduée, abscisse", text: "Une droite graduée possède une origine (le point d'abscisse $0$), un sens et une unité reportée régulièrement **des deux côtés** de l'origine. Chaque point est repéré par un nombre relatif, son **abscisse** : positive à droite de l'origine, négative à gauche." },
       { term: "Opposé", text: "Deux nombres sont **opposés** lorsque leur somme est égale à $0$. L'opposé de $a$ se note $-a$.\nExemples : l'opposé de $5$ est $-5$ ; l'opposé de $-2{,}3$ est $2{,}3$ ; l'opposé de $0$ est $0$." },
-      { term: "Valeur absolue (distance à zéro)", text: "La **valeur absolue** d'un nombre est sa distance à zéro : c'est le nombre sans son signe. Elle est toujours positive.\nExemples : la valeur absolue de $-3{,}5$ est $3{,}5$ ; celle de $2$ est $2$." },
+      { term: "Valeur absolue", text: "La **valeur absolue** d'un nombre $a$ est égale à $a$ si $a$ est positif, et à $-a$ si $a$ est négatif. Sur une droite graduée, c'est la **distance à zéro** : la distance entre l'origine et le point d'abscisse $a$. Elle est toujours positive.\nExemples : la valeur absolue de $-3{,}5$ est $3{,}5$ ; celle de $2$ est $2$ ; celle de $0$ est $0$." },
       { term: "Repère du plan, coordonnées", text: "Un repère orthogonal est formé de deux droites graduées perpendiculaires de même origine $O$ : l'**axe des abscisses** (horizontal) et l'**axe des ordonnées** (vertical). Un point $M$ est repéré par ses **coordonnées** $(x\\,;\\,y)$ : d'abord l'abscisse, puis l'ordonnée." },
     ],
     properties: [
-      { title: "Opposé de l'opposé", statement: "Pour tout nombre $a$ : $-(-a) = a$. Deux nombres opposés ont la même distance à zéro et des signes contraires ; sur une droite graduée, ils sont symétriques par rapport à l'origine.", conditions: "Attention : $-a$ n'est pas toujours négatif. Si $a = -4$, alors $-a = 4$." },
-      { title: "Comparer deux relatifs", statement: "Sur une droite graduée orientée vers la droite, le plus petit de deux nombres est le plus à gauche. Donc :\n– un nombre strictement négatif est inférieur à un nombre strictement positif (et à $0$) ;\n– entre deux positifs, le plus grand a la plus grande distance à zéro ;\n– entre deux **négatifs**, le plus grand a la **plus petite** distance à zéro : $-2{,}3 > -4{,}1$." },
-      { title: "Somme de deux nombres de même signe", statement: "On garde le signe commun et on **additionne** les distances à zéro : $(-6) + (-9) = -15$ ; $4{,}2 + 1{,}3 = 5{,}5$." },
-      { title: "Somme de deux nombres de signes contraires", statement: "On **soustrait** les distances à zéro (la plus grande moins la plus petite) et on prend le signe du nombre qui a la plus grande distance à zéro : $6 + (-9) = -3$ ; $(-2{,}5) + 7 = 4{,}5$.", conditions: "Cas particulier : la somme de deux nombres opposés est $0$." },
+      { title: "Opposé de l'opposé", statement: "Pour tout nombre $a$ : $-(-a) = a$. Deux nombres opposés ont la même valeur absolue et des signes contraires ; sur une droite graduée, ils sont symétriques par rapport à l'origine.", conditions: "Attention : $-a$ n'est pas toujours négatif. Si $a = -4$, alors $-a = 4$." },
+      { title: "Comparer deux relatifs", statement: "Sur une droite graduée orientée vers la droite, le plus petit de deux nombres est le plus à gauche. Donc :\n– un nombre strictement négatif est inférieur à un nombre strictement positif (et à $0$) ;\n– entre deux positifs, le plus grand a la plus grande valeur absolue ;\n– entre deux **négatifs**, le plus grand a la **plus petite** valeur absolue (il est plus proche de $0$) : $-2{,}3 > -4{,}1$." },
+      { title: "Somme de deux nombres de même signe", statement: "On garde le signe commun et on **additionne** les valeurs absolues : $(-6) + (-9) = -15$ ; $4{,}2 + 1{,}3 = 5{,}5$." },
+      { title: "Somme de deux nombres de signes contraires", statement: "On **soustrait** les valeurs absolues (la plus grande moins la plus petite) et on prend le signe du nombre qui a la plus grande valeur absolue : $6 + (-9) = -3$ ; $(-2{,}5) + 7 = 4{,}5$.", conditions: "Cas particulier : la somme de deux nombres opposés est $0$." },
       { title: "Soustraction", statement: "Soustraire un nombre revient à **ajouter son opposé** : $a - b = a + (-b)$.\nExemples : $3{,}1 - (-2) = 3{,}1 + 2 = 5{,}1$ ; $4 - 7 = 4 + (-7) = -3$.", conditions: "Seul le nombre soustrait est remplacé par son opposé ; le premier nombre ne change pas." },
       { title: "Sommes de plusieurs nombres", statement: "Dans une suite d'**additions**, on peut changer l'ordre des termes et les regrouper (positifs ensemble, négatifs ensemble, opposés ensemble).", conditions: "On transforme d'abord toutes les soustractions en additions : on ne peut pas changer l'ordre dans une soustraction ($5 - 3 \\neq 3 - 5$)." },
       { title: "Écriture simplifiée et parenthèses", statement: "Quand une expression ne contient plus que des additions, on peut supprimer les signes « + » d'addition et les parenthèses : $(-3) + (-4) + (+2)$ s'écrit $-3 - 4 + 2$.\nUn nombre négatif écrit juste après un signe d'opération doit être entre parenthèses : on écrit $3 + (-2)$, jamais « $3 + -2$ »." },
     ],
     explanations: [
       { title: "1. Prolonger la demi-droite graduée", body: "En 6e, la demi-droite graduée partait de $0$. On la prolonge vers la gauche **par symétrie** : à gauche de $0$ on place $-1$, $-2$, $-3$… exactement en face de $1$, $2$, $3$. Le point d'abscisse $-3$ est à $3$ unités à gauche de l'origine." },
-      { title: "2. Comparer avec la droite graduée", body: "Plus un point est à droite, plus son abscisse est grande. $-7$ est à gauche de $-3$, donc $-7 < -3$. Penser à un thermomètre : $-7$ °C est plus froid que $-3$ °C." },
-      { title: "3. Additionner : des déplacements", body: "Un nombre relatif peut aussi représenter un **déplacement** : $+5$ signifie avancer de 5 vers la droite, $-5$ signifie reculer de 5 vers la gauche. Calculer $-8 + 5$, c'est partir de $-8$ et avancer de $5$ : on arrive en $-3$.\nAutre image : des jetons $+1$ et $-1$. Une paire ($+1$, $-1$) vaut $0$. Dans $6 + (-9)$, six paires s'annulent et il reste $3$ jetons $-1$ : le résultat est $-3$." },
+      { title: "2. Comparer avec la droite graduée", body: "Plus un point est à droite, plus son abscisse est grande. $-7$ est à gauche de $-3$, donc $-7 < -3$. Penser à un thermomètre : $-7$ °C est plus froid que $-3$ °C. On peut aussi dire : « $-7$, c'est $4$ de moins que $-3$ »." },
+      { title: "3. Additionner : des déplacements", body: "Un nombre relatif peut aussi représenter un **déplacement** : $+5$ signifie avancer de 5 vers la droite, $-5$ signifie reculer de 5 vers la gauche. Calculer $-8 + 5$, c'est partir de $-8$ et avancer de $5$ : on arrive en $-3$.\nAutre image : des jetons $+1$ et $-1$. Une paire ($+1$, $-1$) vaut $0$. Dans $6 + (-9)$, six paires s'annulent et il reste $3$ jetons $-1$ : le résultat est $-3$.\nPour deux négatifs : $(-6) + (-9) + 6 + 9 = 0$ (on regroupe les opposés), donc $(-6) + (-9)$ est l'opposé de $6 + 9 = 15$, c'est-à-dire $-15$." },
       { title: "4. Pourquoi « soustraire, c'est ajouter l'opposé » ?", body: "$5 - (-3)$ est le nombre qu'il faut ajouter à $-3$ pour obtenir $5$. On ajoute d'abord $3$ (pour revenir à $0$), puis $5$ : en tout $3 + 5 = 8$. Donc $5 - (-3) = 5 + 3 = 8$.\nSur la droite graduée, $a - b$ est le déplacement qui mène du point $b$ au point $a$ : de $-3$ à $5$, on avance de $8$." },
       { title: "5. États et variations", body: "Dans un problème, distingue un **état** (une température, une altitude) d'une **variation** (une hausse, une baisse). On a : état final = état initial + variation, et variation = état final − état initial." },
     ],
@@ -629,7 +640,7 @@ export const math5eNombresRelatifs: ChapterContent = {
       { title: "Résoudre un problème avec des relatifs", steps: ["Repérer l'état initial, les variations, l'état cherché.", "Écrire le calcul : état final = état initial + variations, ou variation = final − initial.", "Calculer, puis vérifier le sens du résultat (hausse ou baisse ?)."] },
     ],
     summary: [
-      "Un nombre relatif = un signe + une distance à zéro (sa valeur absolue).",
+      "Un nombre relatif s'écrit avec un signe et une partie numérique ; sa valeur absolue est sa distance à zéro sur la droite graduée.",
       "$0$ est positif et négatif, mais ni strictement positif ni strictement négatif.",
       "Deux nombres opposés ont une somme nulle ; $-(-a) = a$ ; $-a$ n'est pas toujours négatif.",
       "Entre deux négatifs, le plus grand est le plus proche de $0$.",
@@ -639,7 +650,7 @@ export const math5eNombresRelatifs: ChapterContent = {
     ],
     revisionSheet: {
       keyPoints: ["Positif : $\\geqslant 0$ ; strictement positif : $> 0$. Négatif : $\\leqslant 0$ ; strictement négatif : $< 0$.", "Opposé de $a$ : $-a$, avec $a + (-a) = 0$.", "Comparaison : le plus à gauche sur la droite graduée est le plus petit.", "$(-6) + (-9) = -15$ ; $6 + (-9) = -3$.", "$a - b = a + (-b)$ : $3 - (-2) = 5$.", "Variation = état final − état initial."],
-      skills: ["Lire et placer un nombre relatif sur une droite graduée.", "Lire et placer un point dans un repère du plan.", "Comparer et ranger des décimaux relatifs.", "Additionner et soustraire des décimaux relatifs.", "Simplifier une écriture et calculer une suite d'additions et de soustractions.", "Résoudre un problème de températures, d'altitudes ou de soldes."],
+      skills: ["Lire et placer un nombre relatif sur une droite graduée.", "Lire et placer un point dans un repère du plan.", "Comparer et ranger des décimaux relatifs.", "Additionner et soustraire des décimaux relatifs.", "Simplifier une écriture et calculer une suite d'additions et de soustractions.", "Résoudre un problème de températures, d'altitudes ou de soldes.", "Compléter une addition à trou par une soustraction : $(-3) + \\ldots = 5$ donne $5 - (-3) = 8$."],
     },
     miniQuiz: [
       { question: "Quel est le plus grand nombre ?", options: ["$-8$", "$-3$", "$-5{,}5$", "$-10$"], answer: 1, explanation: "Entre négatifs, le plus grand est le plus proche de $0$ : $-3$." },
@@ -656,7 +667,7 @@ export const math5eNombresRelatifs: ChapterContent = {
       id: "rel5-jeu-droite", template: "droite-graduee", title: "Explorateur de la droite graduée",
       objective: "Placer et lire des nombres relatifs sur une droite graduée, avec des graduations de 1, de 0,5 puis de 0,2.",
       instructions: "Place le point demandé (clic, appui tactile ou flèches ← → puis Entrée) ou lis l'abscisse du point affiché. Trois réussites d'affilée font passer au niveau suivant.",
-      objectives: ["M5-REL-06", "M5-REL-08"],
+      objectives: ["M5-REL-06"],
       config: { rounds: 10, levels: [{ min: -5, max: 5, step: 1 }, { min: -10, max: 10, step: 1 }, { min: -3, max: 3, step: 0.5 }, { min: -2, max: 2, step: 0.2 }] },
     },
     {
@@ -675,7 +686,7 @@ export const math5eNombresRelatifs: ChapterContent = {
         { niveau: 1, calc: "$(-3) + (-4) = -7$", correct: true, explanation: "Même signe : $3 + 4 = 7$, signe $-$." },
         { niveau: 1, calc: "$(-3) + (-4) = 7$", correct: false, errors: ["Une somme de deux négatifs est négative", "Il fallait calculer $4 - 3$", "Le calcul est impossible"], error: 0, explanation: "$(-3) + (-4) = -7$ : deux baisses font encore baisser." },
         { niveau: 1, calc: "$-7 > -3$", correct: false, errors: ["Entre deux négatifs, le plus grand est le plus proche de 0", "Il faut comparer 7 et 3 sans les signes", "Un négatif est toujours plus grand qu'un positif"], error: 0, explanation: "$-7 < -3$ : $-3$ est plus proche de $0$." },
-        { niveau: 2, calc: "$(-8) + 5 = -13$", correct: false, errors: ["Signes contraires : il fallait soustraire les distances à zéro ($8 - 5$)", "Le signe devrait être +", "Il fallait multiplier"], error: 0, explanation: "$(-8) + 5 = -3$." },
+        { niveau: 2, calc: "$(-8) + 5 = -13$", correct: false, errors: ["Signes contraires : il fallait soustraire les distances à zéro ($8 - 5$)", "Le signe devrait être +", "On peut changer l'ordre dans une soustraction"], error: 0, explanation: "$(-8) + 5 = -3$." },
         { niveau: 2, calc: "$3 + (-8) = 5$", correct: false, errors: ["Le résultat prend le signe du nombre le plus éloigné de zéro", "Il fallait additionner 3 et 8", "Il fallait écrire $3 - 8 = 5$"], error: 0, explanation: "$3 + (-8) = -5$ : $-8$ est le plus éloigné de $0$." },
         { niveau: 2, calc: "$6 + (-6) = 0$", correct: true, explanation: "Deux nombres opposés ont une somme nulle." },
         { niveau: 3, calc: "$5 - (-3) = 2$", correct: false, errors: ["Soustraire $-3$, c'est ajouter $3$", "Il fallait changer le signe de 5", "Le résultat doit être négatif"], error: 0, explanation: "$5 - (-3) = 5 + 3 = 8$." },
