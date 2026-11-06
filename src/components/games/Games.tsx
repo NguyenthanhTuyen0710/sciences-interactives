@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MathInline, frTypo } from "../MathText";
 import type { ChapterGame } from "@/lib/chapters/schema";
-import { adapt, calcFeedback, calcQuestion, frRel, gameRng, lineFeedback, lineRound, parseRel, type Adapt, type CalcLevel, type CalcQuestion, type LineLevel, type LineRound } from "@/lib/games/logic";
+import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, frRel, gameRng, lineFeedback, lineRound, parseRel, type Adapt, type CalcLevel, type FlashLevel, type LineLevel, type LineRound } from "@/lib/games/logic";
 import { randomSeed } from "@/lib/engine/rng";
 import type { Rng } from "@/lib/engine/types";
 
@@ -186,10 +186,12 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
   );
 }
 
-// ───────── Calcul mental (chronométré ou entraînement) ─────────
-interface LogLine { tex: string; given: string; ok: boolean; answer: number }
-function CalculMental({ game }: { game: ChapterGame }) {
-  const levels = game.config.levels as CalcLevel[];
+// ───────── Questions chronométrées ou entraînement (calcul mental, calcul flash) ─────────
+/** Question d'une partie : énoncé riche, correction (null = saisie illisible ; message complet si juste), rappel « question = réponse ». */
+interface TimedQ { prompt: string; check: (raw: string) => Fb | null; recap: string; invalid: string }
+interface LogLine { recap: string; given: string; ok: boolean }
+
+function TimedQuiz({ game, nLevels, draw }: { game: ChapterGame; nLevels: number; draw: (rng: Rng, level: number) => TimedQ }) {
   const duration = (game.config.duration as number) ?? 90;
   const practiceCount = (game.config.practiceCount as number) ?? 20;
   const rng = useRef<Rng>(gameRng(randomSeed()));
@@ -197,7 +199,7 @@ function CalculMental({ game }: { game: ChapterGame }) {
   const [phase, setPhase] = useState<"accueil" | "jeu" | "fin">("accueil");
   const [left, setLeft] = useState(duration);
   const [ad, setAd] = useState<Adapt>({ level: 1, streak: 0, misses: 0 });
-  const [q, setQ] = useState<CalcQuestion | null>(null);
+  const [q, setQ] = useState<TimedQ | null>(null);
   const [typed, setTyped] = useState("");
   const [score, setScore] = useState(0);
   const [asked, setAsked] = useState(0);
@@ -227,7 +229,7 @@ function CalculMental({ game }: { game: ChapterGame }) {
   const start = (m: "chrono" | "entrainement") => {
     rng.current = gameRng(randomSeed());
     counts.current = { score: 0, asked: 0 };
-    setMode(m); setQ(calcQuestion(rng.current, levels[0])); setAd({ level: 1, streak: 0, misses: 0 });
+    setMode(m); setQ(draw(rng.current, 1)); setAd({ level: 1, streak: 0, misses: 0 });
     setScore(0); setAsked(0); setLog([]); setFb(null); setTyped(""); setLeft(duration);
     endAt.current = Date.now() + duration * 1000;
     setPhase("jeu");
@@ -235,30 +237,28 @@ function CalculMental({ game }: { game: ChapterGame }) {
   };
   const submit = () => {
     if (!q) return;
-    const v = parseRel(typed);
-    if (v === null) { setFb({ ok: false, message: "Écris un nombre relatif, par exemple −7 ou 3." }); return; }
-    const r = calcFeedback(q, v);
-    const result = `$${q.tex} = ${frRel(q.answer).replace(",", "{,}")}$`;
-    setFb({ ok: r.ok, message: r.ok ? `${result}` : `Calcul précédent : ${result} (ta réponse : ${typed}). ${r.message}` });
+    const r = q.check(typed);
+    if (r === null) { setFb({ ok: false, message: q.invalid }); return; }
+    setFb({ ok: r.ok, message: r.ok ? r.message : `Question précédente : ${q.recap} (ta réponse : ${typed}). ${r.message}` });
     counts.current = { score: counts.current.score + (r.ok ? 1 : 0), asked: counts.current.asked + 1 };
     setAsked(counts.current.asked); setScore(counts.current.score);
-    setLog((l) => [...l, { tex: q.tex, given: typed, ok: r.ok, answer: q.answer }]);
-    const na = adapt(ad, r.ok, levels.length);
+    setLog((l) => [...l, { recap: q.recap, given: typed, ok: r.ok }]);
+    const na = adapt(ad, r.ok, nLevels);
     setAd(na);
     setTyped("");
     if (mode === "entrainement" && counts.current.asked >= practiceCount) { finish(); return; }
-    setQ(calcQuestion(rng.current, levels[na.level - 1]));
+    setQ(draw(rng.current, na.level));
     input.current?.focus();
   };
   const restart = () => { setPhase("accueil"); setFb(null); };
 
   return (
-    <Shell game={game} score={`Score : ${score}/${asked}`} level={phase === "accueil" ? undefined : ad.level} maxLevel={levels.length} best={best !== null ? `${best} (chrono)` : undefined} onRestart={restart}>
+    <Shell game={game} score={`Score : ${score}/${asked}`} level={phase === "accueil" ? undefined : ad.level} maxLevel={nLevels} best={best !== null ? `${best} (chrono)` : undefined} onRestart={restart}>
       {phase === "accueil" && (
         <div className="space-y-3 text-center">
           <p className="text-slate-600">Le niveau s'adapte à tes réussites. Commence par l'entraînement si les règles ne sont pas encore sûres.</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <button type="button" className="btn-ghost" onClick={() => start("entrainement")}>Entraînement sans chrono ({practiceCount} calculs)</button>
+            <button type="button" className="btn-ghost" onClick={() => start("entrainement")}>Entraînement sans chrono ({practiceCount} questions)</button>
             <button type="button" className="btn-primary" onClick={() => start("chrono")}>Défi chronométré ({duration} s)</button>
           </div>
         </div>
@@ -268,12 +268,12 @@ function CalculMental({ game }: { game: ChapterGame }) {
           <div className="flex items-center justify-between text-sm">
             {mode === "chrono"
               ? <span className={`rounded-lg px-2.5 py-1 font-mono font-bold ${left <= 10 ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-800"}`}>⏱ {left} s</span>
-              : <span className="text-slate-500">Calcul {asked + 1}/{practiceCount}</span>}
+              : <span className="text-slate-500">Question {asked + 1}/{practiceCount}</span>}
             <span className="sr-only" role="status">{mode === "chrono" && left === 10 ? "Plus que 10 secondes" : ""}</span>
           </div>
           <form className="flex flex-wrap items-center gap-3" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-            <span className="text-2xl"><MathInline text={`$${q.tex} =$`} /></span>
-            <input ref={input} className="input w-32 text-lg" inputMode="text" autoComplete="off" value={typed} onChange={(e) => setTyped(e.target.value)} aria-label="Ton résultat" />
+            <span className="text-xl"><MathInline text={q.prompt} /></span>
+            <input ref={input} className="input w-32 text-lg" inputMode="text" autoComplete="off" value={typed} onChange={(e) => setTyped(e.target.value)} aria-label="Ta réponse" />
             <button className="btn-primary" type="submit">OK</button>
           </form>
           <Feedback fb={fb} />
@@ -282,17 +282,47 @@ function CalculMental({ game }: { game: ChapterGame }) {
       {phase === "fin" && (
         <div className="space-y-3" ref={(el) => { el?.querySelector("button")?.focus(); }}>
           {asked === 0 ? (
-            <div className="space-y-3 text-center"><p className="font-semibold">Temps écoulé : aucune réponse.</p><button type="button" className="btn-primary" onClick={restart}>Rejouer</button></div>
+            <div className="space-y-3 text-center"><p className="font-semibold">Temps écoulé : aucune réponse.</p><button type="button" className="btn-primary" onClick={restart}>Rejouer</button></div>
           ) : <Finished score={score} total={asked} onRestart={restart} />}
           {log.some((l) => !l.ok) && (
-            <div className="rounded-xl bg-slate-50 p-3 text-sm"><p className="mb-1 font-semibold">À revoir :</p>
-              <ul className="space-y-1">{log.filter((l) => !l.ok).map((l, i) => <li key={i}><MathInline text={`$${l.tex} = ${frRel(l.answer).replace(",", "{,}")}$`} /> <span className="text-slate-500">(ta réponse : {l.given})</span></li>)}</ul>
+            <div className="rounded-xl bg-slate-50 p-3 text-sm"><p className="mb-1 font-semibold">À revoir :</p>
+              <ul className="space-y-1">{log.filter((l) => !l.ok).map((l, i) => <li key={i}><MathInline text={l.recap} /> <span className="text-slate-500">(ta réponse : {l.given})</span></li>)}</ul>
             </div>
           )}
         </div>
       )}
     </Shell>
   );
+}
+
+function CalculMental({ game }: { game: ChapterGame }) {
+  const levels = game.config.levels as CalcLevel[];
+  const draw = useCallback((rng: Rng, level: number): TimedQ => {
+    const q = calcQuestion(rng, levels[level - 1]);
+    const recap = `$${q.tex} = ${frRel(q.answer).replace(",", "{,}")}$`;
+    return {
+      prompt: `$${q.tex} =$`, recap, invalid: "Écris un nombre relatif, par exemple −7 ou 3.",
+      check: (raw) => { const v = parseRel(raw); if (v === null) return null; const r = calcFeedback(q, v); return r.ok ? { ok: true, message: recap } : r; },
+    };
+  }, [levels]);
+  return <TimedQuiz game={game} nLevels={levels.length} draw={draw} />;
+}
+
+function CalculFlash({ game }: { game: ChapterGame }) {
+  const levels = game.config.levels as FlashLevel[];
+  const last = useRef(-1);
+  const draw = useCallback((rng: Rng, level: number): TimedQ => {
+    const items = levels[level - 1].items;
+    const i = flashPick(rng, items.length, last.current);
+    last.current = i;
+    const it = items[i];
+    const recap = `${it.q} : $${flashAnswerTex(it.answer)}$`;
+    return {
+      prompt: it.q, recap, invalid: "Écris un nombre : entier, décimal (2,5), fraction (3/4) ou puissance de 10 (2,5×10^3).",
+      check: (raw) => { const r = flashFeedback(it, raw); return r?.ok ? { ok: true, message: `${recap}. ${r.message}` } : r; },
+    };
+  }, [levels]);
+  return <TimedQuiz game={game} nLevels={levels.length} draw={draw} />;
 }
 
 // ───────── Chasse aux erreurs ─────────
@@ -422,6 +452,7 @@ export default function ChapterGameView({ game }: { game: ChapterGame }) {
   switch (game.template) {
     case "droite-graduee": return <DroiteGraduee game={game} />;
     case "calcul-mental": return <CalculMental game={game} />;
+    case "calcul-flash": return <CalculFlash game={game} />;
     case "chasse-erreurs": return <ChasseErreurs game={game} />;
     case "memory": return <Memory game={game} />;
     default: return <p className="text-sm text-slate-500">Activité indisponible.</p>;

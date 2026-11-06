@@ -1,6 +1,7 @@
 // Logique pure (testable) des modèles de jeux : génération des manches, correction, diagnostic, adaptation.
 import { createRng } from "../engine/rng";
 import type { Rng } from "../engine/types";
+import { gcd, nearlyEqual, parseNumber } from "../engine/numbers";
 
 /** Écriture française d'un relatif : −3 ; 2,5 ; +4 si `plus`. */
 export function frRel(x: number, plus = false): string {
@@ -86,6 +87,41 @@ export function calcFeedback(q: CalcQuestion, given: number): { ok: boolean; mes
   if (Math.sign(a) !== Math.sign(bb) && eq(Math.abs(given), Math.abs(a) + Math.abs(bb)))
     return { ok: false, message: `Les deux nombres ont des signes contraires : on soustrait les distances à zéro (${frRel(Math.max(Math.abs(a), Math.abs(bb)))} − ${frRel(Math.min(Math.abs(a), Math.abs(bb)))}) au lieu de les additionner.${rule} Résultat : ${frRel(answer)}.` };
   return { ok: false, message: `Le résultat était ${frRel(answer)}.${rule}` };
+}
+
+// ───────── Calcul flash (banque de questions à réponse numérique, tous chapitres) ─────────
+export interface FlashItem { q: string; answer: string; irreducible?: boolean; explanation: string }
+export interface FlashLevel { label: string; items: FlashItem[] }
+
+/** Tire l'indice d'une question du niveau, différente de la précédente si possible. */
+export function flashPick(rng: Rng, n: number, last = -1): number {
+  if (n <= 1) return 0;
+  let i = last;
+  while (i === last) i = rng.int(0, n - 1);
+  return i;
+}
+
+/** Écriture LaTeX d'une réponse de la banque : « 17/12 » → \dfrac{17}{12}, « 3e-4 » → 3 \times 10^{-4}, « -2,5 » → -2{,}5. */
+export function flashAnswerTex(answer: string): string {
+  const s = answer.trim().replace(/[−–]/g, "-").replace(/\./g, ",");
+  const f = s.match(/^(-?)(\d+)\/(\d+)$/);
+  if (f) return `${f[1]}\\dfrac{${f[2]}}{${f[3]}}`;
+  const e = s.match(/^(-?[\d,]+)e([+-]?\d+)$/i);
+  if (e) return `${e[1].replace(",", "{,}")} \\times 10^{${Number(e[2])}}`;
+  return s.replace(",", "{,}");
+}
+
+/** Correction d'une réponse saisie ; `null` si la saisie n'est pas un nombre. */
+export function flashFeedback(item: FlashItem, raw: string): { ok: boolean; message: string } | null {
+  const p = parseNumber(raw);
+  if (!p) return null;
+  const exp = parseNumber(item.answer);
+  if (!exp) throw new Error(`Réponse de banque illisible : ${item.answer}`);
+  const shown = `$${flashAnswerTex(item.answer)}$`;
+  if (!nearlyEqual(p.value, exp.value)) return { ok: false, message: `Réponse attendue : ${shown}. ${item.explanation}` };
+  if (item.irreducible && p.isFraction && Number.isInteger(p.num) && Number.isInteger(p.den) && gcd(p.num!, p.den!) > 1)
+    return { ok: false, message: `Valeur juste, mais la fraction n'est pas irréductible : ${shown}. ${item.explanation}` };
+  return { ok: true, message: item.explanation };
 }
 
 /** Graine stable pour une partie (permet de rejouer à l'identique dans les tests). */

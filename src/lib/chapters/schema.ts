@@ -78,7 +78,7 @@ const ExerciseSchema = z
   .passthrough()
   .refine((e) => e.vary || (e.statement && e.parts?.length && e.solution?.length), "exercice sans énoncé/parties/solution ni générateur `vary`");
 
-export const GAME_TEMPLATES = ["droite-graduee", "calcul-mental", "chasse-erreurs", "memory"] as const;
+export const GAME_TEMPLATES = ["droite-graduee", "calcul-mental", "calcul-flash", "chasse-erreurs", "memory"] as const;
 
 export const GameSchema = z.object({
   id: id,

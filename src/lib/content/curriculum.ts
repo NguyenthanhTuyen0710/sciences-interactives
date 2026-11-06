@@ -160,9 +160,10 @@ export const CURRICULUM: Record<Subject, Level[]> = {
           proprietes: ["$b = f(0)$.", "$a = \\dfrac{f(x_2) - f(x_1)}{x_2 - x_1}$ : quand $x$ augmente de 1, $f(x)$ augmente de $a$.", "Si $b = 0$, la fonction est linéaire (droite passant par l'origine)."],
         }),
       ]),
+      ch("m3-arithmetique", "Arithmétique : nombres premiers, diviseurs et multiples", NC),
+      ch("m3-puissances", "Fractions, puissances et racines carrées", NC),
+      ch("m3-pourcentages", "Ratios, pourcentages et évolutions", GD),
       ch("m3-equations", "Équations et inéquations", NC),
-      ch("m3-puissances", "Puissances et notation scientifique", NC),
-      ch("m3-racines", "Racines carrées", NC),
       ch("m3-thales", "Théorème de Thalès", EG),
       ch("m3-pythagore", "Théorème de Pythagore et réciproque", EG, [
         n("m3-pythagore-reciproque", "Démontrer qu'un triangle est rectangle", {
