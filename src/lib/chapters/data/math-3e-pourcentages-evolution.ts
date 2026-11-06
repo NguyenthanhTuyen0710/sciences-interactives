@@ -17,18 +17,18 @@ const S = (x: number) => (x > 0 ? `+${P(x)}` : P(x));
 const r2 = (x: number) => roundTo(x, 2);
 const r4 = (x: number) => roundTo(x, 4);
 
-const num = (value: number, mistakes: Mistake[] = [], prompt?: string, decimals?: number): ChapterPart => ({
+const num = (value: number, mistakes: Mistake[] = [], prompt?: string, decimals?: number, suffix?: string): ChapterPart => ({
   prompt,
-  interaction: { kind: "numerique", answer: { value, ...(decimals !== undefined ? { decimals } : {}) } },
+  interaction: { kind: "numerique", ...(suffix ? { suffix } : {}), answer: { value, ...(decimals !== undefined ? { decimals } : {}) } },
   mistakes: mistakes.filter((m) => Number(m.match.replace(",", ".")) !== value),
 });
 /** Réponse arrondie : `dec` décimales, tolérance d'une demi-unité du dernier rang. */
-const numR = (exact: number, dec: number, label: string, mistakes: Mistake[] = [], prompt?: string): ChapterPart => {
+const numR = (exact: number, dec: number, label: string, mistakes: Mistake[] = [], prompt?: string, suffix?: string): ChapterPart => {
   const value = roundTo(exact, dec);
   const tol = 0.5 * 10 ** -dec + 1e-9;
   return {
     prompt,
-    interaction: { kind: "numerique", answer: { value, tol, decimals: dec, roundingLabel: label } },
+    interaction: { kind: "numerique", ...(suffix ? { suffix } : {}), answer: { value, tol, decimals: dec, roundingLabel: label } },
     mistakes: mistakes.filter((m) => Math.abs(Number(m.match) - value) > tol),
   };
 };
@@ -39,21 +39,28 @@ function shuffledQcm(rng: Rng, options: string[], answer: number, diag: Record<n
   return qcm(order.map((i) => options[i]), order.indexOf(answer), Object.entries(diag).map(([i, feedback]) => ({ match: String(order.indexOf(Number(i))), feedback })), prompt);
 }
 const m = (v: number, feedback: string): Mistake => ({ match: String(v), feedback });
+/** « = x » si la valeur est exacte à `dec` décimales, sinon « ≈ x » (LaTeX). */
+const approx = (x: number, dec: number, fmt: (v: number) => string = T) => (roundTo(x, 6) === roundTo(x, dec) ? "=" : "\\approx") + " " + fmt(roundTo(x, dec));
 
 const ADD_ERR = "Les pourcentages successifs **ne s'additionnent pas** : chaque évolution s'applique à la valeur obtenue juste avant, donc on **multiplie** les coefficients.";
 
 const O = {
-  "M4-OGDF-08": "(Consolidation 4e) Calculer une quatrième proportionnelle par la procédure de son choix ; appliquer et calculer un pourcentage.",
-  "M4-OGDF-10": "(Consolidation 4e) Partager une quantité selon un ratio donné (a : b) ; relier ratio, fraction et pourcentage.",
+  "M6-NC-24": "Connaître la définition d'un pourcentage et son sens.",
+  "M6-NC-25": "Calculer une proportion (partie/tout) et l'exprimer en pourcentage dans des cas simples.",
+  "M4-AUTO-03": "Procédures de calcul d'une quatrième proportionnelle et d'application d'un pourcentage ou d'une échelle.",
+  "M4-OGDF-08": "Calculer une quatrième proportionnelle par la procédure de son choix.",
+  "M4-OGDF-10": "Partager une quantité selon un ratio donné (a : b).",
   "M3-OGDF-13": "Relier un taux d'évolution et un coefficient multiplicateur (hausse de 5 % ↔ ×1,05).",
-  "M3-OGDF-13-B": "Utiliser le coefficient multiplicateur pour calculer une valeur finale ou retrouver une valeur initiale.",
-  "M3-OGDF-13-C": "Déterminer un taux d'évolution à partir d'une valeur initiale et d'une valeur finale.",
-  "M3-OGDF-13-D": "Enchaîner des évolutions successives en multipliant les coefficients multiplicateurs.",
+  "M3-OGDF-13#B": "(Déclinaison interne de M3-OGDF-13) Utiliser le coefficient multiplicateur pour calculer une valeur finale ou retrouver une valeur initiale.",
+  "M3-OGDF-13#C": "(Déclinaison interne de M3-OGDF-13) Déterminer un taux d'évolution à partir d'une valeur initiale et d'une valeur finale.",
+  "M3-OGDF-13#D": "(Déclinaison interne de M3-OGDF-13) Enchaîner des évolutions successives en multipliant les coefficients multiplicateurs.",
 } as const;
 type Obj = keyof typeof O;
 const SRC_3E = "Repères annuels de progression du cycle 4 (BO n° 22 du 29 mai 2019), 3e, « Proportionnalité » ; attendus de fin de 3e (2019) ; programme du cycle 4 (BO n° 31 du 30 juillet 2020), thème B";
-const SRC_DECL = `${SRC_3E} — déclinaison de M3-OGDF-13`;
-const SRC_4E_08 = "Repères annuels de progression du cycle 4 (BO n° 22 du 29 mai 2019), 4e, « Proportionnalité » ; attendus de fin de 4e (2019) — consolidation en 3e";
+const SRC_DECL = `${SRC_3E} — déclinaison interne de M3-OGDF-13 (identifiant absent de l'inventaire)`;
+const SRC_4E_08 = "Repères annuels de progression du cycle 4 (BO n° 22 du 29 mai 2019), 4e, « Proportionnalité » ; attendus de fin de 4e (2019) — objectif de 4e consolidé en 3e";
+const SRC_AUTO = "Programme du cycle 4 (BO n° 31 du 30 juillet 2020), thème B, automatismes — objectif de 4e consolidé en 3e";
+const SRC_6E = "Programme du cycle 3 (BO n° 16 du 17 avril 2025), sixième, « Les fractions – Pourcentages » — prérequis consolidé en 3e";
 const SRC_4E_10 = "Programme du cycle 4 (BO n° 31 du 30 juillet 2020), thème B, « Résoudre des problèmes de proportionnalité » (notion de ratio) — objectif de 4e consolidé en 3e";
 
 // ───────────────────────── Exercices ─────────────────────────
@@ -62,7 +69,7 @@ const ex = (e: Omit<ChapterExercise, "objectives"> & { objectives: Obj[] }): Cha
 const EXERCISES: ChapterExercise[] = [
   // ── Niveau 1 : Découverte ──
   ex({
-    id: "pct3-01", title: "Pourcentages et fractions", niveau: 1, objectives: ["M4-OGDF-08"], time: 60,
+    id: "pct3-01", title: "Pourcentages et fractions", niveau: 1, objectives: ["M6-NC-24"], time: 60,
     statement: "Associe chaque pourcentage à la fraction qui lui est égale.",
     parts: [{ interaction: { kind: "associer", left: ["$50\\,\\%$", "$25\\,\\%$", "$10\\,\\%$", "$75\\,\\%$", "$20\\,\\%$"], right: ["$\\dfrac{1}{4}$", "$\\dfrac{1}{5}$", "$\\dfrac{3}{4}$", "$\\dfrac{1}{2}$", "$\\dfrac{1}{10}$"], answer: [3, 0, 4, 2, 1] } }],
     solution: ["$t\\,\\%$ signifie « $t$ pour cent » : $t\\,\\% = \\dfrac{t}{100}$.", "$50\\,\\% = \\dfrac{50}{100} = \\dfrac{1}{2}$ ; $25\\,\\% = \\dfrac{25}{100} = \\dfrac{1}{4}$ ; $10\\,\\% = \\dfrac{1}{10}$.", "$75\\,\\% = \\dfrac{75}{100} = \\dfrac{3}{4}$ ; $20\\,\\% = \\dfrac{20}{100} = \\dfrac{1}{5}$."],
@@ -70,7 +77,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris chaque pourcentage sous la forme $\\dfrac{t}{100}$.", "Simplifie la fraction obtenue."],
   }),
   ex({
-    id: "pct3-02", title: "Appliquer un pourcentage", niveau: 1, objectives: ["M4-OGDF-08"], time: 60,
+    id: "pct3-02", title: "Appliquer un pourcentage", niveau: 1, objectives: ["M4-AUTO-03"], time: 60,
     vary: (rng) => {
       const p = rng.pick([10, 20, 25, 50, 75]);
       const n = rng.int(2, 30) * 20;
@@ -133,7 +140,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris d'abord le ratio avec les nombres de l'énoncé, dans l'ordre demandé.", "Cherche un diviseur commun aux deux nombres."],
   }),
   ex({
-    id: "pct3-06", title: "Vrai ou faux ?", niveau: 1, objectives: ["M3-OGDF-13", "M4-OGDF-08"], time: 120,
+    id: "pct3-06", title: "Vrai ou faux ?", niveau: 1, objectives: ["M3-OGDF-13", "M4-AUTO-03"], time: 120,
     statement: "Pour chaque affirmation, indique si elle est vraie ou fausse.",
     parts: [{ interaction: { kind: "vrai-faux", items: ["Augmenter un prix de $100\\,\\%$, c'est le doubler.", "Baisser un prix de $50\\,\\%$, c'est le diviser par $2$.", "Augmenter un prix de $20\\,\\%$, c'est le multiplier par $0{,}2$.", "$25\\,\\%$ de $80$ est égal à $80\\,\\%$ de $25$.", "Baisser un prix de $10\\,\\%$, c'est le multiplier par $0{,}1$."], answer: [true, true, false, true, false] } }],
     solution: ["Hausse de $100\\,\\%$ : coefficient $1 + 1 = 2$ : on double. **Vrai**.", "Baisse de $50\\,\\%$ : coefficient $0{,}5$, c'est diviser par $2$. **Vrai**.", "Hausse de $20\\,\\%$ : coefficient $1{,}2$ (et non $0{,}2$). **Faux**.", "$0{,}25 \\times 80 = 20$ et $0{,}8 \\times 25 = 20$. **Vrai** : la multiplication est commutative.", "Baisse de $10\\,\\%$ : coefficient $1 - 0{,}1 = 0{,}9$. **Faux**."],
@@ -143,14 +150,14 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 2 : Application directe ──
   ex({
-    id: "pct3-07", title: "Calculer une proportion en pourcentage", niveau: 2, objectives: ["M4-OGDF-08"], time: 75,
+    id: "pct3-07", title: "Calculer une proportion en pourcentage", niveau: 2, objectives: ["M6-NC-25"], time: 75,
     vary: (rng) => {
       const n = rng.pick([20, 25, 40, 50]);
       const k = rng.int(3, n - 3);
       const p = roundTo((k * 100) / n, 2);
       return {
         statement: `Dans une classe de $${n}$ élèves, $${k}$ pratiquent un sport en club. Quel pourcentage des élèves de la classe cela représente-t-il ?`,
-        parts: [num(p, [m(k, "$" + k + "$ est un effectif, pas un pourcentage : il faut le comparer à l'effectif total."), m(roundTo(((n - k) * 100) / n, 2), "Tu as calculé le pourcentage des élèves qui **ne** pratiquent **pas** de sport en club.")], "Pourcentage (en %) :")],
+        parts: [num(p, [m(k, "$" + k + "$ est un effectif, pas un pourcentage : il faut le comparer à l'effectif total."), m(roundTo(((n - k) * 100) / n, 2), "Tu as calculé le pourcentage des élèves qui **ne** pratiquent **pas** de sport en club.")], "Pourcentage (en %) :", undefined, "%")],
         solution: [`Proportion : $\\dfrac{${k}}{${n}}$.`, `$\\dfrac{${k}}{${n}} = ${T(k / n)} = \\dfrac{${T(p)}}{100}$.`, `Cela représente $${P(p)}$ des élèves.`],
       };
     },
@@ -174,15 +181,15 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Compare le coefficient à $1$ pour savoir si c'est une hausse ou une baisse.", "L'écart entre le coefficient et $1$, multiplié par $100$, donne le taux."],
   }),
   ex({
-    id: "pct3-09", title: "Prix après une hausse", niveau: 2, objectives: ["M3-OGDF-13-B"], time: 75,
+    id: "pct3-09", title: "Prix après une hausse", niveau: 2, objectives: ["M3-OGDF-13#B"], time: 75,
     vary: (rng) => {
-      const p0 = rng.int(15, 400);
+      const [obj, lo, hi] = rng.pick([["Un vélo", 150, 900], ["Un abonnement annuel", 20, 400], ["Une console", 200, 600], ["Un billet de train", 15, 150]] as const);
+      const p0 = rng.int(lo, hi);
       const t = rng.int(3, 30);
       const p1 = r2((p0 * (100 + t)) / 100);
-      const obj = rng.pick(["Un vélo", "Un abonnement annuel", "Une console", "Un billet de train"]);
       return {
         statement: `${obj} coûtait $${T(p0)}$ €. Son prix augmente de $${P(t)}$. Quel est son nouveau prix (en €) ?`,
-        parts: [num(p1, [m(p0 + t, `Tu as ajouté $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant** de la hausse ; il faut l'ajouter au prix initial."), m(r2((p0 * (100 - t)) / 100), "Tu as appliqué une **baisse**.")], undefined, 2)],
+        parts: [num(p1, [m(p0 + t, `Tu as ajouté $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant** de la hausse ; il faut l'ajouter au prix initial."), m(r2((p0 * (100 - t)) / 100), "Tu as appliqué une **baisse**.")], undefined, 2, "€")],
         solution: [`Coefficient multiplicateur : $1 + \\dfrac{${t}}{100} = ${T((100 + t) / 100)}$.`, `$${T(p0)} \\times ${T((100 + t) / 100)} = ${E(p1)}$.`, `Le nouveau prix est $${E(p1)}$ €.`],
       };
     },
@@ -190,14 +197,14 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quel est le coefficient multiplicateur d'une hausse de $t\\,\\%$ ?", "Multiplie l'ancien prix par ce coefficient."],
   }),
   ex({
-    id: "pct3-10", title: "Prix soldé", niveau: 2, objectives: ["M3-OGDF-13-B"], time: 75,
+    id: "pct3-10", title: "Prix soldé", niveau: 2, objectives: ["M3-OGDF-13#B"], time: 75,
     vary: (rng) => {
       const p0 = rng.int(12, 300);
       const t = rng.pick([10, 15, 20, 25, 30, 35, 40, 50, 60, 70]);
       const p1 = r2((p0 * (100 - t)) / 100);
       return {
         statement: `Pendant les soldes, une veste à $${T(p0)}$ € est affichée à $-${P(t)}$. Quel est son prix soldé (en €) ?`,
-        parts: [num(p1, [m(p0 - t, `Tu as retiré $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant de la réduction** ; il faut le retirer du prix initial."), m(r2((p0 * (100 + t)) / 100), "Tu as appliqué une **hausse** au lieu d'une baisse.")], undefined, 2)],
+        parts: [num(p1, [m(p0 - t, `Tu as retiré $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant de la réduction** ; il faut le retirer du prix initial."), m(r2((p0 * (100 + t)) / 100), "Tu as appliqué une **hausse** au lieu d'une baisse.")], undefined, 2, "€")],
         solution: [`Coefficient multiplicateur : $1 - \\dfrac{${t}}{100} = ${T((100 - t) / 100)}$.`, `$${T(p0)} \\times ${T((100 - t) / 100)} = ${E(p1)}$.`, `Le prix soldé est $${E(p1)}$ €.`],
       };
     },
@@ -249,7 +256,7 @@ const EXERCISES: ChapterExercise[] = [
       const fruit = rng.pick(["pommes", "tomates", "poires", "carottes"]);
       return {
         statement: `$${q1}$ kg de ${fruit} coûtent $${E(p1)}$ €. Le prix est proportionnel à la masse. Combien coûtent $${q2}$ kg de ${fruit} (en €) ?`,
-        parts: [num(p2, [m(r2(p1 * q2), "Tu as multiplié le prix de $" + q1 + "$ kg par $" + q2 + "$ : il faut d'abord trouver le prix d'**un** kilogramme."), m(r2(p1 + q2 - q1), "Le prix n'augmente pas d'un euro par kilogramme : utilise la proportionnalité.")], undefined, 2)],
+        parts: [num(p2, [m(r2(p1 * q2), "Tu as multiplié le prix de $" + q1 + "$ kg par $" + q2 + "$ : il faut d'abord trouver le prix d'**un** kilogramme."), m(r2(p1 + q2 - q1), "Le prix n'augmente pas d'un euro par kilogramme : utilise la proportionnalité.")], undefined, 2, "€")],
         solution: [`Prix d'un kilogramme : $${E(p1)} \\div ${q1} = ${E(u)}$ €.`, `Prix de $${q2}$ kg : $${q2} \\times ${E(u)} = ${E(p2)}$ €.`, `Autre méthode (produit en croix) : $\\dfrac{${E(p1)} \\times ${q2}}{${q1}} = ${E(p2)}$.`],
       };
     },
@@ -259,15 +266,15 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 3 : Entraînement ──
   ex({
-    id: "pct3-14", title: "Retrouver le prix avant une hausse", niveau: 3, objectives: ["M3-OGDF-13-B"], time: 90,
+    id: "pct3-14", title: "Retrouver le prix avant une hausse", niveau: 3, objectives: ["M3-OGDF-13#B"], time: 90,
     vary: (rng) => {
-      const p0 = rng.int(20, 500);
+      const p0 = rng.int(150, 1200);
       const t = rng.pick([4, 5, 8, 10, 12, 15, 20, 25]);
       const c = (100 + t) / 100;
       const p1 = r2(p0 * c);
       return {
         statement: `Après une hausse de $${P(t)}$, un téléviseur coûte $${E(p1)}$ €. Quel était son prix avant la hausse (en €) ?`,
-        parts: [num(p0, [m(r2((p1 * (100 - t)) / 100), `Retirer $${P(t)}$ du **nouveau** prix ne ramène pas à l'ancien : les $${P(t)}$ ont été calculés sur l'ancien prix. Il faut **diviser** par le coefficient.`), m(r2(p1 - t), "Ce sont des pourcentages, pas des euros.")], undefined, 2)],
+        parts: [num(p0, [m(r2((p1 * (100 - t)) / 100), `Retirer $${P(t)}$ du **nouveau** prix ne ramène pas à l'ancien : les $${P(t)}$ ont été calculés sur l'ancien prix. Il faut **diviser** par le coefficient.`), m(r2(p1 - t), "Ce sont des pourcentages, pas des euros.")], undefined, 2, "€")],
         solution: [`On a : ancien prix $\\times ${T(c)} = ${E(p1)}$.`, `Donc ancien prix $= ${E(p1)} \\div ${T(c)} = ${T(p0)}$.`, `Vérification : $${T(p0)} \\times ${T(c)} = ${E(p1)}$. L'ancien prix était $${T(p0)}$ €.`],
       };
     },
@@ -275,7 +282,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris l'égalité : ancien prix $\\times$ coefficient $=$ nouveau prix.", "Quelle opération permet de retrouver le facteur inconnu d'un produit ?"],
   }),
   ex({
-    id: "pct3-15", title: "Le prix avant la remise", niveau: 3, objectives: ["M3-OGDF-13-B", "M3-OGDF-13"], time: 90,
+    id: "pct3-15", title: "Le prix avant la remise", niveau: 3, objectives: ["M3-OGDF-13#B", "M3-OGDF-13"], time: 90,
     vary: (rng) => {
       const p0 = rng.int(10, 250);
       const t = rng.pick([10, 15, 20, 25, 30, 35, 40, 60]);
@@ -283,7 +290,7 @@ const EXERCISES: ChapterExercise[] = [
       const p1 = r2(p0 * c);
       return {
         statement: `Grâce à une remise de $${P(t)}$, Inès paie un casque $${E(p1)}$ €. Retrouve le prix du casque avant la remise.`,
-        parts: [{ interaction: { kind: "etapes", steps: [{ prompt: "Coefficient multiplicateur de la remise", answer: { value: c } }, { prompt: "Prix avant la remise (en €)", answer: { value: p0 } }] } }],
+        parts: [{ interaction: { kind: "etapes", steps: [{ prompt: "Coefficient multiplicateur de la remise", answer: { value: c } }, { prompt: "Prix avant la remise (en €)", answer: { value: p0 }, suffix: "€" }] } }],
         solution: [`Remise de $${P(t)}$ : coefficient $1 - ${T(t / 100)} = ${T(c)}$.`, `Prix initial $\\times ${T(c)} = ${E(p1)}$, donc prix initial $= ${E(p1)} \\div ${T(c)} = ${T(p0)}$ €.`, `Attention : $${E(p1)} \\times ${T((100 + t) / 100)} = ${E(r2(p1 * (100 + t) / 100))}$ ne redonne pas le bon prix.`],
       };
     },
@@ -291,7 +298,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quel pourcentage du prix initial Inès a-t-elle payé ?", "Prix initial $=$ prix payé $\\div$ coefficient."],
   }),
   ex({
-    id: "pct3-16", title: "Calculer un taux d'évolution", niveau: 3, objectives: ["M3-OGDF-13-C"], time: 90,
+    id: "pct3-16", title: "Calculer un taux d'évolution", niveau: 3, objectives: ["M3-OGDF-13#C"], time: 90,
     vary: (rng) => {
       const v1 = rng.int(3, 90) * 100;
       let t = 0;
@@ -307,24 +314,26 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule d'abord la variation : valeur finale $-$ valeur initiale.", "Divise cette variation par la valeur **initiale**, puis multiplie par $100$."],
   }),
   ex({
-    id: "pct3-17", title: "Évolution d'une population", niveau: 3, objectives: ["M3-OGDF-13-C"], time: 120,
+    id: "pct3-17", title: "Évolution d'une population", niveau: 3, objectives: ["M3-OGDF-13#C"], time: 120,
     vary: (rng) => {
       const v1 = rng.int(1200, 25000);
       let v2 = v1;
-      while (Math.abs(v2 - v1) / v1 < 0.01) v2 = Math.round(v1 * rng.int(80, 130) / 100 + rng.int(-40, 40));
+      const halfway = (x: number) => Math.abs(Math.abs(x * 10) % 1 - 0.5) < 1e-6;
+      while (Math.abs(v2 - v1) / v1 < 0.01 || halfway(((v2 - v1) / v1) * 100)) v2 = Math.round(v1 * rng.int(80, 130) / 100 + rng.int(-40, 40));
       const t = ((v2 - v1) / v1) * 100;
+      const t1 = frFixed(roundTo(t, 1), 1).replace("−", "-").replace(",", "{,}");
       const town = rng.pick(["Saint-Aubin", "Montverde", "Lacroix", "Beaulieu"]);
       return {
         statement: `La population de ${town} est passée de $${T(v1)}$ habitants en 2015 à $${T(v2)}$ habitants en 2025. Calcule le taux d'évolution de la population, en %, arrondi au dixième (négatif s'il s'agit d'une baisse).`,
-        parts: [numR(t, 1, "au dixième", [m(roundTo(((v2 - v1) / v2) * 100, 1), "Tu as divisé par la population de 2025 : on divise par la valeur **initiale** (2015)."), m(roundTo((v2 / v1) * 100, 1), "Ce nombre est le pourcentage que représente la population de 2025 par rapport à celle de 2015 ; retire $100$ pour obtenir le taux d'évolution."), m(v2 - v1, "C'est la variation en nombre d'habitants, pas en pourcentage.")], "Taux d'évolution (en %) :")],
-        solution: [`Variation : $${T(v2)} - ${T(v1)} = ${T(v2 - v1)}$ habitants.`, `Taux : $\\dfrac{${T(v2 - v1)}}{${T(v1)}} \\times 100 \\approx ${T(roundTo(t, 3))}$.`, `Arrondi au dixième : $${S(roundTo(t, 1))}$.`],
+        parts: [numR(t, 1, "au dixième", [m(roundTo(((v2 - v1) / v2) * 100, 1), "Tu as divisé par la population de 2025 : on divise par la valeur **initiale** (2015)."), m(roundTo((v2 / v1) * 100, 1), "Ce nombre est le pourcentage que représente la population de 2025 par rapport à celle de 2015 ; retire $100$ pour obtenir le taux d'évolution."), m(v2 - v1, "C'est la variation en nombre d'habitants, pas en pourcentage.")], "Taux d'évolution (en %) :", "%")],
+        solution: [`Variation : $${T(v2)} - ${T(v1)} = ${T(v2 - v1)}$ habitants.`, `Taux : $\\dfrac{${T(v2 - v1)}}{${T(v1)}} \\times 100 ${approx(t, 3)}$.`, `Arrondi au dixième : $${t > 0 ? "+" : ""}${t1}\\,\\%$.`],
       };
     },
     reasoning: "On compare la variation à la valeur de départ ; l'arrondi se fait seulement à la fin.",
     hints: ["Quelle est la valeur initiale ? la valeur finale ?", "Taux $= \\dfrac{\\text{finale} - \\text{initiale}}{\\text{initiale}} \\times 100$."],
   }),
   ex({
-    id: "pct3-18", title: "Deux évolutions successives", niveau: 3, objectives: ["M3-OGDF-13-D", "M3-OGDF-13"], time: 150,
+    id: "pct3-18", title: "Deux évolutions successives", niveau: 3, objectives: ["M3-OGDF-13#D", "M3-OGDF-13"], time: 150,
     vary: (rng) => {
       const t1 = rng.int(2, 30);
       const t2 = rng.int(2, 30) * (rng.next() < 0.5 ? 1 : -1);
@@ -336,7 +345,7 @@ const EXERCISES: ChapterExercise[] = [
           { prompt: "Coefficient multiplicateur de la 1re évolution", answer: { value: (100 + t1) / 100 } },
           { prompt: "Coefficient multiplicateur de la 2e évolution", answer: { value: (100 + t2) / 100 } },
           { prompt: "Coefficient multiplicateur global", answer: { value: k / 10000 } },
-          { prompt: "Taux d'évolution global (en %, négatif pour une baisse)", answer: { value: g } },
+          { prompt: "Taux d'évolution global (en %, négatif pour une baisse)", answer: { value: g }, suffix: "%" },
         ] } }],
         solution: [`1re évolution : $\\times ${T((100 + t1) / 100)}$ ; 2e évolution : $\\times ${T((100 + t2) / 100)}$.`, `Coefficient global : $${T((100 + t1) / 100)} \\times ${T((100 + t2) / 100)} = ${T(k / 10000)}$.`, `Taux global : $(${T(k / 10000)} - 1) \\times 100 = ${T(g)}$, soit $${S(g)}$.`, `Ce n'est pas $${S(t1 + t2)}$ : ${ADD_ERR}`],
       };
@@ -345,13 +354,13 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris le coefficient de chaque évolution.", "Le prix est multiplié par le premier coefficient, **puis** par le second."],
   }),
   ex({
-    id: "pct3-19", title: "Ratio, fraction et pourcentage", niveau: 3, objectives: ["M4-OGDF-10", "M4-OGDF-08"], time: 90,
+    id: "pct3-19", title: "Ratio, fraction et pourcentage", niveau: 3, objectives: ["M4-OGDF-10", "M6-NC-25"], time: 90,
     vary: (rng) => {
       const [a, b] = rng.pick([[1, 3], [3, 1], [2, 3], [3, 2], [1, 4], [4, 1], [3, 7], [7, 3], [1, 9], [9, 11], [7, 13], [3, 17], [6, 19], [12, 13], [4, 21]]);
       const n = a + b;
       return {
         statement: `Dans un club, le ratio filles : garçons est $${a} : ${b}$.`,
-        parts: [{ interaction: { kind: "texte-trous", template: "La fraction des membres qui sont des filles est [[0]] (fraction irréductible).\nLes filles représentent [[1]] $\\%$ des membres.", blanks: [{ type: "number", answer: { value: a / n, fraction: [a, n] } }, { type: "number", answer: { value: (a * 100) / n } }] } }],
+        parts: [{ interaction: { kind: "texte-trous", template: "La fraction des membres qui sont des filles est [[0]] (fraction irréductible ou écriture décimale exacte).\nLes filles représentent [[1]] $\\%$ des membres.", blanks: [{ type: "number", answer: { value: a / n, fraction: [a, n] } }, { type: "number", answer: { value: (a * 100) / n } }] } }],
         solution: [`Sur $${a} + ${b} = ${n}$ membres, $${a}$ sont des filles : fraction $\\dfrac{${a}}{${n}}$ (et non $\\dfrac{${a}}{${b}}$).`, `$\\dfrac{${a}}{${n}} = ${T(a / n)} = ${P((a * 100) / n)}$.`],
       };
     },
@@ -359,7 +368,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Combien de membres y a-t-il dans un « groupe » qui respecte exactement le ratio ?", "La fraction de filles est « filles / total », pas « filles / garçons »."],
   }),
   ex({
-    id: "pct3-20", title: "Hors taxes et toutes taxes comprises", niveau: 3, objectives: ["M3-OGDF-13-B", "M3-OGDF-13"], time: 120,
+    id: "pct3-20", title: "Hors taxes et toutes taxes comprises", niveau: 3, objectives: ["M3-OGDF-13#B", "M3-OGDF-13"], time: 120,
     vary: (rng) => {
       const ht = rng.int(15, 900);
       const ttc = r2(ht * 1.2);
@@ -368,10 +377,10 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `La TVA est une taxe ajoutée au prix hors taxes (HT) pour obtenir le prix toutes taxes comprises (TTC). Elle est de $20\\,\\%$ pour un aspirateur et de $5{,}5\\,\\%$ pour les produits alimentaires.`,
         parts: [
-          num(ttc, [m(ht + 20, "La TVA est de $20\\,\\%$ du prix, pas de $20$ €."), m(r2(ht * 0.2), "C'est le montant de la TVA ; il faut l'ajouter au prix HT.")], `Un aspirateur coûte $${T(ht)}$ € HT. Son prix TTC (en €) :`, 2),
-          numR(ttc2, 2, "au centime", [m(r2(ht2 * 1.55), "$5{,}5\\,\\% = 0{,}055$ : le coefficient est $1{,}055$, et non $1{,}55$."), m(r2(ht2 + 5.5), "La TVA est de $5{,}5\\,\\%$ du prix, pas de $5{,}5$ €.")], `Un panier de courses coûte $${E(ht2)}$ € HT. Son prix TTC (en €, arrondi au centime) :`),
+          num(ttc, [m(ht + 20, "La TVA est de $20\\,\\%$ du prix, pas de $20$ €."), m(r2(ht * 0.2), "C'est le montant de la TVA ; il faut l'ajouter au prix HT.")], `Un aspirateur coûte $${T(ht)}$ € HT. Son prix TTC (en €) :`, 2, "€"),
+          numR(ttc2, 2, "au centime", [m(r2(ht2 * 1.55), "$5{,}5\\,\\% = 0{,}055$ : le coefficient est $1{,}055$, et non $1{,}55$."), m(r2(ht2 + 5.5), "La TVA est de $5{,}5\\,\\%$ du prix, pas de $5{,}5$ €.")], `Un panier de courses coûte $${E(ht2)}$ € HT. Son prix TTC (en €, arrondi au centime) :`, "€"),
         ],
-        solution: [`Aspirateur : coefficient $1 + 0{,}2 = 1{,}2$ ; $${T(ht)} \\times 1{,}2 = ${E(ttc)}$ €.`, `Courses : coefficient $1 + 0{,}055 = 1{,}055$ ; $${E(ht2)} \\times 1{,}055 = ${T(roundTo(ttc2, 4))} \\approx ${E(roundTo(ttc2, 2))}$ €.`],
+        solution: [`Aspirateur : coefficient $1 + 0{,}2 = 1{,}2$ ; $${T(ht)} \\times 1{,}2 = ${E(ttc)}$ €.`, `Courses : coefficient $1 + 0{,}055 = 1{,}055$ ; $${E(ht2)} \\times 1{,}055 ${roundTo(ttc2, 6) === roundTo(ttc2, 2) ? `= ${E(ttc2)}` : `= ${T(roundTo(ttc2, 4))} \\approx ${E(roundTo(ttc2, 2))}`}$ €.`],
       };
     },
     reasoning: "Ajouter une TVA de $t\\,\\%$, c'est appliquer une hausse de $t\\,\\%$ au prix HT.",
@@ -380,7 +389,7 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 4 : Problèmes complexes ──
   ex({
-    id: "pct3-21", title: "Hausse puis baisse du même pourcentage", niveau: 4, objectives: ["M3-OGDF-13-D"], time: 150,
+    id: "pct3-21", title: "Hausse puis baisse du même pourcentage", niveau: 4, objectives: ["M3-OGDF-13#D"], time: 150,
     vary: (rng) => {
       const p0 = rng.int(2, 20) * 100;
       const t = rng.pick([10, 20, 25, 30, 40, 50]);
@@ -390,9 +399,9 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Un ordinateur coûte $${T(p0)}$ €. Son prix augmente de $${P(t)}$, puis baisse de $${P(t)}$.`,
         parts: [{ interaction: { kind: "etapes", steps: [
-          { prompt: "Prix après la hausse (en €)", answer: { value: p1 } },
-          { prompt: "Prix après la baisse (en €)", answer: { value: p2 } },
-          { prompt: "Taux d'évolution global (en %, négatif pour une baisse)", answer: { value: g } },
+          { prompt: "Prix après la hausse (en €)", answer: { value: p1 }, suffix: "€" },
+          { prompt: "Prix après la baisse (en €)", answer: { value: p2 }, suffix: "€" },
+          { prompt: "Taux d'évolution global (en %, négatif pour une baisse)", answer: { value: g }, suffix: "%" },
         ] } }],
         solution: [`Après la hausse : $${T(p0)} \\times ${T((100 + t) / 100)} = ${T(p1)}$ €.`, `Après la baisse : $${T(p1)} \\times ${T((100 - t) / 100)} = ${T(p2)}$ €.`, `Coefficient global : $${T((100 + t) / 100)} \\times ${T((100 - t) / 100)} = ${T(1 + g / 100)}$, soit $${S(g)}$.`, `Le prix ne revient pas à $${T(p0)}$ € : la baisse de $${P(t)}$ porte sur un prix plus grand que le prix de départ.`],
       };
@@ -401,42 +410,46 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule le prix après chaque évolution, l'une après l'autre.", "Pour le taux global, compare le prix final au prix initial."],
   }),
   ex({
-    id: "pct3-22", title: "Compenser une hausse", niveau: 4, objectives: ["M3-OGDF-13-D", "M3-OGDF-13-C"], time: 150,
+    id: "pct3-22", title: "Compenser une hausse", niveau: 4, objectives: ["M3-OGDF-13#D", "M3-OGDF-13#C"], time: 150,
     vary: (rng) => {
       const t = rng.pick([10, 20, 25, 40, 50, 60, 100]);
       const d = (100 * t) / (100 + t);
       return {
         statement: `Le prix d'un article augmente de $${P(t)}$. De quel pourcentage doit-il ensuite baisser pour revenir exactement au prix de départ ? Donne le résultat arrondi au dixième si nécessaire.`,
-        parts: [numR(d, 1, "au dixième", [m(t, `Baisser de $${P(t)}$ ne suffit pas à compenser : la baisse porte sur un prix plus grand.`)], "Baisse nécessaire (en %) :")],
-        solution: [`Hausse : coefficient $${T((100 + t) / 100)}$. On cherche un coefficient $c$ tel que $${T((100 + t) / 100)} \\times c = 1$.`, `$c = \\dfrac{1}{${T((100 + t) / 100)}} \\approx ${T(roundTo(1 / ((100 + t) / 100), 4))}$.`, `$1 - c \\approx ${T(roundTo(d / 100, 4))}$ : il faut une baisse d'environ $${P(roundTo(d, 1))}$.`],
+        parts: [numR(d, 1, "au dixième", [m(t, `Baisser de $${P(t)}$ ne suffit pas à compenser : la baisse porte sur un prix plus grand.`)], "Baisse nécessaire (en %) :", "%")],
+        solution: [`Hausse : coefficient $${T((100 + t) / 100)}$. On cherche un coefficient $c$ tel que $${T((100 + t) / 100)} \\times c = 1$.`, `$c = \\dfrac{1}{${T((100 + t) / 100)}} ${approx(100 / (100 + t), 4)}$.`, `$1 - c ${approx(d / 100, 4)}$ : il faut une baisse ${roundTo(d, 6) === roundTo(d, 1) ? "de" : "d'environ"} $${P(roundTo(d, 1))}$.`],
       };
     },
     reasoning: "Pour annuler une multiplication par $c$, on multiplie par l'inverse $\\dfrac{1}{c}$ ; on traduit ensuite ce coefficient en taux.",
     hints: ["Quel coefficient faut-il multiplier par celui de la hausse pour obtenir $1$ ?", "Transforme ce coefficient en taux de baisse : $(1 - c) \\times 100$."],
   }),
   ex({
-    id: "pct3-23", title: "Comparer deux offres", niveau: 4, objectives: ["M3-OGDF-13-D", "M3-OGDF-13-B"], time: 180,
+    id: "pct3-23", title: "Comparer deux offres", niveau: 4, objectives: ["M3-OGDF-13#D", "M3-OGDF-13#B"], time: 180,
     vary: (rng) => {
       const p0 = rng.int(1, 15) * 100;
       const [t2, t3] = rng.pick([[20, 10], [30, 10], [20, 20], [40, 10], [25, 15], [30, 20], [15, 15]]);
       const t = t2 + t3;
       const a = (p0 * (100 - t)) / 100;
       const b = (p0 * (100 - t2) * (100 - t3)) / 10000;
+      const single = rng.next() < 0.5; // l'offre « remise unique » est-elle l'offre A ?
+      const oneShot = `$-${P(t)}$ en une seule fois`;
+      const twoSteps = `$-${P(t2)}$, puis une remise supplémentaire de $${P(t3)}$ sur le prix déjà réduit`;
+      const [la, lb] = single ? ["A", "B"] : ["B", "A"];
       return {
-        statement: `Un magasin vend un canapé à $${T(p0)}$ €. Deux offres sont proposées :\n– offre A : $-${P(t)}$ en une seule fois ;\n– offre B : $-${P(t2)}$, puis une remise supplémentaire de $${P(t3)}$ sur le prix déjà réduit.`,
+        statement: `Un magasin vend un canapé à $${T(p0)}$ €. Deux offres sont proposées :\n– offre A : ${single ? oneShot : twoSteps} ;\n– offre B : ${single ? twoSteps : oneShot}.`,
         parts: [
-          num(a, [], "Prix avec l'offre A (en €) :", 2),
-          num(b, [m(a, ADD_ERR)], "Prix avec l'offre B (en €) :", 2),
-          qcm(["L'offre A", "L'offre B", "Les deux offres se valent"], 0, [{ match: "2", feedback: ADD_ERR }, { match: "1", feedback: "Compare les deux prix que tu as calculés : le moins cher est le plus avantageux." }], "Quelle offre est la plus avantageuse ?"),
+          num(single ? a : b, single ? [] : [m(a, ADD_ERR)], "Prix avec l'offre A (en €) :", 2, "€"),
+          num(single ? b : a, single ? [m(a, ADD_ERR)] : [], "Prix avec l'offre B (en €) :", 2, "€"),
+          shuffledQcm(rng, ["L'offre A", "L'offre B", "Les deux offres se valent"], single ? 0 : 1, { 2: ADD_ERR, [single ? 1 : 0]: "Compare les deux prix que tu as calculés : le moins cher est le plus avantageux." }, "Quelle offre est la plus avantageuse ?"),
         ],
-        solution: [`Offre A : $${T(p0)} \\times ${T((100 - t) / 100)} = ${E(a)}$ €.`, `Offre B : $${T(p0)} \\times ${T((100 - t2) / 100)} \\times ${T((100 - t3) / 100)} = ${E(b)}$ €.`, `$${E(a)} < ${E(b)}$ : l'offre A est la plus avantageuse. Les remises successives équivalent à $\\times ${T(r4(((100 - t2) * (100 - t3)) / 10000))}$, soit seulement $${P(roundTo(100 - ((100 - t2) * (100 - t3)) / 100, 2))}$ de remise.`],
+        solution: [`Offre ${la} : $${T(p0)} \\times ${T((100 - t) / 100)} = ${E(a)}$ €.`, `Offre ${lb} : $${T(p0)} \\times ${T((100 - t2) / 100)} \\times ${T((100 - t3) / 100)} = ${E(b)}$ €.`, `$${E(a)} < ${E(b)}$ : l'offre ${la} est la plus avantageuse. Les remises successives équivalent à $\\times ${T(r4(((100 - t2) * (100 - t3)) / 10000))}$, soit seulement $${P(roundTo(100 - ((100 - t2) * (100 - t3)) / 100, 2))}$ de remise.`],
       };
     },
     reasoning: "Une remise successive s'applique sur un prix déjà réduit : elle « rapporte » moins que la même remise appliquée au prix de départ.",
-    hints: ["Calcule le prix avec chaque offre, sans additionner les remises de l'offre B.", "Offre B : deux multiplications successives."],
+    hints: ["Calcule le prix avec chaque offre, sans additionner les deux remises successives.", "Deux remises successives : deux multiplications successives."],
   }),
   ex({
-    id: "pct3-24", title: "Une croissance sur plusieurs années", niveau: 4, objectives: ["M3-OGDF-13-D"], time: 150,
+    id: "pct3-24", title: "Une croissance sur plusieurs années", niveau: 4, objectives: ["M3-OGDF-13#D"], time: 150,
     vary: (rng) => {
       const n0 = rng.int(80, 600) * 100;
       const t = rng.pick([1.5, 2, 2.5, 3, 4, -1.5, -2, -3]);
@@ -447,7 +460,7 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Une ville compte $${T(n0)}$ habitants. Sa population ${t > 0 ? "augmente" : "diminue"} de $${P(Math.abs(t))}$ chaque année. Combien d'habitants comptera-t-elle dans $${n}$ ans ? Arrondis à l'unité.`,
         parts: [numR(nf, 0, "à l'unité", [m(add, `Tu as ajouté $${n}$ fois le même nombre d'habitants. Chaque année, le pourcentage s'applique à la population de l'année précédente : on multiplie $${n}$ fois par $${T(c)}$.`)])],
-        solution: [`Chaque année, la population est multipliée par $1 ${t > 0 ? "+" : "-"} ${T(Math.abs(t) / 100)} = ${T(c)}$.`, `En $${n}$ ans : $${T(n0)} \\times ${T(c)}^{${n}} \\approx ${T(roundTo(nf, 2))}$.`, `Soit environ $${T(Math.round(nf))}$ habitants.`],
+        solution: [`Chaque année, la population est multipliée par $1 ${t > 0 ? "+" : "-"} ${T(Math.abs(t) / 100)} = ${T(c)}$.`, `En $${n}$ ans : $${T(n0)} \\times ${T(c)}^{${n}} ${approx(nf, 2)}$.`, `${roundTo(nf, 6) === Math.round(nf) ? "Soit" : "Soit environ"} $${T(Math.round(nf))}$ habitants.`],
       };
     },
     reasoning: "Une évolution répétée de $t\\,\\%$ pendant $n$ années revient à multiplier $n$ fois par le même coefficient, c'est-à-dire par $CM^n$.",
@@ -460,24 +473,24 @@ const EXERCISES: ChapterExercise[] = [
       const k = rng.int(4, 40) * 10;
       const s = k * (a + b + c);
       return {
-        statement: `Trois associés, Ali, Bérénice et Chloé, se partagent un bénéfice de $${T(s)}$ € selon le ratio $${a} : ${b} : ${c}$ (dans cet ordre).`,
-        parts: [{ interaction: { kind: "texte-trous", template: "Ali reçoit [[0]] €, Bérénice reçoit [[1]] € et Chloé reçoit [[2]] €.", blanks: [{ type: "number", answer: { value: a * k } }, { type: "number", answer: { value: b * k } }, { type: "number", answer: { value: c * k } }] } }],
-        solution: [`Nombre de parts : $${a} + ${b} + ${c} = ${a + b + c}$.`, `Une part : $${T(s)} \\div ${a + b + c} = ${T(k)}$ €.`, `Ali : $${a} \\times ${T(k)} = ${T(a * k)}$ € ; Bérénice : $${T(b * k)}$ € ; Chloé : $${T(c * k)}$ €.`, `Vérification : $${T(a * k)} + ${T(b * k)} + ${T(c * k)} = ${T(s)}$.`],
+        statement: `Trois associés, Ali, Bérénice et Chloé, se partagent un bénéfice selon le ratio $${a} : ${b} : ${c}$ (dans cet ordre). Chloé reçoit $${T(c * k)}$ €.`,
+        parts: [{ interaction: { kind: "texte-trous", template: "Ali reçoit [[0]] €, Bérénice reçoit [[1]] € et le bénéfice total est de [[2]] €.", blanks: [{ type: "number", answer: { value: a * k } }, { type: "number", answer: { value: b * k } }, { type: "number", answer: { value: s } }] } }],
+        solution: [`Chloé reçoit $${c}$ parts, donc une part vaut $${T(c * k)} \\div ${c} = ${T(k)}$ €.`, `Ali : $${a} \\times ${T(k)} = ${T(a * k)}$ € ; Bérénice : $${b} \\times ${T(k)} = ${T(b * k)}$ €.`, `Nombre de parts : $${a} + ${b} + ${c} = ${a + b + c}$ ; total : $${a + b + c} \\times ${T(k)} = ${T(s)}$ €.`, `Vérification : $${T(a * k)} + ${T(b * k)} + ${T(c * k)} = ${T(s)}$.`],
       };
     },
     reasoning: "Un ratio à trois termes se traite comme un ratio à deux termes : on compte le nombre total de parts.",
-    hints: ["Additionne les trois termes du ratio.", "Calcule la valeur d'une part."],
+    hints: ["Combien de parts reçoit Chloé ? Déduis-en la valeur d'une part.", "Le total correspond à la somme des trois termes du ratio."],
   }),
   ex({
-    id: "pct3-26", title: "Une recette en ratio", niveau: 4, objectives: ["M4-OGDF-10", "M4-OGDF-08"], time: 100,
+    id: "pct3-26", title: "Une recette en ratio", niveau: 3, objectives: ["M4-OGDF-10", "M4-OGDF-08"], time: 100,
     vary: (rng) => {
-      const [a, b] = rng.pick([[5, 2], [3, 2], [4, 3], [5, 3], [7, 4], [2, 3]]);
+      const [a, b] = rng.pick([[4, 1], [5, 1], [6, 1], [8, 1], [5, 2], [7, 2]]);
       const k = rng.int(2, 9) * 10;
       const f = a * k;
       const s = b * k;
       return {
         statement: `Dans une pâte à crêpes, le ratio farine : sucre est $${a} : ${b}$ (en masse). Sami utilise $${T(f)}$ g de farine. Quelle masse de sucre doit-il utiliser (en g) ?`,
-        parts: [num(s, [m(r2((f * a) / b), "Tu as inversé le ratio : il y a $" + a + "$ parts de farine pour $" + b + "$ parts de sucre."), m(f - (a - b), "Un ratio ne se traduit pas par une différence constante : c'est une situation de proportionnalité.")])],
+        parts: [num(s, [m(r2((f * a) / b), "Tu as inversé le ratio : il y a $" + a + "$ parts de farine pour $" + b + "$ parts de sucre."), m(f - (a - b), "Un ratio ne se traduit pas par une différence constante : c'est une situation de proportionnalité.")], undefined, undefined, "g")],
         solution: [`$${a}$ parts de farine correspondent à $${T(f)}$ g, donc une part vaut $${T(f)} \\div ${a} = ${T(k)}$ g.`, `Sucre : $${b} \\times ${T(k)} = ${T(s)}$ g.`],
       };
     },
@@ -485,7 +498,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["À combien de grammes correspond une part ?", "Combien de parts représente le sucre ?"],
   }),
   ex({
-    id: "pct3-27", title: "Ranger des évolutions", niveau: 4, objectives: ["M3-OGDF-13", "M3-OGDF-13-D"], time: 150,
+    id: "pct3-27", title: "Ranger des évolutions", niveau: 4, objectives: ["M3-OGDF-13", "M3-OGDF-13#D"], time: 150,
     vary: (rng) => {
       const pool: [string, number][] = [
         ["$+15\\,\\%$", 1.15], ["$-20\\,\\%$", 0.8], ["$\\times 0{,}9$", 0.9], ["$+10\\,\\%$ puis $-10\\,\\%$", 0.99],
@@ -494,7 +507,11 @@ const EXERCISES: ChapterExercise[] = [
       // On évite les ex æquo (×1,08 et ×1,2 puis ×0,9 donnent le même résultat).
       let items = rng.shuffle(pool).slice(0, 5);
       while (new Set(items.map(([, c]) => c)).size < items.length) items = rng.shuffle(pool).slice(0, 5);
-      const order = items.map((_, i) => i).sort((i, j) => items[i][1] - items[j][1]);
+      let order = items.map((_, i) => i).sort((i, j) => items[i][1] - items[j][1]);
+      while (order.every((v, i) => v === i)) {
+        items = rng.shuffle(items);
+        order = items.map((_, i) => i).sort((i, j) => items[i][1] - items[j][1]);
+      }
       return {
         statement: "Un prix de départ de $100$ € subit l'une des évolutions ci-dessous. Range ces évolutions de celle qui donne le prix final le plus **bas** à celle qui donne le prix final le plus **haut**.",
         parts: [{ interaction: { kind: "ordonner", items: items.map(([l]) => l), answer: order, hint: "Du prix final le plus bas (en haut) au plus haut (en bas)" } }],
@@ -507,7 +524,7 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 5 : Type Brevet ──
   ex({
-    id: "pct3-28", title: "Brevet — Le forfait téléphonique", niveau: 5, objectives: ["M3-OGDF-13-B", "M3-OGDF-13-D", "M3-OGDF-13-C"], time: 240,
+    id: "pct3-28", title: "Type Brevet — Le forfait téléphonique", niveau: 5, objectives: ["M3-OGDF-13#B", "M3-OGDF-13#D", "M3-OGDF-13#C"], time: 240,
     vary: (rng) => {
       const p0 = rng.int(15, 45);
       const t1 = rng.pick([4, 5, 6, 8, 10, 12]);
@@ -518,20 +535,20 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Le forfait mensuel de Maëlle coûte $${T(p0)}$ €. En janvier, l'opérateur augmente tous ses forfaits de $${P(t1)}$. En mars, Maëlle obtient une réduction de fidélité de $${P(t2)}$ sur le nouveau prix.`,
         parts: [{ interaction: { kind: "etapes", steps: [
-          { prompt: "Prix du forfait en janvier (en €)", answer: { value: r2(p1) } },
-          { prompt: "Prix du forfait en mars (en €, arrondi au centime)", answer: { value: r2(p2), tol: 0.005 + 1e-9, decimals: 2, roundingLabel: "au centime" } },
-          { prompt: "Taux d'évolution entre le prix initial et le prix de mars (en %, négatif pour une baisse)", answer: { value: g } },
+          { prompt: "Prix du forfait en janvier (en €)", answer: { value: r2(p1) }, suffix: "€" },
+          { prompt: "Prix du forfait en mars (en €, arrondi au centime)", answer: { value: r2(p2), tol: 0.005 + 1e-9, decimals: 2, roundingLabel: "au centime" }, suffix: "€" },
+          { prompt: "Taux d'évolution entre le prix initial et le prix de mars (en %, négatif pour une baisse)", answer: { value: g }, suffix: "%" },
         ] } }],
-        solution: [`Janvier : $${T(p0)} \\times ${T((100 + t1) / 100)} = ${E(p1)}$ €.`, `Mars : $${E(p1)} \\times ${T((100 - t2) / 100)} = ${T(roundTo(p2, 4))} \\approx ${E(r2(p2))}$ €.`, `Coefficient global : $${T((100 + t1) / 100)} \\times ${T((100 - t2) / 100)} = ${T(r4(1 + g / 100))}$, donc taux $= ${S(g)}$.`, `Rédaction : « Le prix a été multiplié par $${T(r4(1 + g / 100))}$ ; il a ${g > 0 ? "augmenté" : "baissé"} de $${P(Math.abs(g))}$ par rapport au prix initial. »`],
+        solution: [`Janvier : $${T(p0)} \\times ${T((100 + t1) / 100)} = ${E(p1)}$ €.`, `Mars : $${E(p1)} \\times ${T((100 - t2) / 100)} ${roundTo(p2, 6) === r2(p2) ? `= ${E(p2)}` : `= ${T(roundTo(p2, 4))} \\approx ${E(r2(p2))}`}$ €.`, `Coefficient global : $${T((100 + t1) / 100)} \\times ${T((100 - t2) / 100)} = ${T(r4(1 + g / 100))}$, donc taux $= ${S(g)}$.`, `Rédaction : « Le prix a été multiplié par $${T(r4(1 + g / 100))}$ ; il a ${g > 0 ? "augmenté" : "baissé"} de $${P(Math.abs(g))}$ par rapport au prix initial. »`],
       };
     },
     reasoning: "Chaque évolution correspond à un coefficient ; le taux global se lit sur le produit des coefficients, pas sur la somme des taux.",
     hints: ["Applique la hausse au prix initial, puis la réduction au prix de janvier.", "Pour le taux global : multiplie les deux coefficients, puis retire $1$ et multiplie par $100$."],
   }),
   ex({
-    id: "pct3-29", title: "Brevet — TVA et remise", niveau: 5, objectives: ["M3-OGDF-13-B", "M3-OGDF-13-C", "M3-OGDF-13-D"], time: 240,
+    id: "pct3-29", title: "Type Brevet — TVA et remise", niveau: 5, objectives: ["M3-OGDF-13#B", "M3-OGDF-13#C", "M3-OGDF-13#D"], time: 240,
     vary: (rng) => {
-      const ht = rng.int(8, 120) * 5;
+      const ht = rng.int(16, 60) * 50;
       const r = rng.pick([5, 10, 15, 25, 30]);
       const ttc = ht * 1.2;
       const fin = (ttc * (100 - r)) / 100;
@@ -539,9 +556,9 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Un vélo électrique coûte $${T(ht)}$ € hors taxes. On ajoute la TVA de $20\\,\\%$, puis le vendeur accorde une remise de $${P(r)}$ sur le prix TTC.`,
         parts: [
-          num(r2(ttc), [m(r2(ht * 0.2), "C'est seulement le montant de la TVA.")], "Prix TTC (en €) :", 2),
-          numR(fin, 2, "au centime", [m(r2((ht * (120 - r)) / 100), ADD_ERR)], "Prix payé après la remise (en €) :"),
-          num(g, [m(20 - r, ADD_ERR)], "Taux d'évolution entre le prix HT et le prix payé (en %, négatif pour une baisse) :"),
+          num(r2(ttc), [m(r2(ht * 0.2), "C'est seulement le montant de la TVA.")], "Prix TTC (en €) :", 2, "€"),
+          numR(fin, 2, "au centime", [m(r2((ht * (120 - r)) / 100), ADD_ERR)], "Prix payé après la remise (en €, arrondi au centime) :", "€"),
+          num(g, [m(20 - r, ADD_ERR)], "Taux d'évolution entre le prix HT et le prix payé (en %, négatif pour une baisse) :", undefined, "%"),
         ],
         solution: [`Prix TTC : $${T(ht)} \\times 1{,}2 = ${E(ttc)}$ €.`, `Prix payé : $${E(ttc)} \\times ${T((100 - r) / 100)} = ${E(r2(fin))}$ €.`, `Coefficient global : $1{,}2 \\times ${T((100 - r) / 100)} = ${T(roundTo(1.2 * (100 - r) / 100, 4))}$, soit un taux de $${S(g)}$.`, `Ce n'est pas $${S(20 - r)}$ : ${ADD_ERR}`],
       };
@@ -550,7 +567,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Applique d'abord la TVA au prix HT.", "La remise porte sur le prix TTC.", "Pour le taux global, multiplie les deux coefficients."],
   }),
   ex({
-    id: "pct3-30", title: "Brevet — Le prix d'un appartement", niveau: 5, objectives: ["M3-OGDF-13-B", "M3-OGDF-13-D"], time: 240,
+    id: "pct3-30", title: "Type Brevet — Le prix d'un appartement", niveau: 5, objectives: ["M3-OGDF-13#B", "M3-OGDF-13#D"], time: 240,
     vary: (rng) => {
       const k = rng.int(12, 40);
       const v0 = k * 10000;
@@ -562,7 +579,7 @@ const EXERCISES: ChapterExercise[] = [
         statement: `Le prix d'un appartement a augmenté de $${P(t1)}$ en 2024, puis baissé de $${P(t2)}$ en 2025. Fin 2025, il vaut $${T(v2)}$ €. Quel était son prix début 2024 ?`,
         parts: [{ interaction: { kind: "etapes", steps: [
           { prompt: "Coefficient multiplicateur global sur les deux années", answer: { value: c } },
-          { prompt: "Prix début 2024 (en €)", answer: { value: v0 } },
+          { prompt: "Prix début 2024 (en €)", answer: { value: v0 }, suffix: "€" },
         ] } }],
         solution: [`Coefficient global : $${T((100 + t1) / 100)} \\times ${T((100 - t2) / 100)} = ${T(c)}$.`, `Prix début 2024 $\\times ${T(c)} = ${T(v2)}$, donc prix début 2024 $= ${T(v2)} \\div ${T(c)} = ${T(v0)}$ €.`, `Vérification : $${T(v0)} \\times ${T((100 + t1) / 100)} = ${T((v0 * (100 + t1)) / 100)}$ puis $\\times ${T((100 - t2) / 100)} = ${T(v2)}$.`],
       };
@@ -571,7 +588,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule le coefficient global des deux évolutions.", "Valeur initiale $=$ valeur finale $\\div$ coefficient global."],
   }),
   ex({
-    id: "pct3-31", title: "Brevet — Mélange de peinture", niveau: 5, objectives: ["M4-OGDF-10", "M4-OGDF-08"], time: 180,
+    id: "pct3-31", title: "Type Brevet — Mélange de peinture", niveau: 5, objectives: ["M4-OGDF-10", "M6-NC-25"], time: 180,
     vary: (rng) => {
       const [a, b] = rng.pick([[1, 3], [3, 1], [2, 3], [3, 2], [1, 4], [3, 7], [7, 3], [9, 11], [1, 9]]);
       const k = rng.pick([0.5, 1, 1.5, 2, 2.5, 3]);
@@ -579,8 +596,8 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Pour obtenir une peinture verte, on mélange de la peinture bleue et de la peinture jaune selon le ratio bleu : jaune $= ${a} : ${b}$. On veut préparer $${T(v)}$ litres de peinture verte.`,
         parts: [
-          num(roundTo(a * k, 4), [m(roundTo((v * a) / b, 4), `Le volume total correspond à $${a} + ${b}$ parts, pas à $${b}$ parts.`), m(roundTo(b * k, 4), "C'est le volume de peinture **jaune**.")], "Volume de peinture bleue (en L) :"),
-          num((a * 100) / (a + b), [m(roundTo((a * 100) / b, 4), "Le pourcentage se calcule par rapport au volume **total**, pas par rapport au jaune.")], "Pourcentage de peinture bleue dans le mélange (en %) :"),
+          num(roundTo(a * k, 4), [m(roundTo((v * a) / b, 4), `Le volume total correspond à $${a} + ${b}$ parts, pas à $${b}$ parts.`), m(roundTo(b * k, 4), "C'est le volume de peinture **jaune**.")], "Volume de peinture bleue (en L) :", undefined, "L"),
+          num((a * 100) / (a + b), [m(roundTo((a * 100) / b, 4), "Le pourcentage se calcule par rapport au volume **total**, pas par rapport au jaune.")], "Pourcentage de peinture bleue dans le mélange (en %) :", undefined, "%"),
         ],
         solution: [`Nombre de parts : $${a} + ${b} = ${a + b}$ ; une part : $${T(v)} \\div ${a + b} = ${T(k)}$ L.`, `Bleu : $${a} \\times ${T(k)} = ${T(a * k)}$ L.`, `Pourcentage de bleu : $\\dfrac{${a}}{${a + b}} = ${T(a / (a + b))} = ${P((a * 100) / (a + b))}$.`],
       };
@@ -589,7 +606,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Combien de parts au total ?", "Bleu : combien de parts sur le total ?"],
   }),
   ex({
-    id: "pct3-32", title: "Brevet — Vrai ou faux, justifier", niveau: 5, objectives: ["M3-OGDF-13", "M3-OGDF-13-D", "M3-OGDF-13-C"], time: 240,
+    id: "pct3-32", title: "Type Brevet — Vrai ou faux, justifier", niveau: 5, objectives: ["M3-OGDF-13", "M3-OGDF-13#D", "M3-OGDF-13#C"], time: 240,
     vary: (rng) => {
       const t1 = rng.pick([10, 20, 30]);
       const t2 = rng.pick([5, 10, 15]);
@@ -613,7 +630,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Traduis chaque évolution en coefficient multiplicateur.", "Teste avec un prix de $100$ € si tu hésites."],
   }),
   ex({
-    id: "pct3-33", title: "Brevet — Compléter un raisonnement", niveau: 5, objectives: ["M3-OGDF-13", "M3-OGDF-13-D", "M3-OGDF-13-C"], time: 180,
+    id: "pct3-33", title: "Type Brevet — Compléter un raisonnement", niveau: 5, objectives: ["M3-OGDF-13", "M3-OGDF-13#D", "M3-OGDF-13#C"], time: 180,
     vary: (rng) => {
       const t1 = rng.pick([10, 20, 25, 30, 40]);
       let t2 = t1;
@@ -667,9 +684,9 @@ export const math3ePourcentagesEvolution: ChapterContent = {
   curriculumChapterIds: ["math-3e-pourcentages-evolution", "math-4e-proportionnalite"],
   curriculumVersion: "2026-2027",
   title: "Ratios, pourcentages et évolutions",
-  officialObjectives: (Object.keys(O) as Obj[]).map((id) => ({ id, text: O[id], source: id === "M3-OGDF-13" ? SRC_3E : id.startsWith("M3-") ? SRC_DECL : id === "M4-OGDF-08" ? SRC_4E_08 : SRC_4E_10 })),
+  officialObjectives: (Object.keys(O) as Obj[]).map((id) => ({ id, text: O[id], source: id === "M3-OGDF-13" ? SRC_3E : id.startsWith("M3-") ? SRC_DECL : id === "M4-OGDF-08" ? SRC_4E_08 : id === "M4-AUTO-03" ? SRC_AUTO : id.startsWith("M6-") ? SRC_6E : SRC_4E_10 })),
   prerequisites: [
-    { text: "Reconnaître une situation de proportionnalité et calculer une quatrième proportionnelle (5e-4e)." },
+    { text: "Reconnaître une situation de proportionnalité et calculer une quatrième proportionnelle (5e et 4e)." },
     { text: "Écrire un pourcentage sous forme de fraction ou de nombre décimal : $t\\,\\% = \\dfrac{t}{100}$ (cycle 3, 5e)." },
     { text: "Multiplier et diviser des nombres décimaux ; simplifier une fraction." },
     { text: "Notion de ratio $a : b$ (4e)." },
@@ -677,7 +694,7 @@ export const math3ePourcentagesEvolution: ChapterContent = {
   sources: [
     { id: "R1", title: "Programme de mathématiques du cycle 4 (version 2020), BO n° 31 du 30 juillet 2020", url: "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm", kind: "official", note: "thème B « Organisation et gestion de données, fonctions » : proportionnalité, pourcentages, ratio" },
     { id: "R2", title: "Repères annuels de progression et attendus de fin d'année du cycle 4, BO n° 22 du 29 mai 2019", url: "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913384N.htm", kind: "official", note: "3e : relier taux d'évolution et coefficient multiplicateur ; 4e : quatrième proportionnelle" },
-    { id: "R3", title: "Inventaire officiel des chapitres de mathématiques 2026-2027 (agent A1)", url: "https://eduscol.education.gouv.fr/", kind: "supplementary", note: "research/curriculum/mathematiques/curriculum-math.json ; le programme 2026 ne s'applique en 3e qu'à la rentrée 2028" },
+    { id: "R3", title: "Inventaire interne des objectifs de mathématiques 2026-2027 (agent A1)", url: "https://github.com/NguyenthanhTuyen0710/sciences-interactives/blob/main/research/curriculum/mathematiques/curriculum-math.json", kind: "supplementary", note: "research/curriculum/mathematiques/curriculum-math.json ; le programme 2026 ne s'applique en 3e qu'à la rentrée 2028" },
   ],
   lesson: {
     introduction: "Un jean à $50$ € est soldé à $-20\\,\\%$ ; un loyer augmente de $3\\,\\%$ ; la population d'une ville baisse de $1{,}5\\,\\%$ par an. Les **pourcentages d'évolution** décrivent des changements, et un seul outil suffit pour les calculer tous : le **coefficient multiplicateur**.\nDans ce chapitre, tu vas relier un taux d'évolution et un coefficient multiplicateur, enchaîner plusieurs évolutions, retrouver une valeur de départ, et revoir les **ratios** qui servent à partager une quantité.",
@@ -690,14 +707,14 @@ export const math3ePourcentagesEvolution: ChapterContent = {
     ],
     properties: [
       { title: "Hausse de t %", statement: "Augmenter une valeur de $t\\,\\%$, c'est la multiplier par $CM = 1 + \\dfrac{t}{100}$.\nExemple : hausse de $15\\,\\%$ : $\\times 1{,}15$ ; hausse de $100\\,\\%$ : $\\times 2$.", conditions: "Une hausse correspond à un coefficient strictement supérieur à $1$." },
-      { title: "Baisse de t %", statement: "Diminuer une valeur de $t\\,\\%$, c'est la multiplier par $CM = 1 - \\dfrac{t}{100}$.\nExemple : baisse de $20\\,\\%$ : $\\times 0{,}8$ ; baisse de $3\\,\\%$ : $\\times 0{,}97$.", conditions: "Une baisse correspond à un coefficient compris entre $0$ et $1$ (pour $0 < t \\leqslant 100$)." },
+      { title: "Baisse de t %", statement: "Diminuer une valeur de $t\\,\\%$, c'est la multiplier par $CM = 1 - \\dfrac{t}{100}$.\nExemple : baisse de $20\\,\\%$ : $\\times 0{,}8$ ; baisse de $3\\,\\%$ : $\\times 0{,}97$.", conditions: "Une baisse correspond à un coefficient $CM$ tel que $0 \\leqslant CM < 1$ (pour $0 < t \\leqslant 100$)." },
       { title: "Du coefficient au taux", statement: "Si $CM$ est le coefficient multiplicateur, le taux d'évolution vaut $(CM - 1) \\times 100$ (en %).\nExemple : $CM = 0{,}88$ : $(0{,}88 - 1) \\times 100 = -12$ : baisse de $12\\,\\%$." },
       { title: "Retrouver la valeur initiale", statement: "Comme $V_f = V_i \\times CM$, on a $V_i = V_f \\div CM$.\nExemple : après une hausse de $25\\,\\%$, un prix vaut $75$ € ; avant, il valait $75 \\div 1{,}25 = 60$ €." },
       { title: "Évolutions successives", statement: "Si une grandeur subit plusieurs évolutions successives, le coefficient multiplicateur global est le **produit** des coefficients.\nExemple : $+10\\,\\%$ puis $-10\\,\\%$ : $1{,}1 \\times 0{,}9 = 0{,}99$, soit une baisse globale de $1\\,\\%$.", conditions: "Les taux ne s'additionnent pas : chaque évolution porte sur la valeur obtenue juste avant." },
       { title: "Partage selon un ratio", statement: "Pour partager une quantité $Q$ selon le ratio $a : b$, on calcule une part $\\dfrac{Q}{a + b}$ ; la première quantité vaut $a$ parts, la seconde $b$ parts. La première représente la fraction $\\dfrac{a}{a + b}$ du total." },
     ],
     explanations: [
-      { title: "1. Pourquoi multiplier par 1,15 ?", body: "Un prix de $80$ € augmente de $15\\,\\%$. Méthode en deux temps : la hausse vaut $0{,}15 \\times 80 = 12$ €, le nouveau prix est $80 + 12 = 92$ €.\nEn une seule fois : nouveau prix $= 80 + 0{,}15 \\times 80 = 80 \\times (1 + 0{,}15) = 80 \\times 1{,}15 = 92$ €. On a factorisé par $80$ : c'est la distributivité !" },
+      { title: "1. Pourquoi multiplier par 1,15 ?", body: "Un prix de $80$ € augmente de $15\\,\\%$. Méthode en deux temps : la hausse vaut $0{,}15 \\times 80 = 12$ €, le nouveau prix est $80 + 12 = 92$ €.\nEn une seule fois : nouveau prix $= 80 + 0{,}15 \\times 80 = 80 \\times (1 + 0{,}15) = 80 \\times 1{,}15 = 92$ €. On a factorisé par $80$ : c'est la distributivité !\nAppliquer une hausse de $15\\,\\%$ à n'importe quel prix, c'est donc appliquer la **fonction linéaire** $x \\mapsto 1{,}15x$ : le nouveau prix est proportionnel à l'ancien, de coefficient $1{,}15$." },
       { title: "2. Une baisse, c'est ce qui reste", body: "Après une remise de $20\\,\\%$, il reste à payer $100\\,\\% - 20\\,\\% = 80\\,\\%$ du prix, soit $\\times 0{,}8$. Penser « ce qui reste » évite d'oublier de retirer la remise." },
       { title: "3. Remonter le temps : on divise", body: "Si $V_i \\times 1{,}15 = 92$, alors $V_i = 92 \\div 1{,}15 = 80$. Attention : retirer $15\\,\\%$ à $92$ donnerait $78{,}20$ €, ce qui est faux, car les $15\\,\\%$ portaient sur $80$, pas sur $92$." },
       { title: "4. Enchaîner des évolutions", body: "Un prix augmente de $10\\,\\%$, puis baisse de $10\\,\\%$. Avec $100$ € : $100 \\times 1{,}1 = 110$, puis $110 \\times 0{,}9 = 99$. On ne revient pas à $100$ : la baisse de $10\\,\\%$ porte sur $110$ €, elle enlève $11$ € alors que la hausse avait ajouté $10$ €." },
@@ -717,7 +734,7 @@ export const math3ePourcentagesEvolution: ChapterContent = {
     commonMistakes: [
       { mistake: "Une hausse de $15\\,\\%$ : « je multiplie par $0{,}15$ »", correction: "On multiplie par $1{,}15$", why: "$0{,}15 \\times$ prix donne seulement le montant de la hausse ; il faut garder les $100\\,\\%$ du prix." },
       { mistake: "$+10\\,\\%$ puis $+20\\,\\%$ « font $+30\\,\\%$ »", correction: "$1{,}1 \\times 1{,}2 = 1{,}32$ : $+32\\,\\%$", why: "La seconde hausse porte sur un prix déjà augmenté : on multiplie les coefficients." },
-      { mistake: "Prix avant une hausse de $25\\,\\%$ d'un article à $75$ € : « $75 \\times 0{,}75 = 56{,}25$ € »", correction: "$75 \\div 1{,}25 = 60$ €", why: "Les $25\\,\\%$ portaient sur l'ancien prix : on divise le nouveau prix par le coefficient." },
+      { mistake: "Un article coûte $75$ € après une hausse de $25\\,\\%$ ; son prix d'avant : « $75 \\times 0{,}75 = 56{,}25$ € »", correction: "$75 \\div 1{,}25 = 60$ €", why: "Les $25\\,\\%$ portaient sur l'ancien prix : on divise le nouveau prix par le coefficient." },
       { mistake: "Taux de $40$ à $50$ : « $\\dfrac{10}{50} = 20\\,\\%$ »", correction: "$\\dfrac{10}{40} = 25\\,\\%$", why: "On divise la variation par la valeur **initiale**." },
       { mistake: "Ratio filles : garçons $= 3 : 2$, « les filles représentent $\\dfrac{3}{2}$ de la classe »", correction: "$\\dfrac{3}{5}$ de la classe", why: "La fraction d'une part se calcule par rapport au total $3 + 2 = 5$." },
       { mistake: "« Une baisse de $5\\,\\%$ : $\\times 0{,}5$ »", correction: "$\\times 0{,}95$", why: "$5\\,\\% = 0{,}05$ ; il reste $95\\,\\%$ du prix, et $0{,}5$ correspondrait à une baisse de $50\\,\\%$." },
@@ -738,7 +755,7 @@ export const math3ePourcentagesEvolution: ChapterContent = {
       "Ratio $a : b$ : $a + b$ parts égales ; la première quantité représente $\\dfrac{a}{a + b}$ du total.",
     ],
     revisionSheet: {
-      keyPoints: ["$+5\\,\\%$ : $\\times 1{,}05$ ; $-5\\,\\%$ : $\\times 0{,}95$ ; $+100\\,\\%$ : $\\times 2$ ; $-50\\,\\%$ : $\\times 0{,}5$.", "$CM > 1$ : hausse ; $0 < CM < 1$ : baisse.", "$+10\\,\\%$ puis $-10\\,\\%$ : $\\times 0{,}99$, soit $-1\\,\\%$.", "Retour en arrière : on divise par le coefficient.", "Ratio $3 : 2$ : $\\dfrac{3}{5} = 60\\,\\%$ et $\\dfrac{2}{5} = 40\\,\\%$."],
+      keyPoints: ["$+5\\,\\%$ : $\\times 1{,}05$ ; $-5\\,\\%$ : $\\times 0{,}95$ ; $+100\\,\\%$ : $\\times 2$ ; $-50\\,\\%$ : $\\times 0{,}5$.", "$CM > 1$ : hausse ; $0 \\leqslant CM < 1$ : baisse.", "$+10\\,\\%$ puis $-10\\,\\%$ : $\\times 0{,}99$, soit $-1\\,\\%$.", "Retour en arrière : on divise par le coefficient.", "Ratio $3 : 2$ : $\\dfrac{3}{5} = 60\\,\\%$ et $\\dfrac{2}{5} = 40\\,\\%$."],
       skills: ["Appliquer et calculer un pourcentage.", "Passer d'un taux d'évolution à un coefficient multiplicateur et inversement.", "Calculer une valeur finale, une valeur initiale, un taux d'évolution.", "Calculer l'effet de plusieurs évolutions successives.", "Partager une quantité selon un ratio et relier ratio, fraction et pourcentage."],
     },
     miniQuiz: [
@@ -755,7 +772,7 @@ export const math3ePourcentagesEvolution: ChapterContent = {
       id: "pct3-jeu-flash", template: "calcul-flash", title: "Flash coefficients",
       objective: "Automatiser le passage entre taux d'évolution et coefficient multiplicateur, puis les calculs de pourcentages les plus fréquents.",
       instructions: "Réponds le plus vite possible. Écris les nombres décimaux avec une virgule, par exemple 1,05. Pour un taux de baisse, écris un nombre négatif, par exemple −12. Le niveau s'adapte à tes réussites.",
-      objectives: ["M3-OGDF-13", "M3-OGDF-13-B", "M4-OGDF-08"],
+      objectives: ["M3-OGDF-13", "M3-OGDF-13#B", "M4-AUTO-03"],
       config: { duration: 90, practiceCount: 15, levels: [
         { label: "Taux → coefficient", items: [
           { q: "Coefficient multiplicateur d'une hausse de $8\\,\\%$", answer: "1,08", explanation: "$1 + 0{,}08 = 1{,}08$." },
@@ -776,13 +793,13 @@ export const math3ePourcentagesEvolution: ChapterContent = {
           { q: "Taux global (en %) de $+10\\,\\%$ puis $-10\\,\\%$", answer: "-1", explanation: "$1{,}1 \\times 0{,}9 = 0{,}99$ : baisse de $1\\,\\%$." },
           { q: "Taux global (en %) de $+20\\,\\%$ puis $+50\\,\\%$", answer: "80", explanation: "$1{,}2 \\times 1{,}5 = 1{,}8$ : hausse de $80\\,\\%$." },
         ] },
-        { label: "Calculs en euros", items: [
+        { label: "Calculs de prix et de taux", items: [
           { q: "$20\\,\\%$ de $45$ €, en €", answer: "9", explanation: "$0{,}2 \\times 45 = 9$." },
           { q: "Prix de $80$ € après une baisse de $30\\,\\%$, en €", answer: "56", explanation: "$80 \\times 0{,}7 = 56$." },
           { q: "Prix de $60$ € après une hausse de $15\\,\\%$, en €", answer: "69", explanation: "$60 \\times 1{,}15 = 69$." },
           { q: "Prix avant une hausse de $25\\,\\%$ si le prix est maintenant $50$ €, en €", answer: "40", explanation: "$50 \\div 1{,}25 = 40$." },
           { q: "Prix avant une remise de $50\\,\\%$ si l'on paie $35$ €, en €", answer: "70", explanation: "$35 \\div 0{,}5 = 70$." },
-          { q: "Part de la plus petite quantité quand on partage $60$ € selon le ratio $1 : 2$, en €", answer: "20", explanation: "$60 \\div 3 = 20$." },
+          { q: "Plus petite part (en €) quand on partage $60$ € selon le ratio $1 : 2$", answer: "20", explanation: "$60 \\div 3 = 20$." },
           { q: "Taux d'évolution (en %) d'un prix qui passe de $40$ € à $50$ €", answer: "25", explanation: "$\\dfrac{50 - 40}{40} \\times 100 = 25$." },
         ] },
       ] },
@@ -791,11 +808,11 @@ export const math3ePourcentagesEvolution: ChapterContent = {
       id: "pct3-jeu-erreurs", template: "chasse-erreurs", title: "Chasse aux erreurs de pourcentages",
       objective: "Repérer les raisonnements faux les plus fréquents : additionner des taux, multiplier par le taux au lieu du coefficient, diviser par la mauvaise valeur.",
       instructions: "Pour chaque calcul, dis s'il est juste. S'il est faux, choisis l'erreur commise.",
-      objectives: ["M3-OGDF-13", "M3-OGDF-13-B", "M3-OGDF-13-C", "M3-OGDF-13-D", "M4-OGDF-10"],
+      objectives: ["M3-OGDF-13", "M3-OGDF-13#B", "M3-OGDF-13#C", "M3-OGDF-13#D", "M4-OGDF-10"],
       config: { items: [
         { niveau: 1, calc: "Hausse de $15\\,\\%$ : $\\times 1{,}15$", correct: true, explanation: "$1 + 0{,}15 = 1{,}15$." },
         { niveau: 1, calc: "Baisse de $5\\,\\%$ : $\\times 0{,}5$", correct: false, errors: ["$5\\,\\% = 0{,}05$ : le coefficient est $0{,}95$", "Une baisse se calcule par une division", "Il fallait multiplier par $1{,}05$"], error: 0, explanation: "$1 - 0{,}05 = 0{,}95$ ; $\\times 0{,}5$ correspond à une baisse de $50\\,\\%$." },
-        { niveau: 1, calc: "Hausse de $20\\,\\%$ de $30$ € : $30 \\times 0{,}2 = 6$ €", correct: false, errors: ["$6$ € est le montant de la hausse : le nouveau prix est $36$ €", "Il fallait calculer $30 + 20$", "Il fallait diviser par $0{,}2$"], error: 0, explanation: "$30 \\times 1{,}2 = 36$ €." },
+        { niveau: 1, calc: "Prix de $30$ € après une hausse de $20\\,\\%$ : $30 \\times 0{,}2 = 6$ €", correct: false, errors: ["$6$ € est le montant de la hausse : le nouveau prix est $36$ €", "Il fallait calculer $30 + 20$", "Il fallait diviser par $0{,}2$"], error: 0, explanation: "$30 \\times 1{,}2 = 36$ €." },
         { niveau: 2, calc: "Taux d'évolution de $40$ à $50$ : $\\dfrac{10}{50} = 20\\,\\%$", correct: false, errors: ["On divise par la valeur initiale : $\\dfrac{10}{40} = 25\\,\\%$", "Il fallait calculer $50 - 40 = 10\\,\\%$", "Il fallait diviser $40$ par $50$"], error: 0, explanation: "Taux $= \\dfrac{50 - 40}{40} \\times 100 = 25\\,\\%$." },
         { niveau: 2, calc: "$\\times 0{,}88$ : baisse de $12\\,\\%$", correct: true, explanation: "$(0{,}88 - 1) \\times 100 = -12$." },
         { niveau: 2, calc: "Ratio $2 : 3$ : la première part représente $\\dfrac{2}{3}$ du total", correct: false, errors: ["Le total compte $2 + 3 = 5$ parts : c'est $\\dfrac{2}{5}$", "C'est $\\dfrac{3}{2}$ du total", "C'est $23\\,\\%$ du total"], error: 0, explanation: "$\\dfrac{2}{5} = 40\\,\\%$." },
@@ -804,22 +821,22 @@ export const math3ePourcentagesEvolution: ChapterContent = {
         { niveau: 3, calc: "Avant une hausse de $25\\,\\%$, un prix de $75$ € valait $75 \\times 0{,}75 = 56{,}25$ €", correct: false, errors: ["Il faut diviser par le coefficient : $75 \\div 1{,}25 = 60$ €", "Il fallait calculer $75 - 25 = 50$ €", "Il fallait multiplier par $1{,}25$"], error: 0, explanation: "$60 \\times 1{,}25 = 75$ : l'ancien prix était $60$ €." },
         { niveau: 4, calc: "$+50\\,\\%$ puis $-50\\,\\%$ : baisse globale de $25\\,\\%$", correct: true, explanation: "$1{,}5 \\times 0{,}5 = 0{,}75$." },
         { niveau: 4, calc: "Une population augmente de $2\\,\\%$ par an pendant $3$ ans : $\\times 1{,}06$", correct: false, errors: ["On multiplie trois fois : $1{,}02^3 \\approx 1{,}0612$", "C'est $\\times 1{,}02 \\times 3$", "C'est $\\times 1{,}2$"], error: 0, explanation: "$1{,}02 \\times 1{,}02 \\times 1{,}02 \\approx 1{,}0612$ : un peu plus de $6\\,\\%$." },
-        { niveau: 4, calc: "Pour compenser une baisse de $20\\,\\%$, il faut une hausse de $20\\,\\%$", correct: false, errors: ["Il faut $\\times \\dfrac{1}{0{,}8} = 1{,}25$ : une hausse de $25\\,\\%$", "Il faut une baisse de $20\\,\\%$", "C'est impossible de compenser"], error: 0, explanation: "$0{,}8 \\times 1{,}25 = 1$." },
+        { niveau: 4, calc: "Pour compenser une baisse de $20\\,\\%$, il faut une hausse de $20\\,\\%$", correct: false, errors: ["Il faut $\\times \\dfrac{1}{0{,}8} = 1{,}25$ : une hausse de $25\\,\\%$", "Il faut une baisse de $20\\,\\%$", "Il est impossible de compenser cette baisse"], error: 0, explanation: "$0{,}8 \\times 1{,}25 = 1$." },
       ] },
     },
     {
       id: "pct3-jeu-memory", template: "memory", title: "Memory des évolutions",
       objective: "Associer rapidement une évolution en pourcentage et son coefficient multiplicateur, y compris pour des évolutions successives.",
       instructions: "Retourne deux cartes : si une évolution et son coefficient multiplicateur vont ensemble, elles restent visibles. Trouve toutes les paires en un minimum d'essais.",
-      objectives: ["M3-OGDF-13", "M3-OGDF-13-D", "M4-OGDF-10"],
+      objectives: ["M3-OGDF-13", "M3-OGDF-13#D"],
       config: { pairs: [
         ["Hausse de $7\\,\\%$", "$\\times 1{,}07$"],
         ["Baisse de $30\\,\\%$", "$\\times 0{,}7$"],
         ["Hausse de $70\\,\\%$", "$\\times 1{,}7$"],
         ["Baisse de $3\\,\\%$", "$\\times 0{,}97$"],
         ["$+10\\,\\%$ puis $-10\\,\\%$", "$\\times 0{,}99$"],
-        ["Doubler", "Hausse de $100\\,\\%$"],
-        ["Ratio $3 : 1$ : part de la 1re quantité", "$75\\,\\%$"],
+        ["Hausse de $100\\,\\%$", "$\\times 2$"],
+        ["$-25\\,\\%$ puis $+20\\,\\%$", "$\\times 0{,}9$"],
       ] },
     },
   ],

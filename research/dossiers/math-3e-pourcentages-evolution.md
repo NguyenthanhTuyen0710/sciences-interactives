@@ -5,14 +5,17 @@
 - **Sources :** inventaire A1 `research/curriculum/mathematiques/curriculum-math.json` (objectifs vérifiés, non re-téléchargés). Source Notion : `SOURCE_INACCESSIBLE` (voir `manifest-3e.json`). Aucun texte copié.
 
 ## 1. Périmètre officiel
-| ID | Objectif | Statut |
+| ID | Objectif (texte de l'inventaire) | Statut |
 |---|---|---|
 | M3-OGDF-13 | Relier un taux d'évolution et un coefficient multiplicateur (hausse de 5 % ↔ ×1,05). | 3e, officiel |
-| M3-OGDF-13-B | Valeur finale / valeur initiale à l'aide du coefficient. | déclinaison de M3-OGDF-13 |
-| M3-OGDF-13-C | Taux d'évolution à partir de deux valeurs. | déclinaison de M3-OGDF-13 |
-| M3-OGDF-13-D | Évolutions successives : produit des coefficients. | déclinaison de M3-OGDF-13 (fréquent au DNB) |
-| M4-OGDF-08 | Quatrième proportionnelle ; appliquer / calculer un pourcentage. | consolidation 4e |
-| M4-OGDF-10 | Partager selon un ratio a : b. | consolidation 4e (notion de ratio, programme 2020) |
+| M3-OGDF-13#B | Valeur finale / valeur initiale à l'aide du coefficient. | déclinaison interne (absente de l'inventaire) |
+| M3-OGDF-13#C | Taux d'évolution à partir de deux valeurs. | déclinaison interne |
+| M3-OGDF-13#D | Évolutions successives : produit des coefficients (fréquent au DNB). | déclinaison interne |
+| M4-OGDF-08 | Calculer une quatrième proportionnelle par la procédure de son choix. | consolidation 4e |
+| M4-OGDF-10 | Partager une quantité selon un ratio donné (a : b). | consolidation 4e |
+| M4-AUTO-03 | Procédures de calcul d'une quatrième proportionnelle et d'application d'un pourcentage ou d'une échelle. | automatisme 4e (application d'un pourcentage) |
+| M6-NC-24 | Connaître la définition d'un pourcentage et son sens. | prérequis cycle 3 |
+| M6-NC-25 | Calculer une proportion (partie/tout) et l'exprimer en pourcentage dans des cas simples. | prérequis cycle 3 (lien ratio ↔ fraction ↔ %) |
 
 ## 2. Hors programme 3e (non traité)
 Taux moyen (racine n-ième), indices base 100, suites géométriques, intérêts composés formalisés. L'évolution répétée n fois est traitée seulement par CMⁿ avec n = 2 ou 3 (puissances connues).
