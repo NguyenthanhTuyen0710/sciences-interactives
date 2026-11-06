@@ -5,7 +5,7 @@ import type { Rng } from "../engine/types";
 /** Écriture française d'un relatif : −3 ; 2,5 ; +4 si `plus`. */
 export function frRel(x: number, plus = false): string {
   const s = String(Math.abs(Math.round(x * 1000) / 1000)).replace(".", ",");
-  return x < 0 ? `-${s}` : plus && x > 0 ? `+${s}` : s;
+  return x < 0 ? `−${s}` : plus && x > 0 ? `+${s}` : s;
 }
 /** Relatif entre parenthèses s'il est négatif (pour écrire un calcul). */
 export const par = (x: number) => (x < 0 ? `(${frRel(x)})` : frRel(x));
@@ -50,9 +50,8 @@ export function lineFeedback(target: number, answer: number, step: number): { ok
     return { ok: false, message: `Tu as trouvé l'opposé (${frRel(answer)}). ${target < 0 ? "Les nombres négatifs sont à gauche de 0." : "Les nombres positifs sont à droite de 0."}` };
   if (Math.abs(answer - target) <= step + 1e-9)
     return { ok: false, message: `Presque : décalage d'une graduation. Chaque graduation vaut ${frRel(step)} ; compte-les depuis 0.` };
-  if (target < 0 && answer < 0 && eq(Math.abs(answer), Math.abs(target) + step))
-    return { ok: false, message: "Compte les graduations à partir de 0, pas à partir de la graduation −1." };
-  return { ok: false, message: `La réponse était ${frRel(target)} : sa distance à zéro est ${frRel(Math.abs(target))} graduation${Math.abs(target / step) > 1 ? "s" : ""} de ${frRel(step)}, ${target < 0 ? "à gauche" : "à droite"} de 0.` };
+  const n = Math.round(Math.abs(target / step));
+  return { ok: false, message: `La réponse était ${frRel(target)} : le point est à ${n} graduation${n > 1 ? "s" : ""} de ${frRel(step)} ${target < 0 ? "à gauche" : "à droite"} de 0 (distance à zéro : ${frRel(Math.abs(target))}).` };
 }
 
 // ───────── Calcul mental (somme / différence de relatifs) ─────────

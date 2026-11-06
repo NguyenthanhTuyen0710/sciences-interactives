@@ -121,7 +121,7 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
           <p className="font-medium" aria-live="polite">Manche {n + 1}/{rounds} — {round.type === "placer" ? <>Place le point <strong>M</strong> d'abscisse <strong>{frRel(round.target)}</strong>.</> : <>Lis l'abscisse du point <strong>M</strong>.</>}</p>
           <svg viewBox={`0 0 ${W} 90`} className="w-full touch-manipulation select-none rounded-lg bg-white ring-1 ring-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             role={round.type === "placer" ? "slider" : "img"} tabIndex={round.type === "placer" ? 0 : -1} onKeyDown={onKey} onClick={onClick}
-            aria-label={round.type === "placer" ? "Droite graduée : utilisez les flèches gauche et droite pour déplacer le point, Entrée pour valider" : `Droite graduée avec le point M`}
+            aria-label={round.type === "placer" ? "Droite graduée : utilise les flèches gauche et droite pour déplacer le point, Entrée pour valider" : `Droite graduée avec le point M`}
             aria-valuemin={lv.min} aria-valuemax={lv.max} aria-valuenow={cursor ?? undefined} aria-valuetext={cursor === null ? "aucun point placé" : `abscisse ${frRel(cursor)}`}>
             <line x1={pad - 10} y1={45} x2={W - pad + 14} y2={45} stroke="#0f172a" strokeWidth={2} />
             <polygon points={`${W - pad + 14},45 ${W - pad + 4},40 ${W - pad + 4},50`} fill="#0f172a" />
@@ -326,7 +326,7 @@ function Memory({ game }: { game: ChapterGame }) {
         })}
       </div>
       <div className="mt-3"><Feedback fb={fb} /></div>
-      {done && <p className="mt-3 text-center font-semibold text-emerald-700">Toutes les paires trouvées en {tries} essais !</p>}
+      {done && <p className="mt-3 text-center font-semibold text-emerald-700">Toutes les paires ont été trouvées en {tries} essais !</p>}
     </Shell>
   );
 }
