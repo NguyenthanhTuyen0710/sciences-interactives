@@ -1,0 +1,1770 @@
+{
+ "subject": "physique-chimie",
+ "generatedAt": "2026-11-06",
+ "grades": [
+  {
+   "grade": "6e",
+   "cycle": 3,
+   "curriculumVersion": "2026-2027",
+   "programme": {
+    "title": "Programme de sciences et technologie du cycle 3 (version 2023) – partie « Matière, mouvement, énergie, information »",
+    "reference": "Arrêté du 15 juin 2023 (JO du 21/06/2023) modifiant l'arrêté du 9 novembre 2015 ; BO n°25 du 22 juin 2023",
+    "nor": "MENE2314101A",
+    "url": "https://www.education.gouv.fr/bo/2023/Hebdo25/MENE2314101A",
+    "applicability": "Rentrée 2023-2024 ; reste applicable en 6e en 2026-2027. Remplacé en 6e à la rentrée 2027-2028 par l'arrêté du 5 juin 2026 (NOR MENE2611650A, BO n°24 du 11 juin 2026, art. 3).",
+    "status": "transitional"
+   },
+   "domains": [
+    {
+     "id": "pc-c3-6e-mmei",
+     "title": "Matière, mouvement, énergie, information",
+     "chapters": [
+      {
+       "id": "pc-6e-proprietes-matiere",
+       "title": "États et propriétés de la matière",
+       "objectives": [
+        {
+         "id": "P6-M-01",
+         "text": "Décrire un échantillon de matière avec le vocabulaire scientifique et les grandeurs masse et volume.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – États et constitution de la matière – attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P6-M-02",
+         "text": "Classer et trier des matériaux selon leurs propriétés physiques (conductivité thermique ou électrique, interaction avec un aimant), par l'expérience ou des documents.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Propriétés de la matière – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-03",
+         "text": "Rechercher la durée de décomposition dans la nature de matériaux usuels (métaux, papier-carton, plastiques, verre) et en déduire leurs effets possibles sur l'environnement.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Propriétés de la matière – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-04",
+         "text": "Mesurer des températures de changement d'état.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Propriétés de la matière – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-05",
+         "text": "Suivre l'évolution de la température d'un corps chauffé ou refroidi et repérer les paliers lors des changements d'état.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Propriétés de la matière – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [],
+       "safety": [
+        "Plaques chauffantes et eau chaude : risque de brûlure, manipuler avec pince ou gants thermiques.",
+        "Thermomètres : préférer les sondes électroniques aux thermomètres en verre."
+       ],
+       "misconceptions": [
+        "Croire que la température continue d'augmenter pendant l'ébullition.",
+        "Confondre fusion et dissolution (« le sucre fond dans l'eau »).",
+        "Penser que les bulles de l'eau bouillante sont de l'air."
+       ],
+       "notes": "Programme de cycle 3 en vigueur en 6e pour 2026-2027 (colonne « fin de sixième »). Les acquis « fin de CM » (états solide/liquide/gaz, réversibilité) sont des prérequis de l'école primaire."
+      },
+      {
+       "id": "pc-6e-masse-volume",
+       "title": "Masse et volume",
+       "objectives": [
+        {
+         "id": "P6-M-06",
+         "text": "Mesurer un volume de gaz par déplacement de liquide.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Masse et volume – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-07",
+         "text": "Convertir des unités de masse et de volume.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Masse et volume – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-08",
+         "text": "Comparer et mesurer les masses de corps différents de même volume, et inversement.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Masse et volume – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-09",
+         "text": "Exploiter la proportionnalité entre masse et volume d'un corps homogène (préparation de la masse volumique du cycle 4).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Masse et volume – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-10",
+         "text": "Mettre en évidence un critère permettant de prévoir l'ordre de superposition de deux liquides non miscibles (masses comparées à volume égal).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Masse et volume – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-proprietes-matiere"
+       ],
+       "safety": [
+        "Verrerie (éprouvettes, béchers) : signaler toute casse, ne pas ramasser le verre à la main."
+       ],
+       "misconceptions": [
+        "Croire qu'un gaz n'a pas de masse.",
+        "Confondre masse et volume (« plus gros donc plus lourd »).",
+        "Lire le volume au mauvais endroit du ménisque."
+       ],
+       "notes": "La grandeur « masse volumique » n'est introduite qu'au cycle 4 ; en 6e on s'en tient à la proportionnalité masse-volume."
+      },
+      {
+       "id": "pc-6e-melanges-transformations",
+       "title": "Mélanges et premières transformations chimiques",
+       "objectives": [
+        {
+         "id": "P6-M-11",
+         "text": "Caractériser la diversité de la matière et de ses transformations à l'échelle macroscopique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – États et constitution de la matière – attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P6-M-12",
+         "text": "Séparer deux liquides non miscibles par une technique adaptée.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-13",
+         "text": "Observer la saturation lors de la dissolution d'un solide dans l'eau et la décrire quantitativement.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-14",
+         "text": "Rechercher la composition de l'air et citer des gaz contribuant à l'effet de serre.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-15",
+         "text": "Réaliser un mélange dont les changements observés (couleur, gaz produit…) s'interprètent par une transformation chimique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-16",
+         "text": "Mettre en évidence la consommation de réactifs ou la formation de produits lors d'une transformation chimique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-17",
+         "text": "Rechercher les règles de sécurité liées aux produits ménagers et leurs conséquences environnementales.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-M-18",
+         "text": "Associer les pictogrammes de sécurité du laboratoire de chimie aux dangers et risques correspondants.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mélanges – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-masse-volume"
+       ],
+       "safety": [
+        "Port de lunettes et blouse lors des mélanges réactifs.",
+        "Ne jamais goûter ni sentir directement un produit.",
+        "Ne jamais mélanger des produits ménagers (ex. eau de Javel + acide → dégagement toxique).",
+        "Lire les pictogrammes SGH avant toute manipulation."
+       ],
+       "misconceptions": [
+        "Penser qu'un solide dissous disparaît et n'a plus de masse.",
+        "Croire que tout changement de couleur ou toute bulle est une transformation chimique (confusion avec ébullition/dissolution).",
+        "Croire que l'air est « vide » ou constitué uniquement d'oxygène."
+       ],
+       "notes": "Acquis de fin de CM supposés : tamisage, décantation, filtration, évaporation, conservation de la masse lors d'une dissolution."
+      },
+      {
+       "id": "pc-6e-mouvements",
+       "title": "Mouvements et vitesse",
+       "objectives": [
+        {
+         "id": "P6-I-01",
+         "text": "Décrire un mouvement en précisant le point de vue (« par rapport à »).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Différents types de mouvement – attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P6-I-02",
+         "text": "Calculer la valeur de la vitesse à partir de la distance et de la durée pour un mouvement uniforme par rapport à un observateur (seul calcul exigible en 6e).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mouvements – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-I-03",
+         "text": "Identifier des situations où la valeur de la vitesse est constante ou variable.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mouvements – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-I-04",
+         "text": "Convertir des unités de distance et de durée, notamment pour la révolution des planètes.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mouvements – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-I-05",
+         "text": "Associer l'année à la révolution de la Terre autour du Soleil (point de vue héliocentrique) et le jour à sa rotation autour de l'axe des pôles.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Mouvements – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [],
+       "safety": [],
+       "misconceptions": [
+        "Penser qu'un objet est en mouvement ou immobile dans l'absolu, sans référentiel.",
+        "Croire que le Soleil tourne autour de la Terre parce qu'on le voit se déplacer.",
+        "Confondre durée et instant (date)."
+       ],
+       "notes": "L'exploitation générale de v = d/t (calcul de d ou t) relève du cycle 4."
+      },
+      {
+       "id": "pc-6e-energie",
+       "title": "Ressources et conversions d'énergie",
+       "objectives": [
+        {
+         "id": "P6-E-01",
+         "text": "Identifier les formes d'énergie (pesanteur, cinétique, chimique, thermique, électrique, nucléaire, lumineuse) dans des situations variées.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Conversions d'énergie – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-E-02",
+         "text": "Réaliser un dispositif de conversion d'énergie et le représenter par une chaîne énergétique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Conversions d'énergie – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-E-03",
+         "text": "Classer des ressources en énergie (Soleil, eau, vent, pétrole, bois, charbon, dihydrogène, uranium…) selon leur caractère renouvelable à l'échelle d'une vie humaine.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Conversions d'énergie – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-E-04",
+         "text": "Rechercher les conséquences environnementales de l'utilisation de ces ressources (gaz à effet de serre, déchets…) en exerçant son esprit critique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Conversions d'énergie – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [],
+       "safety": [
+        "Moteurs et piles : ne pas court-circuiter une pile (échauffement)."
+       ],
+       "misconceptions": [
+        "Croire que l'énergie se « crée » ou « se perd » au lieu de se convertir/transférer.",
+        "Confondre source d'énergie et forme d'énergie.",
+        "Penser que l'électricité est une source d'énergie primaire."
+       ],
+       "notes": "Le programme demande de distinguer énergies stockées (pesanteur, cinétique, chimique, nucléaire, thermique) et transferts (électrique, lumineuse). La dépendance à la masse n'est pas exigible en fin de cycle 3."
+      },
+      {
+       "id": "pc-6e-lumiere-terre",
+       "title": "Lumière, ombres, jour/nuit et saisons",
+       "objectives": [
+        {
+         "id": "P6-S-01",
+         "text": "Interpréter la formation d'ombres, notamment dans le système Soleil-Terre-Lune.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Signal et information – attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P6-S-02",
+         "text": "Interpréter l'alternance jour/nuit pour un observateur terrestre à l'aide d'une modélisation.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Lumière – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-03",
+         "text": "Relier l'alternance des saisons à l'inclinaison du Soleil et à la durée du jour pour un observateur terrestre.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Lumière – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-mouvements"
+       ],
+       "safety": [
+        "Ne jamais observer le Soleil directement, même avec des lunettes de soleil ordinaires."
+       ],
+       "misconceptions": [
+        "Expliquer les saisons par la variation de distance Terre-Soleil.",
+        "Croire que la nuit est due au Soleil qui « se cache » ou s'éteint.",
+        "Confondre ombre propre et ombre portée."
+       ],
+       "notes": "Acquis de CM supposés : objets transparents/translucides/opaques, ombres, phases de la Lune."
+      },
+      {
+       "id": "pc-6e-electricite",
+       "title": "Circuits électriques à une boucle",
+       "objectives": [
+        {
+         "id": "P6-S-04",
+         "text": "Réaliser des circuits électriques à une boucle en respectant des consignes de sécurité.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Signal et information – attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P6-S-05",
+         "text": "Montrer expérimentalement qu'on peut intervertir les composants d'un circuit à une boucle.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Électricité – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-06",
+         "text": "Réaliser un circuit à une boucle comportant un convertisseur d'énergie (moteur, cellule photovoltaïque…).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Électricité – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-07",
+         "text": "Réaliser un circuit à une boucle comportant un capteur (température, éclairement, mouvement…).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Électricité – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-08",
+         "text": "Représenter le circuit réalisé par un schéma normalisé.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Électricité – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-09",
+         "text": "Rechercher et appliquer les règles de sécurité électrique.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Électricité – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-proprietes-matiere"
+       ],
+       "safety": [
+        "Utiliser uniquement des piles/générateurs basse tension ; ne jamais expérimenter sur le secteur 230 V.",
+        "Éviter les courts-circuits (échauffement des fils et de la pile)."
+       ],
+       "misconceptions": [
+        "Conception « circulatoire » : le courant s'use ou s'épuise le long du circuit.",
+        "Croire qu'un seul fil suffit pour allumer une lampe.",
+        "Penser que l'ordre des composants change le fonctionnement d'un circuit série."
+       ],
+       "notes": "Le programme cite explicitement l'objectif de dépasser la conception d'un courant qui s'use."
+      },
+      {
+       "id": "pc-6e-signaux",
+       "title": "Signaux et transmission de l'information",
+       "objectives": [
+        {
+         "id": "P6-S-10",
+         "text": "Identifier des signaux de natures différentes (sonore, lumineux, électrique…) servant à transmettre une information.",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Transmission de l'information – fin de sixième",
+         "verified": true
+        },
+        {
+         "id": "P6-S-11",
+         "text": "Citer des applications où un signal transmet une information (feux, voyants, alarmes, câbles sous-marins…).",
+         "officialRef": "BO n°25 du 22/06/2023, annexe Sciences et technologie cycle 3 – Matière, mouvement, énergie, information – Transmission de l'information – fin de sixième",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-electricite"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Confondre le signal (support physique) et l'information qu'il porte."
+       ],
+       "notes": "Lien possible avec l'initiation à la programmation (thème objets techniques)."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "5e",
+   "cycle": 4,
+   "curriculumVersion": "2026-2027",
+   "programme": {
+    "title": "Programme de physique-chimie du cycle 4 (cycle des approfondissements), version 2020",
+    "reference": "Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie)",
+    "nor": "MENE2018714A",
+    "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
+    "applicability": "En vigueur depuis la rentrée 2020 pour 5e, 4e, 3e ; toujours applicable en 2026-2027 (aucun arrêté de nouveau programme PC cycle 4 publié à la date du 2026-11-06 selon les sources consultées ; projet CSP soumis à consultation du 18/05 au 19/06/2026).",
+    "status": "current"
+   },
+   "domains": [
+    {
+     "id": "pc-c4-5-m",
+     "title": "Organisation et transformations de la matière",
+     "chapters": [
+      {
+       "id": "pc-5e-etats-changements-etat",
+       "title": "États de la matière et changements d'état",
+       "objectives": [
+        {
+         "id": "P5-M-01",
+         "text": "Caractériser les trois états de la matière (solide, liquide, gaz).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-02",
+         "text": "Concevoir et réaliser un protocole pour étudier les changements d'état : conservation de la masse, variation du volume.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-03",
+         "text": "Caractériser les changements d'état d'un corps pur et utiliser sa température de changement d'état pour l'identifier.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-04",
+         "text": "Interpréter les états et changements d'état avec un modèle particulaire simple.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-proprietes-matiere"
+       ],
+       "safety": [
+        "Chauffage : lunettes, cheveux attachés, ne jamais chauffer un récipient fermé.",
+        "Glace + sel : contact prolongé avec la peau à éviter (brûlure par le froid)."
+       ],
+       "misconceptions": [
+        "Croire que la masse change lors d'un changement d'état (« la glace est plus lourde »).",
+        "Penser que les particules elles-mêmes se dilatent ou fondent.",
+        "Croire qu'entre les particules d'un gaz il y a de l'air."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : repères de progressivité du programme (« dès la classe de 5e » : conservation de la masse, non-conservation du volume, modèle particulaire) et exemple Eduscol 2016. Le terme « molécule » est employé au sens de particule, sans atomes, en 5e (Eduscol 2016)."
+      },
+      {
+       "id": "pc-5e-melanges-corps-purs",
+       "title": "Mélanges, corps purs, miscibilité et solubilité",
+       "objectives": [
+        {
+         "id": "P5-M-05",
+         "text": "Distinguer espèce chimique, corps pur et mélange.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-06",
+         "text": "Concevoir et réaliser des expériences pour caractériser des mélanges (miscibilité de liquides, dissolution d'un solide).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-07",
+         "text": "Estimer expérimentalement une valeur de solubilité dans l'eau.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P5-M-08",
+         "text": "Établir expérimentalement la proportionnalité entre masse et volume pour une substance donnée (approche de la masse volumique).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Repères de progressivité",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-melanges-transformations",
+        "pc-6e-masse-volume"
+       ],
+       "safety": [
+        "Lunettes lors des manipulations de solutions ; rincer et ranger la verrerie."
+       ],
+       "misconceptions": [
+        "Croire qu'un liquide limpide et incolore est forcément de l'eau (Eduscol 2016).",
+        "Confondre « pur » au sens courant (naturel, sain) et corps pur au sens chimique.",
+        "Penser que la dissolution fait perdre de la masse."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : miscibilité/solubilité « dès le début du cycle » (programme). Eduscol 2016 propose mélanges solide-liquide et liquide-liquide en 5e, gaz-liquide en 4e."
+      },
+      {
+       "id": "pc-5e-transformations-chimiques-intro",
+       "title": "Reconnaître une transformation chimique ; acidité et pH",
+       "objectives": [
+        {
+         "id": "P5-M-09",
+         "text": "Identifier expérimentalement une transformation chimique (formation de nouvelles espèces).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P5-M-10",
+         "text": "Distinguer transformation chimique, mélange et transformation physique (approche macroscopique).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P5-M-11",
+         "text": "Identifier le caractère acide ou basique d'une solution par mesure du pH.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Propriétés de quelques transformations chimiques",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-melanges-transformations"
+       ],
+       "safety": [
+        "Lunettes et blouse obligatoires avec acides/bases même dilués.",
+        "Utiliser des produits du quotidien dilués (vinaigre, bicarbonate) ; ne pas manipuler de soude ou d'acide concentré.",
+        "Lire les pictogrammes des produits ménagers."
+       ],
+       "misconceptions": [
+        "Confondre dissolution et transformation chimique.",
+        "Croire qu'acide signifie forcément dangereux/corrosif et basique inoffensif.",
+        "Penser que le gaz dégagé « vient de nulle part »."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : le programme indique que des exemples de transformations chimiques sont introduits expérimentalement « dès la classe de 5e » ; l'interprétation atomique et le lien pH-ions sont reportés (Eduscol 2016 : pas envisageable en 5e)."
+      },
+      {
+       "id": "pc-5e-systeme-solaire",
+       "title": "Le système solaire et les distances",
+       "objectives": [
+        {
+         "id": "P5-M-12",
+         "text": "Décrire la structure du système solaire (système Terre-Lune-Soleil, planètes).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P5-M-13",
+         "text": "Aborder différentes unités de distance adaptées (km, unité astronomique).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-mouvements",
+        "pc-6e-lumiere-terre"
+       ],
+       "safety": [
+        "Observation du Soleil : jamais à l'œil nu ni avec un instrument non équipé de filtre normé."
+       ],
+       "misconceptions": [
+        "Représentations à l'échelle erronées (planètes proches les unes des autres).",
+        "Expliquer les phases de la Lune par l'ombre de la Terre (confusion avec les éclipses)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : partie à aborder « tout au long du cycle ». Eduscol 2016 suggère de rester dans le système solaire en 5e (phases, éclipses ; UA accessible ; puissances de dix et vitesse de la lumière non envisageables)."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-5-i",
+     "title": "Mouvement et interactions",
+     "chapters": [
+      {
+       "id": "pc-5e-caracteriser-mouvement",
+       "title": "Caractériser un mouvement",
+       "objectives": [
+        {
+         "id": "P5-I-01",
+         "text": "Caractériser le mouvement d'un objet : trajectoire rectiligne ou circulaire, mouvement uniforme ou à vitesse variable.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        },
+        {
+         "id": "P5-I-02",
+         "text": "Calculer une vitesse avec v = d/t à partir de valeurs données (application numérique directe).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-mouvements"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Confondre trajectoire et déplacement.",
+        "Penser qu'un mouvement circulaire ne peut pas être uniforme.",
+        "Croire qu'un objet en mouvement uniforme a besoin d'une « force motrice » permanente."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : Eduscol 2016 – en 5e la notion d'inconnue n'étant pas stabilisée en mathématiques, on n'exige pas d'isoler d ou t."
+      },
+      {
+       "id": "pc-5e-actions-mecaniques",
+       "title": "Actions de contact et actions à distance",
+       "objectives": [
+        {
+         "id": "P5-I-03",
+         "text": "Identifier les actions mises en jeu (de contact ou à distance) de manière descriptive.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Modéliser une action exercée sur un objet par une force",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-caracteriser-mouvement"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Croire qu'une action nécessite toujours un contact.",
+        "Penser qu'un objet immobile ne subit aucune action."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : la notion d'interaction est abordée « de manière descriptive dès le début du cycle » (programme) ; Eduscol 2016 précise qu'on ne parle pas encore de force en 5e. Le diagramme objet-interaction est utilisable dès la 5e."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-5-e",
+     "title": "L'énergie, ses transferts et ses conversions",
+     "chapters": [
+      {
+       "id": "pc-5e-sources-formes-energie",
+       "title": "Sources, formes, transferts et conversions d'énergie",
+       "objectives": [
+        {
+         "id": "P5-E-01",
+         "text": "Identifier les différentes formes d'énergie (thermique, électrique, lumineuse…).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Identifier les sources, les transferts, les conversions et les formes d'énergie",
+         "verified": true
+        },
+        {
+         "id": "P5-E-02",
+         "text": "Distinguer sources, transferts et conversions d'énergie dans des situations de la vie courante.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Identifier les sources, les transferts, les conversions et les formes d'énergie",
+         "verified": true
+        },
+        {
+         "id": "P5-E-03",
+         "text": "Comparer des ordres de grandeur d'énergies ou de puissances de dispositifs usuels (notion qualitative de puissance).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Repères de progressivité",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-energie"
+       ],
+       "safety": [
+        "Appareils électriques domestiques : observer sans démonter ni brancher sur le secteur en classe."
+       ],
+       "misconceptions": [
+        "Confondre puissance et énergie.",
+        "Utiliser « produire » ou « consommer » de l'énergie comme si elle était créée/détruite.",
+        "Croire que la chaleur est une substance."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : le programme indique que la 5e est l'occasion de revenir sur les attendus du cycle 3 (sources, conversions). La puissance y est qualitative (Eduscol 2016, note 20)."
+      },
+      {
+       "id": "pc-5e-circuits-electriques",
+       "title": "Circuits électriques : série et dérivation",
+       "objectives": [
+        {
+         "id": "P5-E-04",
+         "text": "Élaborer et réaliser un circuit électrique répondant à un cahier des charges simple.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P5-E-05",
+         "text": "Distinguer dipôles en série et dipôles en dérivation.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P5-E-06",
+         "text": "Aborder qualitativement le courant et la tension (premières mesures à l'ampèremètre et au voltmètre).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Repères de progressivité",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-electricite"
+       ],
+       "safety": [
+        "Basse tension uniquement (piles, générateurs ≤ 12 V).",
+        "Brancher l'ampèremètre en série, jamais directement aux bornes du générateur.",
+        "Débrancher avant de modifier le montage."
+       ],
+       "misconceptions": [
+        "Le courant « s'use » dans les lampes (Eduscol 2016).",
+        "Le courant part des deux bornes et se « choque » dans la lampe.",
+        "Confondre tension et intensité."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : « dès la classe de 5e » (programme) ; les lois des circuits sont prématurées en 5e (Eduscol 2016, note 21)."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-5-s",
+     "title": "Des signaux pour observer et communiquer",
+     "chapters": [
+      {
+       "id": "pc-5e-lumiere-propagation",
+       "title": "Sources de lumière et propagation rectiligne",
+       "objectives": [
+        {
+         "id": "P5-S-01",
+         "text": "Distinguer une source primaire de lumière d'un objet diffusant.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux lumineux",
+         "verified": true
+        },
+        {
+         "id": "P5-S-02",
+         "text": "Exploiter expérimentalement la propagation rectiligne de la lumière et le modèle du rayon lumineux.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux lumineux",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-6e-lumiere-terre"
+       ],
+       "safety": [
+        "Laser : jamais dirigé vers les yeux, pas de surfaces réfléchissantes non maîtrisées (risque signalé par le programme).",
+        "Lampes puissantes : éviter l'éblouissement."
+       ],
+       "misconceptions": [
+        "Croire qu'on voit un objet parce que l'œil émet quelque chose.",
+        "Penser que la lumière ne se propage que la nuit ou qu'elle « reste » autour de la lampe.",
+        "Croire que le rayon lumineux est un objet réel et non un modèle."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 5e, avec conditions de visibilité, ombres)."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "4e",
+   "cycle": 4,
+   "curriculumVersion": "2026-2027",
+   "programme": {
+    "title": "Programme de physique-chimie du cycle 4 (cycle des approfondissements), version 2020",
+    "reference": "Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie)",
+    "nor": "MENE2018714A",
+    "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
+    "applicability": "En vigueur depuis la rentrée 2020 pour 5e, 4e, 3e ; toujours applicable en 2026-2027 (aucun arrêté de nouveau programme PC cycle 4 publié à la date du 2026-11-06 selon les sources consultées ; projet CSP soumis à consultation du 18/05 au 19/06/2026).",
+    "status": "current"
+   },
+   "domains": [
+    {
+     "id": "pc-c4-4-m",
+     "title": "Organisation et transformations de la matière",
+     "chapters": [
+      {
+       "id": "pc-4e-air-gaz-tests",
+       "title": "L'air, la dissolution des gaz et les tests caractéristiques",
+       "objectives": [
+        {
+         "id": "P4-M-01",
+         "text": "Connaître la composition de l'air (diazote, dioxygène, autres gaz).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P4-M-02",
+         "text": "Estimer expérimentalement la solubilité d'un gaz (notamment le CO2) dans l'eau.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P4-M-03",
+         "text": "Mettre en œuvre des tests caractéristiques d'espèces chimiques à partir d'une banque fournie (dioxygène, dioxyde de carbone, eau).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-melanges-corps-purs"
+       ],
+       "safety": [
+        "Test du dioxygène (bûchette incandescente) : flamme, cheveux attachés, éloigner le matériel inflammable.",
+        "Eau de chaux : irritante, lunettes obligatoires.",
+        "Sulfate de cuivre anhydre : nocif, gants ou spatule, ne pas jeter à l'évier."
+       ],
+       "misconceptions": [
+        "Croire que l'air est principalement composé de dioxygène.",
+        "Penser qu'un gaz dissous n'est plus présent ou n'a plus de masse."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 4e ; mélanges gaz-liquide réservés à la 4e)."
+      },
+      {
+       "id": "pc-4e-masse-volumique",
+       "title": "La masse volumique",
+       "objectives": [
+        {
+         "id": "P4-M-04",
+         "text": "Proposer et réaliser un protocole pour déterminer la masse volumique d'un liquide ou d'un solide.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        },
+        {
+         "id": "P4-M-05",
+         "text": "Utiliser la relation m = ρ × V, et l'influence de la température sur ρ.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P4-M-06",
+         "text": "Exploiter des mesures de masse volumique pour différencier des espèces chimiques.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire la constitution et les états de la matière",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-melanges-corps-purs",
+        "pc-6e-masse-volume"
+       ],
+       "safety": [
+        "Solides métalliques : manipuler sans laisser tomber dans la verrerie (casse)."
+       ],
+       "misconceptions": [
+        "Confondre masse volumique et masse (« le fer est plus lourd que le bois »).",
+        "Croire que la masse volumique dépend de la taille de l'échantillon.",
+        "Erreurs d'unités (g/cm³ vs kg/m³)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : le programme indique que la grandeur quotient est introduite « progressivement à partir de la classe de 4e ». L'exemple Eduscol 2016 (antérieur à 2020) place la relation m = ρV en 3e : placement 4e/3e au choix de l'équipe ; réinvestissement en 3e (reconnaissance de métaux, planètes)."
+      },
+      {
+       "id": "pc-4e-atomes-molecules-reactions",
+       "title": "Atomes, molécules et transformations chimiques",
+       "objectives": [
+        {
+         "id": "P4-M-07",
+         "text": "Interpréter une transformation chimique comme une redistribution des atomes.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P4-M-08",
+         "text": "Utiliser une équation de réaction fournie pour décrire une transformation observée.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P4-M-09",
+         "text": "Connaître la conservation de la masse lors d'une transformation chimique.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P4-M-10",
+         "text": "Associer leurs symboles aux éléments à l'aide de la classification périodique.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P4-M-11",
+         "text": "Interpréter une formule chimique en termes atomiques (O2, H2, N2, H2O, CO2, CH4, N2O).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P4-M-12",
+         "text": "Distinguer transformation chimique, mélange et transformation physique en mobilisant le modèle particulaire/atomique.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P4-M-13",
+         "text": "Étudier des combustions dans l'air.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Propriétés de quelques transformations chimiques",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-transformations-chimiques-intro",
+        "pc-4e-air-gaz-tests",
+        "pc-5e-etats-changements-etat"
+       ],
+       "safety": [
+        "Combustions : réalisées par le professeur ou en petite quantité, lunettes, cheveux attachés, paillasse dégagée.",
+        "Combustion incomplète : risque de monoxyde de carbone (aérer, lien avec la sécurité domestique)."
+       ],
+       "misconceptions": [
+        "Croire que la matière disparaît lors d'une combustion (bougie qui « se consume »).",
+        "Confondre atome et molécule.",
+        "Penser que les coefficients d'une équation modifient la formule des espèces."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : équations « initiées en classe de 4e dans des cas simples », tableau périodique « à partir de la classe de 4e » (programme). Aucun attendu de fin de cycle sur l'ajustement des équations (Eduscol 2016). Le méthane et le protoxyde d'azote figurent dans la liste 2020 (lien gaz à effet de serre)."
+      },
+      {
+       "id": "pc-4e-univers-distances",
+       "title": "Structure de l'Univers et grandes distances",
+       "objectives": [
+        {
+         "id": "P4-M-14",
+         "text": "Décrire la structure de l'Univers et du système solaire (galaxies).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P4-M-15",
+         "text": "Convertir des unités de distance du kilomètre à l'année-lumière ; ordres de grandeur de distances astronomiques.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P4-M-16",
+         "text": "Situer la formation du système solaire et les âges géologiques.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-systeme-solaire",
+        "pc-4e-vitesse"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Croire que l'année-lumière est une durée.",
+        "Penser que les étoiles visibles existent forcément encore telles qu'on les voit (« voir loin, c'est voir dans le passé »)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 4e, après la notion d'inconnue en mathématiques)."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-4-i",
+     "title": "Mouvement et interactions",
+     "chapters": [
+      {
+       "id": "pc-4e-vitesse",
+       "title": "Vitesse : direction, sens et valeur",
+       "objectives": [
+        {
+         "id": "P4-I-01",
+         "text": "Utiliser la relation entre vitesse, distance et durée pour un mouvement uniforme (calcul de v, d ou t).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        },
+        {
+         "id": "P4-I-02",
+         "text": "Caractériser la vitesse par une direction, un sens et une valeur.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        },
+        {
+         "id": "P4-I-03",
+         "text": "Distinguer mouvements uniformes et mouvements dont la vitesse varie en valeur ou en direction.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-caracteriser-mouvement"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Penser qu'un mouvement circulaire à vitesse de valeur constante n'a pas de vitesse variable (direction).",
+        "Erreurs de conversion km/h ↔ m/s."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 4e). Le vecteur vitesse relève du lycée : ne pas l'introduire."
+      },
+      {
+       "id": "pc-4e-poids-pesanteur",
+       "title": "Modéliser une action par une force ; le poids",
+       "objectives": [
+        {
+         "id": "P4-I-04",
+         "text": "Modéliser une action par une force caractérisée par un point d'application, une direction, un sens et une valeur.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P4-I-05",
+         "text": "Connaître la force de pesanteur et son expression P = m × g.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Modéliser une action exercée sur un objet par une force",
+         "verified": true
+        },
+        {
+         "id": "P4-I-06",
+         "text": "Distinguer poids et masse (grandeurs, unités).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Exemples de situations (pesanteur sur Terre et sur la Lune)",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-actions-mecaniques"
+       ],
+       "safety": [
+        "Dynamomètres et masses marquées : ne pas dépasser le calibre, attention aux chutes de masses."
+       ],
+       "misconceptions": [
+        "Confondre masse (kg) et poids (N).",
+        "Croire que le poids n'existe pas dans l'espace ou que la masse change sur la Lune.",
+        "Penser que les objets lourds tombent plus vite (dans le vide)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : forces « progressivement et si possible dès la classe de 4e » (programme) ; Eduscol 2016 centre la 4e sur le poids, la généralisation de la notion de force étant en 3e."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-4-e",
+     "title": "L'énergie, ses transferts et ses conversions",
+     "chapters": [
+      {
+       "id": "pc-4e-lois-electricite",
+       "title": "Intensité, tension et lois des circuits",
+       "objectives": [
+        {
+         "id": "P4-E-01",
+         "text": "Élaborer et réaliser un protocole pour vérifier une loi de l'électricité.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P4-E-02",
+         "text": "Exploiter l'unicité de l'intensité dans un circuit série et l'additivité des intensités (circuit à deux mailles).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P4-E-03",
+         "text": "Exploiter l'additivité des tensions (une maille) et l'unicité des tensions (dérivation).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P4-E-04",
+         "text": "Étudier l'influence d'une résistance dans un circuit.",
+         "officialRef": "Eduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (non prescriptif)",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-circuits-electriques"
+       ],
+       "safety": [
+        "Respecter calibres et branchements des multimètres (ampèremètre en série, voltmètre en dérivation).",
+        "Basse tension uniquement."
+       ],
+       "misconceptions": [
+        "La tension « circule » dans le circuit comme le courant.",
+        "L'intensité est plus forte « avant » une lampe qu'après.",
+        "Aborder l'intensité avant la tension peut faire croire que la tension est due au courant (Eduscol 2016)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : « en classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose » (programme). Le dernier objectif provient de l'exemple Eduscol 2016 (résistance), le programme ne citant que la loi d'Ohm."
+      },
+      {
+       "id": "pc-4e-energie-chimique-bilan",
+       "title": "Énergie chimique, bilan énergétique et relation E = P × t",
+       "objectives": [
+        {
+         "id": "P4-E-05",
+         "text": "Identifier l'énergie chimique notamment via les combustions.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Identifier les sources, les transferts, les conversions et les formes d'énergie",
+         "verified": true
+        },
+        {
+         "id": "P4-E-06",
+         "text": "Identifier un dispositif de conversion d'énergie qui émet du dioxyde de carbone.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Identifier les sources, les transferts, les conversions et les formes d'énergie [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P4-E-07",
+         "text": "Établir un bilan énergétique pour un système simple (sources, transferts, conversions, unités).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie",
+         "verified": true
+        },
+        {
+         "id": "P4-E-08",
+         "text": "Utiliser la relation entre énergie, puissance et durée.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-sources-formes-energie",
+        "pc-4e-atomes-molecules-reactions"
+       ],
+       "safety": [
+        "Combustions : voir chapitre transformations chimiques."
+       ],
+       "misconceptions": [
+        "Confondre kW et kWh.",
+        "Penser que la chaleur dégagée est « perdue » donc détruite."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 4e). La pleine maîtrise P-E est un objectif de fin de cycle."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-4-s",
+     "title": "Des signaux pour observer et communiquer",
+     "chapters": [
+      {
+       "id": "pc-4e-son-vitesse-propagation",
+       "title": "Propagation du son et vitesse de la lumière",
+       "objectives": [
+        {
+         "id": "P4-S-01",
+         "text": "Décrire les conditions de propagation d'un son (milieu matériel nécessaire).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux sonores",
+         "verified": true
+        },
+        {
+         "id": "P4-S-02",
+         "text": "Relier la distance parcourue par un son à la durée de propagation.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux sonores",
+         "verified": true
+        },
+        {
+         "id": "P4-S-03",
+         "text": "Connaître la vitesse de propagation de la lumière et utiliser l'année-lumière comme unité de distance.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux lumineux",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-5e-lumiere-propagation",
+        "pc-4e-vitesse"
+       ],
+       "safety": [
+        "Risques auditifs : limiter niveaux sonores et durée d'exposition (programme)."
+       ],
+       "misconceptions": [
+        "Croire que le son se propage dans le vide.",
+        "Penser que le son et la lumière ont des vitesses comparables (orage : éclair et tonnerre).",
+        "Croire que l'air se déplace de la source à l'oreille."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : Eduscol 2016 indique que les conditions de propagation du son peuvent être traitées dès la 5e, au choix de l'enseignant."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "3e",
+   "cycle": 4,
+   "curriculumVersion": "2026-2027",
+   "programme": {
+    "title": "Programme de physique-chimie du cycle 4 (cycle des approfondissements), version 2020",
+    "reference": "Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie)",
+    "nor": "MENE2018714A",
+    "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
+    "applicability": "En vigueur depuis la rentrée 2020 pour 5e, 4e, 3e ; toujours applicable en 2026-2027 (aucun arrêté de nouveau programme PC cycle 4 publié à la date du 2026-11-06 selon les sources consultées ; projet CSP soumis à consultation du 18/05 au 19/06/2026).",
+    "status": "current"
+   },
+   "domains": [
+    {
+     "id": "pc-c4-3-m",
+     "title": "Organisation et transformations de la matière",
+     "chapters": [
+      {
+       "id": "pc-3e-atome-noyau-ions",
+       "title": "Constitution de l'atome, noyau et ions",
+       "objectives": [
+        {
+         "id": "P3-M-01",
+         "text": "Décrire les constituants de l'atome : noyau (protons, neutrons) et électrons.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P3-M-02",
+         "text": "Connaître les notions de molécules, atomes, ions.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P3-M-03",
+         "text": "Utiliser le tableau périodique pour relier nom, symbole et numéro atomique d'un élément.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Exemples de situations",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-atomes-molecules-reactions"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Représenter l'atome comme un système solaire « plein » (absence de vide).",
+        "Croire que les électrons sont dans le noyau.",
+        "Penser qu'un ion est un atome différent (changement d'élément)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : la description de l'atome et du noyau « peut être réservée à la classe de 3e » (programme), en lien avec les puissances de dix. La formation des ions n'est pas à expliciter avant (Eduscol 2016)."
+      },
+      {
+       "id": "pc-3e-acides-bases-metaux",
+       "title": "Acides, bases, pH et réactions avec les métaux",
+       "objectives": [
+        {
+         "id": "P3-M-04",
+         "text": "Associer le caractère acide ou basique à la présence d'ions H+ et OH-.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Propriétés de quelques transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P3-M-05",
+         "text": "Étudier les réactions acide-base et acide-métal ; utiliser une équation fournie pour les décrire.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P3-M-06",
+         "text": "Mettre en œuvre des tests caractéristiques (ions, dihydrogène) à partir d'une banque fournie.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire et expliquer des transformations chimiques",
+         "verified": true
+        },
+        {
+         "id": "P3-M-07",
+         "text": "Étudier la corrosion d'un métal.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Propriétés de quelques transformations chimiques [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        }
+       ],
+       "prerequisites": [
+        "pc-3e-atome-noyau-ions",
+        "pc-5e-transformations-chimiques-intro"
+       ],
+       "safety": [
+        "Acide chlorhydrique (dilué) : lunettes, gants, blouse ; verser l'acide dans l'eau et jamais l'inverse.",
+        "Dihydrogène : gaz inflammable/explosif, test en très petite quantité, loin de toute flamme non prévue.",
+        "Solutions de soude : corrosives même diluées pour les yeux.",
+        "Récupérer les solutions métalliques dans les bidons de récupération."
+       ],
+       "misconceptions": [
+        "Croire que le métal « fond » ou « se dissout » sans transformation chimique dans l'acide.",
+        "Penser que diluer un acide le rend basique.",
+        "Croire que pH 7 signifie « eau pure »."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 3e – espèces chargées). Aucun attendu sur l'ajustement des équations."
+      },
+      {
+       "id": "pc-3e-chimie-climat-environnement",
+       "title": "Transformations chimiques, gaz à effet de serre et environnement",
+       "objectives": [
+        {
+         "id": "P3-M-08",
+         "text": "Identifier les gaz à effet de serre produits lors de transformations chimiques.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Propriétés de quelques transformations chimiques [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P3-M-09",
+         "text": "Relier combustions et émissions de CO2 ; aborder l'acidification des océans et l'empreinte carbone.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Exemples de situations [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-atomes-molecules-reactions",
+        "pc-3e-acides-bases-metaux"
+       ],
+       "safety": [
+        "Ne pas réaliser de combustion de plastiques (fumées toxiques)."
+       ],
+       "misconceptions": [
+        "Confondre effet de serre et trou dans la couche d'ozone.",
+        "Croire que l'effet de serre est entièrement nocif (effet naturel indispensable)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : ajouts de la version 2020 (climat) – pas de répartition annuelle Eduscol (document de 2016 antérieur) ; placement en 3e = choix éditorial, à articuler avec SVT."
+      },
+      {
+       "id": "pc-3e-origine-matiere-univers",
+       "title": "Origine de la matière et évolution de l'Univers",
+       "objectives": [
+        {
+         "id": "P3-M-10",
+         "text": "Connaître et comprendre l'origine de la matière ; évolution de l'Univers.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P3-M-11",
+         "text": "Comprendre que la matière observable est partout de même nature et obéit aux mêmes lois.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers",
+         "verified": true
+        },
+        {
+         "id": "P3-M-12",
+         "text": "Comparer l'abondance de certains éléments sur Terre et dans l'Univers (H, He, O, C, Fe, Si, terres rares…) et les ressources terrestres.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Organisation et transformations de la matière – Décrire l'organisation de la matière dans l'Univers [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-univers-distances",
+        "pc-3e-atome-noyau-ions"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Croire que l'Univers a toujours été identique.",
+        "Penser que les éléments chimiques de la Terre sont différents de ceux des étoiles."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression (Eduscol 2016 : niveau 3e ; nucléosynthèse comme support possible, familles de planètes par densité non exigible)."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-3-i",
+     "title": "Mouvement et interactions",
+     "chapters": [
+      {
+       "id": "pc-3e-forces-gravitation",
+       "title": "Interactions, forces et gravitation universelle",
+       "objectives": [
+        {
+         "id": "P3-I-01",
+         "text": "Identifier les actions mises en jeu (contact, distance) et les modéliser par des forces.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Modéliser une action exercée sur un objet par une force",
+         "verified": true
+        },
+        {
+         "id": "P3-I-02",
+         "text": "Associer la notion d'interaction à la notion de force.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Modéliser une action exercée sur un objet par une force",
+         "verified": true
+        },
+        {
+         "id": "P3-I-03",
+         "text": "Exploiter l'expression littérale scalaire de la loi de gravitation universelle, la loi étant fournie.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Modéliser une action exercée sur un objet par une force",
+         "verified": true
+        },
+        {
+         "id": "P3-I-04",
+         "text": "Comparer la pesanteur sur Terre et sur d'autres astres ; aborder qualitativement l'impesanteur.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Exemples de situations",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-poids-pesanteur"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Croire qu'il n'y a pas de gravité dans la Station spatiale.",
+        "Penser que seule la Terre attire la Lune et non l'inverse (interaction réciproque).",
+        "Confondre force et énergie."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : en fin de cycle l'élève exploite la loi de gravitation fournie et P = mg (programme)."
+      },
+      {
+       "id": "pc-3e-relativite-mouvement",
+       "title": "Relativité du mouvement",
+       "objectives": [
+        {
+         "id": "P3-I-05",
+         "text": "Comprendre la relativité du mouvement dans des cas simples (observateur immobile ou en mouvement).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Mouvement et interactions – Caractériser un mouvement",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-vitesse"
+       ],
+       "safety": [],
+       "misconceptions": [
+        "Croire qu'un passager assis dans un train qui roule est immobile dans l'absolu."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : Eduscol 2016 la place en 3e mais précise qu'elle peut être abordée avant ; placement libre."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-3-e",
+     "title": "L'énergie, ses transferts et ses conversions",
+     "chapters": [
+      {
+       "id": "pc-3e-conservation-energie",
+       "title": "Formes d'énergie, conservation et énergie cinétique",
+       "objectives": [
+        {
+         "id": "P3-E-01",
+         "text": "Identifier les sources, transferts, conversions et formes d'énergie (cinétique, potentielle, thermique, électrique, chimique, nucléaire, lumineuse).",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Attendu de fin de cycle",
+         "verified": true
+        },
+        {
+         "id": "P3-E-02",
+         "text": "Utiliser la relation Ec = ½ m v².",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Identifier les sources, les transferts, les conversions et les formes d'énergie",
+         "verified": true
+        },
+        {
+         "id": "P3-E-03",
+         "text": "Utiliser la conservation de l'énergie ; analyser une situation où transferts entrants et sortants diffèrent.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P3-E-04",
+         "text": "Établir un bilan énergétique pour un système simple ; utiliser la relation puissance-énergie-durée.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-energie-chimique-bilan",
+        "pc-4e-vitesse"
+       ],
+       "safety": [
+        "Sécurité routière : lien Ec et distance de freinage (contexte, pas de manipulation)."
+       ],
+       "misconceptions": [
+        "Croire que l'énergie cinétique est proportionnelle à la vitesse (et non à son carré).",
+        "Penser que l'énergie se perd lors d'une conversion."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : « l'expression littérale de l'énergie cinétique peut être réservée à la classe de 3e » ; conservation de l'énergie = objectif de fin de cycle (programme)."
+      },
+      {
+       "id": "pc-3e-rayonnement-effet-serre",
+       "title": "Transferts d'énergie par rayonnement",
+       "objectives": [
+        {
+         "id": "P3-E-05",
+         "text": "Associer émission et absorption d'un rayonnement à un transfert d'énergie.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        },
+        {
+         "id": "P3-E-06",
+         "text": "Expliquer l'absorption du rayonnement terrestre par les gaz à effet de serre ; bilan qualitatif du système Terre-atmosphère.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Utiliser la conservation de l'énergie [ajout/modification 2020 ; lu uniquement dans la reproduction pccl.fr]",
+         "verified": false
+        }
+       ],
+       "prerequisites": [
+        "pc-3e-conservation-energie",
+        "pc-3e-chimie-climat-environnement"
+       ],
+       "safety": [
+        "Lampes chauffantes : ne pas toucher (brûlure)."
+       ],
+       "misconceptions": [
+        "Croire que seuls les objets chauds/lumineux émettent un rayonnement.",
+        "Confondre rayonnement et radioactivité."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : contenu ajouté en 2020, absent de l'exemple Eduscol 2016 ; placement en 3e = choix éditorial (prérequis énergie et GES)."
+      },
+      {
+       "id": "pc-3e-puissance-energie-electrique",
+       "title": "Loi d'Ohm, puissance et énergie électriques",
+       "objectives": [
+        {
+         "id": "P3-E-07",
+         "text": "Exploiter la relation tension-courant : loi d'Ohm.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P3-E-08",
+         "text": "Utiliser la puissance électrique P = U × I et la relation entre énergie, puissance et durée.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P3-E-09",
+         "text": "Conduire un calcul de consommation d'énergie électrique d'une situation de la vie courante.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        },
+        {
+         "id": "P3-E-10",
+         "text": "Mettre en relation les lois de l'électricité et les règles de sécurité électrique.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-lois-electricite",
+        "pc-4e-energie-chimique-bilan"
+       ],
+       "safety": [
+        "Secteur 230 V : jamais en manipulation élève ; rôle du disjoncteur, du fusible et de la prise de terre.",
+        "Multiprises surchargées : risque d'échauffement (lien P = U × I)."
+       ],
+       "misconceptions": [
+        "Croire qu'une résistance « consomme » du courant.",
+        "Confondre puissance (W) et énergie (J, kWh)."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : aspects énergétiques « réservables à la 3e » (programme) ; la loi d'Ohm peut être placée avant la 3e (Eduscol 2016)."
+      }
+     ]
+    },
+    {
+     "id": "pc-c4-3-s",
+     "title": "Des signaux pour observer et communiquer",
+     "chapters": [
+      {
+       "id": "pc-3e-frequence-signaux-information",
+       "title": "Fréquence, signaux et information",
+       "objectives": [
+        {
+         "id": "P3-S-01",
+         "text": "Connaître la notion de fréquence : sons audibles, infrasons, ultrasons.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signaux sonores",
+         "verified": true
+        },
+        {
+         "id": "P3-S-02",
+         "text": "Comprendre que le son et la lumière permettent d'émettre et de transporter un signal, donc une information.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Signal et information",
+         "verified": true
+        },
+        {
+         "id": "P3-S-03",
+         "text": "Caractériser différents types de signaux (lumineux, sonores, radio…) et utiliser leurs propriétés.",
+         "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – Des signaux pour observer et communiquer – Attendus de fin de cycle",
+         "verified": true
+        }
+       ],
+       "prerequisites": [
+        "pc-4e-son-vitesse-propagation"
+       ],
+       "safety": [
+        "Risques auditifs : casques, concerts (niveau sonore et durée).",
+        "Ultrasons/infrasons : pas de source de forte puissance en classe."
+       ],
+       "misconceptions": [
+        "Confondre fréquence (hauteur) et niveau sonore (intensité).",
+        "Croire que les ultrasons sont des sons « très forts »."
+       ],
+       "notes": "Le programme de cycle 4 fixe des attendus de FIN DE CYCLE (fin de 3e) ; la répartition 5e/4e/3e ci-dessous est une RECOMMANDATION de progression : la maîtrise de la fréquence est un objectif de fin de cycle (programme) ; f = 1/T n'est pas un attendu (Eduscol 2016)."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "id": "src-legifrance-arrete-2026-06-05",
+   "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054218988",
+   "title": "Arrêté du 5 juin 2026 fixant les programmes d'enseignement de sciences et technologie du cycle 2 et du cycle 3",
+   "publisher": "Légifrance (JORF n°0133 du 9 juin 2026, texte n°7)",
+   "date": "2026-06-09",
+   "kind": "official",
+   "status": "read (articles 1-3 lus ; annexes non lues)",
+   "license": "Licence Ouverte / données publiques",
+   "accessNote": "Accessible via WebFetch ; seul le dispositif (art. 1-3) a été lu, pas l'annexe programme."
+  },
+  {
+   "id": "src-bo-2026-24-MENE2611650A",
+   "url": "https://www.education.gouv.fr/bo/2026/Hebdo24/MENE2611650A",
+   "title": "BO n°24 du 11 juin 2026 – Programmes de sciences et technologie des cycles 2 et 3",
+   "publisher": "Ministère de l'Éducation nationale",
+   "date": "2026-06-11",
+   "kind": "official",
+   "status": "not read (HTTP 403)",
+   "license": "Licence Ouverte",
+   "accessNote": "education.gouv.fr renvoie 403 aux requêtes automatisées ; contenu non consulté."
+  },
+  {
+   "id": "src-bo-2023-25-MENE2314101A",
+   "url": "https://www.education.gouv.fr/bo/2023/Hebdo25/MENE2314101A",
+   "title": "BO n°25 du 22 juin 2023 – Arrêté du 15 juin 2023 (programme de sciences et technologie du cycle 3)",
+   "publisher": "Ministère de l'Éducation nationale",
+   "date": "2023-06-22",
+   "kind": "official",
+   "status": "not read directly (HTTP 403) ; métadonnées (date, JO, NOR, application rentrée 2023) issues de résultats de recherche",
+   "license": "Licence Ouverte",
+   "accessNote": "403 ; voir reproduction académique src-nancy-metz-c3-2023."
+  },
+  {
+   "id": "src-nancy-metz-c3-2023",
+   "url": "https://sites.ac-nancy-metz.fr/physique/wp_local/IPR/BO_ProgrammeCycle3_2023.pdf",
+   "title": "Annexe – Programme de sciences et technologie du cycle 3 (BO n°25 du 22 juin 2023), PDF hébergé par l'inspection PC de Nancy-Metz",
+   "publisher": "Académie de Nancy-Metz (IA-IPR physique-chimie)",
+   "date": "2023-06-22",
+   "kind": "academic",
+   "status": "read in full (partie Matière, mouvement, énergie, information + thème Terre)",
+   "license": "Texte officiel reproduit (© MENJ, Licence Ouverte)",
+   "accessNote": "PDF téléchargé (15 p., sha256 828c6940…) ; chaque page porte l'en-tête BO n°25 du 22 juin 2023 et la mention education.gouv.fr."
+  },
+  {
+   "id": "src-nancy-metz-page",
+   "url": "https://sites.ac-nancy-metz.fr/physique/wp_local/?p=2012",
+   "title": "Mise à jour de programmes : Physique-chimie de 6ème et Enseignement scientifique",
+   "publisher": "Académie de Nancy-Metz",
+   "date": "2023",
+   "kind": "academic",
+   "status": "read",
+   "license": "",
+   "accessNote": "Confirme : BO n°25 du 22/06/2023, application à compter de la rentrée 2023-2024."
+  },
+  {
+   "id": "src-bo-2020-31-MENE2018714A",
+   "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
+   "title": "BO n°31 du 30 juillet 2020 – Arrêté du 17 juillet 2020 modifiant l'arrêté du 9 novembre 2015 (programmes cycles 2, 3, 4)",
+   "publisher": "Ministère de l'Éducation nationale",
+   "date": "2020-07-30",
+   "kind": "official",
+   "status": "not read directly (HTTP 403)",
+   "license": "Licence Ouverte",
+   "accessNote": "403 ; NOR et date confirmés par la lettre de rentrée IA-IPR Lyon 2020 et des résultats de recherche."
+  },
+  {
+   "id": "src-pccl-c4-2020",
+   "url": "https://pccl.fr/programme-de-physique-chimie-cycle-4.pdf",
+   "title": "Physique-Chimie cycle 4 – « D'après le BOEN n°31 du 30 juillet 2020 » (document Eduscol reproduit)",
+   "publisher": "Eduscol/DGESCO (document), hébergé par pccl.fr (site enseignant)",
+   "date": "2020",
+   "kind": "supplementary",
+   "status": "read in full (11 pages de programme)",
+   "license": "Texte officiel reproduit (© DGESCO)",
+   "accessNote": "Hébergeur non institutionnel ; pied de page « Direction générale de l'enseignement scolaire > eduscol » sur chaque page. Les repères de progressivité sont mot pour mot identiques à ceux cités dans le document Eduscol src-eduscol-aide-progression-2016 (lu directement), et la structure (4 thèmes, annexe 3 p.95-105) concorde avec la lettre IA-IPR Lyon. Copies académiques (Grenoble, Orléans-Tours, Mayotte) inaccessibles (redirection vers portail authentifié / connexion réinitialisée)."
+  },
+  {
+   "id": "src-eduscol-aide-progression-2016",
+   "url": "https://eduscol.education.gouv.fr/sites/default/files/document/ra16c4phchaideconstructionprogression594860pdf-78099.pdf",
+   "title": "Physique-Chimie – Inscrire son enseignement dans une logique de cycle : Aide à la construction d'une progression en physique-chimie au cycle 4",
+   "publisher": "Eduscol (MENESR)",
+   "date": "2016-06",
+   "kind": "official",
+   "status": "read in full",
+   "license": "Ressource Eduscol (réutilisation non commerciale, cf. mentions eduscol)",
+   "accessNote": "Fichier PDF directement téléchargeable (la page HTML eduscol renvoie 403). Ressource d'accompagnement NON prescriptive ; antérieure à la version 2020 (ne couvre pas les ajouts climat/rayonnement)."
+  },
+  {
+   "id": "src-lyon-lettre-rentree-2020",
+   "url": "https://physique-chimie.enseigne.ac-lyon.fr/spip/IMG/pdf/lettre_de_rentree_2020_-_ia-ipr_physique_chimie.pdf",
+   "title": "Lettre de rentrée 2020 des IA-IPR de physique-chimie",
+   "publisher": "Académie de Lyon",
+   "date": "2020-09",
+   "kind": "academic",
+   "status": "read (extraits)",
+   "license": "",
+   "accessNote": "Confirme BO n°31 du 30/07/2020 (MENE2018714A), PC cycle 4 en annexe 3 p.95-105, ajouts liés au réchauffement climatique ; horaire indicatif 1,5 h/an en cycle 4 (4,5 h sur le cycle, modulable)."
+  },
+  {
+   "id": "src-snes-c4-consultation-2026",
+   "url": "https://www.snes.edu/article/programme-de-physique-chimie-de-cycle-4-la-consultation-est-ouverte/",
+   "title": "Programme de physique-chimie de cycle 4 : la consultation est ouverte",
+   "publisher": "SNES-FSU",
+   "date": "2026-05-21",
+   "kind": "supplementary",
+   "status": "read",
+   "license": "",
+   "accessNote": "Source syndicale : consultation Eduscol du 18 mai au 19 juin 2026 ; calendrier d'application non officiel (souhait 5e rentrée 2028)."
+  },
+  {
+   "id": "src-snes-c3-publie-2026",
+   "url": "https://www.snes.edu/article/le-programme-de-sciences-et-technologie-de-cycle-3-est-publie/",
+   "title": "Le programme de sciences et technologie de cycle 3 est publié",
+   "publisher": "SNES-FSU",
+   "date": "2026-06-11",
+   "kind": "supplementary",
+   "status": "read",
+   "license": "",
+   "accessNote": "Contient une incohérence de calendrier (6e en 2027 dans le chapô, 2028 dans le corps) ; tranché par l'article 3 de l'arrêté (Légifrance) : 6e à la rentrée 2027-2028."
+  },
+  {
+   "id": "src-snes-pc-index",
+   "url": "https://www.snes.edu/metiers/physique-chimie/",
+   "title": "SNES-FSU – rubrique Sciences physiques et chimiques",
+   "publisher": "SNES-FSU",
+   "date": "consulté 2026-11-06",
+   "kind": "supplementary",
+   "status": "read",
+   "license": "",
+   "accessNote": "Aucune annonce de publication d'un programme PC cycle 4 entre juillet et novembre 2026 ; mention d'une application visée en 5e à la rentrée 2027 (non confirmée officiellement)."
+  },
+  {
+   "id": "src-snalc-cr-2026-09-24",
+   "url": "https://snalc.fr/programmes-physique-chimie-cycle-4-cr-24-septembre-2026",
+   "title": "Programmes de physique-chimie du cycle 4 : compte rendu du 24 septembre 2026",
+   "publisher": "SNALC",
+   "date": "2026-09-24",
+   "kind": "supplementary",
+   "status": "read",
+   "license": "",
+   "accessNote": "Indique que le projet de programme PC cycle 4 était encore en concertation avec les organisations syndicales fin septembre 2026."
+  },
+  {
+   "id": "src-eduscol-c4-ressources",
+   "url": "https://eduscol.education.gouv.fr/5739/ressources-d-accompagnement-du-programme-de-physique-chimie-au-cycle-4",
+   "title": "Ressources d'accompagnement du programme de physique-chimie au cycle 4",
+   "publisher": "Eduscol",
+   "date": "",
+   "kind": "official",
+   "status": "not read (HTTP 403)",
+   "license": "",
+   "accessNote": "403 ; contenu connu uniquement par extraits de moteur de recherche (« programme publié au BO n°31 du 30 juillet 2020 »)."
+  },
+  {
+   "id": "src-eduscol-reperes-annuels",
+   "url": "https://eduscol.education.gouv.fr/6910/reperes-annuels-de-progression-et-attendus-de-fin-d-annee-du-cp-la-troisieme",
+   "title": "Repères annuels de progression et attendus de fin d'année du CP à la troisième",
+   "publisher": "Eduscol",
+   "date": "2019 (BO n°22 du 29 mai 2019)",
+   "kind": "official",
+   "status": "not read (HTTP 403)",
+   "license": "",
+   "accessNote": "Selon extraits de recherche, couvre au cycle 4 le français, les mathématiques et les langues vivantes, pas la physique-chimie : non vérifié dans le texte."
+  },
+  {
+   "id": "src-nantes-c4-2026",
+   "url": "https://www.pedagogie.ac-nantes.fr/physique-chimie/s-informer/actualites/nouveau-programme-cycle-4-rentree-2026-1304417.kjsp?RH=PHY",
+   "title": "Nouveau programme cycle 4 rentrée 2026",
+   "publisher": "Académie de Nantes",
+   "date": "2024-2025",
+   "kind": "academic",
+   "status": "not read (seulement extrait de recherche) – obsolète",
+   "license": "",
+   "accessNote": "Annonçait une application à la rentrée 2026 ; calendrier non tenu."
+  }
+ ],
+ "limitations": [
+  "education.gouv.fr (BO) et les pages HTML eduscol renvoient HTTP 403 aux requêtes automatisées : aucun texte BO lu directement. Les contenus proviennent de reproductions (académie de Nancy-Metz pour le cycle 3 2023 ; document Eduscol reproduit sur pccl.fr pour le cycle 4 2020) et de Légifrance pour l'arrêté de 2026.",
+  "La source du programme cycle 4 (pccl.fr) est un hébergeur non institutionnel ; elle est jugée fidèle (pied de page DGESCO/eduscol, repères identiques mot pour mot au document Eduscol 2016 lu directement), mais n'a pas pu être comparée ligne à ligne au BO. Les copies académiques (Grenoble, Orléans-Tours, Mayotte) étaient inaccessibles.",
+  "Règle verified : true = paraphrase d'un texte lu (reproduction académique fidèle du BO 2023 pour la 6e ; pour le cycle 4, item présent dans la reproduction du programme 2020 ET corroboré par le document officiel Eduscol 2016 lu directement). false = 11 items ajoutés/modifiés en 2020 (gaz à effet de serre, rayonnement, corrosion, CH4/N2O, CO2 dissous, influence de la température sur ρ, ressources en éléments, bilans entrant/sortant) lus uniquement dans la reproduction non institutionnelle pccl.fr.",
+  "Absence (non confirmée formellement) de « repères annuels de progression » officiels en physique-chimie au cycle 4 : seuls les « repères de progressivité » intégrés au programme et l'exemple non prescriptif Eduscol 2016 ont servi à répartir les chapitres en 5e/4e/3e. Toute répartition annuelle est donc une recommandation, pas une obligation.",
+  "Le document Eduscol 2016 est antérieur à la révision 2020 : les ajouts 2020 (gaz à effet de serre, rayonnement, CH4/N2O, acidification des océans, empreinte carbone) ont été placés en 3e par choix éditorial.",
+  "Statut du nouveau programme PC cycle 4 au 2026-11-06 : projet CSP (juillet 2025), consultation 18/05-19/06/2026, concertation syndicale en septembre 2026 ; aucune publication au JO/BO trouvée. Une publication très récente (octobre-novembre 2026) non indexée ne peut être exclue. Calendrier futur non officiel (SNES : 5e en 2027 ou 2028).",
+  "Le nouveau programme de sciences et technologie du cycle 3 (arrêté du 5 juin 2026) s'appliquera en 6e en 2027-2028 ; son annexe (contenus 6e) n'a pas été lue et n'est pas inventoriée ici.",
+  "Le thème cycle 3 « La Terre, une planète peuplée par des êtres vivants » (réchauffement climatique, place de la Terre dans le système solaire) est principalement SVT et n'a pas été inventorié pour la physique-chimie ; il recoupe pc-6e-melanges-transformations (gaz à effet de serre) et pc-6e-mouvements.",
+  "Les champs « misconceptions » et une partie des points « safety » reposent sur des connaissances didactiques et règles de sécurité de laboratoire générales ; seules certaines entrées sont explicitement issues des sources (courant qui « s'use », liquide limpide = eau, intensité avant tension, laser, risques auditifs, pictogrammes, produits ménagers, risque électrique).",
+  "Les horaires (3 h de sciences partagées en 6e selon des sources académiques non lues ; 1,5 h/an indicatif en cycle 4 selon la lettre IA-IPR Lyon 2020) ne sont pas vérifiés pour 2026-2027.",
+  "Labolycée n'a pas été utilisé (niveau lycée, hors périmètre) ; aucun concept de lycée (vecteur vitesse, f = 1/T, ajustement d'équations, quantité de matière) n'a été importé.",
+  "Les objectifs sont des paraphrases concises, pas des citations ; les références officialRef pointent vers la partie du programme et non vers une page du BO."
+ ],
+ "summary": {
+  "applicabilityDecisions": [
+   "6e 2026-2027 : programme sciences et technologie cycle 3 version 2023 (arrêté 15/06/2023, BO n°25 22/06/2023, MENE2314101A) – transitoire : l'arrêté du 5 juin 2026 (MENE2611650A, BO n°24 11/06/2026) s'applique en 6e à la rentrée 2027-2028 (art. 3, lu sur Légifrance).",
+   "5e/4e/3e 2026-2027 : programme PC cycle 4 2015 modifié (arrêté 17/07/2020, BO n°31 30/07/2020, MENE2018714A). Nouveau programme PC cycle 4 : projet CSP (07/2025), consultation 18/05-19/06/2026, concertation 09/2026, non publié au 2026-11-06.",
+   "Répartition 5e/4e/3e = recommandation (repères de progressivité du programme + exemple Eduscol 2016 non prescriptif) ; seuls les attendus de fin de cycle sont obligatoires. Ajouts 2020 placés en 3e par choix éditorial."
+  ],
+  "counts": [
+   {
+    "grade": "6e",
+    "domains": 1,
+    "chapters": 8,
+    "objectives": 38,
+    "verified": 38
+   },
+   {
+    "grade": "5e",
+    "domains": 4,
+    "chapters": 9,
+    "objectives": 24,
+    "verified": 24
+   },
+   {
+    "grade": "4e",
+    "domains": 4,
+    "chapters": 9,
+    "objectives": 33,
+    "verified": 29
+   },
+   {
+    "grade": "3e",
+    "domains": 4,
+    "chapters": 10,
+    "objectives": 30,
+    "verified": 23
+   }
+  ],
+  "totals": {
+   "chapters": 36,
+   "objectives": 125,
+   "verified": 114,
+   "verifiedRatio": 0.912
+  },
+  "reportNote": "report.md non écrit : l'environnement de l'agent a bloqué l'écriture de fichiers de rapport ; synthèse transmise à l'agent appelant."
+ }
+}

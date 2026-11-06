@@ -51,7 +51,7 @@ const pct = (a: number, b: number) => (b ? `${Math.round((100 * a) / b)} %` : "�
 
 function render() {
   const cur = curricula();
-  const chapters = new Map(ALL_CHAPTERS.map((c) => [c.id, c]));
+  const chapters = new Map(ALL_CHAPTERS.flatMap((c) => (c.curriculumChapterIds ?? [c.id]).map((id) => [id, c] as const)));
   const out: string[] = [];
   out.push("# Tableau de bord de progression", "", `_Généré par \`npm run dashboard\` le ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC à partir de \`project/ledger.json\`, des inventaires de \`research/curriculum/\` et des données de \`src/lib/chapters/data/\`. Ne pas éditer._`, "");
   out.push("Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).", "");

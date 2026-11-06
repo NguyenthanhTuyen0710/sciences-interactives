@@ -3,9 +3,10 @@
 import type { Generator, InteractionKind, Subject } from "../engine/types";
 import { createRng } from "../engine/rng";
 import type { ChapterContent, ChapterExercise } from "./schema";
+import { math5eNombresRelatifs } from "./data/math-5e-nombres-relatifs";
 
-// Chapitres complets (src/lib/chapters/data/). Le chapitre pilote SCI-5E-MATH-001 est en cours de rédaction.
-export const ALL_CHAPTERS: ChapterContent[] = [];
+/** Chapitres complets (src/lib/chapters/data/). */
+export const ALL_CHAPTERS: ChapterContent[] = [math5eNombresRelatifs];
 
 /** Un chapitre est visible publiquement s'il est publié (ou en prévisualisation : SHOW_DRAFTS=1). */
 export const isVisible = (c: ChapterContent) => c.publicationStatus === "published" || process.env.SHOW_DRAFTS === "1";

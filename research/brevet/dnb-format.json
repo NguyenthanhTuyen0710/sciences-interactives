@@ -1,0 +1,192 @@
+{
+  "generatedAt": "2026-11-06",
+  "scope": "DNB série générale, written exams in mathématiques and sciences (physique-chimie / SVT / technologie). Série professionnelle has distinct subjects (see S1) and is out of scope except where noted.",
+  "sessions": [
+    {
+      "session": "2027",
+      "subject": "mathematiques",
+      "duration": "2 h (Partie 1: 20 min, then Partie 2: 1 h 40, no break, two separate answer sheets; the Partie 1 sheet is collected after 20 min)",
+      "points": "/20, coefficient 2 (written exams = 60 % of the final DNB mark, contrôle continu = 40 %)",
+      "examDate": "Monday 28 June 2027, 10 h – 12 h (Paris time, métropole / La Réunion / Mayotte)",
+      "programmeBasis": "Note de service MENE2623228N: 'programme de mathématiques de la classe de troisième s'il est en vigueur ou, à défaut, des programmes de cycle 4'. The new cycle 4 maths programme (arrêté 18-02-2026, BO n°10 du 5-03-2026) reaches 3e only at rentrée 2028, so for session 2027 the reference is in practice the current (2020-revised) cycle 4 programme. Partie 1 explicitly targets 'automatismes du cycle 4'. See limitations L3.",
+      "structure": [
+        {
+          "part": "Partie 1 – Automatismes et applications directes",
+          "points": "6",
+          "description": "Short-answer questions mobilising cycle-4 automatismes or a direct application of a property, formula or theorem. No justification required or assessed. Number of questions not fixed (8–9 in every 2026 paper and reference subject examined). Per IEA inspection (S8): questions scored 0.5 or 1 pt; formats = direct answer, vrai/faux, or QCM with exactly one correct answer out of 4; wrong/missing answer costs nothing. The candidate copies question number + answer on the sheet.",
+          "calculator": "Not allowed (except candidates whose aménagement d'examen authorises it, S8/S9)."
+        },
+        {
+          "part": "Partie 2 – Raisonnement et résolution de problèmes",
+          "points": "14 (of which 2 points assess clarity/precision of reasoning and the four dimensions of maîtrise de la langue; i.e. ~12 points of exercises)",
+          "description": "Independent exercises; may use real-life contexts or other disciplines; any format EXCEPT QCM. All answers must be justified unless stated otherwise; attempts and unfinished approaches are credited. Number of exercises not fixed (4 exercises of 2–4.5 pts in the 2026 papers examined; reference subjects: 3 exercises of 4 pts). Draft paper allowed throughout.",
+          "calculator": "Allowed: calculatrice with active 'mode examen' or non-programmable 'type collège' without memory (circulaire 2015-178)."
+        }
+      ],
+      "references": ["S1", "S3", "S4", "S5", "S8", "S9", "S11", "S12"],
+      "status": "current"
+    },
+    {
+      "session": "2027",
+      "subject": "sciences",
+      "duration": "1 h total = 2 × 30 min (indicative time split), one single answer sheet",
+      "points": "/20, coefficient 2; 10 points per discipline; 2 of the 20 points (1 per discipline) assess the four dimensions of maîtrise de la langue",
+      "examDate": "Monday 28 June 2027, 8 h – 9 h (Paris time), same morning as maths",
+      "programmeBasis": "Programmes de la classe de troisième if in force, otherwise cycle 4 programmes, for each of PC / SVT / technologie (S1). No new PC/SVT/technologie cycle-4 programme was found in force for 2026-2027 (S13, supplementary) -> current cycle 4 programmes apply.",
+      "structure": [
+        {
+          "part": "Discipline 1 (one of physique-chimie / SVT / technologie)",
+          "points": "10",
+          "description": "Independent exercises; at least some require initiative (question ouverte, chercher/raisonner); exploit numerical and/or experimental data; analyse information with the discipline's reasoning, methods and models; written expression assessed (1 pt). Exact answers and clearly formulated relevant ideas fully credited; partial approaches credited.",
+          "calculator": "Not specified in the note de service. For session 2026 the cover page of sciences subjects stated that calculators (mode examen or type collège) are allowed (S9); assume the same unless the 2027 subject says otherwise."
+        },
+        {
+          "part": "Discipline 2 (another of the three)",
+          "points": "10",
+          "description": "Same rules. The two disciplines are announced on Éduscol two months before the exam; choice valid for June and September sessions; may differ for centres étrangers.",
+          "calculator": "As above."
+        }
+      ],
+      "references": ["S1", "S3", "S9", "S13"],
+      "status": "current"
+    },
+    {
+      "session": "2026",
+      "subject": "mathematiques",
+      "duration": "2 h (20 min + 1 h 40); tiers-temps: 27 min + 2 h 14",
+      "points": "/20, coefficient 2 (first session with 60 % written exams / 40 % contrôle continu)",
+      "examDate": "Tuesday 30 June 2026 (métropole), replacement session 10 September 2026",
+      "programmeBasis": "Programmes du cycle 4 (S8: 'jusqu'à la session 2026').",
+      "structure": [
+        {
+          "part": "Partie 1 – Automatismes",
+          "points": "6",
+          "description": "First session with an automatismes part. Real papers: 8–9 questions; Métropole 30-06-2026 was presented as 'Automatismes – QCM' (9 questions); Amérique du Nord, Centres étrangers mixed direct answers and choices. Supported by an Éduscol indicative list of automatismes (Oct 2025), a livret, and 2 sujets zéro (série générale) + 2 (série professionnelle).",
+          "calculator": "Not allowed (except aménagement)."
+        },
+        {
+          "part": "Partie 2 – Raisonnement et résolution de problèmes",
+          "points": "14 (12 for exercises 'comparable to previous sessions' + 2 for clarity/precision of reasoning and rédaction)",
+          "description": "Real 2026 papers (Métropole, Amérique du Nord, Asie, Centres étrangers): 4 exercises totalling 12 points.",
+          "calculator": "Allowed for all candidates (mode examen or type collège)."
+        }
+      ],
+      "references": ["S2", "S8", "S9", "S10", "S14", "S18"],
+      "status": "historic"
+    },
+    {
+      "session": "2026",
+      "subject": "sciences",
+      "duration": "1 h (2 × 30 min)",
+      "points": "/20, coefficient 2, 10 points per discipline (per secondary/academic sources; S10 itself not read)",
+      "examDate": "Monday 29 June 2026 (métropole)",
+      "programmeBasis": "Programmes du cycle 4.",
+      "structure": [
+        {
+          "part": "Physique-chimie (chosen discipline 2026, série générale)",
+          "points": "10",
+          "description": "Per SNES report of a Nancy-Metz inspection letter (local, May 2026): shorter exercise, max 7 questions, at least one initiative question and one writing-quality question with minimum line count. Not confirmed as a national rule.",
+          "calculator": "Allowed (cover page instruction reported in S9)."
+        },
+        {
+          "part": "SVT (chosen discipline 2026, série générale)",
+          "points": "10",
+          "description": "Document-based reasoning exercise.",
+          "calculator": "Allowed (S9)."
+        }
+      ],
+      "references": ["S9", "S10", "S16", "S17"],
+      "status": "historic"
+    },
+    {
+      "session": "historic(2018-2025)",
+      "subject": "mathematiques",
+      "duration": "2 h",
+      "points": "100 points (DNB total 800 = 400 socle/contrôle continu + 400 épreuves: français 100, maths 100, HG-EMC 50, sciences 50, oral 100 — per S20 summary); maths subjects typically 5–7 exercises whose points sum to 100",
+      "programmeBasis": "Programmes du cycle 4 (2015, revised 2018/2020).",
+      "structure": [
+        {
+          "part": "Single part – exercises",
+          "points": "100",
+          "description": "5–7 independent exercises (e.g. Métropole 2019: 6 exercises 10–19 pts; 2021–2025: 5 exercises ~18–23 pts). From 2020 onward, one exercise per Métropole paper was usually a QCM (3 choices, no justification). Recurring: Scratch exercise, programme de calcul, probabilities, Pythagore/Thalès/trigonométrie, statistics/tableur, arithmetic. 'Toutes les réponses doivent être justifiées sauf indication contraire'; traces of research credited.",
+          "calculator": "Allowed throughout (mode examen or type collège, per paper cover pages, circulaire 2015-178)."
+        }
+      ],
+      "references": ["S18", "S20"],
+      "status": "historic"
+    },
+    {
+      "session": "historic(2018-2025)",
+      "subject": "sciences",
+      "duration": "1 h (2 × 30 min)",
+      "points": "50 points (25 per discipline)",
+      "programmeBasis": "Programmes du cycle 4.",
+      "structure": [
+        {
+          "part": "Two disciplines among PC / SVT / technologie",
+          "points": "25 + 25",
+          "description": "Two disciplines announced ~2 months before the exam. 2018 série générale: SVT + technologie (S20 summary). 2024 série générale: PC + technologie (S21, press). Other years: press sources conflict (see limitations).",
+          "calculator": "Allowed."
+        }
+      ],
+      "references": ["S20", "S21"],
+      "status": "historic"
+    }
+  ],
+  "sources": [
+    {"id": "S1", "url": "https://www.education.gouv.fr/sites/default/files/document/20260917boenjsspe4pdf-520753.pdf", "title": "BO spécial n°4 du 17 septembre 2026 – incl. 'Définition des épreuves de l'examen du DNB à compter de la session 2027' (NS du 11-9-2026, NOR MENE2623228N), 'Modalités d'attribution du DNB à compter de la session 2027' (NOR MENE2623194N), 'Exigences en matière de maîtrise de la langue à tous les examens à compter de la session 2027' (NOR MENE2623195N)", "publisher": "Ministère de l'Éducation nationale (DGESCO A1-2)", "date": "2026-09-17", "kind": "official", "license": "Official public text (reproduction of official texts free; cite source)", "accessNote": "HTML page https://www.education.gouv.fr/bo/2026/Special4 returned 403 to automated fetch; the full-issue PDF was downloaded and text-extracted (pdftotext). Primary source for the 2027 format. MENE2623228N abrogates the note de service du 2 septembre 2025."},
+    {"id": "S2", "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2013%20du%2027%20mars%202026-508043.pdf", "title": "BO n°13 du 27 mars 2026 – 'Préparation des élèves aux exigences du DNB et des baccalauréats général et technologique à compter de la session 2026' (NS du 26-3-2026, NOR MENE2607843N)", "publisher": "Ministère de l'Éducation nationale", "date": "2026-03-27", "kind": "official", "license": "Official public text", "accessNote": "HTML version (bo/2026/Hebdo13/MENE2607843N) 403; PDF fetched and text-extracted. Confirms DNB maths 'première partie consacrée aux automatismes' and Éduscol resources (sujets zéro, liste indicative, livret)."},
+    {"id": "S3", "url": "https://www.education.gouv.fr/sites/default/files/document/annexe-i-session-normale-2027-calendrier-des-epreuves-ecrites-du-diplome-national-du-brevet-519820.pdf", "title": "Annexe I – Session normale 2027 : calendrier des épreuves écrites du DNB (BO spécial n°2 du 25 août 2026)", "publisher": "Ministère de l'Éducation nationale", "date": "2026-08-25", "kind": "official", "license": "Official public text", "accessNote": "PDF fetched and extracted. Parent circulaire reported as NOR MENE2622686N by S13 (not verified directly)."},
+    {"id": "S4", "url": "https://eduscol.education.gouv.fr/sites/default/files/document/dnb-sujet-de-reference-mathematiques-serie-generale-n01-129658.pdf", "title": "DNB – Sujet de référence – Mathématiques – Série générale n°1", "publisher": "Éduscol (MEN)", "date": "undated in file (reported published Sept 2026 by S15)", "kind": "official", "license": "Ministry teaching resource; reuse for teaching with attribution; do not republish verbatim", "accessNote": "PDF fetched and extracted. Each question is labelled with the programme objective it tests; Partie 1 = 9 questions; Partie 2 = 3 exercises × 4 pts tagged with domain, 'attendus de fin de cycle', 'notions à mobiliser', 'compétences mobilisées'; questions in bold assess maîtrise de la langue."},
+    {"id": "S5", "url": "https://eduscol.education.gouv.fr/sites/default/files/document/dnb-sujet-de-reference-mathematiques-serie-generale-n02-129661.pdf", "title": "DNB – Sujet de référence – Mathématiques – Série générale n°2", "publisher": "Éduscol (MEN)", "date": "undated in file", "kind": "official", "license": "As S4", "accessNote": "PDF fetched and extracted. Exercises: probabilités; géométrie plane (médiatrice, trigonométrie, Pythagore, aire); calcul littéral/équations/fonctions."},
+    {"id": "S6", "url": "https://eduscol.education.fr/document/67781/download", "title": "Liste indicative d'automatismes pour le DNB (Oct. 2025)", "publisher": "Éduscol (MEN)", "date": "2025-10", "kind": "official", "license": "Ministry resource", "accessNote": "Redirects to https://eduscol.education.gouv.fr/sites/default/files/document/liste-indicative-dautomatismes-pour-le-dnbpdf-116340.pdf which returned 404 on 2026-11-06. Content NOT read; automatismes themes in competency-map.md are inferred from S4/S5 labels and 2026 papers."},
+    {"id": "S7", "url": "https://eduscol.education.gouv.fr/5607/les-epreuves-du-dnb", "title": "Éduscol – Les épreuves du DNB (sujets zéro, sujets de référence, annales)", "publisher": "Éduscol (MEN)", "date": "n/a", "kind": "official", "license": "Ministry website", "accessNote": "403 to automated fetch. Hub page for sujets zéro 2026 and sujets de référence 2027; existence confirmed via search results and S13/S15."},
+    {"id": "S8", "url": "https://chlorofil.fr/fileadmin/user_upload/02-diplomes/referentiels/secondaire/4e3e/dnb/webinaire-DNB-IEA-2026.pdf", "title": "Webinaire de l'inspection de mathématiques de l'enseignement agricole – nouvelle épreuve du DNB 2026", "publisher": "Inspection de l'enseignement agricole (Ministère de l'Agriculture), chlorofil.fr", "date": "2026-01-09", "kind": "academic", "license": "Public institutional slides", "accessNote": "PDF fetched and extracted. Detailed Partie 1 rules (0.5/1 pt, QCM 1/4, vrai/faux, no penalty), Partie 2 = 12 + 2 pts, organisation (sheet collected after 20 min, tiers-temps applied separately). Wording 'à partir de la session 2027 ... programmes de la classe de troisième' pre-dates the S1 nuance."},
+    {"id": "S9", "url": "https://lille.snes.edu/IMG/pdf/2026-04-02_-_comite_de_suivi_des_examens_csa.pdf", "title": "Comité de suivi des examens (CSA), académie de Lille – DNB session 2026", "publisher": "Rectorat de Lille (DEC) slides, hosted by SNES-FSU Lille", "date": "2026-04-02", "kind": "academic", "license": "Public institutional slides (union-hosted copy)", "accessNote": "PDF fetched and extracted. Maths épreuve organisation table (20 min/6 pts no calculator; 1 h 40/14 pts calculator), calculator rules, cover-page instruction for maths and sciences, disciplines announced 2 months before."},
+    {"id": "S10", "url": "https://www.education.gouv.fr/bo/2025/Hebdo33/MENE2515977N", "title": "Note de service du 2-9-2025 'Modalités d'attribution du DNB à compter de la session 2026' (NOR MENE2515977N), BO n°33 du 4-9-2025", "publisher": "Ministère de l'Éducation nationale", "date": "2025-09-04", "kind": "official", "license": "Official public text", "accessNote": "NOT read directly (education.gouv.fr 403, académie mirror 503). Reference confirmed by multiple search results and by S1 which abrogates it from session 2027. Governs session 2026."},
+    {"id": "S11", "url": "https://www.education.gouv.fr/bo/2026/Hebdo10/MENE2602912A", "title": "Arrêté du 18-2-2026 fixant les programmes de français et de mathématiques du cycle 4 (BO n°10 du 5-3-2026, NOR MENE2602912A)", "publisher": "Ministère de l'Éducation nationale", "date": "2026-03-05", "kind": "official", "license": "Official public text", "accessNote": "403; not read directly. Calendar (5e 2026-27, 4e 2027-28, 3e 2028-29) taken from S12 and Bordeaux/Digischool summaries."},
+    {"id": "S12", "url": "https://pedagogie.ac-toulouse.fr/mathematiques/les-nouveaux-programmes-de-cycle-4", "title": "Les nouveaux programmes de cycle 4 (mathématiques)", "publisher": "Académie de Toulouse", "date": "2026", "kind": "academic", "license": "Academic website", "accessNote": "Fetched. States progressive application: 5e rentrée 2026-2027, 4e 2027-2028, 3e 2028-2029. Does not mention the DNB."},
+    {"id": "S13", "url": "https://www.digischool.fr/articles/college/brevet/programme-brevet-2027/", "title": "Programme du brevet 2027 : sur quoi portent réellement les épreuves écrites", "publisher": "digiSchool", "date": "2026-09-02 (updated 2026-09-04)", "kind": "supplementary", "license": "Commercial site, cite only", "accessNote": "Fetched. Cites arrêté du 10-4-2025 (NOR MENE2415613A, 3e programme from session 2027) and arrêté du 17-7-2026 (NOR MENE2613731A, JO 26-8-2026) rewriting art. 15 to '3e programme if in force, otherwise cycle 4'. These two arrêtés were NOT verified on Légifrance."},
+    {"id": "S14", "url": "https://www.letudiant.fr/college/brevet/brevet-tout-savoir-sur-l-epreuve-de-mathematiques.html", "title": "Brevet : tout savoir sur l'épreuve de mathématiques", "publisher": "L'Étudiant", "date": "2026-04-27", "kind": "supplementary", "license": "Press, cite only", "accessNote": "Fetched; consistent with S1/S8/S9."},
+    {"id": "S15", "url": "https://www.nomadeducation.fr/blog/articles/2026-09-24/brevet-2027-sujets-reference-mathematiques", "title": "Brevet 2027 : sujets de référence mathématiques", "publisher": "Nomad Education", "date": "2026-09-24", "kind": "supplementary", "license": "Commercial site, cite only", "accessNote": "Fetched; source of the S4/S5 links and their presentation as 2027 reference subjects."},
+    {"id": "S16", "url": "https://www.digischool.fr/articles/college/brevet/brevet-2026-matieres-sciences/", "title": "Brevet 2026 : les deux matières de sciences sont la physique-chimie et la SVT", "publisher": "digiSchool", "date": "2026-04-29 (updated 2026-05-22)", "kind": "supplementary", "license": "Press, cite only", "accessNote": "Fetched. 2026 disciplines (PC + SVT, série générale and professionnelle), announced 29-4-2026."},
+    {"id": "S17", "url": "https://www.snes.edu/article/dnb-2026-epreuve-de-sciences-exercice-de-physique-chimie-modifie/", "title": "DNB 2026 – épreuve de sciences : exercice de physique-chimie modifié", "publisher": "SNES-FSU", "date": "2026-05-16", "kind": "supplementary", "license": "Union website, cite only", "accessNote": "Fetched. Reports a Nancy-Metz IA-IPR letter (local), not a national text."},
+    {"id": "S18", "url": "https://www.apmep.fr/Annales-du-Brevet-des-colleges", "title": "APMEP – Annales du Brevet des collèges (sujets et corrigés, 1951–2026)", "publisher": "Association des professeurs de mathématiques de l'enseignement public (APMEP)", "date": "accessed 2026-11-06", "kind": "supplementary", "license": "No open licence stated. Mentions légales: non-public documents require authors' prior agreement, free reproduction with integrity + attribution + link; commercial use prohibited. Corrigés are independently authored by APMEP volunteers (not official). Subjects themselves are retyped (LaTeX) transcriptions of official papers.", "accessNote": "Hub and year pages fetched; per-year pages https://www.apmep.fr/Brevet-YYYY (2026: https://www.apmep.fr/Brevets-2026). Used for theme-frequency analysis only; nothing copied into the product."},
+    {"id": "S19", "url": "https://www.apmep.fr/spip.php?page=mentions", "title": "APMEP – Mentions légales", "publisher": "APMEP", "date": "accessed 2026-11-06", "kind": "supplementary", "license": "See S18", "accessNote": "Fetched; basis for the APMEP licence assessment."},
+    {"id": "S20", "url": "https://www.education.gouv.fr/diplome-national-du-brevet-tout-savoir-sur-la-session-2018-454725", "title": "DNB : tout savoir sur la session 2018 (+ note de service n°2017-172 du 22-12-2017, NOR MENE1731896N; arrêté du 27-11-2017 NOR MENE1731390A)", "publisher": "Ministère de l'Éducation nationale", "date": "2017-12 / 2018", "kind": "official", "license": "Official", "accessNote": "403; facts (maths 100 pts, sciences 50 pts, HG-EMC 50, français 100; 2018 sciences = SVT + techno) taken from search-result summaries only. Corroborated for maths by point totals of APMEP transcriptions (2019, 2021–2025 papers sum to 100)."},
+    {"id": "S21", "url": "https://www.letudiant.fr/college/brevet/brevet-2024-quelles-sont-les-deux-disciplines-de-lepreuve-de-sciences.html", "title": "Brevet 2024 : quelles sont les deux disciplines de l'épreuve de sciences", "publisher": "L'Étudiant", "date": "2024", "kind": "supplementary", "license": "Press, cite only", "accessNote": "Search-result summary only (PC + technologie série générale 2024)."},
+    {"id": "S22", "url": "https://ent2d.ac-bordeaux.fr/disciplines/sti-college/2026/09/25/dnb-2027-un-sujet-de-reference-en-technologie-pour-preparer-les-eleves/", "title": "DNB 2027 – Un sujet de référence en Technologie pour préparer les élèves", "publisher": "Académie de Bordeaux (STI collège)", "date": "2026-09-25", "kind": "academic", "license": "Academic website", "accessNote": "503 on fetch; existence known from search snippet only. A companion SVT presentation 'Evolution épreuves et barème du DNB et BAC session 2027' (ac-bordeaux SVT, Oct 2026) was also 503. Content of sciences reference subjects NOT verified."}
+  ],
+  "pastPapers": [
+    {"year": "2027-ref", "center": "sujet de référence n°1 (national)", "subject": "mathematiques", "url": "https://eduscol.education.gouv.fr/sites/default/files/document/dnb-sujet-de-reference-mathematiques-serie-generale-n01-129658.pdf", "officialCorrection": false, "note": "Official reference subject for the current format; no official corrigé found; each question annotated with objective/compétences."},
+    {"year": "2027-ref", "center": "sujet de référence n°2 (national)", "subject": "mathematiques", "url": "https://eduscol.education.gouv.fr/sites/default/files/document/dnb-sujet-de-reference-mathematiques-serie-generale-n02-129661.pdf", "officialCorrection": false, "note": "As above."},
+    {"year": "2026-zero", "center": "sujet zéro A (national)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_0_A_2026_DV.pdf", "officialCorrection": false, "note": "APMEP transcription of the Éduscol sujet zéro (original on S7, not reachable). Corrigé APMEP: https://www.apmep.fr/IMG/pdf/Corrige_Brevet_0_A_2026_DV.pdf"},
+    {"year": "2026-zero", "center": "sujet zéro B (national)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_0_B_2026_DV.pdf", "officialCorrection": false, "note": "APMEP transcription; corrigé https://www.apmep.fr/IMG/pdf/Corrige_Brevet_0_B_2026_DV-2.pdf"},
+    {"year": "2026", "center": "métropole (30 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/DNB_generale_Sujet_2026-06-30_Metropole_FK-v2.pdf", "officialCorrection": false, "note": "First real paper in new format. Partie 1 = 9 QCM; Partie 2 = 4 exercises (3+4+3+2 pts). APMEP corrigé: https://www.apmep.fr/IMG/pdf/DNB_generale_Corrige_2026-06-30_Metropole_MD-v4.pdf"},
+    {"year": "2026", "center": "Amérique du Nord (3 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Ameri_Nord_3_06_2026_DV.pdf", "officialCorrection": false, "note": "Partie 1 = 8 questions; Partie 2 = 4 exercises (2.5+3.5+4+2)."},
+    {"year": "2026", "center": "Asie (15 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/DNB_generale_Sujet_2026-06-15_Asie_DV-v3.pdf", "officialCorrection": false, "note": "Partie 1 = 9 questions (mostly QCM); Partie 2 = 4 exercises (2.5+3+4+2.5)."},
+    {"year": "2026", "center": "centres étrangers (18 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/DNB_generale_Sujet_2026-06-18_Centres-etrangers_DV-v3.pdf", "officialCorrection": false, "note": "Partie 1 = 9 questions; Partie 2 = 3 exercises listed (4+3.5+4.5)."},
+    {"year": "2026", "center": "métropole – Antilles-Guyane (10 sept., remplacement)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/DNB_generale_Sujet_2026-09-10_Metropole_FB.pdf", "officialCorrection": false, "note": "Listed by APMEP; not analysed."},
+    {"year": "2025", "center": "métropole – Antilles-Guyane (26 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Me_tropole_26_06_2025_FK.pdf", "officialCorrection": false, "note": "Last old-format métropole paper (5 exercises, 100 pts). APMEP corrigé https://www.apmep.fr/IMG/pdf/Corrige_Brevet_Metropole_26_06_2025_DV.pdf"},
+    {"year": "2025", "center": "Amérique du Nord (4 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Am_du_Nord_4_06_2025_DV_JCS_PS.pdf", "officialCorrection": false, "note": "Downloaded, not analysed in detail."},
+    {"year": "2024", "center": "métropole – Antilles-Guyane (1er juillet)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Metropole_1_07_2024_DV.pdf", "officialCorrection": false, "note": "5 exercises; Ex4 QCM."},
+    {"year": "2023", "center": "métropole – Antilles-Guyane (26 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Metropole_26_juin_2023_FK.pdf", "officialCorrection": false, "note": "5 exercises; Ex3 QCM."},
+    {"year": "2022", "center": "métropole (30 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_metro_juin_2022_DV.pdf", "officialCorrection": false, "note": "5 exercises; Ex2 QCM."},
+    {"year": "2021", "center": "métropole – La Réunion – Antilles-Guyane (28 juin)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/brevet_metropole_28_06_2021_dv.pdf", "officialCorrection": false, "note": "5 exercises; Ex3 QCM."},
+    {"year": "2020", "center": "métropole – La Réunion (14 sept.)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/brevet_metropole_sept_2020_dv-2.pdf", "officialCorrection": false, "note": "No June 2020 métropole paper listed by APMEP (June 2020 session not held in written form — COVID; general knowledge, not verified in a source here)."},
+    {"year": "2019", "center": "métropole – La Réunion (1er juillet)", "subject": "mathematiques", "url": "https://www.apmep.fr/IMG/pdf/Brevet_Metropole_1_juillet_2019_DV-2.pdf", "officialCorrection": false, "note": "6 exercises, no QCM."},
+    {"year": "2019-2026", "center": "all centres (index)", "subject": "mathematiques", "url": "https://www.apmep.fr/Annales-du-Brevet-des-colleges", "officialCorrection": false, "note": "APMEP counts: 2019 18 sujets/12 corrigés; 2020 8/5; 2021 13/8; 2022 15/11; 2023 15/14; 2024 14/14; 2025 14/14 (incl. 2 sujets zéro 2026); 2026 11/11."},
+    {"year": "2025-2026", "center": "official national publication", "subject": "sciences", "url": "https://eduscol.education.gouv.fr/5607/les-epreuves-du-dnb", "officialCorrection": false, "note": "Official sciences subjects are posted on Éduscol (403 to automated access). No sciences past paper was analysed in this study."}
+  ],
+  "limitations": [
+    "L1: education.gouv.fr HTML pages and eduscol.education.gouv.fr pages returned HTTP 403 to automated fetches; several académie sites (ac-bordeaux ent2d, ac-orleans-tours, ac-nice, ac-guadeloupe) returned 503. Official texts were obtained through the BO PDF files on education.gouv.fr/sites/default/files (which were reachable). No restriction was bypassed.",
+    "L2: The Éduscol 'liste indicative d'automatismes' (S6) returned 404 at its redirect target; its exact content is not verified. The automatismes theme list in competency-map.md is inferred from labels in the official reference subjects (S4, S5) and the 2026 papers.",
+    "L3: Programme basis 2027: the task brief assumed 'from session 2027 the maths exam is based on the 3e programme'. The binding text for 2027 (S1, MENE2623228N) says '3e programme s'il est en vigueur ou, à défaut, programmes de cycle 4'. Since the new 3e maths programme (S11) applies only from rentrée 2028, the 2027 maths exam is effectively based on the current cycle 4 programme; the new programme would first be examined at session 2029 (3e in 2028-2029) — inference, not stated explicitly in any text read. The earlier wording (arrêté 10-4-2025 / S8: 'programmes de la classe de troisième à partir de 2027') and its amendment (arrêté 17-7-2026, NOR MENE2613731A) are known only via S13 and were not verified on Légifrance.",
+    "L4: The sujets de référence (S4, S5) carry no session date in the file; S15 presents them as 'brevet 2027'. They match the S1 format exactly, but the publication date is not officially confirmed here.",
+    "L5: Sciences 2027 reference subjects (technologie, SVT; PC unknown) were announced by académie de Bordeaux pages that returned 503; their contents are unverified. Choice of the two 2027 sciences disciplines is not yet known (to be announced ~2 months before 28 June 2027, i.e. around late April 2027).",
+    "L6: Historic sciences discipline choices per year conflict across press sources (2023 and 2025 notably); only 2018 (official summary), 2024 (L'Étudiant) and 2026 (digiSchool + Nomad agree) are recorded.",
+    "L7: Calculator use in the 2027 sciences épreuve is not stated in MENE2623228N; inferred from 2026 practice (S9).",
+    "L8: Theme frequencies in competency-map.md are the author's manual classification of 7 old-format métropole papers (2019, Sept 2020, 2021–2025) and 4 new-format 2026 papers + 2 zéro + 2 référence subjects, using APMEP transcriptions. Small sample; métropole only; not an official statistic.",
+    "L9: No official full corrigé is published openly for DNB maths; APMEP corrigés are independent volunteer work (not official, no open licence). Neither subjects nor corrigés may be copied into the product; cite by year/centre/exercise only."
+  ]
+}

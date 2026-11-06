@@ -1,12 +1,1578 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-06T00:00:00.000Z",
+  "updatedAt": "2026-11-06T05:22:17.659Z",
   "tasks": [
-    { "id": "SCI-INFRA-001", "kind": "infra", "title": "Audit du dépôt et base de référence (tests, typage, lint, build)", "state": "PUBLISHED", "owner": "Orchestrateur", "files": ["project/reports/SCI-INFRA-001-orchestrateur.md"], "next": "" },
-    { "id": "SCI-INFRA-002", "kind": "infra", "title": "Contrat de données chapitre, modèles de jeux, registre et tableau de bord", "state": "INTEGRATED", "owner": "B4", "files": ["src/lib/chapters/schema.ts", "src/lib/chapters/index.ts", "src/lib/games/logic.ts", "src/components/games/Games.tsx", "scripts/dashboard.ts"], "next": "Revue QA5 avec le chapitre pilote" },
-    { "id": "SCI-RES-001", "kind": "research", "title": "A1 — Inventaire officiel mathématiques 6e-3e (2026-2027)", "state": "RESEARCHING", "owner": "A1", "files": ["research/curriculum/mathematiques/"], "next": "Fusion dans master-curriculum.json (npm run dashboard -- sync)" },
-    { "id": "SCI-RES-002", "kind": "research", "title": "A3 — Inventaire officiel physique-chimie 6e-3e (2026-2027)", "state": "RESEARCHING", "owner": "A3", "files": ["research/curriculum/physique-chimie/"], "next": "Fusion dans master-curriculum.json" },
-    { "id": "SCI-DNB-MATH-001", "kind": "brevet", "title": "A4 — Format DNB session 2027 et carte des compétences", "state": "RESEARCHING", "owner": "A4", "files": ["research/brevet/"], "next": "Matrice de compétences DNB" },
-    { "id": "SCI-5E-MATH-001", "kind": "chapter", "title": "Nombres relatifs (5e) — tranche verticale pilote", "state": "RESEARCHING", "grade": "5e", "subject": "mathematiques", "chapterId": "math-5e-nombres-relatifs", "owner": "A2", "dependsOn": ["SCI-INFRA-002"], "files": ["research/dossiers/math-5e-nombres-relatifs.md", "src/lib/chapters/data/math-5e-nombres-relatifs.ts"], "next": "B1/B2/B3 : rédaction à partir du dossier" }
+    {
+      "id": "SCI-INFRA-001",
+      "kind": "infra",
+      "title": "Audit du dépôt et base de référence (tests, typage, lint, build)",
+      "state": "PUBLISHED",
+      "owner": "Orchestrateur",
+      "files": [
+        "project/reports/SCI-INFRA-001-orchestrateur.md"
+      ],
+      "next": ""
+    },
+    {
+      "id": "SCI-INFRA-002",
+      "kind": "infra",
+      "title": "Contrat de données chapitre, modèles de jeux, registre et tableau de bord",
+      "state": "INTEGRATED",
+      "owner": "B4",
+      "files": [
+        "src/lib/chapters/schema.ts",
+        "src/lib/chapters/index.ts",
+        "src/lib/games/logic.ts",
+        "src/components/games/Games.tsx",
+        "scripts/dashboard.ts"
+      ],
+      "next": "Revue QA5 avec le chapitre pilote"
+    },
+    {
+      "id": "SCI-RES-001",
+      "kind": "research",
+      "title": "A1 — Inventaire officiel mathématiques 6e-3e (2026-2027)",
+      "state": "RESEARCHED",
+      "owner": "A1",
+      "files": [
+        "research/curriculum/mathematiques/"
+      ],
+      "next": "Revue QA1 de l’inventaire ; dossiers par chapitre (A2/A3)"
+    },
+    {
+      "id": "SCI-RES-002",
+      "kind": "research",
+      "title": "A3 — Inventaire officiel physique-chimie 6e-3e (2026-2027)",
+      "state": "RESEARCHED",
+      "owner": "A3",
+      "files": [
+        "research/curriculum/physique-chimie/"
+      ],
+      "next": "Revue QA1 de l’inventaire ; dossiers par chapitre (A2/A3)"
+    },
+    {
+      "id": "SCI-DNB-MATH-001",
+      "kind": "brevet",
+      "title": "A4 — Format DNB session 2027 et carte des compétences",
+      "state": "RESEARCHED",
+      "owner": "A4",
+      "files": [
+        "research/brevet/"
+      ],
+      "next": "Banque de questions DNB originales (phase 5)"
+    },
+    {
+      "id": "SCI-5E-MATH-001",
+      "kind": "chapter",
+      "title": "Nombres relatifs (5e) — tranche verticale pilote",
+      "state": "QA_PENDING",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-nombres-relatifs",
+      "owner": "B1/B2/B3",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "files": [
+        "research/dossiers/math-5e-nombres-relatifs.md",
+        "src/lib/chapters/data/math-5e-nombres-relatifs.ts"
+      ],
+      "next": "Revues QA1–QA6 indépendantes"
+    },
+    {
+      "id": "SCI-6E-MATH-001",
+      "kind": "chapter",
+      "title": "Nombres entiers et décimaux : numération, repérage, comparaison",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-numeration-decimaux",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-002",
+      "kind": "chapter",
+      "title": "Addition, soustraction et multiplication des nombres décimaux",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-operations-decimaux",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-003",
+      "kind": "chapter",
+      "title": "Division euclidienne et division décimale",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-division",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-004",
+      "kind": "chapter",
+      "title": "La fraction comme quotient",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-fraction-quotient",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-005",
+      "kind": "chapter",
+      "title": "Comparer et calculer avec des fractions",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-fractions-calculs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-006",
+      "kind": "chapter",
+      "title": "Pourcentages",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-pourcentages",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-007",
+      "kind": "chapter",
+      "title": "Pensée algébrique : nombres inconnus et motifs évolutifs",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-pensee-algebrique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-008",
+      "kind": "chapter",
+      "title": "Longueurs et périmètres, périmètre du disque",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-longueurs-perimetres",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-009",
+      "kind": "chapter",
+      "title": "Aires : unités, conversions, carré et rectangle",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-aires",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-010",
+      "kind": "chapter",
+      "title": "Volumes : le centimètre cube",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-volumes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-011",
+      "kind": "chapter",
+      "title": "Horaires et durées",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-durees",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-012",
+      "kind": "chapter",
+      "title": "Distances, milieu, cercle et disque",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-distances-cercles",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-013",
+      "kind": "chapter",
+      "title": "Médiatrice d'un segment",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-mediatrice",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-014",
+      "kind": "chapter",
+      "title": "Angles et bissectrice",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-angles",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-015",
+      "kind": "chapter",
+      "title": "Triangles : construction, angles, cercle circonscrit",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-triangles",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-016",
+      "kind": "chapter",
+      "title": "Symétrie axiale",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-symetrie-axiale",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-017",
+      "kind": "chapter",
+      "title": "Vision dans l'espace : solides et assemblages de cubes",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-vision-espace",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-018",
+      "kind": "chapter",
+      "title": "Organiser et exploiter des données",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-donnees",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-019",
+      "kind": "chapter",
+      "title": "Premières probabilités",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-probabilites",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-020",
+      "kind": "chapter",
+      "title": "Proportionnalité entre grandeurs",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-proportionnalite",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-021",
+      "kind": "chapter",
+      "title": "Instructions et séquences (programmation par blocs)",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-pensee-informatique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-MATH-022",
+      "kind": "chapter",
+      "title": "Automatismes et calcul mental de 6e",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "mathematiques",
+      "chapterId": "math-6e-automatismes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-002",
+      "kind": "chapter",
+      "title": "Enchaînement d'opérations et priorités",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-operations-priorites",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-003",
+      "kind": "chapter",
+      "title": "Multiples, diviseurs et critères de divisibilité",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-multiples-diviseurs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-004",
+      "kind": "chapter",
+      "title": "Addition et soustraction des nombres relatifs",
+      "state": "QA_PENDING",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-relatifs-addition-soustraction",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "Couvert par SCI-5E-MATH-001 (chapitre fusionné) — suit son statut"
+    },
+    {
+      "id": "SCI-5E-MATH-005",
+      "kind": "chapter",
+      "title": "Fractions : comparaison, addition, soustraction",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-fractions",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-006",
+      "kind": "chapter",
+      "title": "Puissances : carrés et cubes",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-puissances",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-007",
+      "kind": "chapter",
+      "title": "Expressions littérales et distributivité",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-expressions-litterales",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-008",
+      "kind": "chapter",
+      "title": "Premières équations",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-equations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-009",
+      "kind": "chapter",
+      "title": "Repérage sur une droite et dans le plan",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-reperage",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-010",
+      "kind": "chapter",
+      "title": "Représenter l'espace : perspective cavalière et patrons",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-solides-representations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-011",
+      "kind": "chapter",
+      "title": "Aire du disque et volumes (prisme, cylindre)",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-aires-volumes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-012",
+      "kind": "chapter",
+      "title": "Symétrie centrale (demi-tour)",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-symetrie-centrale",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-013",
+      "kind": "chapter",
+      "title": "Angles et parallélisme",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-angles-parallelisme",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-014",
+      "kind": "chapter",
+      "title": "Triangles : somme des angles, constructions, droites remarquables",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-triangles",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-015",
+      "kind": "chapter",
+      "title": "Parallélogrammes et parallélogrammes particuliers",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-parallelogrammes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-016",
+      "kind": "chapter",
+      "title": "Statistiques : effectifs, fréquences, représentations, moyenne",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-statistiques",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-017",
+      "kind": "chapter",
+      "title": "Probabilités : vocabulaire, équiprobabilité, fréquences",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-probabilites",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-018",
+      "kind": "chapter",
+      "title": "Proportionnalité, proportions et pourcentages",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-proportionnalite-pourcentages",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-019",
+      "kind": "chapter",
+      "title": "Grandeurs dépendantes : tableaux, graphiques, formules",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-dependance-grandeurs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-020",
+      "kind": "chapter",
+      "title": "Programmation par blocs : instructions, formules, boucle simple",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-pensee-informatique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-MATH-021",
+      "kind": "chapter",
+      "title": "Automatismes et calcul mental de 5e",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "mathematiques",
+      "chapterId": "math-5e-automatismes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-001",
+      "kind": "chapter",
+      "title": "Multiplication et division des nombres relatifs",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-relatifs-multiplication-division",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-002",
+      "kind": "chapter",
+      "title": "Nombres rationnels : multiplication, division, inverse",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-fractions-operations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-003",
+      "kind": "chapter",
+      "title": "Puissances et notation scientifique",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-puissances",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-004",
+      "kind": "chapter",
+      "title": "Carrés parfaits et racine carrée",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-racine-carree",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-005",
+      "kind": "chapter",
+      "title": "Divisibilité et nombres premiers",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-nombres-premiers",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-006",
+      "kind": "chapter",
+      "title": "Calcul littéral : distributivité simple, réduction",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-calcul-litteral",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-007",
+      "kind": "chapter",
+      "title": "Équations du premier degré",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-equations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-008",
+      "kind": "chapter",
+      "title": "Statistiques : médiane, diagrammes circulaires",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-statistiques",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-009",
+      "kind": "chapter",
+      "title": "Probabilités : calculs, évènements contraires",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-probabilites",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-010",
+      "kind": "chapter",
+      "title": "Proportionnalité : quatrième proportionnelle, graphiques, ratio",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-proportionnalite",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-011",
+      "kind": "chapter",
+      "title": "Dépendance entre grandeurs : formules et graphiques",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-fonctions-dependance",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-012",
+      "kind": "chapter",
+      "title": "Volumes de la pyramide et du cône ; grandeurs composées",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-volumes-grandeurs-composees",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-013",
+      "kind": "chapter",
+      "title": "Agrandissement et réduction",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-agrandissement-reduction",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-014",
+      "kind": "chapter",
+      "title": "Repérage dans un pavé, pyramide et cône",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-reperage-espace",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-015",
+      "kind": "chapter",
+      "title": "Théorème de Pythagore et réciproque",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-pythagore",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-016",
+      "kind": "chapter",
+      "title": "Théorème de Thalès (triangles emboîtés)",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-thales",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-017",
+      "kind": "chapter",
+      "title": "Cosinus d'un angle aigu",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-cosinus",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-018",
+      "kind": "chapter",
+      "title": "Cas d'égalité des triangles",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-triangles-egaux",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-019",
+      "kind": "chapter",
+      "title": "Translations",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-translation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-020",
+      "kind": "chapter",
+      "title": "Programmation : conditions, boucles, évènements, variables",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-programmation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-MATH-021",
+      "kind": "chapter",
+      "title": "Automatismes et calcul mental de 4e",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "mathematiques",
+      "chapterId": "math-4e-automatismes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-001",
+      "kind": "chapter",
+      "title": "Arithmétique : fractions irréductibles et problèmes",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-arithmetique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-002",
+      "kind": "chapter",
+      "title": "Puissances, notation scientifique et racines carrées en problèmes",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-puissances-calculs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-003",
+      "kind": "chapter",
+      "title": "Calcul littéral : double distributivité, identités",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-calcul-litteral",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-004",
+      "kind": "chapter",
+      "title": "Équations produits et équations x² = a",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-equations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-005",
+      "kind": "chapter",
+      "title": "Statistiques : histogrammes, étendue",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-statistiques",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-006",
+      "kind": "chapter",
+      "title": "Probabilités : fréquences, simulation, deux épreuves",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-probabilites",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-007",
+      "kind": "chapter",
+      "title": "Notion de fonction : image, antécédent, représentations",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-notion-fonction",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-008",
+      "kind": "chapter",
+      "title": "Fonctions linéaires et affines",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-fonctions-affines",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-009",
+      "kind": "chapter",
+      "title": "Pourcentages d'évolution et coefficient multiplicateur",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-pourcentages-evolution",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-010",
+      "kind": "chapter",
+      "title": "Boule, volumes composés, grandeurs composées",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-volumes-grandeurs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-011",
+      "kind": "chapter",
+      "title": "Sphère, repérage terrestre et sections de solides",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-sphere-sections",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-012",
+      "kind": "chapter",
+      "title": "Thalès (configuration papillon) et triangles semblables",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-thales-semblables",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-013",
+      "kind": "chapter",
+      "title": "Trigonométrie : cosinus, sinus, tangente",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-trigonometrie",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-014",
+      "kind": "chapter",
+      "title": "Rotations et homothéties",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-rotations-homotheties",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-015",
+      "kind": "chapter",
+      "title": "Programmation : boucles conditionnelles, scripts parallèles, blocs personnalisés",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-programmation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-016",
+      "kind": "chapter",
+      "title": "Automatismes et calcul mental de 3e",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-automatismes",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-001",
+      "kind": "chapter",
+      "title": "États et propriétés de la matière",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-proprietes-matiere",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-002",
+      "kind": "chapter",
+      "title": "Masse et volume",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-masse-volume",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-003",
+      "kind": "chapter",
+      "title": "Mélanges et premières transformations chimiques",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-melanges-transformations",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-004",
+      "kind": "chapter",
+      "title": "Mouvements et vitesse",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-mouvements",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-005",
+      "kind": "chapter",
+      "title": "Ressources et conversions d'énergie",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-energie",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-006",
+      "kind": "chapter",
+      "title": "Lumière, ombres, jour/nuit et saisons",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-lumiere-terre",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-007",
+      "kind": "chapter",
+      "title": "Circuits électriques à une boucle",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-electricite",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-6E-PC-008",
+      "kind": "chapter",
+      "title": "Signaux et transmission de l'information",
+      "state": "TODO",
+      "grade": "6e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-6e-signaux",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-001",
+      "kind": "chapter",
+      "title": "États de la matière et changements d'état",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-etats-changements-etat",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-002",
+      "kind": "chapter",
+      "title": "Mélanges, corps purs, miscibilité et solubilité",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-melanges-corps-purs",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-003",
+      "kind": "chapter",
+      "title": "Reconnaître une transformation chimique ; acidité et pH",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-transformations-chimiques-intro",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-004",
+      "kind": "chapter",
+      "title": "Le système solaire et les distances",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-systeme-solaire",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-005",
+      "kind": "chapter",
+      "title": "Caractériser un mouvement",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-caracteriser-mouvement",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-006",
+      "kind": "chapter",
+      "title": "Actions de contact et actions à distance",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-actions-mecaniques",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-007",
+      "kind": "chapter",
+      "title": "Sources, formes, transferts et conversions d'énergie",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-sources-formes-energie",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-008",
+      "kind": "chapter",
+      "title": "Circuits électriques : série et dérivation",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-circuits-electriques",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-5E-PC-009",
+      "kind": "chapter",
+      "title": "Sources de lumière et propagation rectiligne",
+      "state": "TODO",
+      "grade": "5e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-5e-lumiere-propagation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-001",
+      "kind": "chapter",
+      "title": "L'air, la dissolution des gaz et les tests caractéristiques",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-air-gaz-tests",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-002",
+      "kind": "chapter",
+      "title": "La masse volumique",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-masse-volumique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-003",
+      "kind": "chapter",
+      "title": "Atomes, molécules et transformations chimiques",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-atomes-molecules-reactions",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-004",
+      "kind": "chapter",
+      "title": "Structure de l'Univers et grandes distances",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-univers-distances",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-005",
+      "kind": "chapter",
+      "title": "Vitesse : direction, sens et valeur",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-vitesse",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-006",
+      "kind": "chapter",
+      "title": "Modéliser une action par une force ; le poids",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-poids-pesanteur",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-007",
+      "kind": "chapter",
+      "title": "Intensité, tension et lois des circuits",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-lois-electricite",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-008",
+      "kind": "chapter",
+      "title": "Énergie chimique, bilan énergétique et relation E = P × t",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-energie-chimique-bilan",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-4E-PC-009",
+      "kind": "chapter",
+      "title": "Propagation du son et vitesse de la lumière",
+      "state": "TODO",
+      "grade": "4e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-4e-son-vitesse-propagation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-001",
+      "kind": "chapter",
+      "title": "Constitution de l'atome, noyau et ions",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-atome-noyau-ions",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-002",
+      "kind": "chapter",
+      "title": "Acides, bases, pH et réactions avec les métaux",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-acides-bases-metaux",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-003",
+      "kind": "chapter",
+      "title": "Transformations chimiques, gaz à effet de serre et environnement",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-chimie-climat-environnement",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-004",
+      "kind": "chapter",
+      "title": "Origine de la matière et évolution de l'Univers",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-origine-matiere-univers",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-005",
+      "kind": "chapter",
+      "title": "Interactions, forces et gravitation universelle",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-forces-gravitation",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-006",
+      "kind": "chapter",
+      "title": "Relativité du mouvement",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-relativite-mouvement",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-007",
+      "kind": "chapter",
+      "title": "Formes d'énergie, conservation et énergie cinétique",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-conservation-energie",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-008",
+      "kind": "chapter",
+      "title": "Transferts d'énergie par rayonnement",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-rayonnement-effet-serre",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-009",
+      "kind": "chapter",
+      "title": "Loi d'Ohm, puissance et énergie électriques",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-puissance-energie-electrique",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-PC-010",
+      "kind": "chapter",
+      "title": "Fréquence, signaux et information",
+      "state": "TODO",
+      "grade": "3e",
+      "subject": "physique-chimie",
+      "chapterId": "pc-3e-frequence-signaux-information",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
+    }
   ]
 }

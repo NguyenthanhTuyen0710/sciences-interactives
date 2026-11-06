@@ -108,6 +108,8 @@ export const ChapterSchema = z.object({
   games: z.array(GameSchema).min(1),
   reviewStatus: z.object(Object.fromEntries(REVIEW_KEYS.map((k) => [k, z.enum(REVIEW_STATES)])) as Record<ReviewKey, z.ZodEnum<{ pending: "pending"; pass: "pass"; fail: "fail"; "needs-review": "needs-review" }>>),
   publicationStatus: z.enum(PUBLICATION_STATES),
+  /** Chapitres de l'inventaire officiel (research/curriculum) couverts par ce chapitre, si différent de `id`. */
+  curriculumChapterIds: z.array(z.string()).optional(),
   /** Justification documentée si moins de 30 exercices. */
   exerciseCountJustification: z.string().optional(),
 });
