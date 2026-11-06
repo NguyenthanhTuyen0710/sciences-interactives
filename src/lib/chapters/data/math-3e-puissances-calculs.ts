@@ -4,7 +4,7 @@
 // Hors programme (non exigé) : propriétés algébriques des racines carrées (√a × √b, √(a/b)…), puissances d'exposant non entier.
 import type { ChapterContent, ChapterExercise, ChapterPart } from "../schema";
 import type { Mistake, NumAnswer, Rng } from "../../engine/types";
-import { clean, fracTex, gcd, parseNumber, roundTo, simplify, tex } from "../../engine/numbers";
+import { clean, fracTex, frFixed, gcd, parseNumber, roundTo, simplify, tex } from "../../engine/numbers";
 
 const T = (x: number) => tex(x, 10);
 /** Nombre entre parenthèses s'il est négatif. */
@@ -19,11 +19,15 @@ const nz = (rng: Rng, a: number, b: number) => { let v = 0; while (v === 0) v = 
 const lcm = (a: number, b: number) => (a / gcd(a, b)) * b;
 
 const differs = (value: number) => (m: Mistake) => { const p = parseNumber(m.match); return !p || Math.abs(p.value - value) > 1e-9 * Math.max(1, Math.abs(value)); };
-const num = (value: number, mistakes: Mistake[] = [], prompt?: string, extra: Partial<NumAnswer> = {}): ChapterPart => ({ prompt, interaction: { kind: "numerique", answer: { value, ...extra } }, mistakes: mistakes.filter(differs(value)) });
+/** Écriture LaTeX avec un nombre fixe de décimales (affichage d'un arrondi : 12,0). */
+const TF = (x: number, d: number) => frFixed(x, d).replace("−", "-").replace(",", "{,}").replace(/ /g, "\\,");
+/** Supprime les diagnostics égaux à la bonne réponse et les doublons de valeur. */
+const keep = (value: number, ms: Mistake[]) => ms.filter(differs(value)).filter((m, i, all) => all.findIndex((x) => !differs(parseNumber(x.match)?.value ?? NaN)(m)) === i);
+const num = (value: number, mistakes: Mistake[] = [], prompt?: string, extra: Partial<NumAnswer> = {}): ChapterPart => ({ prompt, interaction: { kind: "numerique", answer: { value, ...extra } }, mistakes: keep(value, mistakes) });
 /** Réponse exacte sous forme de fraction (une valeur décimale approchée est refusée). */
 const frac = (n: number, d: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => {
   const [a, b] = simplify(n, d);
-  return { prompt, interaction: { kind: "numerique", answer: { value: a / b, fraction: [a, b] } }, mistakes: mistakes.filter(differs(a / b)) };
+  return { prompt, interaction: { kind: "numerique", answer: { value: a / b, fraction: [a, b] } }, mistakes: keep(a / b, mistakes) };
 };
 const fracAns = (n: number, d: number): NumAnswer => { const [a, b] = simplify(n, d); return { value: a / b, fraction: [a, b] }; };
 const qcm = (options: string[], answer: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "qcm", options, answer: [answer] }, mistakes });
@@ -66,6 +70,10 @@ const qSub = (a: Q, b: Q): Q => q(a[0] * b[1] - b[0] * a[1], a[1] * b[1]);
 const qMul = (a: Q, b: Q): Q => q(a[0] * b[0], a[1] * b[1]);
 const qDiv = (a: Q, b: Q): Q => q(a[0] * b[1], a[1] * b[0]);
 const QT = (a: Q) => Fs(a[0], a[1]);
+/** Fraction irréductible et non entière n/d, avec 1 ≤ n < d : jamais un entier ni 1 dans un énoncé. */
+const pf = (rng: Rng, dmin: number, dmax: number): Q => { const d = rng.int(Math.max(2, dmin), dmax); let n = rng.int(1, d - 1); while (gcd(n, d) !== 1) n = rng.int(1, d - 1); return [n, d]; };
+/** Idem avec un dénominateur choisi dans une liste. */
+const pfIn = (rng: Rng, dens: number[]): Q => { const d = rng.pick(dens); let n = rng.int(1, d - 1); while (gcd(n, d) !== 1) n = rng.int(1, d - 1); return [n, d]; };
 
 const O = {
   "M3-NC-04": "Utiliser les puissances d'exposant négatif d'un nombre quelconque pour simplifier des quotients.",
@@ -172,8 +180,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "pc3-05", title: "Multiplier deux fractions", niveau: 1, objectives: ["M4-NC-04"], time: 60,
     vary: (rng) => {
-      const b = rng.int(2, 9); let d = rng.int(2, 9); if (d === b) d = b === 9 ? 2 : b + 1;
-      const a = rng.int(1, 8), c = rng.int(1, 8);
+      const [a, b] = pf(rng, 2, 9);
+      let [c, d] = pf(rng, 2, 9);
+      while (d === b) [c, d] = pf(rng, 2, 9);
       const [rn, rd] = simplify(a * c, b * d);
       return {
         statement: `Calculer $${Fw(a, b)} \\times ${Fw(c, d)}$ et donner le résultat sous forme irréductible.`,
@@ -194,7 +203,8 @@ const EXERCISES: ChapterExercise[] = [
       const e = () => nz(rng, -9, 12);
       const m1 = rng.int(11, 99) / 10, p1 = e();
       items.push({ s: sciTx(m1, p1), ok: true, why: `$${T(m1)}$ est compris entre 1 et 10 (10 exclu).` });
-      const m2 = rng.int(101, 999) / 100, p2 = e();
+      let m2 = rng.int(101, 999) / 100, p2 = e();
+      while (m2 === m1 && p2 === p1) { m2 = rng.int(101, 999) / 100; p2 = e(); }
       items.push({ s: sciTx(m2, p2), ok: true, why: `$${T(m2)}$ est compris entre 1 et 10.` });
       const m3 = rng.int(11, 99), p3 = e();
       items.push({ s: sciTx(m3, p3), ok: false, why: `$${m3}$ est supérieur à 10 : on écrirait $${sciTx(m3 / 10, p3 + 1)}$.` });
@@ -224,15 +234,16 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Les préfixes vont de 3 en 3 : kilo, méga, giga pour $10^3$, $10^6$, $10^9$ ; milli, micro, nano pour $10^{-3}$, $10^{-6}$, $10^{-9}$.",
-    hints: ["Kilo signifie mille : $10^{3}$. Les autres préfixes avancent de 3 en 3.", "Les « petits » préfixes (milli, micro, nano) ont des exposants négatifs."],
+    hints: ["Quel préfixe signifie « mille » ? Les autres préfixes avancent de 3 en 3 dans les exposants.", "Les « petits » préfixes (milli, micro, nano) ont des exposants négatifs."],
   }),
 
   // ── Niveau 2 : Application directe ──
   ex({
     id: "pc3-08", title: "Additionner ou soustraire des fractions", niveau: 2, objectives: ["M3-NC-07"], time: 90,
     vary: (rng) => {
-      const b = rng.int(2, 12); let d = rng.int(2, 12); if (d === b) d = b === 12 ? 3 : b + 1;
-      const a = rng.int(1, b + 2), c = rng.int(1, d + 2);
+      const [a, b] = pf(rng, 2, 12);
+      let [c, d] = pf(rng, 2, 12);
+      while (d === b) [c, d] = pf(rng, 2, 12);
       const plus = rng.next() < 0.6;
       const L = lcm(b, d);
       const res = plus ? qAdd([a, b], [c, d]) : qSub([a, b], [c, d]);
@@ -254,7 +265,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "pc3-09", title: "Diviser par une fraction", niveau: 2, objectives: ["M4-NC-04"], time: 75,
     vary: (rng) => {
-      const a = rng.int(1, 9), b = rng.int(2, 9), c = rng.int(1, 9); let d = rng.int(2, 9); if (c === d) d = d === 9 ? 2 : d + 1;
+      const [a, b] = pf(rng, 2, 9);
+      let [c, d] = pf(rng, 2, 9);
+      while (c === a && d === b) [c, d] = pf(rng, 2, 9);
       return {
         statement: `Calculer $${Fw(a, b)} \\div ${Fw(c, d)}$ et donner le résultat sous forme irréductible.`,
         parts: [frac(a * d, b * c, [
@@ -271,7 +284,7 @@ const EXERCISES: ChapterExercise[] = [
     id: "pc3-10", title: "Règles de calcul sur les puissances", niveau: 2, objectives: ["M3-NC-04"], time: 120,
     vary: (rng) => {
       const a = rng.pick([2, 3, 5, 7, 10]);
-      const m = nz(rng, -5, 7), n = nz(rng, -5, 7), r = nz(rng, -6, 6), s = nz(rng, -6, 6), u = nz(rng, -3, 4), v = nz(rng, -3, 4);
+      const m = nz(rng, -5, 7), n = nz(rng, -5, 7), r = nz(rng, -6, 6), s = nz(rng, -6, 6), u = rng.int(2, 4), v = nz(rng, -3, 4);
       return {
         statement: "Écrire chaque nombre sous la forme d'une seule puissance de $" + a + "$, puis donner l'exposant $k$.",
         parts: [{ interaction: { kind: "texte-trous", template: `$${pw(a, m)} \\times ${pw(a, n)} = ${a}^{k}$ avec $k =$ [[0]]\n$\\dfrac{${pw(a, r)}}{${pw(a, s)}} = ${a}^{k}$ avec $k =$ [[1]]\n$(${pw(a, u)})^{${v}} = ${a}^{k}$ avec $k =$ [[2]]`, blanks: [{ type: "number", answer: { value: m + n } }, { type: "number", answer: { value: r - s } }, { type: "number", answer: { value: u * v } }] } }],
@@ -300,15 +313,15 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "pc3-12", title: "Valeur exacte, valeur approchée", niveau: 2, objectives: ["M4-NC-11", "M4-NC-10"], time: 75,
     vary: (rng) => {
-      let n = 0; while (!n || Number.isInteger(Math.sqrt(n))) n = rng.int(2, 150);
+      let n = 0; while (!n || Number.isInteger(Math.sqrt(n)) || roundTo(Math.sqrt(n), 1) === roundTo(Math.sqrt(n), 3)) n = rng.int(2, 150);
       const r1 = roundTo(Math.sqrt(n), 1), r3 = roundTo(Math.sqrt(n), 3);
       return {
         statement: `On considère le nombre $\\sqrt{${n}}$.`,
         parts: [
-          shuffledQcm(rng, [`$\\sqrt{${n}}$`, `$${T(r1)}$`, `$${T(r3)}$`], 0, { 1: "C'est une valeur **approchée** (arrondie) : elle n'est pas égale à la racine.", 2: "Même avec trois décimales, ce n'est qu'une valeur approchée." }, "Quelle écriture est la **valeur exacte** ?"),
-          num(r1, [{ match: String(n / 2), feedback: "La racine carrée n'est pas la moitié du nombre." }, { match: String(Math.floor(Math.sqrt(n) * 10) / 10), feedback: "Tu as tronqué : pour arrondir, regarde le chiffre des centièmes." }], "Donner l'arrondi au dixième de ce nombre (calculatrice autorisée).", { tol: 0.0001, roundingLabel: "au dixième" }),
+          shuffledQcm(rng, [`$\\sqrt{${n}}$`, `$${TF(r1, 1)}$`, `$${TF(r3, 3)}$`], 0, { 1: "C'est une valeur **approchée** (arrondie) : elle n'est pas égale à la racine.", 2: "Même avec trois décimales, ce n'est qu'une valeur approchée." }, "Quelle écriture est la **valeur exacte** ?"),
+          num(r1, [{ match: String(n / 2), feedback: "La racine carrée n'est pas la moitié du nombre." }, { match: String(Math.floor(Math.sqrt(n) * 10) / 10), feedback: "Tu as tronqué : pour arrondir, regarde le chiffre des centièmes." }], "Donner l'arrondi au dixième de ce nombre (calculatrice autorisée).", { tol: 0.0001, decimals: 1, roundingLabel: "au dixième" }),
         ],
-        solution: [`$${n}$ n'est pas un carré parfait : $\\sqrt{${n}}$ n'a pas d'écriture décimale exacte. La valeur exacte s'écrit $\\sqrt{${n}}$.`, `La calculatrice affiche $\\sqrt{${n}} \\approx ${T(roundTo(Math.sqrt(n), 4))}$.`, `Arrondi au dixième : $\\sqrt{${n}} \\approx ${T(r1)}$.`],
+        solution: [`$${n}$ n'est pas un carré parfait : $\\sqrt{${n}}$ n'a pas d'écriture décimale exacte. La valeur exacte s'écrit $\\sqrt{${n}}$.`, `La calculatrice affiche $\\sqrt{${n}} \\approx ${T(roundTo(Math.sqrt(n), 4))}$.`, `Arrondi au dixième : $\\sqrt{${n}} \\approx ${TF(r1, 1)}$.`],
       };
     },
     reasoning: "Une valeur exacte est égale au nombre ; une valeur approchée en est proche. On écrit $\\sqrt{2} \\approx 1{,}41$ (symbole $\\approx$), jamais $\\sqrt{2} = 1{,}41$.",
@@ -349,7 +362,7 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "pc3-15", title: "Priorités avec des fractions", niveau: 3, objectives: ["M3-NC-07"], time: 120,
     vary: (rng) => {
-      const a = rng.int(1, 6), b = rng.int(2, 7), c = rng.int(1, 6), d = rng.int(2, 7), e = rng.int(1, 6), f = rng.int(2, 7);
+      const [a, b] = pf(rng, 2, 7), [c, d] = pf(rng, 2, 7), [e, f] = pf(rng, 2, 7);
       const plus = rng.next() < 0.6;
       const prod = qMul([c, d], [e, f]);
       const res = plus ? qAdd([a, b], prod) : qSub([a, b], prod);
@@ -381,17 +394,18 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "pc3-17", title: "Quotient en notation scientifique", niveau: 3, objectives: ["M3-NC-05", "M3-NC-04"], time: 120,
     vary: (rng) => {
-      const R = rng.int(11, 99), b = rng.pick([2, 4, 5]), p = nz(rng, -6, 9), q2 = nz(rng, -6, 9);
-      const a = clean((R * b) / 10);
-      const m = R / 10, e = p - q2;
+      const b = rng.pick([2, 4, 5, 8]), p = nz(rng, -6, 9), q2 = nz(rng, -6, 9);
+      let A = rng.int(10, 99); while (A === 10 * b) A = rng.int(10, 99);
+      const a = A / 10, coef = clean(a / b, 12), e0 = p - q2;
+      const [m, e] = sciFromInt((A * 1000) / b, e0 - 4);
       return {
         statement: `Calculer $\\dfrac{${sciTx(a, p)}}{${sciTx(b, q2)}}$ et donner le résultat en notation scientifique.`,
         parts: [{ interaction: { kind: "texte-trous", template: "Résultat : [[0]] $\\times 10^{k}$ avec $k =$ [[1]]", blanks: blanksSci(m, e) }, mistakes: [] }],
-        solution: [`$\\dfrac{${T(a)}}{${b}} = ${T(m)}$.`, `$\\dfrac{10^{${p}}}{10^{${q2}}} = 10^{${p} - ${P(q2)}} = 10^{${e}}$.`, `Résultat : $${sciTx(m, e)}$.`],
+        solution: [`$\\dfrac{${T(a)}}{${b}} = ${T(coef)}$.`, `$\\dfrac{10^{${p}}}{10^{${q2}}} = 10^{${p} - ${P(q2)}} = 10^{${e0}}$.`, coef < 1 ? `$${T(coef)} \\times 10^{${e0}}$ : le nombre devant la puissance est inférieur à 1, on réajuste : $${T(coef)} = ${T(m)} \\times 10^{-1}$.` : `$${T(coef)}$ est compris entre 1 et 10 : pas de réajustement.`, `Résultat : $${sciTx(m, e)}$.`],
       };
     },
     reasoning: "On divise les nombres décimaux entre eux et les puissances de 10 entre elles (soustraction des exposants).",
-    hints: ["Sépare le calcul en deux quotients.", "Attention au signe de l'exposant du dénominateur."],
+    hints: ["Sépare le calcul en deux quotients.", "Attention au signe de l'exposant du dénominateur, et vérifie à la fin que le nombre devant la puissance est entre 1 et 10."],
   }),
   ex({
     id: "pc3-18", title: "Ranger des nombres en notation scientifique", niveau: 3, objectives: ["M4-NC-08"], time: 120,
@@ -404,7 +418,7 @@ const EXERCISES: ChapterExercise[] = [
       add(m2, p - 1, sciTx(m2 / 10, p));
       const m3 = rng.int(11, 99); add(m3, p - 2, sciTx(m3 / 10, p - 1));
       const m4 = rng.int(11, 99); add(m4, p, sciTx(m4 / 10, p + 1));
-      const m5 = rng.int(11, 99); add(m5, p - 1, `${T(m5)} \\times 10^{${p - 1}}`);
+      let m5 = rng.int(11, 99); while (m5 === m1 || m5 === m2) m5 = rng.int(11, 99); add(m5, p - 1, `${T(m5)} \\times 10^{${p - 1}}`);
       const vals = rng.shuffle(cand);
       const v = (c: { D: number; e: number }) => c.D * 10 ** c.e;
       let ord = vals.map((_, i) => i).sort((i, j) => v(vals[i]) - v(vals[j]));
@@ -415,13 +429,13 @@ const EXERCISES: ChapterExercise[] = [
         solution: ["On écrit d'abord chaque nombre en notation scientifique, puis on compare les exposants : le plus grand exposant donne le plus grand nombre.", "À exposant égal, on compare les nombres placés devant la puissance de 10.", `Ordre croissant : $${ord.map((i) => vals[i].label).join(" < ")}$.`],
       };
     },
-    reasoning: "En notation scientifique, l'exposant donne l'ordre de grandeur : il se compare en premier. Une écriture non scientifique (comme $23 \\times 10^{2}$) doit être convertie avant de comparer.",
+    reasoning: "En notation scientifique, l'exposant renseigne sur l'ordre de grandeur : il se compare en premier. Une écriture non scientifique (comme $23 \\times 10^{2}$) doit être convertie avant de comparer.",
     hints: ["Une des écritures n'est pas en notation scientifique : convertis-la d'abord.", "Compare d'abord les exposants, puis les nombres devant la puissance."],
   }),
   ex({
     id: "pc3-19", title: "Le potager", niveau: 3, objectives: ["M3-NC-07"], time: 180,
     vary: (rng) => {
-      const b = rng.int(3, 8), a = rng.int(1, b - 1), d = rng.int(2, 5), c = rng.int(1, d - 1);
+      const [a, b] = pf(rng, 3, 8), [c, d] = pf(rng, 2, 5);
       const rest = q(b - a, b), sal = qMul(rest, [c, d]), free = qSub(rest, sal);
       return {
         statement: `Dans un potager, on plante des tomates sur $${Fw(a, b)}$ de la surface, puis des salades sur $${Fw(c, d)}$ **du reste**. Le reste est laissé libre. Donner les fractions sous forme irréductible.`,
@@ -468,7 +482,7 @@ const EXERCISES: ChapterExercise[] = [
       ]).slice(0, 4);
       const rows = kinds.map((k) => { const D = rng.next() < 0.5 ? rng.int(2, 9) : rng.int(12, 95); const dd = D >= 10 ? 1 : 0; return { ...k, D, dd }; });
       return {
-        statement: "Compléter le tableau : convertir chaque grandeur dans l'unité indiquée (écriture décimale ou notation scientifique acceptées, par exemple 3×10^-6).",
+        statement: "Compléter le tableau : convertir chaque grandeur dans l'unité indiquée (écriture décimale ou notation scientifique acceptées, par exemple 3×10^-6). On prend 1 Go $= 10^{9}$ octets.",
         parts: [{ interaction: { kind: "tableau", headers: ["Grandeur", "Valeur convertie"], rows: rows.map((r) => {
           const x = clean(r.D * 10 ** (r.e - r.dd), 12);
           return { label: `$${decTex(r.D, -r.dd)}$ ${r.unit} (en ${r.base})`, cells: [{ answer: { value: x, decimals: Math.max(0, decs(x)) } }] };
@@ -496,7 +510,7 @@ const EXERCISES: ChapterExercise[] = [
       const pool = toks.includes(distract.join("/")) ? res : [...res, distract];
       const order = rng.shuffle(pool.map((_, i) => i));
       return {
-        statement: "Déposer chaque résultat (sous forme irréductible) en face du calcul correspondant. Un résultat proposé ne sert pas, s'il y en a cinq.",
+        statement: "Déposer chaque résultat (sous forme irréductible) en face du calcul correspondant. S'il y a cinq résultats proposés, l'un d'eux ne sert pas.",
         parts: [{ interaction: { kind: "glisser-deposer", zones, tokens: order.map((i) => `$${QT(pool[i])}$`), answer: res.map((_, k) => order.indexOf(k)) } }],
         solution: [
           `Somme : $${Fw(a, b)} + ${Fw(c, d)} = ${Fw(a * d + c * b, b * d)} = ${QT(res[0])}$.`,
@@ -523,10 +537,10 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `La distance moyenne entre le Soleil et ${name} est d'environ $${sciTx(m, p)}$ km. La lumière se déplace à environ $3 \\times 10^{5}$ km/s.`,
         parts: [
-          num(ts, [{ match: String(roundTo(3e5 / (D * 10 ** e), 6)), feedback: "Tu as divisé la vitesse par la distance : la durée est distance ÷ vitesse." }], "Durée du trajet de la lumière, en secondes (arrondie à l'unité).", { tol: 0.0001, roundingLabel: "à l'unité" }),
-          num(tm, [{ match: String(roundTo(t / 100, 1)), feedback: "1 min = 60 s, pas 100 s." }], "Cette durée en minutes (arrondie au dixième).", { tol: 0.0001, roundingLabel: "au dixième" }),
+          num(ts, [], "Durée du trajet de la lumière, en secondes (arrondie à l'unité).", { tol: 0.0001, decimals: 0, roundingLabel: "à l'unité" }),
+          num(tm, [{ match: String(roundTo(t / 100, 1)), feedback: "1 min = 60 s, pas 100 s." }], "Cette durée en minutes (arrondie au dixième).", { tol: 0.0001, decimals: 1, roundingLabel: "au dixième" }),
         ],
-        solution: [`Durée = distance ÷ vitesse : $t = \\dfrac{${sciTx(m, p)}}{3 \\times 10^{5}}$ s.`, `$t = \\dfrac{${T(m)}}{3} \\times 10^{${p - 5}} \\approx ${T(roundTo(t, 2))}$ s, soit environ $${T(ts)}$ s.`, `En minutes : $${T(roundTo(t, 2))} \\div 60 \\approx ${T(tm)}$ min.`],
+        solution: [`Durée = distance ÷ vitesse : $t = \\dfrac{${sciTx(m, p)}}{3 \\times 10^{5}}$ s.`, `$t = \\dfrac{${T(m)}}{3} \\times 10^{${p - 5}} \\approx ${T(roundTo(t, 2))}$ s, soit environ $${T(ts)}$ s.`, `En minutes : $${T(roundTo(t, 2))} \\div 60 \\approx ${TF(tm, 1)}$ min.`],
       };
     },
     reasoning: "La relation $d = v \\times t$ donne $t = \\dfrac{d}{v}$. Les puissances de 10 se simplifient comme dans un quotient.",
@@ -539,19 +553,19 @@ const EXERCISES: ChapterExercise[] = [
       const drops = 20 * V;
       const [m, p] = sciFromInt(340 * V, 20);
       return {
-        statement: `Une goutte d'eau a un volume d'environ $0{,}05$ mL et contient environ $1{,}7 \\times 10^{21}$ molécules d'eau. On s'intéresse à ${lab} d'eau, soit $${V}$ mL.`,
+        statement: `Une goutte d'eau a un volume d'environ $0{,}05$ mL et contient environ $1{,}7 \\times 10^{21}$ molécules d'eau. On s'intéresse à ${lab} d'eau, soit $${T(V)}$ mL.`,
         parts: [
-          num(drops, [{ match: String(V * 5), feedback: "Pour trouver le nombre de gouttes, on divise le volume total par le volume d'une goutte." }], "Combien de gouttes cela représente-t-il ?"),
+          num(drops, [{ match: String(clean(V * 0.05)), feedback: "Tu as multiplié par $0{,}05$ : pour trouver le nombre de gouttes, on **divise** le volume total par le volume d'une goutte." }], "Combien de gouttes cela représente-t-il ?"),
           { prompt: "Nombre de molécules d'eau, en notation scientifique.", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ avec $k =$ [[1]]", blanks: blanksSci(m, p) } },
         ],
-        solution: [`Nombre de gouttes : $${V} \\div 0{,}05 = ${V} \\times 20 = ${drops}$.`, `Nombre de molécules : $${drops} \\times 1{,}7 \\times 10^{21} = ${T(drops * 1.7)} \\times 10^{21}$.`, `En notation scientifique : $${sciTx(m, p)}$.`],
+        solution: [`Nombre de gouttes : $${T(V)} \\div 0{,}05 = ${T(V)} \\times 20 = ${T(drops)}$.`, `Nombre de molécules : $${T(drops)} \\times 1{,}7 \\times 10^{21} = ${T(drops * 1.7)} \\times 10^{21}$.`, `En notation scientifique : $${sciTx(m, p)}$.`],
       };
     },
     reasoning: "On décompose : nombre de gouttes, puis nombre de molécules. La notation scientifique permet d'écrire et de comparer ces très grands nombres.",
     hints: ["Diviser par $0{,}05$, c'est multiplier par 20.", "Écris le produit puis réajuste pour avoir un seul chiffre avant la virgule."],
   }),
   ex({
-    id: "pc3-24", title: "Le carrelage carré", niveau: 4, objectives: ["M3-NC-06"], time: 240,
+    id: "pc3-24", title: "La pièce carrée", niveau: 4, objectives: ["M3-NC-06"], time: 240,
     vary: (rng) => {
       let A = 0; while (!A || Number.isInteger(Math.sqrt(A))) A = rng.int(5, 60);
       const s = Math.sqrt(A), sr = roundTo(s, 2), per = roundTo(4 * s, 2), perBad = roundTo(4 * sr, 2);
@@ -559,10 +573,10 @@ const EXERCISES: ChapterExercise[] = [
         statement: `Une pièce carrée a une aire de $${A}$ m².`,
         parts: [
           shuffledQcm(rng, [`$\\sqrt{${A}}$ m`, `$${T(A / 2)}$ m`, `$${T(A / 4)}$ m`, `$${A * A}$ m`], 0, { 1: "Le côté n'est pas la moitié de l'aire : aire = côté × côté.", 2: "Diviser l'aire par 4 donnerait le côté à partir du **périmètre**, pas de l'aire.", 3: "Le carré de l'aire n'a pas de sens ici." }, "Quelle est la valeur **exacte** du côté ?"),
-          num(sr, [{ match: String(roundTo(A / 2, 2)), feedback: "Le côté est la racine carrée de l'aire, pas sa moitié." }], "Valeur approchée du côté au centimètre près (en m).", { tol: 0.0001, roundingLabel: "au centimètre près" }),
-          num(per, perBad !== per ? [{ match: String(perBad), feedback: "Tu as calculé avec le côté arrondi : utilise la valeur exacte $\\sqrt{" + A + "}$ (mémoire de la calculatrice), puis arrondis seulement à la fin." }] : [], "Périmètre de la pièce au centimètre près (en m).", { tol: 0.0001, roundingLabel: "au centimètre près" }),
+          num(sr, [{ match: String(roundTo(A / 2, 2)), feedback: "Le côté est la racine carrée de l'aire, pas sa moitié." }], "Valeur approchée du côté au centimètre près (en m).", { tol: 0.0001, decimals: 2, roundingLabel: "au centimètre près" }),
+          num(per, perBad !== per ? [{ match: String(perBad), feedback: "Tu as calculé avec le côté arrondi : utilise la valeur exacte $\\sqrt{" + A + "}$ (mémoire de la calculatrice), puis arrondis seulement à la fin." }] : [], "Périmètre de la pièce au centimètre près (en m).", { tol: 0.0001, decimals: 2, roundingLabel: "au centimètre près" }),
         ],
-        solution: [`Si $c$ est le côté, $c^2 = ${A}$ et $c > 0$, donc $c = \\sqrt{${A}}$ m (valeur exacte).`, `$\\sqrt{${A}} \\approx ${T(roundTo(s, 4))}$, donc $c \\approx ${T(sr)}$ m au centimètre près.`, `Périmètre exact : $4\\sqrt{${A}}$ m $\\approx ${T(roundTo(4 * s, 4))}$ m, soit environ $${T(per)}$ m.`],
+        solution: [`Si $c$ est le côté, $c^2 = ${A}$ et $c > 0$, donc $c = \\sqrt{${A}}$ m (valeur exacte).`, `$\\sqrt{${A}} \\approx ${T(roundTo(s, 4))}$, donc $c \\approx ${TF(sr, 2)}$ m au centimètre près.`, `Périmètre exact : $4\\sqrt{${A}}$ m $\\approx ${T(roundTo(4 * s, 4))}$ m, soit environ $${TF(per, 2)}$ m.`],
       };
     },
     reasoning: "On garde la valeur exacte ($\\sqrt{A}$) dans les calculs intermédiaires et on n'arrondit qu'au résultat final, sinon les erreurs d'arrondi s'accumulent.",
@@ -577,9 +591,9 @@ const EXERCISES: ChapterExercise[] = [
         statement: `Un disque a une aire de $${A}$ cm². On note $r$ son rayon.`,
         parts: [
           shuffledQcm(rng, [`$r = \\sqrt{\\dfrac{${A}}{\\pi}}$`, `$r = \\dfrac{${A}}{\\pi}$`, `$r = \\dfrac{${A}}{2\\pi}$`, `$r = \\dfrac{\\sqrt{${A}}}{2}$`], 0, { 1: "$\\dfrac{A}{\\pi}$ est égal à $r^2$ : il faut encore prendre la racine carrée.", 2: "$2\\pi r$ est le périmètre, pas l'aire." }, "Quelle est la valeur exacte de $r$ ?"),
-          num(r, [{ match: String(roundTo(A / Math.PI, 1)), feedback: "Ceci est $r^2$ : prends la racine carrée." }], "Valeur approchée de $r$ au millimètre près (en cm).", { tol: 0.0001, roundingLabel: "au millimètre près" }),
+          num(r, [{ match: String(roundTo(A / Math.PI, 1)), feedback: "Ceci est $r^2$ : prends la racine carrée." }], "Valeur approchée de $r$ au millimètre près (en cm).", { tol: 0.0001, decimals: 1, roundingLabel: "au millimètre près" }),
         ],
-        solution: [`L'aire d'un disque est $\\pi r^2$, donc $\\pi r^2 = ${A}$ et $r^2 = \\dfrac{${A}}{\\pi}$.`, `$r$ est positif, donc $r = \\sqrt{\\dfrac{${A}}{\\pi}}$ (valeur exacte).`, `À la calculatrice : $r \\approx ${T(roundTo(Math.sqrt(A / Math.PI), 3))}$ cm, soit $r \\approx ${T(r)}$ cm au millimètre près.`],
+        solution: [`L'aire d'un disque est $\\pi r^2$, donc $\\pi r^2 = ${A}$ et $r^2 = \\dfrac{${A}}{\\pi}$.`, `$r$ est positif, donc $r = \\sqrt{\\dfrac{${A}}{\\pi}}$ (valeur exacte).`, `À la calculatrice : $r \\approx ${T(roundTo(Math.sqrt(A / Math.PI), 3))}$ cm, soit $r \\approx ${TF(r, 1)}$ cm au millimètre près.`],
       };
     },
     reasoning: "On isole $r^2$ par division, puis on prend la racine carrée car un rayon est positif.",
@@ -595,13 +609,13 @@ const EXERCISES: ChapterExercise[] = [
         statement: `Le triangle $ABC$ est rectangle en $A$, avec $AB = ${a}$ cm et $AC = ${b}$ cm.`,
         parts: [
           num(c2, [{ match: String(a + b), feedback: "Pythagore porte sur les **carrés** des longueurs." }, { match: String((a + b) ** 2), feedback: "On additionne les carrés : $AB^2 + AC^2$, pas $(AB + AC)^2$." }], "Calculer $BC^2$ (en cm²)."),
-          num(c, [{ match: String(roundTo(c2 / 2, 1)), feedback: "La racine carrée n'est pas la moitié." }], "Donner $BC$ arrondi au millimètre (en cm).", { tol: 0.0001, roundingLabel: "au millimètre" }),
-          qcm(["une valeur exacte", "une valeur approchée"], 1, [{ match: "0", feedback: `$${c2}$ n'est pas un carré parfait : $BC = \\sqrt{${c2}}$ n'a pas d'écriture décimale exacte.` }], "Le nombre trouvé à la question précédente est…"),
+          num(c, [{ match: String(roundTo(c2 / 2, 1)), feedback: "La racine carrée n'est pas la moitié." }], "Donner $BC$ arrondi au millimètre (en cm).", { tol: 0.0001, decimals: 1, roundingLabel: "au millimètre" }),
+          shuffledQcm(rng, ["une valeur exacte", "une valeur approchée"], 1, { 0: `$${c2}$ n'est pas un carré parfait : $BC = \\sqrt{${c2}}$ n'a pas d'écriture décimale exacte.` }, "Le nombre trouvé à la question précédente est…"),
         ],
-        solution: [`D'après le théorème de Pythagore : $BC^2 = AB^2 + AC^2 = ${a * a} + ${b * b} = ${c2}$.`, `$BC = \\sqrt{${c2}}$ cm (valeur exacte) $\\approx ${T(roundTo(Math.sqrt(c2), 3))}$ cm.`, `Arrondi au millimètre : $BC \\approx ${T(c)}$ cm ; c'est une valeur approchée.`],
+        solution: [`D'après le théorème de Pythagore : $BC^2 = AB^2 + AC^2 = ${a * a} + ${b * b} = ${c2}$.`, `$BC = \\sqrt{${c2}}$ cm (valeur exacte) $\\approx ${T(roundTo(Math.sqrt(c2), 3))}$ cm.`, `Arrondi au millimètre : $BC \\approx ${TF(c, 1)}$ cm ; c'est une valeur approchée.`],
       };
     },
-    reasoning: "Le théorème de Pythagore donne le **carré** de l'hypoténuse ; la racine carrée donne la longueur. La valeur exacte est $\\sqrt{" + "BC^2}$ ; le résultat arrondi est une valeur approchée.",
+    reasoning: "Le théorème de Pythagore donne le **carré** de l'hypoténuse ; la racine carrée donne la longueur. La valeur exacte est $BC = \\sqrt{AB^2 + AC^2}$ ; le résultat arrondi est une valeur approchée.",
     hints: ["Quel est le plus long côté du triangle ?", "Une longueur s'obtient à partir de son carré grâce à la racine carrée."],
   }),
   ex({
@@ -609,7 +623,7 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       let a = 1, b = 3, c = 1, d = 4;
       for (let t = 0; t < 40; t++) {
-        b = rng.pick([3, 4, 5, 6]); d = rng.pick([3, 4, 6, 8, 10]); a = rng.int(1, b - 1); c = rng.int(1, d - 1);
+        [a, b] = pfIn(rng, [3, 4, 5, 6]); [c, d] = pfIn(rng, [3, 4, 6, 8, 10]);
         if (b !== d && a * d + c * b < b * d) break;
       }
       if (!(b !== d && a * d + c * b < b * d)) { a = 1; b = 3; c = 1; d = 4; }
@@ -617,13 +631,13 @@ const EXERCISES: ChapterExercise[] = [
       const ines = qSub(qSub([1, 1], [a, b]), [c, d]);
       const M = (S * ines[0]) / ines[1];
       return {
-        statement: `Trois amis se partagent une somme d'argent. Léa reçoit $${Fw(a, b)}$ de la somme, Tom $${Fw(c, d)}$ de la somme et Inès reçoit le reste, soit $${M}$ €.`,
+        statement: `Trois amis se partagent une somme d'argent. Léa reçoit $${Fw(a, b)}$ de la somme, Tom $${Fw(c, d)}$ de la somme et Inès reçoit le reste, soit $${T(M)}$ €.`,
         parts: [{ interaction: { kind: "etapes", steps: [
           { prompt: "Fraction de la somme reçue par Inès (forme irréductible)", answer: fracAns(ines[0], ines[1]) },
           { prompt: "Somme totale partagée", answer: { value: S }, suffix: "€" },
           { prompt: "Part de Léa", answer: { value: (S * a) / b }, suffix: "€" },
         ] } }],
-        solution: [`Inès reçoit $1 - ${Fw(a, b)} - ${Fw(c, d)} = ${QT(ines)}$ de la somme.`, `$${QT(ines)}$ de la somme valent $${M}$ €, donc la somme est $${M} \\div ${QT(ines)} = ${M} \\times ${Fs(ines[1], ines[0])} = ${S}$ €.`, `Léa reçoit $${Fw(a, b)} \\times ${S} = ${(S * a) / b}$ €.`],
+        solution: [`Inès reçoit $1 - ${Fw(a, b)} - ${Fw(c, d)} = ${QT(ines)}$ de la somme.`, `$${QT(ines)}$ de la somme valent $${T(M)}$ €, donc la somme est $${T(M)} \\div ${QT(ines)} = ${T(M)} \\times ${Fs(ines[1], ines[0])} = ${T(S)}$ €.`, `Léa reçoit $${Fw(a, b)} \\times ${T(S)} = ${T((S * a) / b)}$ €.`],
       };
     },
     reasoning: "On exprime d'abord la part inconnue comme une fraction du tout ; connaître la valeur de cette fraction permet de retrouver le tout par division.",
@@ -642,7 +656,7 @@ const EXERCISES: ChapterExercise[] = [
           { prompt: "Capacité de la clé en octets, en notation scientifique.", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ octets avec $k =$ [[1]]", blanks: blanksSci(m, p) } },
           num(count, Math.round(exact) !== count ? [{ match: String(Math.round(exact)), feedback: "On ne peut pas enregistrer une photo incomplète : on garde la partie entière (arrondi à l'unité inférieure)." }] : [], "Nombre maximal de photos que l'on peut enregistrer."),
         ],
-        solution: [`$${G}$ Go $= ${G} \\times 10^{9}$ octets $= ${sciTx(m, p)}$ octets.`, `Une photo : $${decTex(Mt, -1)} \\times 10^{6}$ octets.`, `$\\dfrac{${G} \\times 10^{9}}{${decTex(Mt, -1)} \\times 10^{6}} = \\dfrac{${G}}{${decTex(Mt, -1)}} \\times 10^{3} \\approx ${T(roundTo(exact, 2))}$.`, `On peut enregistrer au maximum $${count}$ photos.`],
+        solution: [`$${G}$ Go $= ${G} \\times 10^{9}$ octets $= ${sciTx(m, p)}$ octets.`, `Une photo : $${decTex(Mt, -1)} \\times 10^{6}$ octets.`, `$\\dfrac{${G} \\times 10^{9}}{${decTex(Mt, -1)} \\times 10^{6}} = \\dfrac{${G}}{${decTex(Mt, -1)}} \\times 10^{3} \\approx ${T(roundTo(exact, 2))}$.`, `On peut enregistrer au maximum $${T(count)}$ photos.`],
       };
     },
     reasoning: "On convertit dans la même unité (l'octet) grâce aux puissances de 10, puis on divise. Le contexte impose de prendre la partie entière.",
@@ -651,7 +665,7 @@ const EXERCISES: ChapterExercise[] = [
 
   // ── Niveau 5 : Type Brevet ──
   ex({
-    id: "pc3-29", title: "Vrai ou faux ? (type Brevet)", niveau: 5, objectives: ["M3-NC-07", "M3-NC-04", "M3-NC-06", "M4-NC-04", "M4-NC-07"], time: 300,
+    id: "pc3-29", title: "Vrai ou faux ? Justifier", niveau: 5, objectives: ["M3-NC-07", "M3-NC-04", "M3-NC-06", "M4-NC-04", "M4-NC-07"], time: 300,
     vary: (rng) => {
       const a = rng.int(1, 4), b = rng.int(2, 5);
       const sumOk = rng.next() < 0.5;
@@ -680,7 +694,7 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Pour montrer qu'une affirmation est fausse, un calcul qui donne un autre résultat (un contre-exemple) suffit. Pour montrer qu'elle est vraie, on détaille le calcul.",
-    hints: ["Fais chaque calcul séparément sur ton brouillon.", "Méfie-toi des « règles » qui n'existent pas, comme $\\sqrt{a} + \\sqrt{b} = \\sqrt{a + b}$."],
+    hints: ["Fais chaque calcul séparément sur ton brouillon.", "Méfie-toi des « règles » inventées : calcule séparément chaque membre de l'égalité avant de conclure."],
   }),
   ex({
     id: "pc3-30", title: "L'année-lumière", niveau: 5, objectives: ["M3-NC-05"], time: 300,
@@ -691,11 +705,11 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Une année-lumière (al) est la distance parcourue par la lumière en un an : $1$ al $\\approx 9{,}46 \\times 10^{12}$ km. L'étoile ${star} est à environ $${decTex(d10, -1)}$ al de la Terre.`,
         parts: [
-          { prompt: "Distance Terre–étoile en km, en notation scientifique (nombre devant la puissance arrondi au centième).", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ km avec $k =$ [[1]]", blanks: [{ type: "number", answer: { value: mr, tol: 0.0001, roundingLabel: "au centième" } }, { type: "number", answer: { value: p } }] } },
-          { prompt: "La même distance en mètres.", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ m avec $k =$ [[1]]", blanks: [{ type: "number", answer: { value: mr, tol: 0.0001, roundingLabel: "au centième" } }, { type: "number", answer: { value: p + 3 } }] } },
-          qcm([`$${decTex(d10, -1)}$ ans`, `$${decTex(d10, -1)}$ jours`, `$${decTex(d10, -1)}$ secondes`, "on ne peut pas le savoir"], 0, [{ match: "1", feedback: "L'année-lumière est définie avec une durée d'**un an**." }], "Combien de temps la lumière de l'étoile met-elle pour nous parvenir ?"),
+          { prompt: "Distance Terre–étoile en km, en notation scientifique (nombre devant la puissance arrondi au centième).", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ km avec $k =$ [[1]]", blanks: [{ type: "number", answer: { value: mr, tol: 0.0001, decimals: 2, roundingLabel: "au centième" } }, { type: "number", answer: { value: p } }] } },
+          { prompt: "La même distance en mètres.", interaction: { kind: "texte-trous", template: "[[0]] $\\times 10^{k}$ m avec $k =$ [[1]]", blanks: [{ type: "number", answer: { value: mr, tol: 0.0001, decimals: 2, roundingLabel: "au centième" } }, { type: "number", answer: { value: p + 3 } }] } },
+          shuffledQcm(rng, [`$${decTex(d10, -1)}$ ans`, `$${decTex(d10, -1)}$ jours`, `$${decTex(d10, -1)}$ secondes`, "on ne peut pas le savoir"], 0, { 1: "L'année-lumière est définie avec une durée d'**un an**." }, "Combien de temps la lumière de l'étoile met-elle pour nous parvenir ?"),
         ],
-        solution: [`$${decTex(d10, -1)} \\times 9{,}46 \\times 10^{12} = ${T(clean((d10 * 946) / 1000, 12))} \\times 10^{12}$ km.`, `En notation scientifique : $${sciTx(m, p)}$ km, soit environ $${sciTx(mr, p)}$ km.`, `$1$ km $= 10^{3}$ m, donc la distance est environ $${sciTx(mr, p)} \\times 10^{3} = ${sciTx(mr, p + 3)}$ m.`, `Par définition de l'année-lumière, la lumière met environ $${decTex(d10, -1)}$ ans pour nous parvenir.`],
+        solution: [`$${decTex(d10, -1)} \\times 9{,}46 \\times 10^{12} = ${T(clean((d10 * 946) / 1000, 12))} \\times 10^{12}$ km.`, `En notation scientifique : $${sciTx(m, p)}$ km, soit environ $${TF(mr, 2)} \\times 10^{${p}}$ km.`, `$1$ km $= 10^{3}$ m, donc la distance est environ $${TF(mr, 2)} \\times 10^{${p}} \\times 10^{3} = ${TF(mr, 2)} \\times 10^{${p + 3}}$ m.`, `Par définition de l'année-lumière, la lumière met environ $${decTex(d10, -1)}$ ans pour nous parvenir.`],
       };
     },
     reasoning: "Multiplier par une distance de référence, puis convertir (1 km $= 10^{3}$ m) : les puissances de 10 se gèrent en ajoutant les exposants.",
@@ -705,7 +719,7 @@ const EXERCISES: ChapterExercise[] = [
     id: "pc3-31", title: "Programme de calcul avec des fractions", niveau: 5, objectives: ["M3-NC-07", "M4-NC-04"], time: 240,
     vary: (rng) => {
       const x: Q = q(rng.int(1, 7), rng.int(2, 5));
-      const m1: Q = q(rng.int(1, 5), rng.int(2, 6)), a1: Q = q(rng.int(1, 5), rng.int(2, 6)), d1: Q = q(rng.int(1, 5), rng.int(2, 4));
+      const m1: Q = pf(rng, 2, 6), a1: Q = pf(rng, 2, 6), d1: Q = pf(rng, 2, 5);
       const s1 = qMul(x, m1), s2 = qAdd(s1, a1), s3 = qDiv(s2, d1);
       return {
         statement: `Voici un programme de calcul :\n– choisir un nombre ;\n– le multiplier par $${QT(m1)}$ ;\n– ajouter $${QT(a1)}$ au résultat ;\n– diviser le résultat par $${QT(d1)}$.\nOn choisit le nombre $${QT(x)}$. Donner chaque résultat sous forme irréductible.`,
@@ -730,10 +744,10 @@ const EXERCISES: ChapterExercise[] = [
         parts: [
           num(s, [{ match: String(A / 2), feedback: "Le côté d'un carré est la racine carrée de son aire." }], "Côté du premier jardin (en m)."),
           shuffledQcm(rng, [`$\\sqrt{${A2}}$ m`, `$${2 * s}$ m`, `$${A2 / 2}$ m`, `$${A2}$ m`], 0, { 1: "Doubler le côté multiplie l'aire par 4, pas par 2.", 2: "C'est la moitié de la nouvelle aire, pas un côté." }, "Valeur exacte du côté du nouveau jardin :"),
-          num(s2, [{ match: String(2 * s), feedback: "Si le côté doublait, l'aire serait multipliée par 4." }], "Côté du nouveau jardin arrondi au décimètre (en m).", { tol: 0.0001, roundingLabel: "au dixième" }),
+          num(s2, [{ match: String(2 * s), feedback: "Si le côté doublait, l'aire serait multipliée par 4." }], "Côté du nouveau jardin arrondi au décimètre (en m).", { tol: 0.0001, decimals: 1, roundingLabel: "au décimètre" }),
           shuffledQcm(rng, ["par 2", "par environ 1,41", "par 4", "par 0,5"], 1, { 0: `$2 \\times ${s} = ${2 * s}$ et $${2 * s}^2 = ${4 * A}$ : l'aire serait quadruplée.` }, "Pour doubler l'aire, le côté a été multiplié…"),
         ],
-        solution: [`Premier jardin : $c^2 = ${A}$, donc $c = \\sqrt{${A}} = ${s}$ m (car $${s}^2 = ${A}$).`, `Nouveau jardin : aire $2 \\times ${A} = ${A2}$ m², côté exact $\\sqrt{${A2}}$ m $\\approx ${T(roundTo(Math.sqrt(A2), 3))}$ m.`, `Arrondi au décimètre : $${T(s2)}$ m.`, `$\\sqrt{${A2}} \\div ${s} \\approx ${T(roundTo(Math.sqrt(A2) / s, 3))}$ : le côté est multiplié par environ $1{,}41$, et non par 2.`],
+        solution: [`Premier jardin : $c^2 = ${A}$, donc $c = \\sqrt{${A}} = ${s}$ m (car $${s}^2 = ${A}$).`, `Nouveau jardin : aire $2 \\times ${A} = ${A2}$ m², côté exact $\\sqrt{${A2}}$ m $\\approx ${T(roundTo(Math.sqrt(A2), 3))}$ m.`, `Arrondi au décimètre : $${TF(s2, 1)}$ m.`, `$\\sqrt{${A2}} \\div ${s} \\approx ${T(roundTo(Math.sqrt(A2) / s, 3))}$ : le côté est multiplié par environ $1{,}41$, et non par 2.`],
       };
     },
     reasoning: "L'aire d'un carré est le carré du côté : multiplier le côté par $k$ multiplie l'aire par $k^2$. Pour doubler l'aire, il faut un côté environ $1{,}41$ fois plus grand.",
@@ -759,7 +773,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Doubler $n$ fois, c'est multiplier par $2^n$.", "Calcule les puissances de 2 successives : 2, 4, 8, 16…"],
   }),
   ex({
-    id: "pc3-34", title: "Calcul avec des puissances de 10 (type Brevet)", niveau: 5, objectives: ["M3-NC-04", "M3-NC-05"], time: 240,
+    id: "pc3-34", title: "Calcul avec des puissances de 10", niveau: 5, objectives: ["M3-NC-04", "M3-NC-05"], time: 240,
     vary: (rng) => {
       const a = rng.int(2, 9), b = rng.int(2, 9), c = rng.pick([2, 4, 5, 8]);
       const p = nz(rng, -6, 9), q2 = nz(rng, -6, 9), r = nz(rng, -6, 9);
@@ -803,7 +817,7 @@ const fractionBar = (() => {
 })();
 
 const powersScale = (() => {
-  const items: [string, string][] = [["10⁻⁹ m", "nano : taille d'une molécule"], ["10⁻⁶ m", "micro : une bactérie"], ["10⁻³ m", "milli : grain de sable"], ["10⁰ m", "un mètre"], ["10³ m", "kilo : un village"], ["10⁶ m", "méga : un pays"], ["10⁹ m", "giga : ≈ 3 fois la distance Terre–Lune"]];
+  const items: [string, string][] = [["10⁻⁹ m", "nano : taille d'une molécule"], ["10⁻⁶ m", "micro : une bactérie"], ["10⁻³ m", "milli : grain de sable"], ["10⁰ m", "un mètre"], ["10³ m", "kilo : un village"], ["10⁶ m", "méga : un pays"], ["10⁹ m", "giga : ≈ 2,6 fois la distance Terre–Lune"]];
   let s = `<line x1="20" y1="20" x2="20" y2="${20 + 34 * (items.length - 1)}" stroke="#4338ca" stroke-width="3"/>`;
   items.forEach(([a, b], i) => {
     const y = 20 + 34 * i;
@@ -841,7 +855,7 @@ export const math3ePuissancesCalculs: ChapterContent = {
     introduction: "La lumière du Soleil met environ $500$ secondes pour parcourir $150\\,000\\,000$ km ; un virus mesure environ $0{,}000\\,000\\,1$ m. Pour écrire et calculer avec de tels nombres sans se perdre dans les zéros, on utilise les **puissances** et la **notation scientifique**.\nDans ce chapitre, tu vas aussi consolider le calcul avec les **fractions** (des nombres exacts, là où une écriture décimale serait arrondie) et utiliser la **racine carrée** pour retrouver une longueur à partir d'une aire. Fil rouge : savoir distinguer une **valeur exacte** ($\\dfrac{1}{3}$, $\\sqrt{2}$) d'une **valeur approchée** ($0{,}33$, $1{,}41$).",
     definitions: [
       { term: "Puissance d'exposant entier", text: "Pour un nombre $a$ et un entier $n \\geqslant 1$, $a^n$ est le produit de $n$ facteurs égaux à $a$ : $a^n = a \\times a \\times \\ldots \\times a$. On lit « $a$ exposant $n$ » ; $a$ est la **base**, $n$ l'**exposant**.\nPour $a \\neq 0$ : $a^0 = 1$ et $a^{-n} = \\dfrac{1}{a^n}$ (l'**inverse** de $a^n$).\nExemples : $2^5 = 32$ ; $5^{-2} = \\dfrac{1}{25} = 0{,}04$ ; $10^{-3} = 0{,}001$." },
-      { term: "Notation scientifique", text: "Un nombre décimal positif est écrit en **notation scientifique** lorsqu'il s'écrit $a \\times 10^{n}$ avec $1 \\leqslant a < 10$ et $n$ entier relatif (pour un nombre négatif : $-a \\times 10^{n}$).\nExemples : $45\\,000 = 4{,}5 \\times 10^{4}$ ; $0{,}000\\,72 = 7{,}2 \\times 10^{-4}$. L'exposant $n$ donne l'**ordre de grandeur**." },
+      { term: "Notation scientifique", text: "Un nombre décimal positif est écrit en **notation scientifique** lorsqu'il s'écrit $a \\times 10^{n}$ avec $1 \\leqslant a < 10$ et $n$ entier relatif (pour un nombre négatif : $-a \\times 10^{n}$).\nExemples : $45\\,000 = 4{,}5 \\times 10^{4}$ ; $0{,}000\\,72 = 7{,}2 \\times 10^{-4}$. L'exposant $n$ renseigne sur l'**ordre de grandeur** (puissance de 10 la plus proche)." },
       { term: "Préfixes", text: "giga (G) $= 10^{9}$ ; méga (M) $= 10^{6}$ ; kilo (k) $= 10^{3}$ ; milli (m) $= 10^{-3}$ ; micro (µ) $= 10^{-6}$ ; nano (n) $= 10^{-9}$. Exemple : $3$ ns $= 3 \\times 10^{-9}$ s." },
       { term: "Racine carrée", text: "Pour un nombre $a$ **positif**, la racine carrée de $a$, notée $\\sqrt{a}$, est le nombre **positif** dont le carré est égal à $a$ : $(\\sqrt{a})^2 = a$ et $\\sqrt{a} \\geqslant 0$.\nExemples : $\\sqrt{49} = 7$ car $7^2 = 49$ et $7 \\geqslant 0$ ; $\\sqrt{0{,}25} = 0{,}5$. La racine carrée d'un nombre négatif n'existe pas." },
       { term: "Valeur exacte, valeur approchée", text: "Une **valeur exacte** est égale au nombre : $\\dfrac{2}{3}$, $\\sqrt{10}$, $\\pi$. Une **valeur approchée** en est seulement proche : $0{,}67$, $3{,}16$, $3{,}14$. On écrit $\\sqrt{10} \\approx 3{,}16$ avec le symbole $\\approx$, jamais $=$." },
@@ -849,8 +863,8 @@ export const math3ePuissancesCalculs: ChapterContent = {
     ],
     properties: [
       { title: "Opérations sur les fractions", statement: "$\\dfrac{a}{b} + \\dfrac{c}{b} = \\dfrac{a + c}{b}$ (même dénominateur) ;\n$\\dfrac{a}{b} \\times \\dfrac{c}{d} = \\dfrac{a \\times c}{b \\times d}$ ;\n$\\dfrac{a}{b} \\div \\dfrac{c}{d} = \\dfrac{a}{b} \\times \\dfrac{d}{c}$.", conditions: "Dénominateurs non nuls ; pour la division, $c \\neq 0$. Pour additionner, on met d'abord au même dénominateur." },
-      { title: "Règles de calcul sur les puissances", statement: "Pour $a \\neq 0$ et $m$, $n$ entiers relatifs :\n$a^m \\times a^n = a^{m+n}$ ; $\\dfrac{a^m}{a^n} = a^{m-n}$ ; $(a^m)^n = a^{m \\times n}$.\nExemple : $\\dfrac{10^{5} \\times 10^{-2}}{10^{-4}} = \\dfrac{10^{3}}{10^{-4}} = 10^{7}$.", conditions: "Ces règles ne valent que pour une **même base**. Il n'y a pas de règle pour $a^m + a^n$." },
-      { title: "Signe d'une puissance", statement: "$(-a)^n$ est positif si $n$ est pair, négatif si $n$ est impair. Attention : $-a^n = -(a^n)$, l'exposant ne porte que sur $a$. Ainsi $(-3)^2 = 9$ mais $-3^2 = -9$." },
+      { title: "Règles de calcul sur les puissances", statement: "Pour $a \\neq 0$ et $m$, $n$ entiers relatifs :\n$a^m \\times a^n = a^{m+n}$ ; $\\dfrac{a^m}{a^n} = a^{m-n}$ ; $(a^m)^n = a^{m \\times n}$.\nExemple : $\\dfrac{10^{5} \\times 10^{-2}}{10^{-4}} = \\dfrac{10^{3}}{10^{-4}} = 10^{7}$.", conditions: "Ces règles ne valent que pour une **même base**. Il n'y a pas de règle pour $a^m + a^n$. On peut toujours retrouver ces règles en comptant les facteurs." },
+      { title: "Signe d'une puissance", statement: "$(-a)^n$ est positif si $n$ est pair, négatif si $n$ est impair. Attention : $-a^n = -(a^n)$, l'exposant ne porte que sur $a$. Ainsi $(-3)^2 = 9$ mais $-3^2 = -9$.", conditions: "Pour $a \\neq 0$ (si $a = 0$, la puissance vaut $0$)." },
       { title: "Racine carrée et carré", statement: "Pour $a \\geqslant 0$ : $\\sqrt{a^2} = a$ et $(\\sqrt{a})^2 = a$. Si $0 \\leqslant a < b$, alors $\\sqrt{a} < \\sqrt{b}$ : on peut encadrer une racine carrée par deux entiers ($5 < \\sqrt{30} < 6$ car $25 < 30 < 36$).", conditions: "En général $\\sqrt{a + b} \\neq \\sqrt{a} + \\sqrt{b}$ : $\\sqrt{9 + 16} = 5$ mais $\\sqrt{9} + \\sqrt{16} = 7$." },
       { title: "Équation $x^2 = a$ pour une longueur", statement: "Si une longueur $\\ell$ vérifie $\\ell^2 = a$ (avec $a > 0$), alors $\\ell = \\sqrt{a}$, car une longueur est positive. Exemple : un carré d'aire $20$ cm² a pour côté $\\sqrt{20}$ cm." },
     ],
@@ -894,7 +908,7 @@ export const math3ePuissancesCalculs: ChapterContent = {
       "$\\dfrac{a}{b} \\times \\dfrac{c}{d} = \\dfrac{ac}{bd}$ ; diviser par une fraction, c'est multiplier par son inverse ; pour $+$ et $-$, même dénominateur.",
       "$a^n$ : produit de $n$ facteurs égaux à $a$ ; $a^0 = 1$ ; $a^{-n} = \\dfrac{1}{a^n}$ (inverse, pas opposé).",
       "$a^m \\times a^n = a^{m+n}$ ; $\\dfrac{a^m}{a^n} = a^{m-n}$ ; $(a^m)^n = a^{mn}$, pour une même base.",
-      "Notation scientifique : $a \\times 10^{n}$ avec $1 \\leqslant a < 10$ ; l'exposant donne l'ordre de grandeur.",
+      "Notation scientifique : $a \\times 10^{n}$ avec $1 \\leqslant a < 10$ ; l'exposant renseigne sur l'ordre de grandeur.",
       "$\\sqrt{a}$ ($a \\geqslant 0$) est le nombre positif dont le carré vaut $a$ ; un côté d'aire $A$ mesure $\\sqrt{A}$.",
       "Valeur exacte ($\\sqrt{2}$, $\\dfrac{1}{3}$) ≠ valeur approchée ($1{,}41$ ; $0{,}33$) : on arrondit à la fin, avec $\\approx$.",
     ],
@@ -938,7 +952,7 @@ export const math3ePuissancesCalculs: ChapterContent = {
             { q: "$\\dfrac{3}{4} - \\dfrac{1}{8}$", answer: "5/8", irreducible: true, explanation: "$\\dfrac{6}{8} - \\dfrac{1}{8} = \\dfrac{5}{8}$." },
             { q: "$\\dfrac{2}{3} \\times \\dfrac{9}{4}$", answer: "3/2", irreducible: true, explanation: "$\\dfrac{18}{12} = \\dfrac{3}{2}$." },
             { q: "$\\dfrac{5}{6} \\div \\dfrac{5}{3}$", answer: "1/2", irreducible: true, explanation: "$\\dfrac{5}{6} \\times \\dfrac{3}{5} = \\dfrac{15}{30} = \\dfrac{1}{2}$." },
-            { q: "$\\dfrac{7}{10} + \\dfrac{3}{10}$", answer: "1", explanation: "$\\dfrac{10}{10} = 1$." },
+            { q: "$\\dfrac{7}{10} + \\dfrac{3}{10}$", answer: "1", irreducible: true, explanation: "$\\dfrac{10}{10} = 1$." },
             { q: "$2 - \\dfrac{3}{5}$", answer: "7/5", irreducible: true, explanation: "$\\dfrac{10}{5} - \\dfrac{3}{5} = \\dfrac{7}{5}$." },
             { q: "$\\dfrac{4}{9} \\times 3$", answer: "4/3", irreducible: true, explanation: "$\\dfrac{12}{9} = \\dfrac{4}{3}$." },
             { q: "$\\dfrac{1}{4} + \\dfrac{1}{4} \\times 2$", answer: "3/4", irreducible: true, explanation: "Priorité à la multiplication : $\\dfrac{1}{4} + \\dfrac{2}{4} = \\dfrac{3}{4}$." },
@@ -957,8 +971,8 @@ export const math3ePuissancesCalculs: ChapterContent = {
             { q: "$\\sqrt{144}$", answer: "12", explanation: "$12^2 = 144$." },
             { q: "$\\sqrt{0{,}25}$", answer: "0,5", explanation: "$0{,}5^2 = 0{,}25$." },
             { q: "$\\sqrt{3^{2} + 4^{2}}$", answer: "5", explanation: "$\\sqrt{9 + 16} = \\sqrt{25} = 5$ (et non $3 + 4$)." },
-            { q: "$2{,}5 \\times 10^{3}$", answer: "2500", explanation: "On décale la virgule de 3 rangs vers la droite." },
-            { q: "$4 \\times 10^{-2}$", answer: "0,04", explanation: "On décale la virgule de 2 rangs vers la gauche." },
+            { q: "$2{,}5 \\times 10^{3} + 500$", answer: "3000", explanation: "$2{,}5 \\times 10^{3} = 2\\,500$, puis $2\\,500 + 500 = 3\\,000$." },
+            { q: "$4 \\times 10^{-2} \\times 25$", answer: "1", explanation: "$4 \\times 10^{-2} = 0{,}04$ et $0{,}04 \\times 25 = 1$." },
             { q: "$(2 \\times 10^{3}) \\times (3 \\times 10^{2})$", answer: "6e5", explanation: "$6 \\times 10^{5} = 600\\,000$." },
             { q: "$\\dfrac{8 \\times 10^{5}}{2 \\times 10^{2}}$", answer: "4000", explanation: "$4 \\times 10^{3} = 4\\,000$." },
             { q: "$\\sqrt{100} \\times 10^{-1}$", answer: "1", explanation: "$10 \\times 0{,}1 = 1$." },

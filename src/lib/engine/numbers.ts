@@ -91,6 +91,9 @@ export function parseNumber(input: string): ParsedNumber | null {
     .replace(/[−–]/g, "-")
     // « 35 % » ou « 12 € » : l'unité affichée à côté de la case peut aussi être tapée
     .replace(/(\d)(%|€)$/, "$1")
+    // exposants Unicode (10⁻⁶) et point de multiplication des calculatrices (5,6.10^-6)
+    .replace(/10([⁺⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)$/, (_, e: string) => "10^" + [...e].map((ch) => "⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(ch) >= 0 ? String("⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(ch)) : ch === "⁻" ? "-" : "+").join(""))
+    .replace(/(\d)[.·]10\^/, "$1×10^")
     .replace(/,/g, ".")
     .replace(/[×x*·]10\^?\(?([+-]?\d+)\)?$/i, "e$1")
     .replace(/^10\^\(?([+-]?\d+)\)?$/, "1e$1")
