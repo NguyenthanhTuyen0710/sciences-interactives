@@ -840,6 +840,6 @@ export const math3ePourcentagesEvolution: ChapterContent = {
       ] },
     },
   ],
-  reviewStatus: { curriculum: "pending", accuracy: "pending", exercises: "pending", games: "pending", technical: "pending", language: "pending" },
-  publicationStatus: "draft",
+  reviewStatus: { curriculum: "pass", accuracy: "pass", exercises: "pass", games: "pass", technical: "pass", language: "pass" },
+  publicationStatus: "published",
 };

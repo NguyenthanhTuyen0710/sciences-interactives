@@ -809,10 +809,12 @@ const fractionBar = (() => {
     const fill = i < 6 ? "#fca5a5" : i < 9 ? "#86efac" : "#f8fafc";
     s += `<rect x="${x0 + i * w}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="#475569" stroke-width="1"/>`;
   }
-  s += `<rect x="${x0}" y="${y}" width="${15 * w}" height="${h}" fill="none" stroke="#0f172a" stroke-width="2"/>`;
-  s += `<text x="${x0 + 3 * w}" y="${y - 10}" text-anchor="middle" font-size="12" fill="#b91c1c">tomates : 2/5</text>`;
-  s += `<text x="${x0 + 7.5 * w}" y="${y + h + 18}" text-anchor="middle" font-size="12" fill="#15803d">salades : 1/3 du reste</text>`;
-  s += `<text x="${x0 + 12 * w}" y="${y - 10}" text-anchor="middle" font-size="12" fill="#334155">libre</text>`;
+  // Valeurs littérales : le minificateur SWC de Next tronquait ces gabarits en pré-calculant les expressions
+  // constantes (constaté dans .next/server : width="300<text …). Contrôle : scripts/ui-check.ts.
+  s += '<rect x="10" y="40" width="300" height="40" fill="none" stroke="#0f172a" stroke-width="2"/>';
+  s += '<text x="70" y="30" text-anchor="middle" font-size="12" fill="#b91c1c">tomates : 2/5</text>';
+  s += '<text x="160" y="98" text-anchor="middle" font-size="12" fill="#15803d">salades : 1/3 du reste</text>';
+  s += '<text x="250" y="30" text-anchor="middle" font-size="12" fill="#334155">libre</text>';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 110" role="img" aria-label="Bande partagée en 15 parts : 6 pour les tomates, 3 pour les salades, 6 libres" style="width:100%;max-width:420px;height:auto;font-family:Inter,Arial,sans-serif">${s}</svg>`;
 })();
 
