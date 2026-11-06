@@ -74,6 +74,9 @@ const O = {
   "M3-NC-02": "Rendre une fraction irréductible.",
   "M3-NC-03": "Modéliser et résoudre des problèmes mettant en jeu la divisibilité (engrenages, conjonction de phénomènes…).",
   "M4-NC-12": "Établir la liste des nombres premiers inférieurs à 100 (consolidation de 4e).",
+  "M4-NC-13": "Décomposer un entier en produit de facteurs premiers (consolidation de 4e, prolongée par M3-NC-01).",
+  "M4-NC-14": "Utiliser la décomposition pour produire des fractions égales et simplifier (consolidation de 4e, prolongée par M3-NC-02).",
+  "M4-NC-15": "Modéliser et résoudre des problèmes simples de divisibilité (consolidation de 4e : multiples, diviseurs, critères).",
 } as const;
 type Obj = keyof typeof O;
 const SRC_3E = "Attendus de fin d'année de 3e (2019), « Utiliser les nombres pour comparer, calculer et résoudre des problèmes » ; repères annuels de progression du cycle 4 (BO n° 22 du 29 mai 2019), 3e, divisibilité ; programme du cycle 4 (BO n° 31 du 30 juillet 2020), thème A";
@@ -89,16 +92,16 @@ const notPrimeReason = (n: number) => (n === 1 ? "$1$ n'a qu'un seul diviseur ($
 const EXERCISES: ChapterExercise[] = [
   // ── Niveau 1 : Découverte ──
   ex({
-    id: "ari3-01", title: "Diviseur ou multiple ?", niveau: 1, objectives: ["M3-NC-03"], time: 60,
+    id: "ari3-01", title: "Diviseur ou multiple ?", niveau: 1, objectives: ["M4-NC-15"], time: 60,
     vary: (rng) => {
       const d = rng.pick([3, 4, 6, 7, 8, 9, 11, 12, 15]), k = rng.int(3, 12);
       const divisible = rng.next() < 0.7;
       const r = divisible ? 0 : rng.int(1, d - 1);
       const a = d * k + r;
-      const opts = ["un diviseur", "un multiple", "ni un diviseur ni un multiple"];
+      const opts = ["est un diviseur", "est un multiple", "n'est ni un diviseur ni un multiple"];
       return {
-        statement: `Complète chaque phrase avec le bon mot.`,
-        parts: [{ interaction: { kind: "texte-trous", template: `$${d}$ est [[0]] de $${a}$.\n$${a}$ est [[1]] de $${d}$.`, blanks: [{ type: "select", options: opts, answer: divisible ? 0 : 2 }, { type: "select", options: opts, answer: divisible ? 1 : 2 }] } }],
+        statement: `Complète chaque phrase avec la bonne expression.`,
+        parts: [{ interaction: { kind: "texte-trous", template: `$${d}$ [[0]] de $${a}$.\n$${a}$ [[1]] de $${d}$.`, blanks: [{ type: "select", options: opts, answer: divisible ? 0 : 2 }, { type: "select", options: opts, answer: divisible ? 1 : 2 }] } }],
         solution: divisible
           ? [`$${a} = ${d} \\times ${k}$ : la division de $${a}$ par $${d}$ tombe juste (reste $0$).`, `Donc $${d}$ est un diviseur de $${a}$ et $${a}$ est un multiple de $${d}$.`]
           : [`$${a} = ${d} \\times ${k} + ${r}$ : le reste de la division de $${a}$ par $${d}$ vaut $${r}$, pas $0$.`, `$${d}$ n'est pas un diviseur de $${a}$ et $${a}$ n'est pas un multiple de $${d}$ (et $${d}$, plus petit, ne peut pas être un multiple de $${a}$).`],
@@ -119,14 +122,16 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Un nombre premier a exactement deux diviseurs : $1$ et lui-même. Il suffit d'un diviseur supplémentaire pour qu'il ne soit pas premier.",
-    hints: ["Teste les critères de divisibilité par $2$, $3$ et $5$.", "Pense aussi à $7$ : $49 = 7 \\times 7$, $77 = 7 \\times 11$, $91 = 7 \\times 13$."],
+    hints: ["Teste les critères de divisibilité par $2$, $3$ et $5$.", "Pense aussi à tester la divisibilité par $7$."],
   }),
   ex({
-    id: "ari3-03", title: "Critères de divisibilité", niveau: 1, objectives: ["M3-NC-01"], time: 90,
+    id: "ari3-03", title: "Critères de divisibilité", niveau: 1, objectives: ["M4-NC-15"], time: 90,
     vary: (rng) => {
-      let n = 0;
-      // un nombre divisible par au moins un des diviseurs testés, pour éviter un exercice « tout non »
-      while (![2, 3, 5].some((d) => n % d === 0)) n = rng.int(102, 9990);
+      // un nombre divisible par au moins un des diviseurs testés (pas d'exercice « tout non »),
+      // mais pas par tous (pas d'exercice « tout oui ») ; la moitié des tirages est divisible par 9 ou par 10
+      let n = 1;
+      const want = rng.pick([9, 10, 0, 0]);
+      while (![2, 3, 5].some((d) => n % d === 0) || n % 90 === 0 || (want > 0 && n % want !== 0) || (want === 0 && (n % 9 === 0 || n % 10 === 0))) n = rng.int(102, 9990);
       const digits = String(n).split("").map(Number);
       const s = digits.reduce((a, b) => a + b, 0);
       const ds = [2, 3, 5, 9, 10];
@@ -144,7 +149,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Pour $2$, $5$ et $10$ : regarde seulement le chiffre des unités.", "Pour $3$ et $9$ : additionne tous les chiffres."],
   }),
   ex({
-    id: "ari3-04", title: "La liste des diviseurs", niveau: 1, objectives: ["M3-NC-03"], time: 90,
+    id: "ari3-04", title: "La liste des diviseurs", niveau: 1, objectives: ["M4-NC-15"], time: 90,
     vary: (rng) => {
       const n = rng.pick([12, 18, 20, 24, 28, 30, 36, 40, 42, 45, 48]);
       const dv = divisors(n);
@@ -162,7 +167,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris $n$ comme produit de deux entiers de toutes les façons possibles.", "N'oublie ni $1$ ni le nombre lui-même."],
   }),
   ex({
-    id: "ari3-05", title: "Associer un nombre et sa décomposition", niveau: 1, objectives: ["M3-NC-01"], time: 120,
+    id: "ari3-05", title: "Associer un nombre et sa décomposition", niveau: 1, objectives: ["M3-NC-01", "M4-NC-13"], time: 120,
     vary: (rng) => {
       const set = new Set<number>();
       while (set.size < 4) {
@@ -170,7 +175,8 @@ const EXERCISES: ChapterExercise[] = [
         if (n >= 20 && n <= 900 && flat(n).length >= 3) set.add(n);
       }
       const nums = [...set];
-      const right = rng.shuffle(nums);
+      let right = rng.shuffle(nums);
+      while (right.every((x, i) => x === nums[i])) right = rng.shuffle(nums);
       return {
         statement: "Associe chaque nombre à sa décomposition en produit de facteurs premiers.",
         parts: [{ interaction: { kind: "associer", left: nums.map((n) => `$${T(n)}$`), right: right.map((n) => `$${fTex(n)}$`), answer: nums.map((n) => right.indexOf(n)) } }],
@@ -181,13 +187,15 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule les puissances : $2^3 = 8$, $3^2 = 9$, $5^2 = 25$.", "Un nombre impair ne contient pas le facteur $2$."],
   }),
   ex({
-    id: "ari3-06", title: "Fractions égales ?", niveau: 1, objectives: ["M3-NC-02"], time: 90,
+    id: "ari3-06", title: "Fractions égales ?", niveau: 1, objectives: ["M3-NC-02", "M4-NC-14"], time: 90,
     vary: (rng) => {
       const items: string[] = [], answer: boolean[] = [], sol: string[] = [];
-      for (let i = 0; i < 4; i++) {
+      const kinds = rng.shuffle(["vrai", rng.pick(["vrai", "ajout", "mult"]), "ajout", "mult"]);
+      while (items.length < 4) {
         const [p, q] = coprimePair(rng, 2, 9);
         const k = rng.int(2, 9);
-        const kind = rng.pick(["vrai", "ajout", "mult"]);
+        const kind = kinds[items.length];
+        if (items.some((t) => t.includes(`${frac(p, q)}`))) continue;
         if (kind === "vrai") { items.push(`$${frac(k * p, k * q)} = ${frac(p, q)}$`); answer.push(true); sol.push(`$${frac(k * p, k * q)} = \\dfrac{${k} \\times ${p}}{${k} \\times ${q}} = ${frac(p, q)}$ : vrai.`); }
         else if (kind === "ajout") { items.push(`$${frac(p, q)} = ${frac(p + k, q + k)}$`); answer.push(false); sol.push(`Ajouter $${k}$ au numérateur et au dénominateur ne conserve pas la fraction : $${frac(p, q)} \\neq ${frac(p + k, q + k)}$ (faux).`); }
         else { const m = k + 1; items.push(`$${frac(p, q)} = ${frac(k * p, m * q)}$`); answer.push(false); sol.push(`Le numérateur est multiplié par $${k}$ et le dénominateur par $${m}$ : faux.`); }
@@ -289,11 +297,11 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       let a = 0, b = 0;
       do { a = rng.int(4, 30); b = rng.int(4, 30); } while (a === b || gcd(a, b) === 1 || a % b === 0 || b % a === 0 || lcm(a, b) > 200);
-      const m = lcm(a, b);
+      const m = lcm(a, b), big = Math.max(a, b), small = Math.min(a, b);
       return {
         statement: `Quel est le plus petit multiple commun non nul à $${a}$ et $${b}$ ?`,
         parts: [num(m, [{ match: String(a * b), feedback: `$${a} \\times ${b}$ est bien un multiple commun, mais pas le plus petit : $${a}$ et $${b}$ ont un facteur commun.` }, { match: String(gcd(a, b)), feedback: "Ceci est le plus grand diviseur commun, pas un multiple commun." }])],
-        solution: [`Multiples de $${b}$ : ${Array.from({ length: m / b }, (_, i) => `$${(i + 1) * b}$`).join(" ; ")}…`, `Le premier qui est aussi multiple de $${a}$ est $${m}$ ($${m} = ${a} \\times ${m / a}$).`, `Avec les décompositions : $${a} = ${fTex(a)}$, $${b} = ${fTex(b)}$ ; on prend tous les facteurs avec le plus grand exposant : $${fTex(m)} = ${m}$.`],
+        solution: [`Multiples de $${big}$ : ${Array.from({ length: m / big }, (_, i) => `$${(i + 1) * big}$`).join(" ; ")}…`, `Le premier qui est aussi multiple de $${small}$ est $${m}$ ($${m} = ${small} \\times ${m / small}$).`, `Avec les décompositions : $${a} = ${fTex(a)}$, $${b} = ${fTex(b)}$ ; on prend tous les facteurs avec le plus grand exposant : $${fTex(m)} = ${m}$.`],
       };
     },
     reasoning: "On parcourt les multiples du plus grand nombre jusqu'au premier qui est aussi multiple de l'autre ; le produit $a \\times b$ n'est le plus petit que s'ils n'ont aucun facteur commun.",
@@ -309,11 +317,11 @@ const EXERCISES: ChapterExercise[] = [
         solution: [...nums.map((n) => (isPrime(n) ? `$${n}$ : premier.` : `${notPrimeReason(n)}.`)), "Rappel : $2$ est le seul nombre premier pair ; $1$ n'est pas premier."],
       };
     },
-    reasoning: "Pour un nombre inférieur à $100$, il suffit de tester $2$, $3$, $5$ et $7$ (car $11^2 = 121 > 100$).",
-    hints: ["Teste la divisibilité par $2$, $3$, $5$ puis $7$.", "Si aucun ne divise le nombre (et qu'il est supérieur à 1), il est premier."],
+    reasoning: "Pour un nombre inférieur à $100$, il suffit de tester $2$, $3$, $5$ et $7$ (car $11^2 = 121 > 100$) : un nombre supérieur à $1$ qui n'est divisible par aucun d'eux, sauf éventuellement par lui-même, est premier.",
+    hints: ["Teste la divisibilité par $2$, $3$, $5$ puis $7$.", "Si aucun nombre premier autre que lui-même ne divise le nombre (et qu'il est supérieur à $1$), il est premier."],
   }),
   ex({
-    id: "ari3-14", title: "Compter les diviseurs", niveau: 2, objectives: ["M3-NC-03"], time: 90,
+    id: "ari3-14", title: "Compter les diviseurs", niveau: 2, objectives: ["M4-NC-15"], time: 90,
     vary: (rng) => {
       const n = rng.pick([12, 18, 20, 24, 28, 30, 36, 40, 42, 45, 48, 50, 60, 72, 84, 90, 100]);
       const dv = divisors(n);
@@ -337,7 +345,9 @@ const EXERCISES: ChapterExercise[] = [
       let q = n;
       for (const p of fl) { q /= p; qs.push(q); }
       const zones = fl.map((p, i) => `$${T(i === 0 ? n : qs[i - 1])} \\div ${p} =$`);
-      const tokens = rng.shuffle(qs.map((x) => `$${T(x)}$`));
+      const sortedTok = qs.map((x) => `$${T(x)}$`);
+      let tokens = rng.shuffle(sortedTok);
+      while (tokens.every((x, i) => x === sortedTok[i])) tokens = rng.shuffle(sortedTok);
       return {
         statement: `On décompose $${T(n)}$ par divisions successives. Dépose le bon quotient en face de chaque division.`,
         parts: [{ interaction: { kind: "glisser-deposer", zones, tokens, answer: qs.map((x) => tokens.indexOf(`$${T(x)}$`)) } }],
@@ -349,7 +359,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 3 : Entraînement ──
   ex({
-    id: "ari3-15", title: "Simplifier grâce aux décompositions", niveau: 3, objectives: ["M3-NC-02", "M3-NC-01"], time: 120,
+    id: "ari3-15", title: "Simplifier grâce aux décompositions", niveau: 3, objectives: ["M3-NC-02", "M3-NC-01", "M4-NC-14"], time: 120,
     vary: (rng) => {
       let c = 0, p = 0, q = 0;
       do {
@@ -393,7 +403,8 @@ const EXERCISES: ChapterExercise[] = [
       let q = n;
       for (const p of fl) { lines.push(`$${T(q)} = ${p} \\times ${T(q / p)}$`); q /= p; }
       lines.push(`$${T(n)} = ${fTex(n)}$`);
-      const items = rng.shuffle(lines);
+      let items = rng.shuffle(lines);
+      while (items.every((x, i) => x === lines[i])) items = rng.shuffle(lines);
       return {
         statement: `Remets dans l'ordre les étapes de la décomposition de $${T(n)}$ en produit de facteurs premiers.`,
         parts: [{ interaction: { kind: "ordonner", items, answer: lines.map((l) => items.indexOf(l)), hint: "Première étape en haut, conclusion en bas" } }],
@@ -453,7 +464,7 @@ const EXERCISES: ChapterExercise[] = [
     id: "ari3-21", title: "Produit de fractions simplifié", niveau: 3, objectives: ["M3-NC-02"], time: 120,
     vary: (rng) => {
       let a = 0, b = 0, c = 0, d = 0;
-      do { a = rng.int(2, 15); b = rng.int(2, 21); c = rng.int(2, 21); d = rng.int(2, 15); } while (gcd(a, b) !== 1 || gcd(c, d) !== 1 || gcd(a * c, b * d) === 1 || a * c === b * d);
+      do { a = rng.int(2, 15); b = rng.int(2, 21); c = rng.int(2, 21); d = rng.int(2, 15); } while (gcd(a, b) !== 1 || gcd(c, d) !== 1 || gcd(a * c, b * d) === 1 || (a * c) % (b * d) === 0);
       const [p, q] = simplify(a * c, b * d);
       return {
         statement: `Calcule $${frac(a, b)} \\times ${frac(c, d)}$ et donne le résultat sous forme irréductible.`,
@@ -468,12 +479,15 @@ const EXERCISES: ChapterExercise[] = [
     id: "ari3-22", title: "Ce nombre est-il premier ?", niveau: 3, objectives: ["M4-NC-12", "M3-NC-01"], time: 150,
     vary: (rng) => {
       let p = 0, q = 0;
-      do { p = rng.pick([7, 11, 13, 17, 19, 23]); q = rng.pick([11, 13, 17, 19, 23, 29, 31]); } while (q <= p || p * q > 900);
+      const primeCase = rng.next() < 1 / 3;
+      if (primeCase) { p = rng.pick([101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293]); q = 1; }
+      else do { p = rng.pick([7, 11, 13, 17, 19, 23]); q = rng.pick([11, 13, 17, 19, 23, 29, 31]); } while (q <= p || p * q > 900);
       const n = p * q, r = Math.floor(Math.sqrt(n));
+      const tested = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31].filter((x) => x * x <= n && x < p);
       return {
-        statement: `On veut savoir si $${n}$ est premier. On sait que $${r}^2 = ${r * r}$ et $${r + 1}^2 = ${(r + 1) * (r + 1)}$.`,
-        parts: [{ interaction: { kind: "texte-trous", template: `Le plus petit nombre premier qui divise $${n}$ est [[0]].\n$${n} =$ ce nombre $\\times$ [[1]].\nDonc $${n}$ [[2]] un nombre premier.`, blanks: [{ type: "number", answer: { value: p } }, { type: "number", answer: { value: q } }, { type: "select", options: ["est", "n'est pas"], answer: 1 }] } }],
-        solution: [`Il suffit de tester les nombres premiers $p$ tels que $p^2 \\leqslant ${n}$, donc jusqu'à $${r}$.`, `$${n}$ n'est divisible ni par $2$, ni par $3$, ni par $5$${p > 7 ? ", ni par $7$" : ""}${p > 11 ? ", ni par $11$" : ""}${p > 13 ? ", ni par $13$" : ""}${p > 17 ? ", ni par $17$" : ""}${p > 19 ? ", ni par $19$" : ""}.`, `$${n} = ${p} \\times ${q}$ : $${n}$ n'est pas premier.`],
+        statement: `On veut savoir si $${n}$ est premier (si c'est le cas, le plus petit nombre premier qui le divise est lui-même). On sait que $${r}^2 = ${r * r}$ et $${r + 1}^2 = ${(r + 1) * (r + 1)}$.`,
+        parts: [{ interaction: { kind: "texte-trous", template: `Le plus petit nombre premier qui divise $${n}$ est [[0]].\n$${n} =$ ce nombre $\\times$ [[1]].\nDonc $${n}$ [[2]] un nombre premier.`, blanks: [{ type: "number", answer: { value: p } }, { type: "number", answer: { value: q } }, { type: "select", options: ["est", "n'est pas"], answer: primeCase ? 0 : 1 }] } }],
+        solution: [`Il suffit de tester les nombres premiers $p$ tels que $p^2 \\leqslant ${n}$, donc jusqu'à $${r}$.`, `$${n}$ n'est divisible par aucun des nombres premiers ${tested.map((x) => `$${x}$`).join(", ")}.`, primeCase ? `Aucun nombre premier inférieur ou égal à $${r}$ ne divise $${n}$ : le plus petit nombre premier qui divise $${n}$ est $${n}$ lui-même ($${n} = ${n} \\times 1$), donc $${n}$ est premier.` : `$${n} = ${p} \\times ${q}$ : $${n}$ n'est pas premier.`],
       };
     },
     reasoning: "Si $n$ n'est pas premier, il a un diviseur premier $p$ avec $p^2 \\leqslant n$ ; on teste donc les nombres premiers dans l'ordre jusqu'à $\\sqrt{n}$.",
@@ -550,7 +564,7 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Au terminus, un bus de la ligne 1 part toutes les $${a}$ min et un bus de la ligne 2 toutes les $${b}$ min. Deux bus partent ensemble à $${H}$ h $00$.`,
         parts: [num(m, [{ match: String(a * b), feedback: `$${a * b}$ min est un multiple commun, mais pas le plus petit.` }], "Dans combien de minutes deux bus repartiront-ils ensemble pour la première fois ?"), { prompt: "À quelle heure ?", interaction: { kind: "texte-trous", template: "[[0]] h [[1]] min", blanks: [{ type: "number", answer: { value: Math.floor(t / 60) } }, { type: "number", answer: { value: t % 60 } }] } }],
-        solution: [`Les départs ont lieu aux multiples de $${a}$ min et aux multiples de $${b}$ min après $${H}$ h.`, `$${a} = ${fTex(a)}$, $${b} = ${fTex(b)}$ : le plus petit multiple commun est $${m}$ min.`, `$${m}$ min $= ${Math.floor(m / 60)}$ h $${m % 60}$ min, donc les bus repartent ensemble à $${Math.floor(t / 60)}$ h $${t % 60}$ min.`],
+        solution: [`Les départs ont lieu aux multiples de $${a}$ min et aux multiples de $${b}$ min après $${H}$ h.`, `$${a} = ${fTex(a)}$, $${b} = ${fTex(b)}$ : le plus petit multiple commun est $${m}$ min.`, `${m >= 60 ? `$${m}$ min $= ${Math.floor(m / 60)}$ h${m % 60 ? ` $${m % 60}$ min` : ""}, donc l` : "L"}es bus repartent ensemble à $${Math.floor(t / 60)}$ h $${String(t % 60).padStart(2, "0")}$.`],
       };
     },
     reasoning: "On cherche le plus petit multiple commun des deux intervalles, puis on l'ajoute à l'heure de départ.",
@@ -582,7 +596,7 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Dans un collège de $${tot}$ élèves, $${part}$ ${act}. Quelle fraction des élèves cela représente-t-il ? Donne-la sous forme irréductible.`,
         parts: [fracAns(part, tot, [{ match: `${tot}/${part}`, feedback: "La fraction est (partie) ÷ (total) : le total est au dénominateur." }])],
-        solution: [`Fraction : $${frac(part, tot)}$.`, `Plus grand diviseur commun à $${part}$ et $${tot}$ : $${g}$.`, `$${frac(part, tot)} = ${frac(p, q)}$ : ${p === 1 ? "un" : T(p)} élève${p > 1 ? "s" : ""} sur $${q}$.`],
+        solution: [`Fraction : $${frac(part, tot)}$.`, `Plus grand diviseur commun à $${part}$ et $${tot}$ : $${g}$.`, `$${frac(part, tot)} = ${frac(p, q)}$ : ${p === 1 ? "un" : `$${T(p)}$`} élève${p > 1 ? "s" : ""} sur $${q}$.`],
       };
     },
     reasoning: "La fraction irréductible donne la proportion la plus lisible : « $p$ élèves sur $q$ ».",
@@ -590,7 +604,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 5 : Type Brevet ──
   ex({
-    id: "ari3-30", title: "Brevet — Les boîtes du chocolatier", niveau: 5, objectives: ["M3-NC-01", "M3-NC-03"], time: 300,
+    id: "ari3-30", title: "Type Brevet — Les boîtes du chocolatier", niveau: 5, objectives: ["M3-NC-01", "M3-NC-03"], time: 300,
     vary: (rng) => {
       let g = 0, p = 0, q = 0, a = 0;
       do {
@@ -612,10 +626,10 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Rédaction attendue : identifier que le nombre de boîtes est un diviseur commun, justifier qu'on prend le plus grand, puis conclure par une phrase.",
-    hints: ["Divise $a$ par $2$, $3$, $5$, $7$… autant de fois que possible.", "Le nombre de boîtes doit diviser les deux quantités.", "Prends les facteurs premiers communs aux deux décompositions."],
+    hints: ["Divise le nombre de truffes par $2$, $3$, $5$, $7$… autant de fois que possible.", "Le nombre de boîtes doit diviser les deux quantités.", "Prends les facteurs premiers communs aux deux décompositions."],
   }),
   ex({
-    id: "ari3-31", title: "Brevet — Vrai ou faux justifié", niveau: 5, objectives: ["M3-NC-01", "M3-NC-02"], time: 240,
+    id: "ari3-31", title: "Type Brevet — Vrai ou faux justifié", niveau: 5, objectives: ["M3-NC-01", "M3-NC-02"], time: 240,
     statement: "Pour chaque affirmation, indique si elle est vraie ou fausse. (À l'écrit, chaque réponse doit être justifiée.)",
     parts: [{ interaction: { kind: "vrai-faux", items: ["$2^{3} \\times 3 \\times 7$ est la décomposition en produit de facteurs premiers de $168$.", "La fraction $\\dfrac{126}{210}$ est irréductible.", "$\\dfrac{126}{210} = \\dfrac{3}{5}$.", "$2^{2} \\times 15$ est une décomposition en produit de facteurs premiers.", "$221$ est un nombre premier.", "Un nombre divisible par $4$ et par $6$ est toujours divisible par $24$."], answer: [true, false, true, false, false, false] } }],
     solution: ["Vrai : $2^{3} \\times 3 \\times 7 = 8 \\times 21 = 168$ et $2$, $3$, $7$ sont premiers.", "Faux : $126$ et $210$ sont pairs.", "Vrai : $126 = 2 \\times 3^{2} \\times 7$ et $210 = 2 \\times 3 \\times 5 \\times 7$ ; on simplifie par $2 \\times 3 \\times 7 = 42$ : $\\dfrac{3}{5}$.", "Faux : $15 = 3 \\times 5$ n'est pas premier ; la décomposition est $2^{2} \\times 3 \\times 5$.", "Faux : $221 = 13 \\times 17$.", "Faux : $12$ est divisible par $4$ et par $6$ mais pas par $24$ (le plus petit multiple commun de $4$ et $6$ est $12$)."],
@@ -623,7 +637,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Recalcule les produits proposés.", "Pour la dernière, essaie le nombre $12$."],
   }),
   ex({
-    id: "ari3-32", title: "Brevet — Deux cyclistes sur une piste", niveau: 5, objectives: ["M3-NC-03"], time: 300,
+    id: "ari3-32", title: "Type Brevet — Deux cyclistes sur une piste", niveau: 5, objectives: ["M3-NC-03"], time: 300,
     vary: (rng) => {
       const g = rng.pick([12, 15, 18, 20, 24, 30]);
       let p = 0, q = 0;
@@ -632,14 +646,14 @@ const EXERCISES: ChapterExercise[] = [
       return {
         statement: `Sur une piste, Léa fait un tour en $${a}$ secondes et Hugo en $${b}$ secondes, à vitesse constante. Ils partent ensemble de la ligne de départ. Au bout de combien de temps repasseront-ils **ensemble** sur la ligne de départ pour la première fois ?`,
         parts: [{ interaction: { kind: "etapes", steps: [{ prompt: "Durée (en secondes)", answer: { value: m } }, { prompt: "Nombre de tours effectués par Léa", answer: { value: q } }, { prompt: "Nombre de tours effectués par Hugo", answer: { value: p } }] } }],
-        solution: [`Léa passe sur la ligne aux multiples de $${a}$ s, Hugo aux multiples de $${b}$ s.`, `$${a} = ${fTex(a)}$ et $${b} = ${fTex(b)}$ ; plus petit multiple commun : $${fTex(m)} = ${m}$ s, soit $${Math.floor(m / 60)}$ min $${m % 60}$ s.`, `Léa a fait $${m} \\div ${a} = ${q}$ tours et Hugo $${m} \\div ${b} = ${p}$ tours.`],
+        solution: [`Léa passe sur la ligne aux multiples de $${a}$ s, Hugo aux multiples de $${b}$ s.`, `$${a} = ${fTex(a)}$ et $${b} = ${fTex(b)}$ ; plus petit multiple commun : $${fTex(m)} = ${m}$ s, soit $${Math.floor(m / 60)}$ min${m % 60 ? ` $${m % 60}$ s` : ""}.`, `Léa a fait $${m} \\div ${a} = ${q}$ tours et Hugo $${m} \\div ${b} = ${p}$ tours.`],
       };
     },
     reasoning: "Le plus rapide fait plus de tours : contrôle utile pour vérifier qu'on n'a pas inversé les deux résultats.",
     hints: ["Les instants de passage de chacun sont des multiples de son temps au tour.", "Nombre de tours = durée ÷ temps d'un tour."],
   }),
   ex({
-    id: "ari3-33", title: "Brevet — Avec un logiciel de calcul", niveau: 5, objectives: ["M3-NC-01", "M3-NC-02"], time: 240,
+    id: "ari3-33", title: "Type Brevet — Avec un logiciel de calcul", niveau: 5, objectives: ["M3-NC-01", "M3-NC-02"], time: 240,
     vary: (rng) => {
       let c = 0, p = 0, q = 0;
       do {
@@ -660,7 +674,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Repère les facteurs premiers présents dans les deux décompositions.", "Pour chacun, garde le plus petit exposant."],
   }),
   ex({
-    id: "ari3-34", title: "Brevet — Démontrer une propriété", niveau: 5, objectives: ["M3-NC-03"], time: 180,
+    id: "ari3-34", title: "Type Brevet — Démontrer une propriété", niveau: 5, objectives: ["M3-NC-03"], time: 180,
     statement: "On veut démontrer que **la somme de trois entiers consécutifs est toujours un multiple de 3**. Remets les étapes de la démonstration dans l'ordre.",
     parts: [{ interaction: { kind: "ordonner", items: ["Leur somme est $n + (n + 1) + (n + 2)$.", "Comme $n + 1$ est un entier, la somme est un multiple de $3$.", "Soit $n$ un entier : trois entiers consécutifs s'écrivent $n$, $n + 1$ et $n + 2$.", "Cette somme vaut $3n + 3$, c'est-à-dire $3(n + 1)$."], answer: [2, 0, 3, 1], hint: "Première étape en haut" } }],
     solution: ["Soit $n$ un entier : les trois entiers consécutifs sont $n$, $n + 1$ et $n + 2$.", "Leur somme est $n + (n + 1) + (n + 2) = 3n + 3 = 3(n + 1)$.", "$n + 1$ est un entier, donc la somme est un multiple de $3$.", "Vérifier sur un exemple ($4 + 5 + 6 = 15$) ne suffit pas : il faut le calcul littéral pour couvrir **tous** les cas."],
@@ -668,7 +682,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Une démonstration commence par « Soit… ».", "Un multiple de $3$ s'écrit $3 \\times k$ avec $k$ entier."],
   }),
   ex({
-    id: "ari3-35", title: "Brevet — Planter des arbres autour d'un terrain", niveau: 5, objectives: ["M3-NC-03"], time: 300,
+    id: "ari3-35", title: "Type Brevet — Planter des arbres autour d'un terrain", niveau: 5, objectives: ["M3-NC-03"], time: 300,
     vary: (rng) => {
       const g = rng.pick([3, 4, 5, 6, 8, 10, 12]);
       let p = 0, q = 0;
@@ -738,10 +752,10 @@ export const math3eArithmetique: ChapterContent = {
     introduction: "Deux phares s'allument l'un toutes les $4$ secondes, l'autre toutes les $6$ secondes. Quand brilleront-ils de nouveau ensemble ? Une fleuriste veut faire des bouquets identiques avec $84$ roses et $60$ tulipes : combien au maximum ?\nCes questions se résolvent avec l'**arithmétique**, l'étude des nombres entiers et de leurs diviseurs. Son outil principal est la **décomposition en produit de facteurs premiers** : chaque entier y est écrit avec ses « briques » de base, les nombres premiers. Elle sert aussi à rendre une fraction **irréductible**.",
     definitions: [
       { term: "Multiple, diviseur", text: "$a$ et $b$ sont des entiers, $b \\neq 0$. Si la division euclidienne de $a$ par $b$ a un reste nul, c'est-à-dire s'il existe un entier $k$ tel que $a = b \\times k$, on dit que $a$ est un **multiple** de $b$, que $b$ est un **diviseur** de $a$, ou que $a$ est **divisible** par $b$.\nExemple : $42 = 6 \\times 7$, donc $6$ et $7$ sont des diviseurs de $42$ ; $42$ est un multiple de $6$ et de $7$." },
-      { term: "Nombre premier", text: "Un **nombre premier** est un entier qui a **exactement deux diviseurs** : $1$ et lui-même.\nLes nombres premiers inférieurs à $50$ sont : $2$, $3$, $5$, $7$, $11$, $13$, $17$, $19$, $23$, $29$, $31$, $37$, $41$, $43$, $47$.\n$1$ n'est **pas** premier (il n'a qu'un seul diviseur) ; $2$ est le seul nombre premier pair." },
+      { term: "Nombre premier", text: "Un **nombre premier** est un nombre entier naturel (positif) qui a **exactement deux diviseurs** : $1$ et lui-même.\nLes nombres premiers inférieurs à $50$ sont : $2$, $3$, $5$, $7$, $11$, $13$, $17$, $19$, $23$, $29$, $31$, $37$, $41$, $43$, $47$.\n$1$ n'est **pas** premier (il n'a qu'un seul diviseur) ; $2$ est le seul nombre premier pair." },
       { term: "Décomposition en produit de facteurs premiers", text: "Décomposer un entier supérieur ou égal à $2$, c'est l'écrire comme un produit de nombres premiers, en regroupant les facteurs égaux avec des puissances.\nExemple : $360 = 2 \\times 2 \\times 2 \\times 3 \\times 3 \\times 5 = 2^{3} \\times 3^{2} \\times 5$." },
       { term: "Diviseur commun, plus grand diviseur commun", text: "Un **diviseur commun** à deux entiers est un nombre qui les divise tous les deux. $1$ en est toujours un. Le plus grand d'entre eux s'appelle le **plus grand diviseur commun** (parfois noté PGCD).\nExemple : les diviseurs communs à $12$ et $18$ sont $1$, $2$, $3$, $6$ ; le plus grand est $6$." },
-      { term: "Multiple commun, plus petit multiple commun", text: "Un **multiple commun** à deux entiers non nuls est un nombre qui est multiple de chacun d'eux. Le plus petit multiple commun non nul s'appelle le **plus petit multiple commun** (parfois noté PPCM).\nExemple : multiples de $4$ : $4$, $8$, $12$, $16$, $20$, $24$… ; multiples de $6$ : $6$, $12$, $18$, $24$… Le plus petit multiple commun de $4$ et $6$ est $12$." },
+      { term: "Multiple commun, plus petit multiple commun", text: "Un **multiple commun** à deux entiers non nuls est un nombre qui est multiple de chacun d'eux. Le plus petit d'entre eux, non nul, s'appelle le **plus petit multiple commun** (parfois noté PPCM).\nExemple : multiples de $4$ : $4$, $8$, $12$, $16$, $20$, $24$… ; multiples de $6$ : $6$, $12$, $18$, $24$… Le plus petit multiple commun de $4$ et $6$ est $12$." },
       { term: "Fraction irréductible", text: "Une fraction $\\dfrac{a}{b}$ (avec $a$ et $b$ entiers, $b \\neq 0$) est **irréductible** lorsque $a$ et $b$ n'ont aucun diviseur commun autre que $1$ : on ne peut plus la simplifier.\nExemple : $\\dfrac{2}{3}$ est irréductible ; $\\dfrac{12}{18}$ ne l'est pas ($12$ et $18$ sont divisibles par $6$)." },
     ],
     properties: [
@@ -756,7 +770,7 @@ export const math3eArithmetique: ChapterContent = {
       { title: "2. Les nombres premiers, des « briques »", body: "Un nombre premier ne se décompose pas en produit de nombres plus petits (autres que $1$). Tous les autres entiers $\\geqslant 2$ se fabriquent en multipliant des nombres premiers, comme un mur se construit avec des briques. Pour trouver les nombres premiers inférieurs à $100$, on peut utiliser le **crible d'Ératosthène** : on barre les multiples de $2$, puis de $3$, de $5$ et de $7$ (sauf ces nombres eux-mêmes) ; ceux qui restent (sauf $1$) sont premiers." },
       { title: "3. Décomposer par divisions successives", body: "On divise le nombre par le plus petit nombre premier qui le divise, puis on recommence avec le quotient, jusqu'à obtenir $1$. Les diviseurs utilisés forment la décomposition. Une calculatrice ou un logiciel peut aussi donner la décomposition (touche ou commande « décomposer » / « factoriser »)." },
       { title: "4. Simplifier une fraction en une seule fois", body: "Si l'on écrit le numérateur et le dénominateur en produits de facteurs premiers, on voit **tous** les facteurs communs d'un coup. On les « barre » en haut et en bas : ce qui reste forme la fraction irréductible. Ainsi $\\dfrac{360}{84} = \\dfrac{2^{3} \\times 3^{2} \\times 5}{2^{2} \\times 3 \\times 7} = \\dfrac{2 \\times 3 \\times 5}{7} = \\dfrac{30}{7}$." },
-      { title: "5. Reconnaître le bon outil dans un problème", body: "– « Partager **sans reste** en le **plus grand** nombre de parts identiques », « carreaux les plus grands possible » : on cherche un **diviseur commun**, le plus grand.\n– « Se retrouver **de nouveau ensemble** », « en même temps pour la première fois », « engrenages » : on cherche un **multiple commun**, le plus petit.\nUn contrôle de bon sens aide : un diviseur commun est plus petit que les deux nombres, un multiple commun est plus grand." },
+      { title: "5. Reconnaître le bon outil dans un problème", body: "– « Partager **sans reste** en le **plus grand** nombre de parts identiques », « carreaux les plus grands possible » : on cherche un **diviseur commun**, le plus grand.\n– « Se retrouver **de nouveau ensemble** », « en même temps pour la première fois », « engrenages » : on cherche un **multiple commun**, le plus petit.\nUn contrôle de bon sens aide : un diviseur commun est inférieur ou égal à chacun des deux nombres, un multiple commun (non nul) est supérieur ou égal à chacun." },
     ],
     workedExamples: [
       { title: "Exemple 1 — Décomposer", statement: "Décomposer $1\\,260$ en produit de facteurs premiers.", steps: ["$1\\,260$ est pair : $1\\,260 = 2 \\times 630$, puis $630 = 2 \\times 315$.", "$315$ est impair ; somme des chiffres $3 + 1 + 5 = 9$ : divisible par $3$. $315 = 3 \\times 105$, puis $105 = 3 \\times 35$.", "$35 = 5 \\times 7$ et $7$ est premier.", "Donc $1\\,260 = 2 \\times 2 \\times 3 \\times 3 \\times 5 \\times 7$."], answer: "$1\\,260 = 2^{2} \\times 3^{2} \\times 5 \\times 7$" },
@@ -775,7 +789,7 @@ export const math3eArithmetique: ChapterContent = {
       { mistake: "$60 = 4 \\times 3 \\times 5$ « est la décomposition en facteurs premiers ».", correction: "$60 = 2^{2} \\times 3 \\times 5$", why: "$4$ n'est pas premier : il faut continuer à le décomposer." },
       { mistake: "$\\dfrac{36}{48} = \\dfrac{18}{24}$ « est irréductible ».", correction: "$\\dfrac{36}{48} = \\dfrac{3}{4}$", why: "$18$ et $24$ ont encore le diviseur commun $6$ : on simplifie jusqu'à ce qu'il ne reste que $1$ comme diviseur commun." },
       { mistake: "« Divisible par $4$ et par $6$, donc par $24$. »", correction: "Divisible par le plus petit multiple commun de $4$ et $6$, soit $12$.", why: "$12$ est divisible par $4$ et par $6$ mais pas par $24$ : $4$ et $6$ ont le facteur commun $2$." },
-      { mistake: "Utiliser un multiple commun dans un problème de partage (ou l'inverse).", correction: "Partage sans reste → diviseur commun ; rencontre, « de nouveau ensemble » → multiple commun.", why: "Un nombre de parts doit être plus petit que les quantités partagées ; un instant de rencontre est plus grand que chaque période." },
+      { mistake: "Utiliser un multiple commun dans un problème de partage (ou l'inverse).", correction: "Partage sans reste → diviseur commun ; rencontre, « de nouveau ensemble » → multiple commun.", why: "Un nombre de parts est inférieur ou égal à chaque quantité partagée ; un instant de rencontre est supérieur ou égal à chaque période." },
     ],
     methods: [
       { title: "Décomposer un entier en produit de facteurs premiers", steps: ["Diviser par $2$ tant que le quotient est pair.", "Puis diviser par $3$, par $5$, par $7$, $11$… (critères de divisibilité, puis divisions).", "S'arrêter quand le quotient vaut $1$.", "Écrire le produit des diviseurs utilisés en regroupant avec des puissances, puis vérifier en recalculant le produit."] },
@@ -794,7 +808,7 @@ export const math3eArithmetique: ChapterContent = {
     ],
     revisionSheet: {
       keyPoints: ["Premiers inférieurs à $30$ : $2$, $3$, $5$, $7$, $11$, $13$, $17$, $19$, $23$, $29$.", "Critères : $2$, $5$, $10$ → dernier chiffre ; $3$, $9$ → somme des chiffres.", "$360 = 2^{3} \\times 3^{2} \\times 5$ : uniquement des facteurs premiers.", "$84 = 2^{2} \\times 3 \\times 7$, $60 = 2^{2} \\times 3 \\times 5$ : plus grand diviseur commun $12$, plus petit multiple commun $420$.", "$\\dfrac{84}{60} = \\dfrac{7}{5}$ (irréductible)."],
-      skills: ["Reconnaître un nombre premier et justifier qu'un nombre ne l'est pas.", "Décomposer un entier en produit de facteurs premiers.", "Rendre une fraction irréductible.", "Calculer le plus grand diviseur commun et le plus petit multiple commun de deux entiers.", "Résoudre des problèmes de partage, de carrelage, d'engrenages et de rencontre."],
+      skills: ["Reconnaître un nombre premier et justifier qu'un nombre ne l'est pas.", "Décomposer un entier en produit de facteurs premiers.", "Rendre une fraction irréductible.", "Utiliser un diviseur commun ou un multiple commun pour résoudre un problème.", "Résoudre des problèmes de partage, de carrelage, d'engrenages et de rencontre."],
     },
     miniQuiz: [
       { question: "Lequel de ces nombres est premier ?", options: ["$1$", "$51$", "$53$", "$57$"], answer: 2, explanation: "$51 = 3 \\times 17$, $57 = 3 \\times 19$ et $1$ n'est pas premier ; $53$ n'est divisible ni par $2$, ni par $3$, ni par $5$, ni par $7$." },
@@ -853,17 +867,17 @@ export const math3eArithmetique: ChapterContent = {
       instructions: "Pour chaque affirmation, dis si elle est juste. Si elle est fausse, choisis l'erreur commise.",
       objectives: ["M4-NC-12", "M3-NC-01", "M3-NC-02", "M3-NC-03"],
       config: { items: [
-        { niveau: 1, calc: "$1$ est un nombre premier.", correct: false, errors: ["Un nombre premier a exactement deux diviseurs ; $1$ n'en a qu'un", "$1$ est pair", "$1$ est divisible par $3$"], error: 0, explanation: "$1$ n'est pas premier." },
+        { niveau: 1, calc: "$1$ est un nombre premier.", correct: false, errors: ["$1$ n'a qu'un seul diviseur", "$1$ est divisible par $2$", "$1$ est le produit de deux nombres premiers"], error: 0, explanation: "Un nombre premier a exactement deux diviseurs ; $1$ n'en a qu'un." },
         { niveau: 1, calc: "$2$ est un nombre premier.", correct: true, explanation: "$2$ a exactement deux diviseurs : $1$ et $2$. C'est le seul premier pair." },
-        { niveau: 1, calc: "$57$ est un nombre premier.", correct: false, errors: ["$57 = 3 \\times 19$ : la somme des chiffres $5 + 7 = 12$ est un multiple de $3$", "$57$ est pair", "Un nombre premier ne peut pas dépasser $50$"], error: 0, explanation: "$57 = 3 \\times 19$." },
-        { niveau: 2, calc: "$60 = 4 \\times 3 \\times 5$ est la décomposition en facteurs premiers de $60$.", correct: false, errors: ["$4$ n'est pas premier : $60 = 2^{2} \\times 3 \\times 5$", "Le produit ne vaut pas $60$", "Il faut écrire $60 = 6 \\times 10$"], error: 0, explanation: "$60 = 2^{2} \\times 3 \\times 5$." },
+        { niveau: 1, calc: "$57$ est un nombre premier.", correct: false, errors: ["$57$ est divisible par $3$", "$57$ est divisible par $7$", "$57$ est divisible par $5$"], error: 0, explanation: "$5 + 7 = 12$ est un multiple de $3$ : $57 = 3 \\times 19$." },
+        { niveau: 2, calc: "$60 = 4 \\times 3 \\times 5$ est la décomposition en facteurs premiers de $60$.", correct: false, errors: ["Un des facteurs n'est pas premier", "Le produit ne vaut pas $60$", "Il manque un facteur $5$"], error: 0, explanation: "$4$ n'est pas premier : $60 = 2^{2} \\times 3 \\times 5$." },
         { niveau: 2, calc: "$72 = 2^{3} \\times 3^{2}$", correct: true, explanation: "$8 \\times 9 = 72$ et $2$, $3$ sont premiers." },
-        { niveau: 2, calc: "$90 = 2 \\times 3 \\times 5$", correct: false, errors: ["Il manque un facteur $3$ : $90 = 2 \\times 3^{2} \\times 5$", "$5$ n'est pas premier", "Il faut un facteur $7$"], error: 0, explanation: "$2 \\times 3 \\times 5 = 30$ ; $90 = 2 \\times 3^{2} \\times 5$." },
-        { niveau: 3, calc: "$\\dfrac{36}{48} = \\dfrac{18}{24}$, fraction irréductible.", correct: false, errors: ["$18$ et $24$ ont encore le diviseur commun $6$ : $\\dfrac{3}{4}$", "On ne peut pas diviser $36$ par $2$", "Il fallait diviser seulement le numérateur"], error: 0, explanation: "$\\dfrac{36}{48} = \\dfrac{3}{4}$." },
-        { niveau: 3, calc: "$\\dfrac{2 + 5}{3 + 5} = \\dfrac{2}{3}$", correct: false, errors: ["On simplifie des facteurs communs, jamais des termes d'une somme", "Il fallait barrer le $2$ et le $3$", "Le résultat est $\\dfrac{5}{5}$"], error: 0, explanation: "$\\dfrac{7}{8} \\neq \\dfrac{2}{3}$ : on ne « simplifie » pas un terme ajouté." },
+        { niveau: 2, calc: "$90 = 2 \\times 3 \\times 5$", correct: false, errors: ["Il manque un facteur $3$", "Il manque un facteur $2$", "Un des facteurs n'est pas premier"], error: 0, explanation: "$2 \\times 3 \\times 5 = 30$ ; $90 = 2 \\times 3^{2} \\times 5$." },
+        { niveau: 3, calc: "$\\dfrac{36}{48} = \\dfrac{18}{24}$, fraction irréductible.", correct: false, errors: ["La simplification n'est pas terminée", "L'égalité est fausse : on n'a pas divisé par le même nombre", "On ne peut pas simplifier une fraction dont le numérateur est pair"], error: 0, explanation: "$18$ et $24$ ont encore le diviseur commun $6$ : $\\dfrac{36}{48} = \\dfrac{3}{4}$." },
+        { niveau: 3, calc: "$\\dfrac{2 + 5}{3 + 5} = \\dfrac{2}{3}$", correct: false, errors: ["On a « simplifié » un terme d'une somme au lieu d'un facteur commun", "La simplification n'est pas terminée", "Il fallait simplifier par $2$"], error: 0, explanation: "$\\dfrac{7}{8} \\neq \\dfrac{2}{3}$ : on simplifie des facteurs communs, jamais des termes ajoutés." },
         { niveau: 3, calc: "$\\dfrac{39}{65} = \\dfrac{3}{5}$", correct: true, explanation: "$39 = 3 \\times 13$ et $65 = 5 \\times 13$." },
-        { niveau: 4, calc: "Divisible par $4$ et par $6$, donc divisible par $24$.", correct: false, errors: ["Contre-exemple $12$ : on doit utiliser le plus petit multiple commun, $12$", "$4$ et $6$ sont premiers", "Il faudrait additionner $4$ et $6$"], error: 0, explanation: "$12$ est divisible par $4$ et $6$, pas par $24$." },
-        { niveau: 4, calc: "Phares toutes les $4$ s et $6$ s : ils brillent de nouveau ensemble après $24$ s.", correct: false, errors: ["$24$ est un multiple commun mais pas le plus petit : c'est $12$ s", "Il faut le plus grand diviseur commun, $2$ s", "Il faut additionner : $10$ s"], error: 0, explanation: "Plus petit multiple commun de $4$ et $6$ : $12$." },
+        { niveau: 4, calc: "Divisible par $4$ et par $6$, donc divisible par $24$.", correct: false, errors: ["$4 \\times 6$ n'est pas le plus petit multiple commun de $4$ et $6$", "Il fallait utiliser le plus grand diviseur commun de $4$ et $6$", "Il fallait conclure : divisible par $10$"], error: 0, explanation: "Le plus petit multiple commun de $4$ et $6$ est $12$ ; $12$ est divisible par $4$ et $6$, pas par $24$." },
+        { niveau: 4, calc: "Phares toutes les $4$ s et $6$ s : ils brillent de nouveau ensemble après $24$ s.", correct: false, errors: ["$24$ est un multiple commun, mais pas le plus petit", "Il fallait calculer le plus grand diviseur commun de $4$ et $6$", "Il fallait additionner les deux périodes"], error: 0, explanation: "Le plus petit multiple commun de $4$ et $6$ est $12$ : ils brillent ensemble après $12$ s." },
         { niveau: 4, calc: "$84$ roses et $60$ tulipes : au maximum $12$ bouquets identiques.", correct: true, explanation: "Plus grand diviseur commun de $84$ et $60$ : $12$." },
       ] },
     },
