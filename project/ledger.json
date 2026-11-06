@@ -77,7 +77,18 @@
         "research/dossiers/math-5e-nombres-relatifs.md",
         "src/lib/chapters/data/math-5e-nombres-relatifs.ts"
       ],
-      "next": "Revues QA1–QA6 indépendantes"
+      "next": "Contre-vérification indépendante des correctifs (6 dimensions), puis publication si six PASS",
+      "reports": [
+        "project/reports/SCI-5E-MATH-001-QA1.md",
+        "project/reports/SCI-5E-MATH-001-QA2.md",
+        "project/reports/SCI-5E-MATH-001-QA3.md",
+        "project/reports/SCI-5E-MATH-001-QA4.md",
+        "project/reports/SCI-5E-MATH-001-QA5.md",
+        "project/reports/SCI-5E-MATH-001-QA6.md"
+      ],
+      "blockers": [
+        "Décision du porteur de projet : tutoiement ou vouvoiement de l’interface existante (QA6 Moy3)"
+      ]
     },
     {
       "id": "SCI-6E-MATH-001",
