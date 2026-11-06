@@ -5,7 +5,7 @@ import { getTree } from "@/lib/content/tree";
 import { KIND_LABELS } from "@/lib/engine/labels";
 import { Breadcrumbs, Empty, ExerciseCard } from "@/components/ui";
 import MathText from "@/components/MathText";
-import ChapterView from "@/components/chapter/ChapterView";
+import ChapterView, { ChapterSources } from "@/components/chapter/ChapterView";
 import { chapterByTreeId } from "@/lib/chapters";
 
 export const dynamic = "force-dynamic";
@@ -52,6 +52,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ matier
           );
         })}
       </div>
+      {full && <ChapterSources c={full} />}
     </div>
   );
 }

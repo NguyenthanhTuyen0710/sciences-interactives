@@ -61,6 +61,24 @@ describe("logique des jeux", () => {
     expect(lineFeedback(-3, -3, 1).ok).toBe(true);
     expect(lineFeedback(-3, -2, 1).message).toMatch(/graduation/);
   });
+  it("droite graduée : nombre de graduations correct quand le pas n'est pas 1 (QA4 F10)", () => {
+    expect(lineFeedback(-1.5, 2, 0.5).message).toMatch(/3 graduations de 0,5 à gauche/);
+    expect(lineFeedback(-0.4, 1, 0.2).message).toMatch(/2 graduations de 0,2/);
+    expect(lineFeedback(-1.5, 2, 0.5).message).toContain("−1,5");
+  });
+  it("droite graduée : ~65 % de négatifs, extrémités exclues en lecture (QA4 F11)", () => {
+    const lv: LineLevel = { min: -5, max: 5, step: 1 };
+    const rng = createRng("neg");
+    let neg = 0;
+    const N = 4000;
+    for (let i = 0; i < N; i++) {
+      const r = lineRound(rng, lv);
+      if (r.target < 0) neg++;
+      if (r.type === "lire") expect(Math.abs(r.target)).toBeLessThan(5);
+    }
+    expect(neg / N).toBeGreaterThan(0.6);
+    expect(neg / N).toBeLessThan(0.72);
+  });
 });
 
 for (const c of ALL_CHAPTERS) {

@@ -6,7 +6,7 @@ import ChapterGameView from "../games/Games";
 import type { ChapterContent } from "@/lib/chapters/schema";
 import { NIVEAUX } from "@/lib/engine/labels";
 
-const H2 = ({ id, children }: { id: string; children: React.ReactNode }) => <h2 id={id} className="scroll-mt-24 text-2xl font-black text-slate-900">{children}</h2>;
+const H2 = ({ id, children }: { id: string; children: React.ReactNode }) => <h2 id={id} className="scroll-mt-32 text-2xl font-black text-slate-900">{children}</h2>;
 const H3 = ({ children }: { children: React.ReactNode }) => <h3 className="mb-2 mt-6 text-lg font-bold text-indigo-900">{children}</h3>;
 const fmtTime = (s: number) => (s < 60 ? `${s} s` : `${Math.round(s / 60)} min`);
 
@@ -94,11 +94,17 @@ export default function ChapterView({ c }: { c: ChapterContent }) {
         <MiniQuiz items={L.miniQuiz} />
       </section>
 
-      <section aria-labelledby="sources" className="text-xs text-slate-500">
-        <h2 id="sources" className="mb-1 font-semibold">Références (programme {c.curriculumVersion})</h2>
-        <ul className="space-y-0.5">{c.sources.map((s) => <li key={s.id}><a className="underline hover:text-indigo-600" href={s.url} rel="noopener noreferrer" target="_blank">{s.title}</a>{s.note ? ` — ${s.note}` : ""}</li>)}</ul>
-        <p className="mt-1">Cours, exercices et activités originaux. Les sujets d'examen éventuellement cités sont des références ; aucun n'est reproduit.</p>
-      </section>
     </div>
+  );
+}
+
+/** Références du chapitre, affichées en fin de page (après les exercices complémentaires éventuels). */
+export function ChapterSources({ c }: { c: ChapterContent }) {
+  return (
+    <section aria-labelledby="sources" className="mt-12 text-xs text-slate-500">
+      <h2 id="sources" className="mb-1 font-semibold">Références (programme {c.curriculumVersion})</h2>
+      <ul className="space-y-0.5">{c.sources.map((s) => <li key={s.id}><a className="underline hover:text-indigo-600" href={s.url} rel="noopener noreferrer" target="_blank">{s.title}</a>{s.note ? ` — ${s.note}` : ""}</li>)}</ul>
+      <p className="mt-1">Cours, exercices et activités originaux. Les sujets d'examen éventuellement cités sont des références ; aucun n'est reproduit.</p>
+    </section>
   );
 }

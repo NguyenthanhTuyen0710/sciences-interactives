@@ -429,7 +429,7 @@ function Tableau({ it, value, onChange, result, locked }: P<"tableau">) {
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse text-sm">
         {it.headers.length > 0 && (
-          <thead><tr>{it.headers.map((h, i) => <th key={i} className="border border-slate-300 bg-slate-100 px-3 py-2 text-center font-semibold">{h}</th>)}</tr></thead>
+          <thead><tr>{it.headers.map((h, i) => <th key={i} className="border border-slate-300 bg-slate-100 px-3 py-2 text-center font-semibold"><MathInline text={h} /></th>)}</tr></thead>
         )}
         <tbody>
           {it.rows.map((r, ri) => (

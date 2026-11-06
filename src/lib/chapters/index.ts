@@ -28,7 +28,7 @@ export function exerciseGenerator(c: ChapterContent, e: ChapterExercise): Genera
   return {
     meta: {
       id: e.id, title: e.title, subject: subjectOf(c), level: c.grade, chapterId: c.treeChapterId, notionId: c.id,
-      kinds, summary: e.title, randomized: e.vary ? "valeurs" : "banque", timeLimit: Math.max(60, e.time * 2),
+      kinds, summary: c.officialObjectives.find((o) => o.id === e.objectives[0])?.text ?? e.title, randomized: e.vary ? "valeurs" : "banque", timeLimit: Math.max(60, e.time * 2),
       niveau: e.niveau, objectives: e.objectives,
     },
     generate(rng) {

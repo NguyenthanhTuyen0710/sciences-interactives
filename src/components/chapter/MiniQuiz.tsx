@@ -1,6 +1,6 @@
 "use client";
 // Mini-évaluation de compréhension (formative, corrigée immédiatement dans le navigateur).
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MathInline } from "../MathText";
 
 export interface QuizItem { question: string; options: string[]; answer: number; explanation: string }
@@ -9,8 +9,10 @@ export default function MiniQuiz({ items }: { items: QuizItem[] }) {
   const [sel, setSel] = useState<(number | null)[]>(() => items.map(() => null));
   const [done, setDone] = useState(false);
   const score = sel.filter((s, i) => s === items[i].answer).length;
+  const top = useRef<HTMLDivElement>(null);
+  const missing = sel.filter((s) => s === null).length;
   return (
-    <div className="space-y-4">
+    <div ref={top} tabIndex={-1} className="space-y-4 focus:outline-none">
       {items.map((q, i) => (
         <fieldset key={i} className="space-y-2">
           <legend className="font-medium"><span className="mr-2 text-indigo-600">{i + 1}.</span><MathInline text={q.question} /></legend>
@@ -30,12 +32,15 @@ export default function MiniQuiz({ items }: { items: QuizItem[] }) {
         </fieldset>
       ))}
       {!done ? (
-        <button type="button" className="btn-primary" disabled={sel.some((s) => s === null)} onClick={() => setDone(true)}>Corriger</button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" className="btn-primary" disabled={missing > 0} onClick={() => setDone(true)}>Corriger</button>
+          {missing > 0 && <span className="text-sm text-slate-500">Réponds à toutes les questions pour corriger ({missing} restante{missing > 1 ? "s" : ""}).</span>}
+        </div>
       ) : (
         <div className="flex flex-wrap items-center gap-3" role="status">
           <span className="text-xl font-black">{score}/{items.length}</span>
           <span className="text-sm text-slate-600">{score === items.length ? "Tu maîtrises l'essentiel du cours." : "Relis les rubriques concernées, puis recommence."}</span>
-          <button type="button" className="btn-ghost" onClick={() => { setSel(items.map(() => null)); setDone(false); }}>Recommencer</button>
+          <button type="button" className="btn-ghost" onClick={() => { setSel(items.map(() => null)); setDone(false); top.current?.focus(); }}>Recommencer</button>
         </div>
       )}
     </div>

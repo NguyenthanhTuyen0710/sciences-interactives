@@ -3,7 +3,12 @@
 // on la saisit dans l'interface, on valide et on vérifie le score de 100 %.
 // Usage : BASE_URL=http://localhost:3000 npx tsx scripts/e2e.ts
 import { createRequire } from "node:module";
-import { STATIC_GENERATORS } from "../src/lib/content/registry-static";
+import { STATIC_GENERATORS as ALL_GENERATORS } from "../src/lib/content/registry-static";
+import { ALL_CHAPTERS, isVisible } from "../src/lib/chapters";
+
+// Les exercices des chapitres non publiés ne sont servis qu'avec SHOW_DRAFTS=1 (à passer aussi à ce script).
+const hidden = new Set(ALL_CHAPTERS.filter((c) => !isVisible(c)).flatMap((c) => c.exercises.map((e) => e.id)));
+const STATIC_GENERATORS = ALL_GENERATORS.filter((g) => !hidden.has(g.meta.id));
 import { createRng } from "../src/lib/engine/rng";
 import { perfect } from "../src/lib/engine/solve";
 import type { Difficulty, Interaction } from "../src/lib/engine/types";

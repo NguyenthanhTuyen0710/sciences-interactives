@@ -37,11 +37,14 @@ export interface LineRound { type: "placer" | "lire"; target: number; level: Lin
 
 export function lineRound(rng: Rng, lv: LineLevel): LineRound {
   const n = Math.round((lv.max - lv.min) / lv.step);
-  let k = rng.int(0, n);
-  // éviter 0 et privilégier les négatifs (objet du chapitre)
-  if (eq(lv.min + k * lv.step, 0)) k = Math.max(0, k - 1);
-  const target = Math.round((lv.min + k * lv.step) * 1000) / 1000;
-  return { type: rng.next() < 0.5 ? "placer" : "lire", target, level: lv };
+  const type = rng.next() < 0.5 ? "placer" : "lire";
+  // En lecture, les extrémités (déjà étiquetées) sont exclues ; 0 est toujours exclu.
+  const at = (k: number) => Math.round((lv.min + k * lv.step) * 1000) / 1000;
+  let target = 0;
+  while (eq(target, 0)) target = at(type === "lire" ? rng.int(1, n - 1) : rng.int(0, n));
+  // Privilégier les négatifs (objet du chapitre) : environ 65 % des cibles.
+  if (target > 0 && rng.next() < 0.3 && -target >= lv.min) target = -target;
+  return { type, target, level: lv };
 }
 
 export function lineFeedback(target: number, answer: number, step: number): { ok: boolean; message: string } {
