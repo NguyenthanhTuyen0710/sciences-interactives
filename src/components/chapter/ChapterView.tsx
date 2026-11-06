@@ -1,6 +1,6 @@
 // Page de chapitre complet : cours (15 rubriques), exercices par niveau, activités interactives, révision.
 import Link from "next/link";
-import MathText, { MathInline } from "../MathText";
+import MathText, { MathInline, frTypo } from "../MathText";
 import MiniQuiz from "./MiniQuiz";
 import ChapterGameView from "../games/Games";
 import type { ChapterContent } from "@/lib/chapters/schema";
@@ -31,17 +31,17 @@ export default function ChapterView({ c }: { c: ChapterContent }) {
         <H3>Pour commencer</H3>
         <MathText text={L.introduction} className="leading-relaxed" />
         <H3>Définitions essentielles</H3>
-        <dl className="space-y-3">{L.definitions.map((d) => <div key={d.term} className="rounded-xl border-l-4 border-indigo-500 bg-indigo-50/60 p-3"><dt className="font-bold">{d.term}</dt><dd><MathText text={d.text} /></dd></div>)}</dl>
+        <dl className="space-y-3">{L.definitions.map((d) => <div key={frTypo(d.term)} className="rounded-xl border-l-4 border-indigo-500 bg-indigo-50/60 p-3"><dt className="font-bold">{frTypo(d.term)}</dt><dd><MathText text={d.text} /></dd></div>)}</dl>
         <H3>Propriétés et règles</H3>
-        <div className="space-y-3">{L.properties.map((p) => <div key={p.title} className="rounded-xl border-l-4 border-emerald-500 bg-emerald-50/60 p-3"><p className="font-bold">{p.title}</p><MathText text={p.statement} />{p.conditions && <p className="mt-1 text-sm text-slate-600"><MathInline text={p.conditions} /></p>}</div>)}</div>
+        <div className="space-y-3">{L.properties.map((p) => <div key={frTypo(p.title)} className="rounded-xl border-l-4 border-emerald-500 bg-emerald-50/60 p-3"><p className="font-bold">{frTypo(p.title)}</p><MathText text={p.statement} />{p.conditions && <p className="mt-1 text-sm text-slate-600"><MathInline text={p.conditions} /></p>}</div>)}</div>
         <H3>Explications pas à pas</H3>
-        <div className="space-y-4">{L.explanations.map((e) => <div key={e.title}><p className="font-semibold">{e.title}</p><MathText text={e.body} className="text-slate-700" /></div>)}</div>
+        <div className="space-y-4">{L.explanations.map((e) => <div key={frTypo(e.title)}><p className="font-semibold">{frTypo(e.title)}</p><MathText text={e.body} className="text-slate-700" /></div>)}</div>
         <H3>Illustrations</H3>
         <div className="grid gap-4 md:grid-cols-2">{L.illustrations.map((f, i) => <figure key={i} className="card p-3"><div role="img" aria-label={f.alt} className="flex justify-center [&_svg]:h-auto [&_svg]:max-w-full" dangerouslySetInnerHTML={{ __html: f.svg }} />{f.caption && <figcaption className="mt-2 text-center text-xs text-slate-500"><MathInline text={f.caption} /></figcaption>}</figure>)}</div>
         <H3>Exemples corrigés</H3>
         <div className="space-y-4">{L.workedExamples.map((w) => (
-          <details key={w.title} className="card p-4 open:ring-1 open:ring-indigo-200">
-            <summary className="cursor-pointer font-semibold">{w.title} — <MathInline text={w.statement} /></summary>
+          <details key={frTypo(w.title)} className="card p-4 open:ring-1 open:ring-indigo-200">
+            <summary className="cursor-pointer font-semibold">{frTypo(w.title)} — <MathInline text={w.statement} /></summary>
             <ol className="mt-3 list-decimal space-y-1 pl-6">{w.steps.map((s, i) => <li key={i}><MathInline text={s} /></li>)}</ol>
             <p className="mt-2 font-semibold text-emerald-800">Réponse : <MathInline text={w.answer} /></p>
           </details>
@@ -50,7 +50,7 @@ export default function ChapterView({ c }: { c: ChapterContent }) {
         <div className="overflow-x-auto"><table className="w-full min-w-[36rem] text-left text-sm"><thead><tr className="border-b border-slate-200 text-slate-500"><th className="py-2 pr-3">Erreur</th><th className="py-2 pr-3">Ce qu'il faut écrire</th><th className="py-2">Pourquoi</th></tr></thead>
           <tbody>{L.commonMistakes.map((m, i) => <tr key={i} className="border-b border-slate-100 align-top"><td className="py-2 pr-3 text-rose-800"><MathInline text={m.mistake} /></td><td className="py-2 pr-3 text-emerald-800"><MathInline text={m.correction} /></td><td className="py-2"><MathInline text={m.why} /></td></tr>)}</tbody></table></div>
         <H3>Méthodes à retenir</H3>
-        <div className="grid gap-4 md:grid-cols-2">{L.methods.map((m) => <div key={m.title} className="card p-4"><p className="mb-2 font-bold">{m.title}</p><ol className="list-decimal space-y-1 pl-5 text-sm">{m.steps.map((s, i) => <li key={i}><MathInline text={s} /></li>)}</ol></div>)}</div>
+        <div className="grid gap-4 md:grid-cols-2">{L.methods.map((m) => <div key={frTypo(m.title)} className="card p-4"><p className="mb-2 font-bold">{frTypo(m.title)}</p><ol className="list-decimal space-y-1 pl-5 text-sm">{m.steps.map((s, i) => <li key={i}><MathInline text={s} /></li>)}</ol></div>)}</div>
         <H3>Résumé du cours</H3>
         <ul className="list-disc space-y-1 pl-5">{L.summary.map((s, i) => <li key={i}><MathInline text={s} /></li>)}</ul>
       </section>
@@ -67,7 +67,7 @@ export default function ChapterView({ c }: { c: ChapterContent }) {
               <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {list.map((e) => (
                   <li key={e.id}><Link href={`/exercice/${e.id}`} className="card flex h-full items-start justify-between gap-2 p-3 text-sm transition hover:border-indigo-300 hover:shadow-md">
-                    <span className="font-medium text-slate-800">{e.title}</span><span className="chip shrink-0 bg-slate-100 text-slate-600">≈ {fmtTime(e.time)}</span>
+                    <span className="font-medium text-slate-800">{frTypo(e.title)}</span><span className="chip shrink-0 bg-slate-100 text-slate-600">≈ {fmtTime(e.time)}</span>
                   </Link></li>
                 ))}
               </ul>

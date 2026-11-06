@@ -4,7 +4,7 @@
 // clavier + souris/tactile. Meilleur score mémorisé localement (confort ; ne bloque rien s'il échoue).
 // Les jeux sont montés uniquement dans le navigateur : leur tirage aléatoire ne doit pas différer du rendu serveur.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { MathInline } from "../MathText";
+import { MathInline, frTypo } from "../MathText";
 import type { ChapterGame } from "@/lib/chapters/schema";
 import { adapt, calcFeedback, calcQuestion, frRel, gameRng, lineFeedback, lineRound, parseRel, type Adapt, type CalcLevel, type CalcQuestion, type LineLevel, type LineRound } from "@/lib/games/logic";
 import { randomSeed } from "@/lib/engine/rng";
@@ -36,16 +36,16 @@ function Shell({ game, score, level, maxLevel, best, onRestart, children }: {
     <section className="card overflow-hidden" aria-labelledby={`${game.id}-t`}>
       <header className="space-y-1 border-b border-slate-200 bg-slate-50 px-4 py-3">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 id={`${game.id}-t`} className="text-lg font-bold">{game.title}</h3>
+          <h3 id={`${game.id}-t`} className="text-lg font-bold">{frTypo(game.title)}</h3>
           <div className="ml-auto flex flex-wrap items-center gap-2 text-xs font-semibold">
             {level !== undefined && <span className="chip bg-violet-100 text-violet-800">Niveau {level}/{maxLevel}</span>}
             <span className="chip bg-indigo-100 text-indigo-800" aria-live="polite">{score}</span>
-            {best && <span className="chip bg-amber-100 text-amber-800">Record : {best}</span>}
+            {best && <span className="chip bg-amber-100 text-amber-800">Record : {best}</span>}
             {onRestart && <button type="button" className="btn-ghost px-2.5 py-1 text-xs" onClick={onRestart}>↺ Recommencer</button>}
           </div>
         </div>
-        <p className="text-sm text-slate-600"><span className="font-semibold">Objectif : </span>{game.objective}</p>
-        <p className="text-sm text-slate-600"><span className="font-semibold">Consigne : </span><MathInline text={game.instructions} /></p>
+        <p className="text-sm text-slate-600"><span className="font-semibold">Objectif : </span>{frTypo(game.objective)}</p>
+        <p className="text-sm text-slate-600"><span className="font-semibold">Consigne : </span><MathInline text={game.instructions} /></p>
       </header>
       <div className="p-4">{children}</div>
     </section>
@@ -61,7 +61,7 @@ function Finished({ score, total, onRestart }: { score: number; total: number; o
   return (
     <div className="space-y-3 text-center">
       <p className="text-2xl font-black">{score}/{total}</p>
-      <p className="text-slate-600">{score === total ? "Parfait !" : score >= total * 0.7 ? "Bien joué ! Rejoue pour viser le sans-faute." : "Relis la partie du cours concernée puis réessaie."}</p>
+      <p className="text-slate-600">{score === total ? "Parfait !" : score >= total * 0.7 ? "Bien joué ! Rejoue pour viser le sans-faute." : "Relis la partie du cours concernée puis réessaie."}</p>
       <button type="button" className="btn-primary" onClick={onRestart}>Rejouer</button>
     </div>
   );
@@ -101,7 +101,7 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
   const validate = () => {
     if (fb) return;
     const ans = round.type === "placer" ? cursor : parseRel(typed);
-    if (ans === null) { setNotice(round.type === "placer" ? "Place d'abord le point (clic, toucher ou boutons ← →)." : "Écris un nombre, par exemple −3 ou 2,5."); return; }
+    if (ans === null) { setNotice(round.type === "placer" ? "Place d'abord le point (clic, appui tactile ou boutons ← →)." : "Écris un nombre, par exemple −3 ou 2,5."); return; }
     setNotice("");
     const r = lineFeedback(round.target, ans, lv.step);
     setFb(r);
@@ -134,7 +134,7 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
   const labelEvery = count > 12 ? 2 : 1;
 
   return (
-    <Shell game={game} score={`Score : ${score}/${rounds}`} level={ad.level} maxLevel={levels.length} best={best !== null ? `${best}/${rounds}` : undefined} onRestart={restart}>
+    <Shell game={game} score={`Score : ${score}/${rounds}`} level={ad.level} maxLevel={levels.length} best={best !== null ? `${best}/${rounds}` : undefined} onRestart={restart}>
       {done ? <Finished score={score} total={rounds} onRestart={restart} /> : (
         <div className="space-y-3">
           <p className="font-medium" aria-live="polite">Manche {n + 1}/{rounds} — {round.type === "placer" ? <>Place le point <strong>M</strong> d'abscisse <strong>{frRel(round.target)}</strong>.</> : <>Lis l'abscisse du point <strong>M</strong>.</>}</p>
@@ -170,9 +170,9 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
               <p className="text-xs text-slate-500">Touche la droite, ou utilise ← → puis Entrée. Chaque graduation vaut {frRel(lv.step)}.</p>
             </div>
           ) : (
-            <label className="flex flex-wrap items-center gap-2 text-sm">Abscisse de M :
-              <input ref={inputRef} className="input w-32" inputMode="text" autoComplete="off" value={typed} disabled={!!fb} onChange={(e) => { setTyped(e.target.value); setNotice(""); }} onKeyDown={(e) => { if (e.key === "Enter") validate(); }} />
-              <span className="text-xs text-slate-500">(graduation : {frRel(lv.step)})</span>
+            <label className="flex flex-wrap items-center gap-2 text-sm">Abscisse de M :
+              <input ref={inputRef} className="input w-32" inputMode="text" autoComplete="off" value={typed} disabled={!!fb} onChange={(e) => { setTyped(e.target.value); setNotice(""); }} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); validate(); } }} />
+              <span className="text-xs text-slate-500">(graduation : {frRel(lv.step)})</span>
             </label>
           )}
           {notice && <p role="status" className="rounded-lg bg-amber-50 p-2 text-sm text-amber-900">{notice}</p>}
@@ -253,7 +253,7 @@ function CalculMental({ game }: { game: ChapterGame }) {
   const restart = () => { setPhase("accueil"); setFb(null); };
 
   return (
-    <Shell game={game} score={`Score : ${score}/${asked}`} level={phase === "accueil" ? undefined : ad.level} maxLevel={levels.length} best={best !== null ? `${best} (chrono)` : undefined} onRestart={restart}>
+    <Shell game={game} score={`Score : ${score}/${asked}`} level={phase === "accueil" ? undefined : ad.level} maxLevel={levels.length} best={best !== null ? `${best} (chrono)` : undefined} onRestart={restart}>
       {phase === "accueil" && (
         <div className="space-y-3 text-center">
           <p className="text-slate-600">Le niveau s'adapte à tes réussites. Commence par l'entraînement si les règles ne sont pas encore sûres.</p>
@@ -280,12 +280,12 @@ function CalculMental({ game }: { game: ChapterGame }) {
         </div>
       )}
       {phase === "fin" && (
-        <div className="space-y-3">
+        <div className="space-y-3" ref={(el) => { el?.querySelector("button")?.focus(); }}>
           {asked === 0 ? (
-            <div className="space-y-3 text-center"><p className="font-semibold">Temps écoulé : aucune réponse.</p><button type="button" className="btn-primary" onClick={restart}>Rejouer</button></div>
+            <div className="space-y-3 text-center"><p className="font-semibold">Temps écoulé : aucune réponse.</p><button type="button" className="btn-primary" onClick={restart}>Rejouer</button></div>
           ) : <Finished score={score} total={asked} onRestart={restart} />}
           {log.some((l) => !l.ok) && (
-            <div className="rounded-xl bg-slate-50 p-3 text-sm"><p className="mb-1 font-semibold">À revoir :</p>
+            <div className="rounded-xl bg-slate-50 p-3 text-sm"><p className="mb-1 font-semibold">À revoir :</p>
               <ul className="space-y-1">{log.filter((l) => !l.ok).map((l, i) => <li key={i}><MathInline text={`$${l.tex} = ${frRel(l.answer)}$`} /> <span className="text-slate-500">(ta réponse : {l.given})</span></li>)}</ul>
             </div>
           )}
@@ -333,19 +333,22 @@ function ChasseErreurs({ game }: { game: ChapterGame }) {
     setFb({ ok, message: (ok ? "Bien vu : " : `L'erreur était : « ${it.errors![it.error!]} ». `) + it.explanation });
     if (ok) setScore((s) => s + 1);
   };
-  const next = () => { const nk = k + 1; setK(nk); setVerdict(null); setChoice(null); setFb(null); if (nk >= items.length) record(score); };
+  const firstRef = useRef<HTMLButtonElement>(null);
+  const [moved, setMoved] = useState(false);
+  useEffect(() => { if (moved && !fb) firstRef.current?.focus(); }, [k, moved, fb]);
+  const next = () => { const nk = k + 1; setK(nk); setVerdict(null); setChoice(null); setFb(null); setMoved(true); if (nk >= items.length) record(score); };
   return (
-    <Shell game={game} score={`Score : ${score}/${items.length}`} level={done ? undefined : it.niveau} maxLevel={Math.max(...all.map((i) => i.niveau))} best={best !== null ? `${best}/${items.length}` : undefined} onRestart={restart}>
+    <Shell game={game} score={`Score : ${score}/${items.length}`} level={done ? undefined : it.niveau} maxLevel={Math.max(...all.map((i) => i.niveau))} best={best !== null ? `${best}/${items.length}` : undefined} onRestart={restart}>
       {done ? <Finished score={score} total={items.length} onRestart={restart} /> : (
         <div className="space-y-3">
           <p className="text-sm text-slate-500">Calcul {k + 1}/{items.length}</p>
           <div className="rounded-xl bg-slate-50 p-4 text-lg"><MathInline text={it.calc} /></div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Ce calcul est-il juste ?">
-            <button type="button" className={`btn-ghost ${verdict === true ? "ring-2 ring-indigo-500" : ""}`} onClick={() => judge(true)} disabled={verdict !== null}>✔ Juste</button>
+            <button ref={firstRef} type="button" className={`btn-ghost ${verdict === true ? "ring-2 ring-indigo-500" : ""}`} onClick={() => judge(true)} disabled={verdict !== null}>✔ Juste</button>
             <button type="button" className={`btn-ghost ${verdict === false ? "ring-2 ring-indigo-500" : ""}`} onClick={() => judge(false)} disabled={verdict !== null}>✘ Il y a une erreur</button>
           </div>
           {verdict === false && !it.correct && !fb && (
-            <div className="space-y-2"><p className="font-medium">Quelle est l'erreur ?</p>
+            <div className="space-y-2"><p className="font-medium">Quelle est l'erreur ?</p>
               <div className="grid gap-2 sm:grid-cols-2">{it.errors!.map((e, i) => <button key={i} type="button" className={`rounded-xl border-2 px-3 py-2 text-left text-sm ${FOCUS} ${choice === i ? "border-indigo-500" : "border-slate-200 hover:border-indigo-300"}`} onClick={() => pick(i)}><MathInline text={e} /></button>)}</div>
             </div>
           )}
@@ -391,7 +394,7 @@ function Memory({ game }: { game: ChapterGame }) {
     }
   };
   return (
-    <Shell game={game} score={`Paires : ${found.size}/${pairs.length} · Essais : ${tries}`} best={best !== null ? `${best} essais` : undefined} onRestart={restart}>
+    <Shell game={game} score={`Paires : ${found.size}/${pairs.length} · Essais : ${tries}`} best={best !== null ? `${best} essais` : undefined} onRestart={restart}>
       <p className="mb-2 text-xs text-slate-500">Il faut au minimum {pairs.length} essais ; moins tu en utilises, meilleur est ton record.</p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {cards.map((c, i) => {
@@ -406,7 +409,7 @@ function Memory({ game }: { game: ChapterGame }) {
         })}
       </div>
       <div className="mt-3"><Feedback fb={fb} /></div>
-      {done && <p className="mt-3 text-center font-semibold text-emerald-700">Toutes les paires ont été trouvées en {tries} essais !</p>}
+      {done && <p className="mt-3 text-center font-semibold text-emerald-700">Toutes les paires ont été trouvées en {tries} essais !</p>}
     </Shell>
   );
 }

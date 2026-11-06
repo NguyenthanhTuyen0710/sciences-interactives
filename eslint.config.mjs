@@ -19,6 +19,11 @@ const eslintConfig = [
     },
   },
   {
+    // Les tests inspectent l'union des interactions du moteur sans la retyper cas par cas.
+    files: ["tests/**/*.ts"],
+    rules: { "@typescript-eslint/no-explicit-any": "off" },
+  },
+  {
     ignores: [
       "node_modules/**",
       ".next/**",

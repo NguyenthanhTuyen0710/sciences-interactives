@@ -8,6 +8,7 @@ import type { Difficulty } from "@/lib/engine/types";
 import { Breadcrumbs, ExerciseCard } from "@/components/ui";
 import ExercisePlayer from "@/components/ExercisePlayer";
 import MathText from "@/components/MathText";
+import { frTypo } from "@/components/MathText";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,7 @@ export default async function ExercisePage({ params, searchParams }: { params: P
       ]} />
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <div>
-          <h1 className="mb-1 text-2xl font-black sm:text-3xl">{m.title}</h1>
+          <h1 className="mb-1 text-2xl font-black sm:text-3xl">{frTypo(m.title)}</h1>
           <p className="mb-4 text-slate-600">{m.summary}</p>
           <ExercisePlayer initial={{ meta: m, seed, difficulty: d, exercise }} syncUrl startTimed={sp.chrono === "1"} />
         </div>

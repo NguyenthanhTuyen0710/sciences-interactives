@@ -23,7 +23,7 @@ const SIGN_SUM_NEG = "La somme de deux nombres négatifs est **négative** : deu
 
 const O = {
   "M5-REL-01": "Définir les nombres relatifs.",
-  "M5-REL-02": "Définir et déterminer l'opposé d'un nombre ; savoir que $-a$ n'est pas toujours négatif.",
+  "M5-REL-02": "Définir l'opposé d'un nombre.",
   "M5-REL-03": "Définir la valeur absolue d'un nombre.",
   "M5-REL-04": "Définir positif, strictement positif, négatif, strictement négatif.",
   "M5-REL-05": "Utiliser les nombres relatifs pour représenter des grandeurs qui peuvent être inférieures à zéro (température, temps, altitude…).",
@@ -55,7 +55,7 @@ const EXERCISES: ChapterExercise[] = [
       { match: "1", feedback: "$+4$ et $4$ désignent le même nombre positif. « Sous zéro » se traduit par le signe −." },
     ])],
     solution: ["« Sous zéro » signifie inférieur à 0 : la température est négative.", "Sa distance à zéro est 4, d'où le nombre $-4$ (on lit « moins quatre »)."],
-    reasoning: "Un nombre relatif est formé d'un signe et d'une distance à zéro : le signe − indique « en dessous de 0 ».",
+    reasoning: "Le signe − indique « en dessous de 0 » ; la valeur absolue (ici 4) indique l'écart avec 0.",
     hints: ["La température est-elle au-dessus ou en dessous de 0 ?", "Les températures en dessous de 0 s'écrivent avec le signe −."],
   }),
   ex({
@@ -341,14 +341,14 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "rel5-22", title: "Somme de plusieurs relatifs", niveau: 3, objectives: ["M5-REL-10"], time: 90,
     vary: (rng) => {
-      const a = rng.int(2, 9);
-      const t = rng.shuffle([a, -a, rng.int(2, 12), -rng.int(2, 12), -rng.int(2, 12)]);
-      const s = t.reduce((u, v) => u + v, 0);
-      const pos = t.filter((v) => v > 0).reduce((u, v) => u + v, 0), neg = t.filter((v) => v < 0).reduce((u, v) => u + v, 0);
+      const a = rng.int(11, 89) / 10;
+      const t = rng.shuffle([a, -a, rng.int(11, 99) / 10, -rng.int(11, 99) / 10, -rng.int(2, 12)]);
+      const s = r1(t.reduce((u, v) => u + v, 0));
+      const pos = r1(t.filter((v) => v > 0).reduce((u, v) => u + v, 0)), neg = r1(t.filter((v) => v < 0).reduce((u, v) => u + v, 0));
       return {
         statement: `Calculer astucieusement $${t.map((v, i) => (i === 0 ? T(v) : P(v))).join(" + ")}$.`,
         parts: [num(s, s !== 0 ? [{ match: String(-s), feedback: "Erreur de signe sur le résultat final : compare la somme des positifs et celle des négatifs." }] : [])],
-        solution: [`On repère deux opposés, $${T(a)}$ et $${T(-a)}$ : leur somme est nulle, on les retire.`, `Termes restants positifs : $${pos - a}$ ; termes restants négatifs : $${T(neg + a)}$.`, `Résultat : $${pos - a} + ${P(neg + a)} = ${T(s)}$.`],
+        solution: [`On repère deux opposés, $${T(a)}$ et $${T(-a)}$ : leur somme est nulle, on les retire.`, `Termes restants positifs : $${T(r1(pos - a))}$ ; termes restants négatifs : $${T(r1(neg + a))}$.`, `Résultat : $${T(r1(pos - a))} + ${P(r1(neg + a))} = ${T(s)}$.`],
       };
     },
     reasoning: "Dans une suite d'additions, on peut changer l'ordre et regrouper les termes : opposés ensemble, positifs ensemble, négatifs ensemble.",
@@ -589,7 +589,7 @@ export const math5eNombresRelatifs: ChapterContent = {
   lesson: {
     introduction: "Il fait $3$ °C le soir et la température baisse de $5$ degrés pendant la nuit. Avec les nombres connus jusqu'ici, le calcul $3 - 5$ est impossible ! Pourtant le thermomètre indique bien une température : **2 degrés sous zéro**, que l'on note $-2$ °C.\nLes **nombres relatifs** (positifs et négatifs) permettent de décrire tout ce qui peut passer « sous zéro » : températures, altitudes sous le niveau de la mer, étages en sous-sol, dettes… Ils rendent toutes les soustractions possibles.\nLe savais-tu ? Des calculs avec des quantités négatives apparaissent déjà dans un ouvrage chinois ancien, *Les Neuf Chapitres*, et le mathématicien indien Brahmagupta en énonce des règles vers l'an 600 ; mais en Europe certains savants refusaient encore de les considérer comme des nombres au XVIIe siècle.",
     definitions: [
-      { term: "Nombres relatifs", text: "Les **nombres relatifs** sont les nombres positifs et leurs opposés, les nombres négatifs. Un nombre relatif s'écrit avec un **signe** ($+$ ou $-$) et une **partie numérique**. Les nombres précédés de $-$ sont **négatifs** ; ceux précédés de $+$ (que l'on peut omettre : $+3 = 3$) sont **positifs**.\nExemples : $-4{,}5$ a pour signe $-$ et pour partie numérique $4{,}5$ ; $7$ a pour signe $+$ et pour partie numérique $7$." },
+      { term: "Nombres relatifs", text: "Les **nombres relatifs** sont les nombres positifs et leurs opposés, les nombres négatifs. Un nombre relatif s'écrit avec un **signe** ($+$ ou $-$) suivi d'un nombre positif. Les nombres précédés de $-$ sont **négatifs** ; ceux précédés de $+$ (que l'on peut omettre : $+3 = 3$) sont **positifs**.\nExemples : $-4{,}5$ est négatif ; $7$ (ou $+7$) est positif." },
       { term: "Positif, négatif, strictement", text: "Un nombre est **positif** s'il est supérieur ou égal à $0$ (on note $a \\geqslant 0$), **strictement positif** s'il est supérieur à $0$ ($a > 0$).\nUn nombre est **négatif** s'il est inférieur ou égal à $0$ (on note $a \\leqslant 0$), **strictement négatif** s'il est inférieur à $0$ ($a < 0$).\n$0$ est le seul nombre à la fois positif et négatif ; il n'est ni strictement positif, ni strictement négatif." },
       { term: "Droite graduée, abscisse", text: "Une droite graduée possède une origine (le point d'abscisse $0$), un sens et une unité reportée régulièrement **des deux côtés** de l'origine. Chaque point est repéré par un nombre relatif, son **abscisse** : positive à droite de l'origine, négative à gauche." },
       { term: "Opposé", text: "Deux nombres sont **opposés** lorsque leur somme est égale à $0$. L'opposé de $a$ se note $-a$.\nExemples : l'opposé de $5$ est $-5$ ; l'opposé de $-2{,}3$ est $2{,}3$ ; l'opposé de $0$ est $0$." },
@@ -634,13 +634,13 @@ export const math5eNombresRelatifs: ChapterContent = {
       { mistake: "Placer $(-2\\,;\\,3)$ au point $(3\\,;\\,-2)$", correction: "Abscisse $-2$ (horizontal), puis ordonnée $3$ (vertical)", why: "Les coordonnées s'écrivent toujours dans l'ordre (abscisse ; ordonnée)." },
     ],
     methods: [
-      { title: "Additionner deux relatifs", steps: ["Regarder les signes des deux nombres.", "Même signe : additionner les distances à zéro et garder le signe.", "Signes contraires : soustraire les distances à zéro et prendre le signe du nombre le plus éloigné de zéro.", "Contrôler le signe obtenu avec la droite graduée."] },
+      { title: "Additionner deux relatifs", steps: ["Regarder les signes des deux nombres.", "Même signe : additionner les valeurs absolues et garder le signe.", "Signes contraires : soustraire les valeurs absolues et prendre le signe du nombre qui a la plus grande valeur absolue.", "Contrôler le signe obtenu avec la droite graduée."] },
       { title: "Soustraire deux relatifs", steps: ["Garder le premier nombre.", "Remplacer « $-$ nombre » par « $+$ opposé du nombre ».", "Calculer l'addition obtenue."] },
       { title: "Calculer une suite d'additions et de soustractions", steps: ["Transformer toutes les soustractions en additions.", "Écrire la somme simplifiée (sans parenthèses ni « + » d'addition).", "Regrouper les opposés, puis les positifs, puis les négatifs.", "Additionner les deux résultats."] },
       { title: "Résoudre un problème avec des relatifs", steps: ["Repérer l'état initial, les variations, l'état cherché.", "Écrire le calcul : état final = état initial + variations, ou variation = final − initial.", "Calculer, puis vérifier le sens du résultat (hausse ou baisse ?)."] },
     ],
     summary: [
-      "Un nombre relatif s'écrit avec un signe et une partie numérique ; sa valeur absolue est sa distance à zéro sur la droite graduée.",
+      "Un nombre relatif s'écrit avec un signe ; sa valeur absolue est sa distance à zéro sur la droite graduée.",
       "$0$ est positif et négatif, mais ni strictement positif ni strictement négatif.",
       "Deux nombres opposés ont une somme nulle ; $-(-a) = a$ ; $-a$ n'est pas toujours négatif.",
       "Entre deux négatifs, le plus grand est le plus proche de $0$.",
@@ -686,7 +686,7 @@ export const math5eNombresRelatifs: ChapterContent = {
         { niveau: 1, calc: "$(-3) + (-4) = -7$", correct: true, explanation: "Même signe : $3 + 4 = 7$, signe $-$." },
         { niveau: 1, calc: "$(-3) + (-4) = 7$", correct: false, errors: ["Une somme de deux négatifs est négative", "Il fallait calculer $4 - 3$", "Le calcul est impossible"], error: 0, explanation: "$(-3) + (-4) = -7$ : deux baisses font encore baisser." },
         { niveau: 1, calc: "$-7 > -3$", correct: false, errors: ["Entre deux négatifs, le plus grand est le plus proche de 0", "Il faut comparer 7 et 3 sans les signes", "Un négatif est toujours plus grand qu'un positif"], error: 0, explanation: "$-7 < -3$ : $-3$ est plus proche de $0$." },
-        { niveau: 2, calc: "$(-8) + 5 = -13$", correct: false, errors: ["Signes contraires : il fallait soustraire les distances à zéro ($8 - 5$)", "Le signe devrait être +", "On peut changer l'ordre dans une soustraction"], error: 0, explanation: "$(-8) + 5 = -3$." },
+        { niveau: 2, calc: "$(-8) + 5 = -13$", correct: false, errors: ["Signes contraires : il fallait soustraire les distances à zéro ($8 - 5$)", "Le signe devrait être +", "Il fallait garder le signe de $5$"], error: 0, explanation: "$(-8) + 5 = -3$." },
         { niveau: 2, calc: "$3 + (-8) = 5$", correct: false, errors: ["Le résultat prend le signe du nombre le plus éloigné de zéro", "Il fallait additionner 3 et 8", "Le résultat est positif car $3$ est positif"], error: 0, explanation: "$3 + (-8) = -5$ : $-8$ est le plus éloigné de $0$." },
         { niveau: 2, calc: "$6 + (-6) = 0$", correct: true, explanation: "Deux nombres opposés ont une somme nulle." },
         { niveau: 3, calc: "$5 - (-3) = 2$", correct: false, errors: ["Soustraire $-3$, c'est ajouter $3$", "Il fallait changer le signe de 5", "Le résultat doit être négatif"], error: 0, explanation: "$5 - (-3) = 5 + 3 = 8$." },

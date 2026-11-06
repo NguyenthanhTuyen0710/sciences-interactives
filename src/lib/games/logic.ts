@@ -72,7 +72,7 @@ export function calcQuestion(rng: Rng, lv: CalcLevel): CalcQuestion {
   if (a > 0 && b > 0) b = -b;
   const op = rng.pick(lv.ops);
   const answer = Math.round((op === "+" ? a + b : a - b) * 1000) / 1000;
-  return { a, b, op, answer, tex: `${frRel(a)} ${op === "+" ? "+" : "-"} ${par(b)}`.replace(/-/g, "−") };
+  return { a, b, op, answer, tex: `${frRel(a)} ${op === "+" ? "+" : "-"} ${par(b)}`.replace(/-/g, "−").replace(/,/g, "{,}") };
 }
 
 /** Diagnostic des erreurs fréquentes sur une somme ou une différence de relatifs. */
