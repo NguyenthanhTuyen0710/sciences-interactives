@@ -67,6 +67,9 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
     if (a.fraction && p.isFraction && p.num !== undefined && Number.isInteger(p.num) && Number.isInteger(p.den!) && gcd(p.num, p.den!) > 1) {
       return { ok: false, partial: true, feedback: ["Valeur juste, mais la fraction n'est pas irréductible : simplifiez-la."] };
     }
+    if (a.tol && a.decimals !== undefined && !p.isFraction && p.decimals > a.decimals) {
+      return { ok: false, partial: true, feedback: [`Valeur juste, mais il faut arrondir le résultat${a.roundingLabel ? " " + a.roundingLabel : ` à ${a.decimals} chiffre${a.decimals > 1 ? "s" : ""} après la virgule`}.`] };
+    }
     if (a.sigFigs && !p.isFraction && p.sigFigs !== a.sigFigs) {
       return {
         ok: false,

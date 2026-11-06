@@ -121,6 +121,9 @@ export function flashFeedback(item: FlashItem, raw: string): { ok: boolean; mess
   if (!nearlyEqual(p.value, exp.value)) return { ok: false, message: `Réponse attendue : ${shown}. ${item.explanation}` };
   if (item.irreducible && p.isFraction && Number.isInteger(p.num) && Number.isInteger(p.den) && gcd(p.num!, p.den!) > 1)
     return { ok: false, message: `Valeur juste, mais la fraction n'est pas irréductible : ${shown}. ${item.explanation}` };
+  // Fraction irréductible attendue (réponse non entière) : une écriture décimale n'est pas acceptée.
+  if (item.irreducible && exp.isFraction && !p.isFraction)
+    return { ok: false, message: `On attend une fraction irréductible : ${shown}. ${item.explanation}` };
   return { ok: true, message: item.explanation };
 }
 

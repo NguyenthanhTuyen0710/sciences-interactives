@@ -89,6 +89,8 @@ export function parseNumber(input: string): ParsedNumber | null {
     .trim()
     .replace(/[    ]/g, "")
     .replace(/[−–]/g, "-")
+    // « 35 % » ou « 12 € » : l'unité affichée à côté de la case peut aussi être tapée
+    .replace(/(\d)(%|€)$/, "$1")
     .replace(/,/g, ".")
     .replace(/[×x*·]10\^?\(?([+-]?\d+)\)?$/i, "e$1")
     .replace(/^10\^\(?([+-]?\d+)\)?$/, "1e$1")

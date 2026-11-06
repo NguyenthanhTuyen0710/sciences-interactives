@@ -354,7 +354,7 @@ function ChasseErreurs({ game }: { game: ChapterGame }) {
     if (fb) return;
     setVerdict(v);
     if (v === it.correct && it.correct) { setFb({ ok: true, message: it.explanation }); setScore((s) => s + 1); }
-    else if (v !== it.correct) setFb({ ok: false, message: (it.correct ? "Ce calcul est juste. " : "Ce calcul contient une erreur. ") + it.explanation });
+    else if (v !== it.correct) setFb({ ok: false, message: (it.correct ? "C'est juste. " : "Il y a une erreur. ") + it.explanation });
   };
   const pick = (i: number) => {
     if (fb) return;
@@ -371,9 +371,9 @@ function ChasseErreurs({ game }: { game: ChapterGame }) {
     <Shell game={game} score={`Score : ${score}/${items.length}`} level={done ? undefined : it.niveau} maxLevel={Math.max(...all.map((i) => i.niveau))} best={best !== null ? `${best}/${items.length}` : undefined} onRestart={restart}>
       {done ? <Finished score={score} total={items.length} onRestart={restart} /> : (
         <div className="space-y-3">
-          <p className="text-sm text-slate-500">Calcul {k + 1}/{items.length}</p>
+          <p className="text-sm text-slate-500">Question {k + 1}/{items.length}</p>
           <div className="rounded-xl bg-slate-50 p-4 text-lg"><MathInline text={it.calc} /></div>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Ce calcul est-il juste ?">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Est-ce juste ?">
             <button ref={firstRef} type="button" className={`btn-ghost ${verdict === true ? "ring-2 ring-indigo-500" : ""}`} onClick={() => judge(true)} disabled={verdict !== null}>✔ Juste</button>
             <button type="button" className={`btn-ghost ${verdict === false ? "ring-2 ring-indigo-500" : ""}`} onClick={() => judge(false)} disabled={verdict !== null}>✘ Il y a une erreur</button>
           </div>

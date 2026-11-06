@@ -61,6 +61,16 @@ export function describeChapter(c: ChapterContent) {
         }
       }
     });
+    it("chaque générateur `vary` produit réellement des énoncés différents", () => {
+      for (const e of c.exercises.filter((x) => x.vary)) {
+        const seen = new Set<string>();
+        for (let k = 0; k < 40; k++) {
+          const b = e.vary!(createRng(`d${k}`));
+          seen.add(b.statement + JSON.stringify(b.parts.map((p) => p.interaction)));
+        }
+        expect(seen.size, `${e.id} : tirage constant`).toBeGreaterThan(1);
+      }
+    });
     for (const e of c.exercises) {
       it(`${e.id} : réponse parfaite = 100 %, diagnostics distincts de la bonne réponse, sans fuite`, () => {
         const g = exerciseGenerator(c, e);

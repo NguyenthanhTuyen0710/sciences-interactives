@@ -47,7 +47,9 @@ describe("logique des jeux", () => {
   it("calcul flash : correction, fraction non irréductible, saisie illisible, affichage", () => {
     const it0 = { q: "$\\dfrac{1}{2} + \\dfrac{1}{4}$", answer: "3/4", irreducible: true, explanation: "On réduit au même dénominateur." };
     expect(flashFeedback(it0, "3/4")?.ok).toBe(true);
-    expect(flashFeedback(it0, "0,75")?.ok).toBe(true);
+    expect(flashFeedback(it0, "0,75")?.ok).toBe(false);
+    expect(flashFeedback(it0, "0,75")?.message).toMatch(/fraction irréductible/);
+    expect(flashFeedback({ ...it0, answer: "4" }, "4")?.ok).toBe(true);
     expect(flashFeedback(it0, "6/8")?.ok).toBe(false);
     expect(flashFeedback(it0, "6/8")?.message).toMatch(/irréductible/);
     expect(flashFeedback(it0, "2/3")?.message).toMatch(/attendue/);
