@@ -5,7 +5,7 @@
 // Hors programme 3e (non traité) : taux moyen, indices base 100, intérêts composés formalisés, suites géométriques.
 import type { ChapterContent, ChapterExercise, ChapterPart } from "../schema";
 import type { Mistake, Rng } from "../../engine/types";
-import { fr, frFixed, gcd, roundTo, tex } from "../../engine/numbers";
+import { frFixed, roundTo, tex } from "../../engine/numbers";
 
 const T = (x: number) => tex(x);
 /** Montant en euros avec deux décimales (LaTeX). */
