@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-06T00:00:00.000Z",
+  "tasks": [
+    { "id": "SCI-INFRA-001", "kind": "infra", "title": "Audit du dépôt et base de référence (tests, typage, lint, build)", "state": "PUBLISHED", "owner": "Orchestrateur", "files": ["project/reports/SCI-INFRA-001-orchestrateur.md"], "next": "" },
+    { "id": "SCI-INFRA-002", "kind": "infra", "title": "Contrat de données chapitre, modèles de jeux, registre et tableau de bord", "state": "INTEGRATED", "owner": "B4", "files": ["src/lib/chapters/schema.ts", "src/lib/chapters/index.ts", "src/lib/games/logic.ts", "src/components/games/Games.tsx", "scripts/dashboard.ts"], "next": "Revue QA5 avec le chapitre pilote" },
+    { "id": "SCI-RES-001", "kind": "research", "title": "A1 — Inventaire officiel mathématiques 6e-3e (2026-2027)", "state": "RESEARCHING", "owner": "A1", "files": ["research/curriculum/mathematiques/"], "next": "Fusion dans master-curriculum.json (npm run dashboard -- sync)" },
+    { "id": "SCI-RES-002", "kind": "research", "title": "A3 — Inventaire officiel physique-chimie 6e-3e (2026-2027)", "state": "RESEARCHING", "owner": "A3", "files": ["research/curriculum/physique-chimie/"], "next": "Fusion dans master-curriculum.json" },
+    { "id": "SCI-DNB-MATH-001", "kind": "brevet", "title": "A4 — Format DNB session 2027 et carte des compétences", "state": "RESEARCHING", "owner": "A4", "files": ["research/brevet/"], "next": "Matrice de compétences DNB" },
+    { "id": "SCI-5E-MATH-001", "kind": "chapter", "title": "Nombres relatifs (5e) — tranche verticale pilote", "state": "RESEARCHING", "grade": "5e", "subject": "mathematiques", "chapterId": "math-5e-nombres-relatifs", "owner": "A2", "dependsOn": ["SCI-INFRA-002"], "files": ["research/dossiers/math-5e-nombres-relatifs.md", "src/lib/chapters/data/math-5e-nombres-relatifs.ts"], "next": "B1/B2/B3 : rédaction à partir du dossier" }
+  ]
+}

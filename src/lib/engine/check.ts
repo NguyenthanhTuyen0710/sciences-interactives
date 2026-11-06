@@ -1,5 +1,5 @@
 // Moteur de correction : une fonction pure par type d'interaction.
-import type { CheckResult, ExerciseInstance, Interaction, NumAnswer, PartResult } from "./types";
+import type { CheckResult, ExerciseInstance, Interaction, Mistake, NumAnswer, PartResult } from "./types";
 import { fr, fracTex, frFixed, gcd, nearlyEqual, parseNumber, roundSig, sciTex, simplify } from "./numbers";
 import { convert } from "./units";
 import { equivalent, isReducedPolynomial, normalizeExpr, safeParse, usesUnknownSymbols } from "./expr";
@@ -254,8 +254,32 @@ export function checkPart(it: Interaction, r: unknown): PartResult {
   }
 }
 
+/** La réponse de l'élève correspond-elle à une erreur fréquente déclarée ? */
+export function matchesMistake(it: Interaction, r: unknown, m: Mistake): boolean {
+  switch (it.kind) {
+    case "numerique": {
+      const v = parseNumber(String((r as { value?: string } | undefined)?.value ?? ""));
+      const e = parseNumber(m.match);
+      return !!v && !!e && nearlyEqual(v.value, e.value, 0);
+    }
+    case "qcm": {
+      const sel = arr<number>(r).map(Number);
+      return sel.length === 1 && String(sel[0]) === m.match;
+    }
+    case "texte-libre":
+      return normText(String(r ?? "")) === normText(m.match);
+    default:
+      return false;
+  }
+}
+
 export function checkExercise(inst: ExerciseInstance, responses: unknown[]): CheckResult {
-  const parts = inst.parts.map((p, i) => checkPart(p.interaction, responses?.[i]));
+  const parts = inst.parts.map((p, i) => {
+    const res = checkPart(p.interaction, responses?.[i]);
+    if (res.status === "correct" || !p.mistakes) return res;
+    const hit = p.mistakes.find((m) => matchesMistake(p.interaction, responses?.[i], m));
+    return hit ? { ...res, feedback: [hit.feedback, ...res.feedback.filter((f) => f !== "Attention au signe !")] } : res;
+  });
   const score = parts.reduce((s, p) => s + p.score, 0) / Math.max(1, parts.length);
   return { parts, score, solution: inst.solution, rappel: inst.rappel };
 }

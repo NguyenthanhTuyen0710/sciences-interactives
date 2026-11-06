@@ -24,6 +24,7 @@ export interface PublicExercise {
   statement: string;
   figure?: Figure;
   parts: { prompt?: string; interaction: PublicInteraction }[];
+  hints?: string[];
 }
 
 export function toPublicInteraction(it: Interaction): PublicInteraction {
@@ -68,5 +69,6 @@ export function toPublic(inst: ExerciseInstance): PublicExercise {
     statement: inst.statement,
     figure: inst.figure,
     parts: inst.parts.map((p) => ({ prompt: p.prompt, interaction: toPublicInteraction(p.interaction) })),
+    ...(inst.hints?.length ? { hints: inst.hints } : {}),
   };
 }

@@ -79,9 +79,18 @@ export type Figure =
   | { kind: "image"; src: string; alt: string; caption?: string }
   | { kind: "video"; src: string; caption?: string };
 
+/** Erreur fréquente anticipée : si la réponse de l'élève correspond, on affiche un diagnostic ciblé. */
+export interface Mistake {
+  /** Numérique : valeur (« -3 », « 7/4 ») ; QCM : index de l'option choisie ; texte : réponse normalisée. */
+  match: string;
+  feedback: string;
+}
+
 export interface Part {
   prompt?: string;
   interaction: Interaction;
+  /** Diagnostics d'erreurs fréquentes (jamais envoyés au navigateur). */
+  mistakes?: Mistake[];
 }
 
 export interface ExerciseInstance {
@@ -92,6 +101,8 @@ export interface ExerciseInstance {
   solution: string[];
   /** Rappel de cours affiché avec la correction. */
   rappel?: string;
+  /** Indices progressifs (dévoilés un par un ; ne contiennent pas la réponse). */
+  hints?: string[];
 }
 
 export interface ExerciseMeta {
@@ -107,6 +118,10 @@ export interface ExerciseMeta {
   randomized: "valeurs" | "banque";
   /** Durée suggérée en secondes pour le mode chronométré. */
   timeLimit?: number;
+  /** Exercice de banque d'un chapitre : niveau 1 (Découverte) à 5 (Défi), sans sélecteur de difficulté. */
+  niveau?: 1 | 2 | 3 | 4 | 5;
+  /** Objectifs officiels travaillés (identifiants du référentiel). */
+  objectives?: string[];
 }
 
 export interface Rng {
