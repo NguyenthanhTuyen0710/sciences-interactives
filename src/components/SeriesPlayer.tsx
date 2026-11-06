@@ -79,7 +79,7 @@ export default function SeriesPlayer({ items, title, mode, totalTime, intro }: {
         {totalTime ? <span className={`rounded-lg px-2.5 py-1 font-mono font-bold ${remaining < 60 ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-800"}`}>⏱ {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, "0")}</span> : null}
         <span className="text-sm text-slate-500">{points[step].toFixed(1).replace(".", ",")} pt</span>
       </div>
-      {error && <p className="text-rose-600">{error}</p>}
+      {error && <p className="text-rose-400">{error}</p>}
       {current ? (
         <div>
           <h2 className="mb-2 text-lg font-bold">{current.meta.title}</h2>

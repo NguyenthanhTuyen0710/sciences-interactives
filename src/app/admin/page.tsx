@@ -36,7 +36,7 @@ export default async function AdminHome() {
                   <td className="text-slate-500">{c.updatedAt.toLocaleDateString("fr-FR")}</td>
                   <td className="space-x-3 text-right whitespace-nowrap">
                     <Link href={`/exercice/perso-${c.id}`} className="text-sm font-semibold text-slate-600 hover:underline">Voir</Link>
-                    <Link href={`/admin/exercices/${c.id}`} className="text-sm font-semibold text-indigo-600 hover:underline">Modifier</Link>
+                    <Link href={`/admin/exercices/${c.id}`} className="text-sm font-semibold text-indigo-400 hover:underline">Modifier</Link>
                     <DeleteButton url={`/api/admin/exercises/${c.id}`} confirmText={`Supprimer « ${c.title} » ?`} />
                   </td>
                 </tr>
@@ -66,7 +66,7 @@ export default async function AdminHome() {
               <thead className="text-left text-xs text-slate-500"><tr><th className="py-1">Élève</th><th>Classe</th><th>Tent.</th><th>Moy.</th><th>Dernière activité</th></tr></thead>
               <tbody>{stats.perStudent.map((s) => (
                 <tr key={s.id} className="border-t border-slate-100"><td className="py-1.5 font-medium">{s.name}</td><td>{s.level ?? "—"}</td><td>{s.n}</td>
-                  <td className={s.avg >= 0.75 ? "text-emerald-600" : s.avg >= 0.5 ? "text-amber-600" : "text-rose-600"}>{s.n ? `${Math.round(s.avg * 100)} %` : "—"}</td>
+                  <td className={s.avg >= 0.75 ? "text-emerald-400" : s.avg >= 0.5 ? "text-amber-400" : "text-rose-400"}>{s.n ? `${Math.round(s.avg * 100)} %` : "—"}</td>
                   <td className="text-slate-500">{s.last ? new Date(s.last).toLocaleDateString("fr-FR") : "—"}</td></tr>
               ))}</tbody>
             </table>

@@ -26,14 +26,14 @@ export default async function Home() {
   return (
     <div className="space-y-10">
       {/* Bienvenue */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-600 to-emerald-600 px-6 py-10 text-white sm:px-10 sm:py-14">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#312e81] via-[#3730a3] to-[#065f46] px-6 py-10 text-white sm:px-10 sm:py-14">
         <div className="relative z-10 max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-indigo-100">{user ? `Bonjour ${user.name} 👋` : "Collège · Lycée · De la 6e à la Terminale"}</p>
-          <h1 className="mt-2 text-3xl font-black leading-tight sm:text-5xl">Apprendre les maths et la physique-chimie en <span className="text-emerald-200">pratiquant</span>.</h1>
-          <p className="mt-4 text-indigo-50 sm:text-lg">Des exercices interactifs générés à l'infini, corrigés instantanément, avec des solutions détaillées étape par étape.</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-white/75">{user ? `Bonjour ${user.name} 👋` : "Collège · Lycée · De la 6e à la Terminale"}</p>
+          <h1 className="mt-2 text-3xl font-black leading-tight sm:text-5xl">Apprendre les maths et la physique-chimie en <span className="text-emerald-300">pratiquant</span>.</h1>
+          <p className="mt-4 text-white/85 sm:text-lg">Des exercices interactifs générés à l'infini, corrigés instantanément, avec des solutions détaillées étape par étape.</p>
           <form action="/exercices" className="mt-6 flex max-w-lg gap-2" role="search">
             <input name="q" placeholder="Fractions, Pythagore, loi d'Ohm, pH…" aria-label="Rechercher" className="min-w-0 flex-1 rounded-xl border-0 px-4 py-3 text-slate-900 outline-none ring-2 ring-white/30 focus:ring-white" />
-            <button className="rounded-xl bg-slate-900 px-5 font-semibold hover:bg-black">Rechercher</button>
+            <button className="rounded-xl bg-black/30 px-5 font-semibold hover:bg-black/50">Rechercher</button>
           </form>
         </div>
         <div aria-hidden className="pointer-events-none absolute -right-6 top-6 hidden select-none text-right font-serif text-white/15 lg:block">
@@ -54,7 +54,7 @@ export default async function Home() {
               <div>
                 <h2 className="text-xl font-bold">{S.label}</h2>
                 <p className="text-sm text-slate-600">{S.description}</p>
-                <p className={`mt-1 text-sm font-semibold ${s === "maths" ? "text-indigo-600" : "text-emerald-600"}`}>{n} exercices interactifs →</p>
+                <p className={`mt-1 text-sm font-semibold ${s === "maths" ? "text-indigo-400" : "text-emerald-400"}`}>{n} exercices interactifs →</p>
               </div>
             </Link>
           );
@@ -66,7 +66,7 @@ export default async function Home() {
         <h2 className="mb-3 text-lg font-bold">Choisir sa classe</h2>
         <div className="flex flex-wrap gap-2">
           {LEVELS.map((l) => (
-            <Link key={l.id} href={`/exercices?niveau=${l.id}`} className={`rounded-xl border-2 px-4 py-2 font-semibold transition hover:border-indigo-500 hover:text-indigo-700 ${user?.level === l.id ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-slate-200 bg-white text-slate-700"}`}>
+            <Link key={l.id} href={`/exercices?niveau=${l.id}`} className={`rounded-xl border-2 px-4 py-2 font-semibold transition hover:border-indigo-500 hover:text-indigo-700 ${user?.level === l.id ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-slate-200 bg-surface text-slate-700"}`}>
               {l.short} <span className="text-xs font-normal text-slate-400">{l.cycle}</span>
             </Link>
           ))}
@@ -99,7 +99,7 @@ export default async function Home() {
               {dash.chapters.slice(0, 3).map((c) => (
                 <div key={c.chapterId} className="text-sm"><div className="mb-1 flex justify-between"><span>{c.title}</span><span className="text-slate-500">{c.done}/{c.total}</span></div><Bar value={c.done / c.total} /></div>
               ))}
-              <Link href="/mon-espace" className="text-sm font-semibold text-indigo-600 hover:underline">Tableau de bord complet →</Link>
+              <Link href="/mon-espace" className="text-sm font-semibold text-indigo-400 hover:underline">Tableau de bord complet →</Link>
             </div>
           ) : (
             <div className="mt-3 space-y-3 text-sm text-slate-600">

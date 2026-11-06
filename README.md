@@ -37,7 +37,7 @@ Inscription enseignant : code d'invitation défini par `TEACHER_INVITE_CODE` (d�
 ## Tests
 
 ```bash
-npm test                          # 59 tests unitaires : 50 générateurs × 3 difficultés × 60 tirages + moteur de correction
+npm test                          # 77 tests unitaires : 68 générateurs × 3 difficultés × 60 tirages + moteur de correction
 npm start &                       # puis, serveur lancé :
 npm run test:e2e                  # Playwright : chaque exercice est rempli via l'interface avec la bonne réponse → 100 %
 ```

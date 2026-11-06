@@ -45,7 +45,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       {error && <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700" role="alert">{error}</p>}
       <button className="btn-primary w-full" disabled={busy}>{busy ? "Patientez…" : mode === "login" ? "Se connecter" : "Créer mon compte"}</button>
       <p className="text-center text-sm text-slate-600">
-        {mode === "login" ? <>Pas encore de compte ? <Link href="/inscription" className="font-semibold text-indigo-600">Inscription</Link></> : <>Déjà inscrit ? <Link href="/connexion" className="font-semibold text-indigo-600">Connexion</Link></>}
+        {mode === "login" ? <>Pas encore de compte ? <Link href="/inscription" className="font-semibold text-indigo-400">Inscription</Link></> : <>Déjà inscrit ? <Link href="/connexion" className="font-semibold text-indigo-400">Connexion</Link></>}
       </p>
     </form>
   );

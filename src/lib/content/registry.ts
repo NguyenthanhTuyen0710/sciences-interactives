@@ -3,12 +3,13 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { Generator, ExerciseMeta } from "../engine/types";
 import * as MC from "./maths-college";
+import * as M6 from "./maths-6e";
 import * as ML from "./maths-lycee";
 import * as PC from "./physique";
 import { customToGenerator } from "./custom";
 import { db, schema } from "../db";
 
-export const STATIC_GENERATORS: Generator[] = [...Object.values(MC), ...Object.values(ML), ...Object.values(PC)];
+export const STATIC_GENERATORS: Generator[] = [...Object.values(MC), ...Object.values(M6), ...Object.values(ML), ...Object.values(PC)];
 const BY_ID = new Map(STATIC_GENERATORS.map((g) => [g.meta.id, g]));
 
 export async function getGenerator(id: string): Promise<Generator | null> {

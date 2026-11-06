@@ -39,7 +39,7 @@ export default async function RevisionsPage() {
         <section className="card p-5 lg:col-span-2">
           <h2 className="text-xl font-bold">🩺 Mes points faibles</h2>
           {!user ? (
-            <p className="mt-2 text-sm text-slate-600"><Link href="/connexion" className="font-semibold text-indigo-600">Connectez-vous</Link> pour obtenir un programme de révision basé sur vos résultats.</p>
+            <p className="mt-2 text-sm text-slate-600"><Link href="/connexion" className="font-semibold text-indigo-400">Connectez-vous</Link> pour obtenir un programme de révision basé sur vos résultats.</p>
           ) : dash && dash.weak.length ? (
             <ul className="mt-3 grid gap-3 sm:grid-cols-2">
               {dash.weak.map((w) => {

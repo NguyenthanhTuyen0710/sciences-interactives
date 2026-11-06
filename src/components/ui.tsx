@@ -9,7 +9,7 @@ export function Breadcrumbs({ items }: { items: { href?: string; label: string }
       {items.map((it, i) => (
         <span key={i} className="flex items-center gap-1">
           {i > 0 && <span aria-hidden>›</span>}
-          {it.href ? <Link href={it.href} className="hover:text-indigo-600 hover:underline">{it.label}</Link> : <span className="font-medium text-slate-800">{it.label}</span>}
+          {it.href ? <Link href={it.href} className="hover:text-indigo-400 hover:underline">{it.label}</Link> : <span className="font-medium text-slate-800">{it.label}</span>}
         </span>
       ))}
     </nav>
@@ -33,7 +33,7 @@ export function ExerciseCard({ m, difficulty, note }: { m: ExerciseMeta; difficu
       <h3 className="font-semibold text-slate-900 group-hover:text-indigo-700">{m.title}</h3>
       <p className="line-clamp-2 text-sm text-slate-600">{note ?? m.summary}</p>
       <div className="mt-auto flex flex-wrap gap-1 pt-1">
-        {m.kinds.map((k) => <span key={k} className="chip bg-white text-slate-500 ring-1 ring-slate-200">{KIND_LABELS[k]}</span>)}
+        {m.kinds.map((k) => <span key={k} className="chip bg-surface text-slate-500 ring-1 ring-slate-200">{KIND_LABELS[k]}</span>)}
       </div>
     </Link>
   );

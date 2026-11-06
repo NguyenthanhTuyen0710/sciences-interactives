@@ -5,7 +5,7 @@ import { useState } from "react";
 export function DeleteButton({ url, label = "Supprimer", confirmText }: { url: string; label?: string; confirmText: string }) {
   const router = useRouter();
   return (
-    <button type="button" className="text-sm font-semibold text-rose-600 hover:underline" onClick={async () => {
+    <button type="button" className="text-sm font-semibold text-rose-400 hover:underline" onClick={async () => {
       if (!confirm(confirmText)) return;
       const r = await fetch(url, { method: "DELETE" });
       if (!r.ok) alert("Suppression impossible.");

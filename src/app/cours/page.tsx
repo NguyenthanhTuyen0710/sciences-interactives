@@ -13,8 +13,8 @@ export default async function CoursPage({ searchParams }: { searchParams: Promis
       <h1 className="mb-1 text-3xl font-black">Cours et fiches de révision</h1>
       <p className="mb-4 text-slate-600">Définitions, propriétés, méthodes et exemples, notion par notion.</p>
       <div className="mb-6 flex flex-wrap gap-2">
-        <Link href="/cours" className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${!niveau ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white"}`}>Tous</Link>
-        {LEVELS.map((l) => <Link key={l.id} href={`/cours?niveau=${l.id}`} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${niveau === l.id ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white"}`}>{l.short}</Link>)}
+        <Link href="/cours" className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${!niveau ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-surface"}`}>Tous</Link>
+        {LEVELS.map((l) => <Link key={l.id} href={`/cours?niveau=${l.id}`} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${niveau === l.id ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-surface"}`}>{l.short}</Link>)}
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         {(["maths", "pc"] as Subject[]).map((s) => (

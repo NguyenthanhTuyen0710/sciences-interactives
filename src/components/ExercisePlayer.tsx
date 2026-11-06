@@ -13,7 +13,7 @@ type Result = CheckResult & { saved: boolean; recommendedDifficulty: number };
 const DIFF = ["", "Facile", "Moyen", "Difficile"];
 
 export function FigureView({ figure }: { figure: Fig }) {
-  if (figure.kind === "svg") return <figure className="my-2"><div className="flex justify-center" dangerouslySetInnerHTML={{ __html: figure.svg }} />{figure.caption && <figcaption className="mt-1 text-center text-xs text-slate-500">{figure.caption}</figcaption>}</figure>;
+  if (figure.kind === "svg") return <figure className="my-2"><div className="flex justify-center rounded-xl bg-paper p-2" dangerouslySetInnerHTML={{ __html: figure.svg }} />{figure.caption && <figcaption className="mt-1 text-center text-xs text-slate-500">{figure.caption}</figcaption>}</figure>;
   if (figure.kind === "image")
     // eslint-disable-next-line @next/next/no-img-element
     return <figure className="my-2 text-center"><img src={figure.src} alt={figure.alt} className="mx-auto max-h-80 rounded-lg" />{figure.caption && <figcaption className="mt-1 text-xs text-slate-500">{figure.caption}</figcaption>}</figure>;
@@ -127,12 +127,12 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
       {/* barre d'outils */}
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
         <div className="flex flex-wrap gap-1.5">
-          {kinds.map((k) => <span key={k} className="chip bg-white text-slate-600 ring-1 ring-slate-200">{KIND_LABELS[k]}</span>)}
+          {kinds.map((k) => <span key={k} className="chip bg-surface text-slate-600 ring-1 ring-slate-200">{KIND_LABELS[k]}</span>)}
           {meta.randomized === "valeurs" && <span className="chip bg-violet-50 text-violet-700 ring-1 ring-violet-200">Valeurs aléatoires</span>}
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {!series && (
-            <div className="inline-flex overflow-hidden rounded-lg border border-slate-300 bg-white text-xs font-semibold" role="group" aria-label="Difficulté">
+            <div className="inline-flex overflow-hidden rounded-lg border border-slate-300 bg-surface text-xs font-semibold" role="group" aria-label="Difficulté">
               {[1, 2, 3].map((d) => (
                 <button key={d} type="button" disabled={loading} onClick={() => load(d)} aria-pressed={data.difficulty === d}
                   className={`px-2.5 py-1.5 ${data.difficulty === d ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"}`}>{DIFF[d]}</button>
@@ -140,7 +140,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
             </div>
           )}
           {!series && mode === "libre" && (
-            <button type="button" onClick={() => { setTimed(!timed); setRemaining(limit); started.current = Date.now(); }} className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold ${timed ? "border-amber-500 bg-amber-50 text-amber-800" : "border-slate-300 bg-white text-slate-600"}`}>
+            <button type="button" onClick={() => { setTimed(!timed); setRemaining(limit); started.current = Date.now(); }} className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold ${timed ? "border-amber-500 bg-amber-50 text-amber-800" : "border-slate-300 bg-surface text-slate-600"}`}>
               ⏱ {timed ? "Chrono activé" : "Mode chronométré"}
             </button>
           )}
@@ -225,7 +225,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
                   ))}
                 </ol>
                 {result.rappel && (
-                  <div className="rounded-xl bg-white p-3 text-sm ring-1 ring-indigo-100">
+                  <div className="rounded-xl bg-surface p-3 text-sm ring-1 ring-indigo-100">
                     <span className="font-semibold text-indigo-800">📘 Rappel de cours : </span><MathInline text={result.rappel} />
                   </div>
                 )}

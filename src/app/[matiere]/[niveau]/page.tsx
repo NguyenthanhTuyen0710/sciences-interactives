@@ -21,7 +21,7 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
       <h1 className="mb-1 text-3xl font-black">{S.label} · {level.label}</h1>
       <p className="mb-6 text-slate-600">Chapitres organisés par thème du programme.</p>
       <div className="mb-6 flex flex-wrap gap-2">
-        {levels.map((l) => <Link key={l.id} href={`/${matiere}/${l.id}`} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${l.id === niveau ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white hover:bg-slate-50"}`}>{l.id}</Link>)}
+        {levels.map((l) => <Link key={l.id} href={`/${matiere}/${l.id}`} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${l.id === niveau ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-surface hover:bg-slate-50"}`}>{l.id}</Link>)}
       </div>
       {themes.map((t) => (
         <section key={t} className="mb-8">

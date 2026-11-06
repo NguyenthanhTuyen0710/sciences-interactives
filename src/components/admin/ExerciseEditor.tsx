@@ -39,7 +39,7 @@ function ListEditor({ values, onChange, placeholder, render }: { values: any[]; 
       {values.map((v, i) => (
         <div key={i} className="flex items-start gap-2">
           <div className="flex-1">{render ? render(v, (x) => onChange(values.map((y, j) => (j === i ? x : y))), i) : <input className="input" value={v} placeholder={placeholder} onChange={(e) => onChange(values.map((y, j) => (j === i ? e.target.value : y)))} />}</div>
-          <button type="button" aria-label="Supprimer" onClick={() => onChange(values.filter((_, j) => j !== i))} className="mt-1 rounded-lg px-2 py-1 text-rose-600 hover:bg-rose-50">✕</button>
+          <button type="button" aria-label="Supprimer" onClick={() => onChange(values.filter((_, j) => j !== i))} className="mt-1 rounded-lg px-2 py-1 text-rose-400 hover:bg-rose-50">✕</button>
         </div>
       ))}
     </div>
@@ -74,7 +74,7 @@ function PartEditor({ p, set }: { p: Part; set: (p: Part) => void }) {
           <ListEditor values={p.options} onChange={(v) => set({ ...p, options: v, correct: p.correct.filter((c: number) => c < v.length) })} render={(v, s, i) => (
             <div className="flex items-center gap-2"><input type="checkbox" checked={p.correct.includes(i)} onChange={(e) => f("correct", e.target.checked ? [...p.correct, i] : p.correct.filter((c: number) => c !== i))} aria-label="Bonne réponse" /><input className="input" value={v} onChange={(e) => s(e.target.value)} /></div>
           )} />
-          <button type="button" className="mt-2 text-sm font-semibold text-indigo-600" onClick={() => add("options", "")}>+ proposition</button>
+          <button type="button" className="mt-2 text-sm font-semibold text-indigo-400" onClick={() => add("options", "")}>+ proposition</button>
         </div>
       )}
       {p.kind === "vrai-faux" && (
@@ -83,32 +83,32 @@ function PartEditor({ p, set }: { p: Part; set: (p: Part) => void }) {
           <ListEditor values={p.items} onChange={(v) => set({ ...p, items: v, answers: p.answers.slice(0, v.length) })} render={(v, s, i) => (
             <div className="flex items-center gap-2"><input className="input" value={v} onChange={(e) => s(e.target.value)} /><select className="rounded-lg border border-slate-300 px-2 py-2" value={p.answers[i] ? "1" : "0"} onChange={(e) => f("answers", p.answers.map((a: boolean, j: number) => (j === i ? e.target.value === "1" : a)))}><option value="1">Vrai</option><option value="0">Faux</option></select></div>
           )} />
-          <button type="button" className="mt-2 text-sm font-semibold text-indigo-600" onClick={() => set({ ...p, items: [...p.items, ""], answers: [...p.answers, true] })}>+ affirmation</button>
+          <button type="button" className="mt-2 text-sm font-semibold text-indigo-400" onClick={() => set({ ...p, items: [...p.items, ""], answers: [...p.answers, true] })}>+ affirmation</button>
         </div>
       )}
       {p.kind === "texte-libre" && (
-        <div><label className="label">Réponses acceptées (accents et majuscules ignorés)</label><ListEditor values={p.answers} onChange={(v) => f("answers", v)} /><button type="button" className="mt-2 text-sm font-semibold text-indigo-600" onClick={() => add("answers", "")}>+ variante acceptée</button></div>
+        <div><label className="label">Réponses acceptées (accents et majuscules ignorés)</label><ListEditor values={p.answers} onChange={(v) => f("answers", v)} /><button type="button" className="mt-2 text-sm font-semibold text-indigo-400" onClick={() => add("answers", "")}>+ variante acceptée</button></div>
       )}
       {p.kind === "ordonner" && (
-        <div><label className="label">Éléments dans le BON ordre (ils seront mélangés)</label><ListEditor values={p.items} onChange={(v) => f("items", v)} /><button type="button" className="mt-2 text-sm font-semibold text-indigo-600" onClick={() => add("items", "")}>+ élément</button></div>
+        <div><label className="label">Éléments dans le BON ordre (ils seront mélangés)</label><ListEditor values={p.items} onChange={(v) => f("items", v)} /><button type="button" className="mt-2 text-sm font-semibold text-indigo-400" onClick={() => add("items", "")}>+ élément</button></div>
       )}
       {p.kind === "associer" && (
         <div>
           <label className="label">Paires à associer</label>
           <ListEditor values={p.pairs} onChange={(v) => f("pairs", v)} render={(v, s) => <div className="grid grid-cols-2 gap-2"><input className="input" value={v[0]} onChange={(e) => s([e.target.value, v[1]])} /><input className="input" value={v[1]} onChange={(e) => s([v[0], e.target.value])} /></div>} />
-          <button type="button" className="mt-2 text-sm font-semibold text-indigo-600" onClick={() => add("pairs", ["", ""])}>+ paire</button>
+          <button type="button" className="mt-2 text-sm font-semibold text-indigo-400" onClick={() => add("pairs", ["", ""])}>+ paire</button>
         </div>
       )}
       {p.kind === "classer" && (
         <div className="space-y-2">
           <label className="label">Catégories</label>
           <ListEditor values={p.categories} onChange={(v) => f("categories", v)} />
-          <button type="button" className="text-sm font-semibold text-indigo-600" onClick={() => add("categories", "")}>+ catégorie</button>
+          <button type="button" className="text-sm font-semibold text-indigo-400" onClick={() => add("categories", "")}>+ catégorie</button>
           <label className="label">Éléments à classer</label>
           <ListEditor values={p.items} onChange={(v) => f("items", v)} render={(v, s) => (
             <div className="flex gap-2"><input className="input" value={v.text} onChange={(e) => s({ ...v, text: e.target.value })} /><select className="rounded-lg border border-slate-300 px-2" value={v.category} onChange={(e) => s({ ...v, category: Number(e.target.value) })}>{p.categories.map((c: string, ci: number) => <option key={ci} value={ci}>{c || `Catégorie ${ci + 1}`}</option>)}</select></div>
           )} />
-          <button type="button" className="text-sm font-semibold text-indigo-600" onClick={() => add("items", { text: "", category: 0 })}>+ élément</button>
+          <button type="button" className="text-sm font-semibold text-indigo-400" onClick={() => add("items", { text: "", category: 0 })}>+ élément</button>
         </div>
       )}
     </div>
@@ -203,12 +203,12 @@ export default function ExerciseEditor({ initial, chapters }: { initial: EditorI
                   <label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!v.nonZero} onChange={(e) => set({ ...v, nonZero: e.target.checked })} />≠ 0</label>
                 </div>
               )} />
-              <button type="button" className="text-sm font-semibold text-indigo-600" onClick={() => setS({ ...s, variables: [...s.variables, { name: String.fromCharCode(97 + s.variables.length), min: 1, max: 10 }] })}>+ variable (nom · min · max · pas)</button>
+              <button type="button" className="text-sm font-semibold text-indigo-400" onClick={() => setS({ ...s, variables: [...s.variables, { name: String.fromCharCode(97 + s.variables.length), min: 1, max: 10 }] })}>+ variable (nom · min · max · pas)</button>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div><label className="label">Image (PNG, JPEG, WebP – 2 Mo)</label><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} className="text-sm" /></div>
                 <div><label className="label">ou vidéo (URL YouTube ou .mp4)</label><input className="input" value={s.figure?.kind === "video" ? s.figure.src : ""} onChange={(e) => setS({ ...s, figure: e.target.value ? { kind: "video", src: e.target.value } : undefined })} /></div>
               </div>
-              {s.figure && <div className="flex items-center gap-2 text-sm text-slate-600">Média : {s.figure.src} <button type="button" className="text-rose-600" onClick={() => setS({ ...s, figure: undefined })}>retirer</button></div>}
+              {s.figure && <div className="flex items-center gap-2 text-sm text-slate-600">Média : {s.figure.src} <button type="button" className="text-rose-400" onClick={() => setS({ ...s, figure: undefined })}>retirer</button></div>}
             </section>
 
             <section className="card space-y-4 p-5">
@@ -218,7 +218,7 @@ export default function ExerciseEditor({ initial, chapters }: { initial: EditorI
                   <div className="mb-3 flex items-center gap-2">
                     <span className="grid h-6 w-6 place-items-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">{i + 1}</span>
                     <select className="rounded-lg border border-slate-300 px-2 py-1 text-sm" value={p.kind} onChange={(e) => setPart(i, newPart(e.target.value))}>{KINDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-                    <button type="button" className="ml-auto text-sm text-rose-600" onClick={() => setS({ ...s, parts: s.parts.filter((_, j) => j !== i) })} disabled={s.parts.length === 1}>Supprimer</button>
+                    <button type="button" className="ml-auto text-sm text-rose-400" onClick={() => setS({ ...s, parts: s.parts.filter((_, j) => j !== i) })} disabled={s.parts.length === 1}>Supprimer</button>
                   </div>
                   <PartEditor p={p} set={(np) => setPart(i, np)} />
                 </div>
@@ -229,7 +229,7 @@ export default function ExerciseEditor({ initial, chapters }: { initial: EditorI
             <section className="card space-y-3 p-5">
               <h2 className="font-bold">4. Correction détaillée</h2>
               <ListEditor values={s.solution} onChange={(v) => setS({ ...s, solution: v })} placeholder="Étape de la solution (LaTeX et {{calculs}} autorisés)" />
-              <button type="button" className="text-sm font-semibold text-indigo-600" onClick={() => setS({ ...s, solution: [...s.solution, ""] })}>+ étape</button>
+              <button type="button" className="text-sm font-semibold text-indigo-400" onClick={() => setS({ ...s, solution: [...s.solution, ""] })}>+ étape</button>
               <div><label className="label">Rappel de cours</label><input className="input" value={s.rappel ?? ""} onChange={(e) => setS({ ...s, rappel: e.target.value })} /></div>
             </section>
           </>

@@ -246,3 +246,39 @@ export function barChart(labels: string[], values: number[], title: string, yNam
   body += `<line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="${C.axis}" stroke-width="1.5"/>` + text(L, T - 4, yName, { size: 11, anchor: "start", color: C.axis, italic: true });
   return wrap(W, H, body, title);
 }
+
+// ---------- Demi-droite graduée ----------
+/** `ticks` petits intervalles ; `labels` : abscisses écrites sous certaines graduations ; `points` : lettres au-dessus. */
+export function graduatedLine(opts: { ticks: number; major: number; labels: { at: number; text: string }[]; points: { at: number; name: string }[]; title: string }) {
+  const W = 520, H = 110, L = 24, R = 24, y = 58;
+  const X = (i: number) => L + (i / opts.ticks) * (W - L - R);
+  let body = `<line x1="${L - 10}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="${C.ink}" stroke-width="2"/><polygon points="${W - 6},${y} ${W - 16},${y - 5} ${W - 16},${y + 5}" fill="${C.ink}"/>`;
+  for (let i = 0; i <= opts.ticks; i++) {
+    const big = i % opts.major === 0;
+    body += `<line x1="${X(i)}" y1="${y - (big ? 9 : 5)}" x2="${X(i)}" y2="${y + (big ? 9 : 5)}" stroke="${C.ink}" stroke-width="${big ? 2 : 1.2}"/>`;
+  }
+  opts.labels.forEach((l) => (body += text(X(l.at), y + 26, l.text, { size: 14, weight: 600 })));
+  opts.points.forEach((p) => {
+    body += `<path d="M${X(p.at) - 5},${y - 5} L${X(p.at) + 5},${y + 5} M${X(p.at) - 5},${y + 5} L${X(p.at) + 5},${y - 5}" stroke="${C.red}" stroke-width="2.4"/>`;
+    body += text(X(p.at), y - 22, p.name, { size: 16, weight: 700, color: C.red });
+  });
+  return wrap(W, H, body, opts.title);
+}
+
+// ---------- Quadrillage avec axe de symétrie ----------
+/** Axe vertical (x = axis) ou horizontal (y = axis) ; coordonnées en carreaux, origine en bas à gauche. */
+export function symmetryGrid(opts: { cols: number; rows: number; axis: { dir: "v" | "h"; at: number }; points: { x: number; y: number; name: string }[]; title: string }) {
+  const u = 30, pad = 18, W = opts.cols * u + 2 * pad, H = opts.rows * u + 2 * pad;
+  const X = (x: number) => pad + x * u, Y = (y: number) => H - pad - y * u;
+  let body = "";
+  for (let i = 0; i <= opts.cols; i++) body += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(opts.rows)}" stroke="${C.grid}"/>`;
+  for (let j = 0; j <= opts.rows; j++) body += `<line x1="${X(0)}" y1="${Y(j)}" x2="${X(opts.cols)}" y2="${Y(j)}" stroke="${C.grid}"/>`;
+  const a = opts.axis;
+  body += a.dir === "v"
+    ? `<line x1="${X(a.at)}" y1="${Y(0) + 8}" x2="${X(a.at)}" y2="${Y(opts.rows) - 8}" stroke="${C.blue}" stroke-width="2.5"/>` + text(X(a.at) + 12, Y(opts.rows) + 2, "(d)", { size: 14, color: C.blue, weight: 700 })
+    : `<line x1="${X(0) - 8}" y1="${Y(a.at)}" x2="${X(opts.cols) + 8}" y2="${Y(a.at)}" stroke="${C.blue}" stroke-width="2.5"/>` + text(X(opts.cols) - 14, Y(a.at) - 12, "(d)", { size: 14, color: C.blue, weight: 700 });
+  opts.points.forEach((p) => {
+    body += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="4" fill="${C.red}"/>` + text(X(p.x) + 11, Y(p.y) - 10, p.name, { size: 15, weight: 700 });
+  });
+  return wrap(W, H, body, opts.title);
+}

@@ -68,8 +68,8 @@ export default async function MySpace() {
                   <span className={`chip mt-0.5 shrink-0 ${r.kind === "remediation" ? "bg-rose-100 text-rose-700" : r.kind === "progression" ? "bg-emerald-100 text-emerald-700" : "bg-sky-100 text-sky-700"}`}>{r.kind === "remediation" ? "À revoir" : r.kind === "progression" ? "Niveau +" : "Nouveau"}</span>
                   <div className="flex-1 text-sm"><p className="font-semibold">{r.title}</p><p className="text-slate-600">{r.reason}</p></div>
                   <div className="flex shrink-0 flex-col gap-1">
-                    {r.ficheNotionId && <Link href={`/cours/${r.ficheNotionId}`} className="text-xs font-semibold text-indigo-600 hover:underline">Fiche</Link>}
-                    <Link href={`/exercice/${r.exerciseId}?d=${r.difficulty}`} className="text-xs font-semibold text-indigo-600 hover:underline">S'entraîner →</Link>
+                    {r.ficheNotionId && <Link href={`/cours/${r.ficheNotionId}`} className="text-xs font-semibold text-indigo-400 hover:underline">Fiche</Link>}
+                    <Link href={`/exercice/${r.exerciseId}?d=${r.difficulty}`} className="text-xs font-semibold text-indigo-400 hover:underline">S'entraîner →</Link>
                   </div>
                 </li>
               ))}
@@ -110,9 +110,9 @@ export default async function MySpace() {
                   {d.history.map((h, i) => (
                     <tr key={i} className="border-t border-slate-100">
                       <td className="py-1.5 text-slate-500">{h.createdAt.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })} {h.createdAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" })}</td>
-                      <td><Link href={`/exercice/${h.exerciseId}`} className="hover:text-indigo-600">{h.title}</Link>{h.mode !== "libre" && <span className="ml-1 text-xs text-slate-400">({h.mode})</span>}</td>
+                      <td><Link href={`/exercice/${h.exerciseId}`} className="hover:text-indigo-400">{h.title}</Link>{h.mode !== "libre" && <span className="ml-1 text-xs text-slate-400">({h.mode})</span>}</td>
                       <td className="text-slate-500">{h.difficulty}</td>
-                      <td className={`text-right font-semibold ${h.score === 1 ? "text-emerald-600" : h.score >= 0.5 ? "text-amber-600" : "text-rose-600"}`}>{Math.round(h.score * 100)} %</td>
+                      <td className={`text-right font-semibold ${h.score === 1 ? "text-emerald-400" : h.score >= 0.5 ? "text-amber-400" : "text-rose-400"}`}>{Math.round(h.score * 100)} %</td>
                     </tr>
                   ))}
                 </tbody>

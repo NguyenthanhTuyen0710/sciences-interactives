@@ -33,7 +33,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ matier
             <section key={n.id} id={n.id} className="scroll-mt-24">
               <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
                 <h2 className="text-xl font-bold">{n.title}</h2>
-                {fiche && <Link href={`/cours/${n.id}`} className="text-sm font-semibold text-indigo-600 hover:underline">📘 Fiche de cours</Link>}
+                {fiche && <Link href={`/cours/${n.id}`} className="text-sm font-semibold text-indigo-400 hover:underline">📘 Fiche de cours</Link>}
               </div>
               {fiche && <div className="mb-4 rounded-xl bg-indigo-50/60 p-4 text-sm text-slate-700"><MathText text={fiche.definition} /></div>}
               {list.length ? (

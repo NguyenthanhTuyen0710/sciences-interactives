@@ -49,7 +49,7 @@ export default async function ExercisePage({ params, searchParams }: { params: P
               <ul className="mt-2 space-y-1 text-sm text-slate-700">
                 {found.notion.fiche.proprietes.slice(0, 3).map((p, i) => <li key={i} className="flex gap-1"><span>•</span><MathText text={p} /></li>)}
               </ul>
-              <Link href={`/cours/${found.notion.id}`} className="mt-2 inline-block text-sm font-semibold text-indigo-600 hover:underline">Fiche complète →</Link>
+              <Link href={`/cours/${found.notion.id}`} className="mt-2 inline-block text-sm font-semibold text-indigo-400 hover:underline">Fiche complète →</Link>
             </div>
           )}
           <div className="card p-4 text-sm text-slate-600">

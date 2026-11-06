@@ -16,7 +16,7 @@ export default async function CollectionsAdmin() {
         {rows.length ? <ul className="space-y-2">{rows.map((c) => (
           <li key={c.id} className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 p-3 text-sm">
             <div><p className="font-semibold">{c.title}</p><p className="text-slate-500">{c.items.length} exercice(s)</p></div>
-            <div className="flex gap-3"><Link href={`/collections/${c.id}`} className="font-semibold text-indigo-600 hover:underline">Lien élèves</Link><DeleteButton url={`/api/admin/collections?id=${c.id}`} confirmText="Supprimer cette collection ?" /></div>
+            <div className="flex gap-3"><Link href={`/collections/${c.id}`} className="font-semibold text-indigo-400 hover:underline">Lien élèves</Link><DeleteButton url={`/api/admin/collections?id=${c.id}`} confirmText="Supprimer cette collection ?" /></div>
           </li>
         ))}</ul> : <Empty>Créez une feuille d'exercices à partager avec vos élèves.</Empty>}
       </section>

@@ -153,12 +153,12 @@ export default function InteractiveLesson({ slug }: { slug: string }) {
 
   return (
     <div className="card overflow-hidden">
-      <div className="relative bg-gradient-to-b from-slate-50 to-white">
+      <div className="relative bg-paper">
         <svg viewBox="0 0 480 300" className="block w-full" role="img" aria-label={scene.title}>{scene.render(local)}</svg>
-        <div className="absolute left-3 top-3 rounded-lg bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow">{idx + 1}/{L.scenes.length} · {scene.title}</div>
+        <div className="absolute left-3 top-3 rounded-lg bg-paper/90 px-2 py-1 text-xs font-semibold text-ink shadow">{idx + 1}/{L.scenes.length} · {scene.title}</div>
         {cue && (
-          <div className="absolute inset-0 grid place-items-center bg-slate-900/60 p-4">
-            <div className="animate-pop w-full max-w-md rounded-2xl bg-white p-5 shadow-xl" role="dialog" aria-label="Question">
+          <div className="absolute inset-0 grid place-items-center bg-black/60 p-4">
+            <div className="animate-pop w-full max-w-md rounded-2xl bg-surface p-5 shadow-xl" role="dialog" aria-label="Question">
               <p className="mb-3 font-semibold"><MathInline text={cue.question} /></p>
               <div className="space-y-2">
                 {cue.options.map((o, i) => (

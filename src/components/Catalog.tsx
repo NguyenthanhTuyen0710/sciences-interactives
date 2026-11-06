@@ -18,7 +18,7 @@ export default function Catalog({ items, initial }: { items: { meta: ExerciseMet
       (!level || meta.level === level) && (!subject || meta.subject === subject) && (!kind || meta.kinds.includes(kind as InteractionKind)) &&
       words.every((w) => norm(text).includes(w)));
   }, [items, q, level, subject, kind]);
-  const sel = "rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm";
+  const sel = "rounded-xl border border-slate-300 bg-surface px-3 py-2 text-sm";
   return (
     <div>
       <div className="card mb-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">

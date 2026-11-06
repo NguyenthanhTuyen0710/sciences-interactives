@@ -44,14 +44,86 @@ const LM = "Constitution et transformations de la matière", LMI = "Mouvement et
 export const CURRICULUM: Record<Subject, Level[]> = {
   maths: [
     { id: "6e", label: "Sixième", cycle: "Collège", chapters: [
+      // Progression en 13 chapitres (ordre suivi par de nombreux collèges, cf. math93.com, rubrique Sixième).
       ch("m6-nombres", "Nombres entiers et décimaux", NC, [
+        n("m6-nombres-ecrire", "Lire, écrire et décomposer un nombre", {
+          definition: "Notre numération est décimale et de position : la valeur d'un chiffre dépend de son rang. Dix unités d'un rang forment une unité du rang immédiatement supérieur.",
+          proprietes: [
+            "Partie entière : unités, dizaines, centaines, unités de mille… ; partie décimale : dixièmes ($\\dfrac{1}{10}$), centièmes ($\\dfrac{1}{100}$), millièmes ($\\dfrac{1}{1000}$).",
+            "Le **chiffre** des dizaines de $4\\,385$ est 8, mais le **nombre** de dizaines est 438.",
+            "Dans les grands nombres, on regroupe les chiffres par tranches de trois à partir de la virgule : $12\\,500\\,000$ se lit « douze millions cinq cent mille ».",
+          ],
+          exemple: "$305{,}47 = 3 \\times 100 + 5 \\times 1 + 4 \\times \\dfrac{1}{10} + 7 \\times \\dfrac{1}{100} = 305 + \\dfrac{47}{100}$.",
+        }),
         n("m6-nombres-comparer", "Comparer et ranger des décimaux", {
           definition: "Un nombre décimal s'écrit avec une partie entière et une partie décimale séparées par une virgule : dans $12{,}375$, 3 est le chiffre des dixièmes, 7 celui des centièmes, 5 celui des millièmes.",
           proprietes: ["On compare d'abord les parties entières.", "À partie entière égale, on compare les dixièmes, puis les centièmes, etc.", "Ajouter des zéros à la fin de la partie décimale ne change pas le nombre : $3{,}7 = 3{,}70$."],
           exemple: "$4{,}09 < 4{,}1$ car $4{,}09 = 4{,}09$ et $4{,}1 = 4{,}10$ : 9 centièmes < 10 centièmes.",
         }),
+        n("m6-nombres-droite", "Repérer un nombre sur une demi-droite graduée", {
+          definition: "Une demi-droite graduée a une origine (repérée par 0) et une unité de longueur reportée régulièrement. Chaque point est repéré par un nombre : son abscisse.",
+          proprietes: ["Pour lire une abscisse, on détermine d'abord la valeur d'une graduation : écart entre deux nombres connus divisé par le nombre d'intervalles.", "Plus un point est loin de l'origine, plus son abscisse est grande."],
+          methode: ["Repérer deux graduations dont on connaît l'abscisse.", "Calculer le pas : (différence des abscisses) ÷ (nombre de petits intervalles).", "Compter les intervalles jusqu'au point et ajouter le nombre de pas correspondants."],
+          exemple: "Entre 2 et 3 il y a 10 intervalles : une graduation vaut $0{,}1$. Le point situé 4 graduations après 2 a pour abscisse $2{,}4$.",
+        }),
       ]),
-      ch("m6-fractions", "Fractions", NC, [
+      ch("m6-droites", "Droites parallèles et perpendiculaires", EG, [
+        n("m6-droites-vocabulaire", "Points, droites, segments et demi-droites", {
+          definition: "Par deux points distincts $A$ et $B$ passe une seule droite, notée $(AB)$. Le segment $[AB]$ est la portion de droite limitée par $A$ et $B$ ; la demi-droite $[AB)$ commence en $A$ et passe par $B$.",
+          proprietes: ["$A \\in (d)$ se lit « le point $A$ appartient à la droite $(d)$ » ; $A \\notin (d)$ : il n'y appartient pas.", "Des points alignés sont des points situés sur une même droite.", "$AB$ (sans crochets) désigne la longueur du segment $[AB]$."],
+        }),
+        n("m6-droites-proprietes", "Parallèles et perpendiculaires : propriétés", {
+          definition: "Deux droites sécantes qui forment un angle droit sont **perpendiculaires** (notation $\\perp$). Deux droites qui ne se coupent jamais (ou confondues) sont **parallèles** (notation $/\\!/$).",
+          proprietes: [
+            "Si deux droites sont parallèles à une même troisième droite, alors elles sont parallèles entre elles.",
+            "Si deux droites sont perpendiculaires à une même troisième droite, alors elles sont parallèles entre elles.",
+            "Si deux droites sont parallèles et qu'une troisième droite est perpendiculaire à l'une, alors elle est perpendiculaire à l'autre.",
+          ],
+          methode: ["Tracer une perpendiculaire : placer l'angle droit de l'équerre le long de la droite, au point voulu.", "Tracer une parallèle : tracer deux perpendiculaires successives avec l'équerre, ou faire glisser l'équerre le long d'une règle."],
+        }),
+      ]),
+      ch("m6-calculs", "Opérations : addition, soustraction, multiplication", NC, [
+        n("m6-calculs-vocabulaire", "Vocabulaire des opérations", {
+          definition: "Le résultat d'une addition est une somme (de termes), d'une soustraction une différence, d'une multiplication un produit (de facteurs), d'une division un quotient.",
+          proprietes: ["Dans $a + b$, $a$ et $b$ sont les termes.", "Dans $a \\times b$, $a$ et $b$ sont les facteurs."],
+        }),
+        n("m6-calculs-poser", "Poser une opération avec des décimaux", {
+          definition: "Pour additionner ou soustraire des décimaux, on aligne les virgules (chiffres de même rang les uns sous les autres). Pour multiplier, on calcule sans tenir compte des virgules puis on place la virgule.",
+          proprietes: [
+            "Addition et soustraction : compléter avec des zéros pour avoir le même nombre de décimales.",
+            "Multiplication : le produit a autant de décimales que les deux facteurs réunis.",
+            "Vérifier avec un ordre de grandeur : $19{,}8 \\times 3{,}1 \\approx 20 \\times 3 = 60$.",
+          ],
+          exemple: "$2{,}4 \\times 1{,}35$ : $24 \\times 135 = 3\\,240$ ; 1 + 2 = 3 décimales, donc $2{,}4 \\times 1{,}35 = 3{,}240 = 3{,}24$.",
+        }),
+        n("m6-calculs-mental", "Calcul mental et calcul réfléchi", {
+          definition: "Multiplier par 10, 100, 1 000 décale chaque chiffre de 1, 2, 3 rangs vers la gauche (la virgule « se déplace » vers la droite).",
+          proprietes: ["Multiplier par $0{,}1$ revient à diviser par 10.", "Diviser par 10, 100… décale les chiffres vers la droite."],
+        }),
+      ]),
+      ch("m6-cercle", "Distances, cercle, triangles et médiatrice", EG, [
+        n("m6-cercle-vocabulaire", "Le cercle : centre, rayon, diamètre", {
+          definition: "Le cercle de centre $O$ et de rayon $r$ est l'ensemble des points situés à la distance $r$ du point $O$.",
+          proprietes: ["Un **rayon** relie le centre à un point du cercle ; un **diamètre** est une corde qui passe par le centre.", "Le diamètre mesure le double du rayon : $d = 2r$.", "Un point $M$ est sur le cercle si et seulement si $OM = r$."],
+          exemple: "Un cercle de diamètre $7$ cm a pour rayon $7 \\div 2 = 3{,}5$ cm.",
+        }),
+        n("m6-cercle-triangle", "Construire un triangle, inégalité triangulaire", {
+          definition: "Dans un triangle, la longueur de chaque côté est inférieure à la somme des longueurs des deux autres côtés.",
+          proprietes: ["Un triangle de côtés $a \\leqslant b \\leqslant c$ est constructible si $c < a + b$.", "Si $c = a + b$, les trois points sont alignés (triangle « aplati »).", "On construit un triangle connaissant ses trois côtés à la règle et au compas."],
+          exemple: "Avec 3 cm, 4 cm et 8 cm : $8 > 3 + 4$, le triangle n'est pas constructible.",
+        }),
+        n("m6-cercle-mediatrice", "Médiatrice d'un segment", {
+          definition: "La médiatrice d'un segment est la droite perpendiculaire à ce segment qui passe par son milieu.",
+          proprietes: ["Tout point de la médiatrice de $[AB]$ est à égale distance de $A$ et de $B$.", "Réciproquement, un point équidistant de $A$ et de $B$ est sur la médiatrice de $[AB]$."],
+          methode: ["Au compas : tracer deux arcs de même rayon centrés en $A$ et en $B$, de part et d'autre du segment.", "Relier les deux points d'intersection : c'est la médiatrice."],
+        }),
+      ]),
+      ch("m6-fractions", "Fractions et partage", NC, [
+        n("m6-fractions-partage", "Fraction d'une quantité", {
+          definition: "Prendre $\\dfrac{a}{b}$ d'une quantité, c'est la partager en $b$ parts égales et en prendre $a$.",
+          proprietes: ["$\\dfrac{a}{b}$ de $Q$ $= (Q \\div b) \\times a = \\dfrac{a \\times Q}{b}$.", "Le dénominateur indique le nombre de parts égales, le numérateur le nombre de parts prises."],
+          exemple: "$\\dfrac{3}{4}$ de 20 € : $20 \\div 4 = 5$ puis $5 \\times 3 = 15$ €.",
+        }),
         n("m6-fractions-comparer", "Comparer des fractions", {
           definition: "La fraction $\\dfrac{a}{b}$ ($b \\neq 0$) est le nombre qui, multiplié par $b$, donne $a$ : c'est le quotient $a \\div b$.",
           proprietes: ["Si deux fractions ont le même dénominateur, la plus grande est celle qui a le plus grand numérateur.", "On ne change pas une fraction en multipliant numérateur et dénominateur par un même nombre non nul : $\\dfrac{a}{b} = \\dfrac{a \\times k}{b \\times k}$.", "$\\dfrac{a}{b} > 1$ si $a > b$ ; $\\dfrac{a}{b} < 1$ si $a < b$."],
@@ -64,19 +136,50 @@ export const CURRICULUM: Record<Subject, Level[]> = {
           exemple: "$\\dfrac{3}{4} = 3 \\div 4 = 0{,}75 = \\dfrac{75}{100} = 75\\,\\%$.",
         }),
       ]),
-      ch("m6-calculs", "Calculs", NC, [
-        n("m6-calculs-vocabulaire", "Vocabulaire des opérations", {
-          definition: "Le résultat d'une addition est une somme (de termes), d'une soustraction une différence, d'une multiplication un produit (de facteurs), d'une division un quotient.",
-          proprietes: ["Dans $a + b$, $a$ et $b$ sont les termes.", "Dans $a \\times b$, $a$ et $b$ sont les facteurs."],
+      ch("m6-angles", "Angles", EG, [
+        n("m6-angles-nature", "Nommer et classer les angles", {
+          definition: "Un angle est formé par deux demi-droites de même origine, son sommet. L'angle $\\widehat{xOy}$ a pour sommet $O$ (la lettre du milieu) ; il se mesure en degrés (°) avec un rapporteur.",
+          proprietes: ["Angle **aigu** : entre 0° et 90°.", "Angle **droit** : 90°.", "Angle **obtus** : entre 90° et 180°.", "Angle **plat** : 180° (les deux côtés sont dans le prolongement l'un de l'autre)."],
+          methode: ["Placer le centre du rapporteur sur le sommet.", "Aligner le 0 d'une graduation sur un côté.", "Lire la mesure sur la même graduation, là où passe l'autre côté."],
+        }),
+        n("m6-angles-bissectrice", "Bissectrice d'un angle", {
+          definition: "La bissectrice d'un angle est la demi-droite issue du sommet qui partage cet angle en deux angles de même mesure.",
+          proprietes: ["Si $[Oz)$ est la bissectrice de $\\widehat{xOy}$, alors $\\widehat{xOz} = \\widehat{zOy} = \\dfrac{\\widehat{xOy}}{2}$."],
+          exemple: "La bissectrice d'un angle de 130° le partage en deux angles de 65°.",
+        }),
+      ]),
+      ch("m6-aires", "Aires et périmètres", GM, [
+        n("m6-aires-perimetre", "Périmètre", {
+          definition: "Le périmètre d'une figure est la longueur de son contour.",
+          proprietes: ["Rectangle : $\\mathcal{P} = 2 \\times (L + \\ell)$.", "Carré : $\\mathcal{P} = 4 \\times c$.", "Cercle : $\\mathcal{P} = 2 \\times \\pi \\times r = \\pi \\times d$ (avec $\\pi \\approx 3{,}14$)."],
+          exemple: "Un rectangle de 7 cm sur 4 cm a pour périmètre $2 \\times (7 + 4) = 22$ cm.",
+        }),
+        n("m6-aires-aire", "Aire", {
+          definition: "L'aire d'une figure mesure la surface qu'elle occupe, exprimée en unités d'aire : cm², m²…",
+          proprietes: ["Rectangle : $\\mathcal{A} = L \\times \\ell$ ; carré : $\\mathcal{A} = c \\times c$.", "Triangle rectangle : $\\mathcal{A} = \\dfrac{a \\times b}{2}$ ($a$, $b$ : côtés de l'angle droit).", "Disque : $\\mathcal{A} = \\pi \\times r \\times r$.", "Deux figures peuvent avoir la même aire et des périmètres différents."],
+          exemple: "Carré de côté 6 cm : $\\mathcal{A} = 6 \\times 6 = 36$ cm² et $\\mathcal{P} = 24$ cm.",
+        }),
+        n("m6-aires-conversions", "Conversions de longueurs et d'aires", {
+          definition: "Les unités de longueur se suivent de 10 en 10 : km, hm, dam, m, dm, cm, mm. Les unités d'aire se suivent de 100 en 100 : km², hm², dam², m², dm², cm², mm².",
+          proprietes: ["$1$ m $= 100$ cm ; $1$ km $= 1\\,000$ m.", "$1$ m² $= 100$ dm² $= 10\\,000$ cm².", "Pour passer à une unité plus petite, on multiplie ; à une unité plus grande, on divise."],
+          exemple: "$3{,}5$ m $= 350$ cm ; $2{,}4$ m² $= 24\\,000$ cm².",
+        }),
+      ]),
+      ch("m6-division", "Division et calculs sur les durées", NC, [
+        n("m6-division-euclidienne", "Division euclidienne", {
+          definition: "Effectuer la division euclidienne de $a$ (dividende) par $b$ (diviseur), c'est trouver le quotient entier $q$ et le reste $r$ tels que $a = b \\times q + r$ avec $r < b$.",
+          proprietes: ["Le reste est toujours strictement inférieur au diviseur.", "Si le reste est nul, $a$ est un multiple de $b$ et $b$ est un diviseur de $a$."],
+          exemple: "$87 = 6 \\times 14 + 3$ : quotient 14, reste 3 (et $3 < 6$).",
         }),
         n("m6-calculs-divisibilite", "Multiples, diviseurs, critères de divisibilité", {
           definition: "$a$ est divisible par $b$ si le reste de la division euclidienne de $a$ par $b$ est nul : $a$ est alors un multiple de $b$.",
           proprietes: ["Par 2 : chiffre des unités pair.", "Par 5 : chiffre des unités 0 ou 5.", "Par 10 : chiffre des unités 0.", "Par 3 (resp. 9) : somme des chiffres divisible par 3 (resp. 9).", "Par 4 : nombre formé par les deux derniers chiffres divisible par 4."],
           exemple: "$2\\,358$ : $2+3+5+8 = 18$, donc divisible par 3 et par 9.",
         }),
-        n("m6-calculs-mental", "Calcul mental et calcul réfléchi", {
-          definition: "Multiplier par 10, 100, 1 000 décale chaque chiffre de 1, 2, 3 rangs vers la gauche (la virgule « se déplace » vers la droite).",
-          proprietes: ["Multiplier par $0{,}1$ revient à diviser par 10.", "Diviser par 10, 100… décale les chiffres vers la droite."],
+        n("m6-division-durees", "Calculer avec des durées", {
+          definition: "Les durées ne se comptent pas en base 10 : $1$ h $= 60$ min et $1$ min $= 60$ s.",
+          proprietes: ["Pour additionner des durées, on additionne heures et minutes séparément, puis on convertit 60 min en 1 h.", "Durée = heure de fin − heure de début.", "$1{,}5$ h $= 1$ h $30$ min (et non 1 h 50 min)."],
+          exemple: "Départ 14 h 35, trajet 1 h 50 min : 14 h 35 + 1 h 50 = 15 h 85 min = 16 h 25.",
         }),
       ]),
       ch("m6-proportionnalite", "Proportionnalité", GD, [
@@ -85,10 +188,51 @@ export const CURRICULUM: Record<Subject, Level[]> = {
           proprietes: ["Coefficient : $k = \\dfrac{y}{x}$ pour n'importe quelle colonne complète.", "On peut aussi utiliser la linéarité : additionner ou multiplier des colonnes."],
           exemple: "3 kg coûtent 7,50 € : $k = 7{,}5 \\div 3 = 2{,}5$ €/kg, donc 5 kg coûtent $5 \\times 2{,}5 = 12{,}50$ €.",
         }),
+        n("m6-proportionnalite-pourcentages", "Pourcentages et échelles", {
+          definition: "Appliquer un pourcentage $p\\,\\%$ à une quantité $Q$, c'est calculer $\\dfrac{p}{100} \\times Q$. Une échelle est le coefficient de proportionnalité entre les distances sur le plan et les distances réelles (dans la même unité).",
+          proprietes: ["$10\\,\\%$ de $Q$ $= Q \\div 10$ ; $50\\,\\%$ $=$ la moitié ; $25\\,\\%$ $=$ le quart.", "Échelle $\\dfrac{1}{n}$ : 1 cm sur le plan représente $n$ cm dans la réalité."],
+          exemple: "$30\\,\\%$ de 60 € $= \\dfrac{30}{100} \\times 60 = 18$ €. Sur une carte au $\\dfrac{1}{25\\,000}$, 4 cm représentent $100\\,000$ cm $= 1$ km.",
+        }),
       ]),
-      ch("m6-geometrie", "Géométrie", EG),
-      ch("m6-grandeurs", "Grandeurs et mesures", GM),
-      ch("m6-donnees", "Organisation et gestion de données", GD),
+      ch("m6-quadrilateres", "Triangles et quadrilatères", EG, [
+        n("m6-quadrilateres-triangles", "Triangles particuliers", {
+          definition: "Un triangle **isocèle** a deux côtés de même longueur ; un triangle **équilatéral** a trois côtés de même longueur ; un triangle **rectangle** a un angle droit.",
+          proprietes: ["Dans un triangle isocèle, les angles à la base ont la même mesure.", "Un triangle équilatéral a trois angles de 60°.", "Dans un triangle rectangle, le côté opposé à l'angle droit est l'hypoténuse."],
+        }),
+        n("m6-quadrilateres-quadri", "Quadrilatères particuliers", {
+          definition: "Un **rectangle** a quatre angles droits ; un **losange** a quatre côtés de même longueur ; un **carré** a quatre angles droits et quatre côtés de même longueur.",
+          proprietes: ["Les côtés opposés d'un rectangle sont parallèles et de même longueur ; ses diagonales ont la même longueur et se coupent en leur milieu.", "Les diagonales d'un losange sont perpendiculaires et se coupent en leur milieu.", "Un carré est à la fois un rectangle et un losange."],
+        }),
+      ]),
+      ch("m6-solides", "Solides et volumes", EG, [
+        n("m6-solides-vocabulaire", "Solides : faces, arêtes, sommets, patrons", {
+          definition: "Un solide est limité par des **faces** ; deux faces se rencontrent selon une **arête** ; les arêtes se rejoignent en des **sommets**. Un patron est une figure plane qui, une fois pliée, permet de fabriquer le solide.",
+          proprietes: ["Cube : 6 faces carrées, 12 arêtes, 8 sommets.", "Pavé droit : 6 faces rectangulaires, 12 arêtes, 8 sommets.", "Prisme droit à base triangulaire : 5 faces, 9 arêtes, 6 sommets.", "Pyramide à base carrée : 5 faces, 8 arêtes, 5 sommets."],
+        }),
+        n("m6-solides-volume", "Volume du pavé droit et du cube", {
+          definition: "Le volume d'un solide mesure l'espace qu'il occupe, en unités de volume : cm³, m³… Un cube d'arête 1 cm a un volume de 1 cm³.",
+          proprietes: ["Pavé droit : $\\mathcal{V} = L \\times \\ell \\times h$.", "Cube : $\\mathcal{V} = c \\times c \\times c$.", "$1$ dm³ $= 1$ L $= 1\\,000$ cm³."],
+          exemple: "Pavé de 5 cm × 4 cm × 3 cm : $\\mathcal{V} = 60$ cm³.",
+        }),
+      ]),
+      ch("m6-donnees", "Gestion de données", GD, [
+        n("m6-donnees-lire", "Lire et exploiter tableaux et diagrammes", {
+          definition: "Un tableau ou un graphique (diagramme en barres, diagramme circulaire, graphique cartésien) présente des données de façon organisée.",
+          proprietes: ["Lire le titre, puis la légende des axes et leurs unités.", "Dans un diagramme en barres, la hauteur de chaque barre est proportionnelle à l'effectif représenté.", "Effectif total = somme de tous les effectifs."],
+          methode: ["Repérer la barre (ou la case) concernée.", "Lire sa valeur sur l'axe vertical à l'aide des graduations.", "Effectuer le calcul demandé (somme, différence, comparaison)."],
+        }),
+      ]),
+      ch("m6-symetrie", "Symétrie axiale", EG, [
+        n("m6-symetrie-construire", "Symétrique d'un point, d'une figure", {
+          definition: "Le symétrique d'un point $A$ par rapport à une droite $(d)$ est le point $A'$ tel que $(d)$ soit la médiatrice du segment $[AA']$. Si $A \\in (d)$, son symétrique est lui-même.",
+          proprietes: ["La symétrie axiale conserve les longueurs, les angles, les aires et l'alignement.", "Le symétrique d'une droite est une droite, celui d'un cercle est un cercle de même rayon.", "Une droite $(d)$ est un axe de symétrie d'une figure si la figure et sa symétrique se superposent."],
+          methode: ["Sur quadrillage : compter les carreaux de $A$ jusqu'à l'axe, perpendiculairement à l'axe.", "Reporter le même nombre de carreaux de l'autre côté de l'axe."],
+        }),
+        n("m6-symetrie-axes", "Axes de symétrie des figures usuelles", {
+          definition: "Un axe de symétrie partage une figure en deux parties superposables par pliage.",
+          proprietes: ["Rectangle : 2 axes ; losange : 2 axes (ses diagonales) ; carré : 4 axes.", "Triangle isocèle : 1 axe ; triangle équilatéral : 3 axes.", "Cercle : une infinité d'axes (toutes les droites passant par le centre)."],
+        }),
+      ]),
     ] },
     { id: "5e", label: "Cinquième", cycle: "Collège", chapters: [
       ch("m5-relatifs", "Nombres relatifs", NC, [

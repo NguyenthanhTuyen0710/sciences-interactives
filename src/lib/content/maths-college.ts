@@ -180,7 +180,7 @@ export const m6ClasserNombres: Generator = {
 export const m6VraiFauxDivisibilite: Generator = {
   meta: {
     id: "m6-divisibilite", title: "Critères de divisibilité – Vrai ou faux ?",
-    subject: "maths", level: "6e", chapterId: "m6-calculs", notionId: "m6-calculs-divisibilite",
+    subject: "maths", level: "6e", chapterId: "m6-division", notionId: "m6-calculs-divisibilite",
     kinds: ["vrai-faux"], summary: "Utiliser les critères de divisibilité par 2, 3, 4, 5, 9 et 10.", randomized: "valeurs", timeLimit: 120,
   },
   generate(rng, d) {

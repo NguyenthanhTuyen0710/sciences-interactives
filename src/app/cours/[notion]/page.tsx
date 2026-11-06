@@ -29,7 +29,7 @@ export default async function FichePage({ params }: { params: Promise<{ notion: 
           </section>
           <section>
             <h2 className="mb-2 font-bold text-slate-900">À retenir</h2>
-            <ul className="space-y-2">{fiche.proprietes.map((p, i) => <li key={i} className="flex gap-2 rounded-xl bg-slate-50 p-3"><span className="font-bold text-indigo-600">{i + 1}.</span><MathText text={p} /></li>)}</ul>
+            <ul className="space-y-2">{fiche.proprietes.map((p, i) => <li key={i} className="flex gap-2 rounded-xl bg-slate-50 p-3"><span className="font-bold text-indigo-400">{i + 1}.</span><MathText text={p} /></li>)}</ul>
           </section>
           {fiche.methode && (
             <section>
@@ -51,7 +51,7 @@ export default async function FichePage({ params }: { params: Promise<{ notion: 
           <div className="grid gap-4 sm:grid-cols-2">{exs.map((m) => <ExerciseCard key={m.id} m={m} />)}</div>
         </section>
       )}
-      <p className="mt-6 text-center"><Link href="/cours" className="text-sm font-semibold text-indigo-600 hover:underline">← Toutes les fiches</Link></p>
+      <p className="mt-6 text-center"><Link href="/cours" className="text-sm font-semibold text-indigo-400 hover:underline">← Toutes les fiches</Link></p>
     </div>
   );
 }

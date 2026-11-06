@@ -53,7 +53,7 @@ function Qcm({ it, value, onChange, result, locked }: P<"qcm">) {
           const on = sel.includes(i);
           return (
             <button key={i} type="button" role={it.multiple ? "checkbox" : "radio"} aria-checked={on} onClick={() => toggle(i)} disabled={locked}
-              className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition ${on ? (result ? (result.status === "correct" ? "border-emerald-500 bg-emerald-50" : "border-rose-500 bg-rose-50") : "border-indigo-500 bg-indigo-50") : "border-slate-200 bg-white hover:border-indigo-300"}`}>
+              className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition ${on ? (result ? (result.status === "correct" ? "border-emerald-500 bg-emerald-50" : "border-rose-500 bg-rose-50") : "border-indigo-500 bg-indigo-50") : "border-slate-200 bg-surface hover:border-indigo-300"}`}>
               <span className={`grid h-6 w-6 shrink-0 place-items-center ${it.multiple ? "rounded-md" : "rounded-full"} border-2 text-xs font-bold ${on ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 text-slate-400"}`}>{String.fromCharCode(65 + i)}</span>
               <MathInline text={o} />
             </button>
@@ -75,7 +75,7 @@ function VraiFaux({ it, value, onChange, result, locked }: P<"vrai-faux">) {
           <div className="flex gap-2">
             {[true, false].map((b) => (
               <button key={String(b)} type="button" disabled={locked} aria-pressed={v[i] === b} onClick={() => onChange(v.map((x, j) => (j === i ? b : x)))}
-                className={`min-w-20 rounded-lg border px-3 py-1.5 text-sm font-semibold ${v[i] === b ? (b ? "border-emerald-600 bg-emerald-600 text-white" : "border-rose-600 bg-rose-600 text-white") : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}>
+                className={`min-w-20 rounded-lg border px-3 py-1.5 text-sm font-semibold ${v[i] === b ? (b ? "border-emerald-600 bg-emerald-600 text-white" : "border-rose-600 bg-rose-600 text-white") : "border-slate-300 bg-surface text-slate-700 hover:bg-slate-50"}`}>
                 {b ? "Vrai" : "Faux"}
               </button>
             ))}
@@ -91,7 +91,7 @@ export function NumberInput({ value, onChange, locked, ok, width, ariaLabel }: {
   return (
     <input inputMode="decimal" autoComplete="off" aria-label={ariaLabel ?? "Réponse"} value={value} disabled={locked} onChange={(e) => onChange(e.target.value)}
       style={width ? { width: `${width + 2}ch` } : undefined}
-      className={`rounded-lg border-2 bg-white px-2 py-1.5 text-center font-medium outline-none focus:border-indigo-500 ${width ? "" : "w-32"} ${tone(ok)}`} />
+      className={`rounded-lg border-2 bg-surface px-2 py-1.5 text-center font-medium outline-none focus:border-indigo-500 ${width ? "" : "w-32"} ${tone(ok)}`} />
   );
 }
 
@@ -101,7 +101,7 @@ function Numerique({ it, value, onChange, result, locked }: P<"numerique">) {
       {it.label && <MathInline text={it.label} className="font-medium" />}
       <NumberInput value={value.value} onChange={(s) => onChange({ ...value, value: s })} locked={locked} ok={result?.details?.[0]} />
       {it.units && it.units.length > 1 ? (
-        <select aria-label="Unité" disabled={locked} value={value.unit} onChange={(e) => onChange({ ...value, unit: e.target.value })} className="rounded-lg border-2 border-slate-300 bg-white px-2 py-1.5">
+        <select aria-label="Unité" disabled={locked} value={value.unit} onChange={(e) => onChange({ ...value, unit: e.target.value })} className="rounded-lg border-2 border-slate-300 bg-surface px-2 py-1.5">
           <option value="">unité…</option>
           {it.units.map((u) => <option key={u} value={u}>{u}</option>)}
         </select>
@@ -119,7 +119,7 @@ function ExprPreview({ src }: { src: string }) {
     import("@/lib/engine/expr").then(({ exprToTex }) => {
       if (!alive) return;
       const t = exprToTex(src);
-      setHtml(t ? katex.renderToString(t, { throwOnError: false }) : '<span class="text-rose-600 text-sm">expression incomplète</span>');
+      setHtml(t ? katex.renderToString(t, { throwOnError: false }) : '<span class="text-rose-400 text-sm">expression incomplète</span>');
     });
     return () => { alive = false; };
   }, [src]);
@@ -141,12 +141,12 @@ function Expression({ it, value, onChange, result, locked }: P<"expression">) {
       <div className="flex flex-wrap items-center gap-2">
         {it.label && <MathInline text={`$${it.label.replace("=", "")}=$`} className="font-medium" />}
         <input ref={ref} autoComplete="off" spellCheck={false} aria-label="Expression" value={value} disabled={locked} onChange={(e) => onChange(e.target.value)}
-          placeholder={`ex. 3${it.variable}^2 - 5${it.variable} + 2`} className={`min-w-0 flex-1 rounded-lg border-2 bg-white px-3 py-2 font-mono outline-none focus:border-indigo-500 ${tone(result?.details?.[0])}`} />
+          placeholder={`ex. 3${it.variable}^2 - 5${it.variable} + 2`} className={`min-w-0 flex-1 rounded-lg border-2 bg-surface px-3 py-2 font-mono outline-none focus:border-indigo-500 ${tone(result?.details?.[0])}`} />
       </div>
       {!locked && (
         <div className="flex flex-wrap gap-1.5">
           {keys.map((k) => (
-            <button key={k} type="button" onClick={() => insert(k)} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 font-mono text-sm hover:bg-slate-100">{k}</button>
+            <button key={k} type="button" onClick={() => insert(k)} className="rounded-md border border-slate-300 bg-surface px-2.5 py-1 font-mono text-sm hover:bg-slate-100">{k}</button>
           ))}
         </div>
       )}
@@ -159,7 +159,7 @@ function TexteLibre({ it, value, onChange, result, locked }: P<"texte-libre">) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {it.label && <MathInline text={it.label} />}
-      <input value={value} disabled={locked} aria-label="Réponse" onChange={(e) => onChange(e.target.value)} className={`min-w-0 flex-1 rounded-lg border-2 bg-white px-3 py-2 outline-none focus:border-indigo-500 ${tone(result?.details?.[0])}`} />
+      <input value={value} disabled={locked} aria-label="Réponse" onChange={(e) => onChange(e.target.value)} className={`min-w-0 flex-1 rounded-lg border-2 bg-surface px-3 py-2 outline-none focus:border-indigo-500 ${tone(result?.details?.[0])}`} />
     </div>
   );
 }
@@ -181,7 +181,7 @@ function TexteTrous({ it, value, onChange, result, locked }: P<"texte-trous">) {
             const ok = result?.details?.[i];
             if (b.type === "select")
               return (
-                <select key={k} aria-label={`Trou ${i + 1}`} disabled={locked} value={v[i]} onChange={(e) => set(i, e.target.value)} className={`rounded-lg border-2 bg-white px-2 py-1 font-semibold ${tone(ok)}`}>
+                <select key={k} aria-label={`Trou ${i + 1}`} disabled={locked} value={v[i]} onChange={(e) => set(i, e.target.value)} className={`rounded-lg border-2 bg-surface px-2 py-1 font-semibold ${tone(ok)}`}>
                   <option value="">…</option>
                   {b.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
                 </select>
@@ -198,7 +198,7 @@ function TexteTrous({ it, value, onChange, result, locked }: P<"texte-trous">) {
 function Token({ label, selected, onClick, draggable, onDragStart, disabled, extra, data }: { label: string; selected?: boolean; onClick?: () => void; draggable?: boolean; onDragStart?: (e: DragEvent) => void; disabled?: boolean; extra?: string; data?: Record<string, number> }) {
   return (
     <button type="button" {...data} disabled={disabled} draggable={draggable && !disabled} onDragStart={onDragStart} onClick={onClick}
-      className={`cursor-grab rounded-lg border-2 px-3 py-1.5 text-sm font-medium shadow-sm transition active:cursor-grabbing ${selected ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white hover:border-indigo-400"} ${extra ?? ""}`}>
+      className={`cursor-grab rounded-lg border-2 px-3 py-1.5 text-sm font-medium shadow-sm transition active:cursor-grabbing ${selected ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-surface hover:border-indigo-400"} ${extra ?? ""}`}>
       <MathInline text={label} />
     </button>
   );
@@ -257,7 +257,7 @@ function Classer({ it, value, onChange, result, locked }: P<"classer">) {
         <div className={`grid gap-3 ${it.categories.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
           {it.categories.map((c, ci) => (
             <div key={ci} data-cat={ci} onDragOver={(e) => e.preventDefault()} onDrop={drop(ci)} onClick={() => { if (sel !== null && !locked) { put(sel, ci); setSel(null); } }}
-              className={`min-h-28 rounded-xl border-2 bg-white p-3 ${sel !== null ? "cursor-pointer border-indigo-300" : "border-slate-200"}`}>
+              className={`min-h-28 rounded-xl border-2 bg-surface p-3 ${sel !== null ? "cursor-pointer border-indigo-300" : "border-slate-200"}`}>
               <div className="mb-2 text-sm font-semibold text-slate-700"><MathInline text={c} /></div>
               <div className="flex flex-wrap gap-2">{it.items.map((_, i) => v[i] === ci && tok(i))}</div>
             </div>
@@ -287,7 +287,7 @@ function Associer({ it, value, onChange, result, locked }: P<"associer">) {
         <div className="space-y-2">
           {it.left.map((l, i) => (
             <button key={i} data-left={i} type="button" disabled={locked} onClick={() => setLeft(left === i ? null : i)}
-              className={`flex w-full items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-left ${left === i ? "border-indigo-600 ring-2 ring-indigo-200" : result ? tone(result.details?.[i]) : "border-slate-200 bg-white hover:border-indigo-300"}`}>
+              className={`flex w-full items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-left ${left === i ? "border-indigo-600 ring-2 ring-indigo-200" : result ? tone(result.details?.[i]) : "border-slate-200 bg-surface hover:border-indigo-300"}`}>
               <span className={`h-3 w-3 shrink-0 rounded-full ${v[i] !== null ? colorOf(i) : "bg-slate-200"}`} />
               <MathInline text={l} />
             </button>
@@ -298,7 +298,7 @@ function Associer({ it, value, onChange, result, locked }: P<"associer">) {
             const o = rightOwner(i);
             return (
               <button key={i} data-right={i} type="button" disabled={locked} onClick={() => clickRight(i)}
-                className={`flex w-full items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-left ${left !== null ? "border-indigo-300 hover:bg-indigo-50" : "border-slate-200 bg-white"}`}>
+                className={`flex w-full items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-left ${left !== null ? "border-indigo-300 hover:bg-indigo-50" : "border-slate-200 bg-surface"}`}>
                 <span className={`h-3 w-3 shrink-0 rounded-full ${o >= 0 ? colorOf(o) : "bg-slate-200"}`} />
                 <MathInline text={r} />
               </button>
@@ -324,7 +324,7 @@ function SortableList({ items, order, onChange, locked, details, render }: { ite
     <ol className="space-y-2">
       {order.map((itemIdx, pos) => (
         <li key={itemIdx} data-item-idx={itemIdx} draggable={!locked} onDragStart={() => setDrag(pos)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (drag !== null) move(drag, pos); setDrag(null); }}
-          className={`flex items-start gap-3 rounded-xl border-2 bg-white p-3 ${details ? tone(details[pos]) : "border-slate-200"} ${!locked ? "cursor-grab" : ""}`}>
+          className={`flex items-start gap-3 rounded-xl border-2 bg-surface p-3 ${details ? tone(details[pos]) : "border-slate-200"} ${!locked ? "cursor-grab" : ""}`}>
           <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold text-slate-600">{pos + 1}</span>
           <div className="flex-1">
             <MathInline text={items[itemIdx]} />
@@ -359,7 +359,7 @@ function Demonstration({ it, value, onChange, result, locked }: P<"demonstration
       <SortableList items={it.steps} order={value.order} locked={locked} details={result?.details?.slice(0, n)} onChange={(o) => onChange({ ...value, order: o })}
         render={(idx) => (
           <select aria-label="Justification" disabled={locked} value={value.justifs[idx] ?? ""} onChange={(e) => onChange({ ...value, justifs: value.justifs.map((x: number | null, j: number) => (j === idx ? (e.target.value === "" ? null : Number(e.target.value)) : x)) })}
-            className={`mt-2 w-full rounded-lg border-2 bg-white px-2 py-1 text-sm ${result ? tone(result.details?.[n + idx]) : "border-slate-300"}`}>
+            className={`mt-2 w-full rounded-lg border-2 bg-surface px-2 py-1 text-sm ${result ? tone(result.details?.[n + idx]) : "border-slate-300"}`}>
             <option value="">Justification…</option>
             {it.options.map((o, oi) => <option key={oi} value={oi}>{o}</option>)}
           </select>
@@ -400,12 +400,12 @@ function Repere({ it, value, onChange, result, locked }: P<"repere">) {
       <div className="flex flex-wrap gap-2">
         {it.labels.map((l, i) => (
           <button key={i} data-point={i} type="button" disabled={locked} onClick={() => setActive(i)}
-            className={`rounded-lg border-2 px-3 py-1 text-sm font-semibold ${active === i && !locked ? "border-indigo-600 bg-indigo-600 text-white" : result ? tone(result.details?.[i]) : "border-slate-300 bg-white"}`}>
+            className={`rounded-lg border-2 px-3 py-1 text-sm font-semibold ${active === i && !locked ? "border-indigo-600 bg-indigo-600 text-white" : result ? tone(result.details?.[i]) : "border-slate-300 bg-surface"}`}>
             Point {l} {v[i] ? `(${String(v[i]![0]).replace(".", ",")} ; ${String(v[i]![1]).replace(".", ",")})` : "— à placer"}
           </button>
         ))}
       </div>
-      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} onClick={click} className={`w-full max-w-[420px] touch-manipulation select-none rounded-xl border border-slate-200 bg-white ${locked ? "" : "cursor-crosshair"}`} role="img" aria-label="Repère : cliquez pour placer le point sélectionné">
+      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} onClick={click} className={`w-full max-w-[420px] touch-manipulation select-none rounded-xl border border-slate-200 bg-paper ${locked ? "" : "cursor-crosshair"}`} role="img" aria-label="Repère : cliquez pour placer le point sélectionné">
         {lines}
         <line x1={X(it.xmin)} x2={X(it.xmax)} y1={Y(0)} y2={Y(0)} stroke="#334155" strokeWidth="1.6" />
         <line y1={Y(it.ymin)} y2={Y(it.ymax)} x1={X(0)} x2={X(0)} stroke="#334155" strokeWidth="1.6" />
