@@ -65,7 +65,7 @@
       "id": "SCI-5E-MATH-001",
       "kind": "chapter",
       "title": "Nombres relatifs (5e) — tranche verticale pilote",
-      "state": "QA_PENDING",
+      "state": "PUBLISHED",
       "grade": "5e",
       "subject": "mathematiques",
       "chapterId": "math-5e-nombres-relatifs",
@@ -77,18 +77,18 @@
         "research/dossiers/math-5e-nombres-relatifs.md",
         "src/lib/chapters/data/math-5e-nombres-relatifs.ts"
       ],
-      "next": "Contre-vérification indépendante des correctifs (6 dimensions), puis publication si six PASS",
+      "next": "",
       "reports": [
         "project/reports/SCI-5E-MATH-001-QA1.md",
         "project/reports/SCI-5E-MATH-001-QA2.md",
         "project/reports/SCI-5E-MATH-001-QA3.md",
         "project/reports/SCI-5E-MATH-001-QA4.md",
         "project/reports/SCI-5E-MATH-001-QA5.md",
-        "project/reports/SCI-5E-MATH-001-QA6.md"
+        "project/reports/SCI-5E-MATH-001-QA6.md",
+        "project/reports/SCI-5E-MATH-001-recheck-1.md",
+        "project/reports/SCI-5E-MATH-001-recheck-2.md"
       ],
-      "blockers": [
-        "Décision du porteur de projet : tutoiement ou vouvoiement de l’interface existante (QA6 Moy3)"
-      ]
+      "blockers": []
     },
     {
       "id": "SCI-6E-MATH-001",
@@ -406,14 +406,14 @@
       "id": "SCI-5E-MATH-004",
       "kind": "chapter",
       "title": "Addition et soustraction des nombres relatifs",
-      "state": "QA_PENDING",
+      "state": "PUBLISHED",
       "grade": "5e",
       "subject": "mathematiques",
       "chapterId": "math-5e-relatifs-addition-soustraction",
       "dependsOn": [
         "SCI-INFRA-002"
       ],
-      "next": "Couvert par SCI-5E-MATH-001 (chapitre fusionné) — suit son statut"
+      "next": "Couvert par SCI-5E-MATH-001 (publié)"
     },
     {
       "id": "SCI-5E-MATH-005",
@@ -471,14 +471,14 @@
       "id": "SCI-5E-MATH-009",
       "kind": "chapter",
       "title": "Repérage sur une droite et dans le plan",
-      "state": "TODO",
+      "state": "PUBLISHED",
       "grade": "5e",
       "subject": "mathematiques",
       "chapterId": "math-5e-reperage",
       "dependsOn": [
         "SCI-INFRA-002"
       ],
-      "next": "A2/A3 : dossier de recherche"
+      "next": "Couvert par SCI-5E-MATH-001 (publié)"
     },
     {
       "id": "SCI-5E-MATH-010",
@@ -1584,6 +1584,23 @@
         "SCI-INFRA-002"
       ],
       "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-INFRA-003",
+      "kind": "infra",
+      "title": "Instruire l'erreur d'hydratation intermittente de /admin/exercices/nouveau (e2e)",
+      "state": "TODO",
+      "next": "Reproduire, puis attendre l'hydratation dans scripts/e2e.ts ou corriger la page"
+    },
+    {
+      "id": "SCI-INFRA-004",
+      "kind": "infra",
+      "title": "Décision : tutoiement ou vouvoiement de l'interface existante",
+      "state": "BLOCKED",
+      "blockers": [
+        "Décision du porteur de projet"
+      ],
+      "next": "Appliquer la décision au lecteur d'exercices et au moteur de correction"
     }
   ]
 }

@@ -62,7 +62,7 @@ function Finished({ score, total, onRestart }: { score: number; total: number; o
     <div className="space-y-3 text-center">
       <p className="text-2xl font-black">{score}/{total}</p>
       <p className="text-slate-600">{score === total ? "Parfait !" : score >= total * 0.7 ? "Bien joué ! Rejoue pour viser le sans-faute." : "Relis la partie du cours concernée puis réessaie."}</p>
-      <button type="button" className="btn-primary" onClick={onRestart}>Rejouer</button>
+      <button type="button" className="btn-primary" onClick={onRestart} autoFocus>Rejouer</button>
     </div>
   );
 }
@@ -238,7 +238,7 @@ function CalculMental({ game }: { game: ChapterGame }) {
     const v = parseRel(typed);
     if (v === null) { setFb({ ok: false, message: "Écris un nombre relatif, par exemple −7 ou 3." }); return; }
     const r = calcFeedback(q, v);
-    const result = `$${q.tex} = ${frRel(q.answer)}$`;
+    const result = `$${q.tex} = ${frRel(q.answer).replace(",", "{,}")}$`;
     setFb({ ok: r.ok, message: r.ok ? `${result}` : `Calcul précédent : ${result} (ta réponse : ${typed}). ${r.message}` });
     counts.current = { score: counts.current.score + (r.ok ? 1 : 0), asked: counts.current.asked + 1 };
     setAsked(counts.current.asked); setScore(counts.current.score);
@@ -286,7 +286,7 @@ function CalculMental({ game }: { game: ChapterGame }) {
           ) : <Finished score={score} total={asked} onRestart={restart} />}
           {log.some((l) => !l.ok) && (
             <div className="rounded-xl bg-slate-50 p-3 text-sm"><p className="mb-1 font-semibold">À revoir :</p>
-              <ul className="space-y-1">{log.filter((l) => !l.ok).map((l, i) => <li key={i}><MathInline text={`$${l.tex} = ${frRel(l.answer)}$`} /> <span className="text-slate-500">(ta réponse : {l.given})</span></li>)}</ul>
+              <ul className="space-y-1">{log.filter((l) => !l.ok).map((l, i) => <li key={i}><MathInline text={`$${l.tex} = ${frRel(l.answer).replace(",", "{,}")}$`} /> <span className="text-slate-500">(ta réponse : {l.given})</span></li>)}</ul>
             </div>
           )}
         </div>
@@ -395,7 +395,7 @@ function Memory({ game }: { game: ChapterGame }) {
   };
   return (
     <Shell game={game} score={`Paires : ${found.size}/${pairs.length} · Essais : ${tries}`} best={best !== null ? `${best} essais` : undefined} onRestart={restart}>
-      <p className="mb-2 text-xs text-slate-500">Il faut au minimum {pairs.length} essais ; moins tu en utilises, meilleur est ton record.</p>
+      <p className="mb-2 text-xs text-slate-500">Il faut au minimum {pairs.length} essais ; moins tu en utilises, meilleur est ton record.</p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {cards.map((c, i) => {
           const isFound = found.has(c.pair);

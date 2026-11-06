@@ -622,7 +622,7 @@ export const math5eNombresRelatifs: ChapterContent = {
     illustrations: [
       { svg: numberLine({ min: -5, max: 5, step: 1, points: [{ x: -3, label: "A" }, { x: 3, label: "B" }], title: "Droite graduée : A d'abscisse −3 et B d'abscisse 3, symétriques par rapport à 0" }), alt: "Droite graduée de −5 à 5 ; le point A d'abscisse −3 et le point B d'abscisse 3 sont à la même distance de 0, de part et d'autre.", caption: "$A$ et $B$ ont des abscisses opposées ($-3$ et $3$) : ils sont symétriques par rapport à l'origine." },
       { svg: thermometer, alt: "Thermomètre gradué de −10 °C à 10 °C ; le liquide s'arrête à −4 °C.", caption: "Plus on descend sur le thermomètre, plus la température est petite : $-4 < 0 < 5$." },
-      { svg: plot({ xmin: -5, xmax: 5, ymin: -4, ymax: 4, points: [{ x: 3, y: 2, label: "A(3 ; 2)" }, { x: -4, y: 1, label: "B(−4 ; 1)" }, { x: -2, y: -3, label: "C(−2 ; −3)" }, { x: 2, y: -2, label: "D(2 ; −2)" }], title: "Repère orthogonal avec quatre points", width: 360, height: 300 }), alt: "Repère orthogonal avec les points A(3 ; 2), B(−4 ; 1), C(−2 ; −3) et D(2 ; −2), un dans chaque quart du plan.", caption: "Un point dans chaque quart du plan : le signe des coordonnées indique le quart." },
+      { svg: plot({ xmin: -5, xmax: 5, ymin: -4, ymax: 4, points: [{ x: 3, y: 2, label: "A(3 ; 2)" }, { x: -4, y: 1, label: "B(−4 ; 1)" }, { x: -2, y: -3, label: "C(−2 ; −3)" }, { x: 2, y: -2, label: "D(2 ; −2)" }], title: "Repère orthogonal avec quatre points", width: 360, height: 300 }), alt: "Repère orthogonal avec les points A(3 ; 2), B(−4 ; 1), C(−2 ; −3) et D(2 ; −2), un dans chaque quart du plan.", caption: "Un point dans chaque quart du plan : le signe des coordonnées indique le quart." },
     ],
     commonMistakes: [
       { mistake: "$-7 > -3$ « car 7 est plus grand que 3 »", correction: "$-7 < -3$", why: "Entre deux négatifs, le plus grand est le plus proche de $0$ (−3 °C est moins froid que −7 °C)." },
@@ -712,6 +712,6 @@ export const math5eNombresRelatifs: ChapterContent = {
       ] },
     },
   ],
-  reviewStatus: { curriculum: "pending", accuracy: "pending", exercises: "pending", games: "pending", technical: "pending", language: "pending" },
-  publicationStatus: "draft",
+  reviewStatus: { curriculum: "pass", accuracy: "pass", exercises: "pass", games: "pass", technical: "pass", language: "pass" },
+  publicationStatus: "published",
 };
