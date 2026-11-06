@@ -1,0 +1,11 @@
+{
+  "name": "Sciences Interactives",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [3000],
+  "portsAttributes": { "3000": { "label": "Application", "onAutoForward": "openBrowser" } },
+  "postCreateCommand": "npm ci --legacy-peer-deps && npm run setup",
+  "postAttachCommand": "npm run dev",
+  "customizations": { "vscode": { "extensions": ["bradlc.vscode-tailwindcss", "dbaeumer.vscode-eslint"] } }
+}
