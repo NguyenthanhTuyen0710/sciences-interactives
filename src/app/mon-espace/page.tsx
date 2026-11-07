@@ -15,7 +15,7 @@ export default async function MySpace() {
     return (
       <div className="mx-auto max-w-lg py-10 text-center">
         <h1 className="text-3xl font-black">Mon espace</h1>
-        <p className="mt-2 text-slate-600">Connectez-vous pour retrouver votre progression, vos statistiques et vos recommandations personnalisées.</p>
+        <p className="mt-2 text-slate-600">Connecte-toi pour retrouver ta progression, tes statistiques et tes recommandations personnalisées.</p>
         <div className="mt-6 flex justify-center gap-2"><Link href="/connexion" className="btn-primary">Connexion</Link><Link href="/inscription" className="btn-ghost">Créer un compte</Link></div>
       </div>
     );
@@ -27,7 +27,7 @@ export default async function MySpace() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-3xl font-black">Bonjour {user.name}</h1>
-          <p className="text-slate-600">{user.level ? `Classe : ${user.level}` : "Renseignez votre classe pour des recommandations adaptées."} · {user.role === "eleve" ? "Élève" : user.role === "enseignant" ? "Enseignant" : "Administrateur"}</p>
+          <p className="text-slate-600">{user.level ? `Classe : ${user.level}` : "Renseigne ta classe pour des recommandations adaptées."} · {user.role === "eleve" ? "Élève" : user.role === "enseignant" ? "Enseignant" : "Administrateur"}</p>
         </div>
       </div>
 

@@ -3,7 +3,12 @@
 // on la saisit dans l'interface, on valide et on vérifie le score de 100 %.
 // Usage : BASE_URL=http://localhost:3000 npx tsx scripts/e2e.ts
 import { createRequire } from "node:module";
-import { STATIC_GENERATORS } from "../src/lib/content/registry-static";
+import { STATIC_GENERATORS as ALL_GENERATORS } from "../src/lib/content/registry-static";
+import { ALL_CHAPTERS, isVisible } from "../src/lib/chapters";
+
+// Les exercices des chapitres non publiés ne sont servis qu'avec SHOW_DRAFTS=1 (à passer aussi à ce script).
+const hidden = new Set(ALL_CHAPTERS.filter((c) => !isVisible(c)).flatMap((c) => c.exercises.map((e) => e.id)));
+const STATIC_GENERATORS = ALL_GENERATORS.filter((g) => !hidden.has(g.meta.id));
 import { createRng } from "../src/lib/engine/rng";
 import { perfect } from "../src/lib/engine/solve";
 import type { Difficulty, Interaction } from "../src/lib/engine/types";
@@ -127,7 +132,10 @@ async function main() {
   const before = Number((await page.locator("text=Exercices réalisés").locator("..").locator("p").nth(1).textContent()) ?? 0);
 
   console.log("\n2. Chaque exercice, piloté par l'interface avec la bonne réponse → 100 %");
-  for (const g of process.env.QUICK ? STATIC_GENERATORS.slice(0, 2) : STATIC_GENERATORS) {
+  // ONLY=pref1,pref2 : ne pilote que les exercices dont l'identifiant commence par l'un des préfixes.
+  const only = process.env.ONLY?.split(",");
+  const RUN = only ? STATIC_GENERATORS.filter((g) => only.some((p) => g.meta.id.startsWith(p))) : process.env.QUICK ? STATIC_GENERATORS.slice(0, 2) : STATIC_GENERATORS;
+  for (const g of RUN) {
     const d = ((STATIC_GENERATORS.indexOf(g) % 3) + 1) as Difficulty;
     const seed = `e2e${g.meta.id.length}${d}`;
     const inst = g.generate(createRng(seed), d);
@@ -159,7 +167,7 @@ async function main() {
   console.log("\n4. Progression enregistrée");
   await page.goto(`${BASE}/mon-espace`, { waitUntil: "networkidle" });
   const after = Number((await page.locator("text=Exercices réalisés").locator("..").locator("p").nth(1).textContent()) ?? 0);
-  ok(after >= before + (process.env.QUICK ? 2 : STATIC_GENERATORS.length), `tentatives enregistrées (${before} → ${after})`);
+  ok(after >= before + RUN.length, `tentatives enregistrées (${before} → ${after})`);
   ok(await page.getByText("Recommandations").isVisible(), "recommandations affichées");
 
   console.log("\n5. Défi chronométré (série notée sur 20)");

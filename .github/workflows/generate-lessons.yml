@@ -1,0 +1,226 @@
+# Production d'un chapitre par le pipeline existant (pipeline/run.ts) via l'API Claude.
+#   dry-run : contrôle des données + estimation des coûts, aucun appel API, aucune clé exposée.
+#   submit    : soumet la prochaine étape par Message Batches. Refusé tant que l'une des conditions manque : registre
+#               des dépenses synchronisé (release brouillon « data-store »), creditVerified, plafond 10 USD, aucune
+#               requête identique déjà soumise, aucune opération à l'issue inconnue (pipeline/ledger.ts).
+#   collect   : récupère le résultat d'un batch_id et solde son coût ; aucune nouvelle requête payante.
+#   reconcile : rattache une réservation à l'issue inconnue au batch réellement créé (lecture seule côté API).
+# Les fichiers produits sont publiés comme artefact du run, jamais committés : relecture humaine obligatoire.
+# Droits : seuls les jobs ledger-pull et ledger-push (stockage « data-store ») ont contents: write ; le job qui
+# détient la clé API n'a que contents: read et reçoit le registre par artefact, vérifié par SHA256.
+name: Generate Lessons
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (estimation, sans API) | submit (Message Batches) | collect (résultat d'un batch) | reconcile"
+        type: choice
+        options: [dry-run, submit, collect, reconcile]
+        default: dry-run
+      level:
+        description: "Niveau (doit correspondre à la fiche du chapitre)"
+        type: choice
+        options: [3e]
+        default: 3e
+      subject:
+        description: "Matière (doit correspondre à la fiche du chapitre)"
+        type: choice
+        options: [mathematiques]
+        default: mathematiques
+      chapter:
+        description: "Identifiant de chapitre (fichier pipeline/chapters/<id>.json)"
+        type: choice
+        options: [math-3e-pythagore, math-3e-calcul-litteral]
+        default: math-3e-pythagore
+      exercise_count:
+        description: "Nombre d'exercices imposé (1-60) ; vide = règle normale (≥ 30)"
+        type: string
+        default: "5"
+      batch_id:
+        description: "Identifiant msgbatch_… (mode collect uniquement)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-store # une seule exécution à la fois sur le registre partagé (avec collect-sources.yml)
+  cancel-in-progress: false
+
+jobs:
+  ledger-pull:
+    if: inputs.mode != 'dry-run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # lecture d'une release brouillon (réservée aux jetons en écriture)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lire le registre des dépenses (SHA256 vérifié)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh pull-ledger
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store/
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error
+
+  pipeline:
+    needs: ledger-pull
+    if: always() && (inputs.mode == 'dry-run' || needs.ledger-pull.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Aucun appel possible avant cette étape
+        run: echo "started=false" >> "$GITHUB_OUTPUT"
+        id: premark
+
+      - name: Recevoir le registre
+        if: inputs.mode != 'dry-run'
+        uses: actions/download-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store
+
+      - name: Vérifier le registre reçu
+        if: inputs.mode != 'dry-run'
+        run: |
+          (cd pipeline/.store && sha256sum -c ledger.sha256)
+          npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl
+          echo "PIPELINE_LEDGER_SYNCED=1" >> "$GITHUB_ENV"
+
+      - name: Marquer le début des appels possibles
+        id: mark
+        run: echo "started=true" >> "$GITHUB_OUTPUT"
+
+      - name: Pipeline (${{ inputs.mode }})
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          LEVEL: ${{ inputs.level }}
+          SUBJECT: ${{ inputs.subject }}
+          CHAPTER: ${{ inputs.chapter }}
+          EXERCISES: ${{ inputs.exercise_count }}
+          BATCH_ID: ${{ inputs.batch_id }}
+          # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
+          # et pipeline/run.ts ne l'affiche jamais.
+          ANTHROPIC_API_KEY: ${{ inputs.mode != 'dry-run' && secrets.ANTHROPIC_API_KEY || '' }}
+        run: |
+          args=("$CHAPTER" --level "$LEVEL" --subject "$SUBJECT")
+          if [ -n "$EXERCISES" ]; then args+=(--exercises "$EXERCISES"); fi
+          case "$MODE" in
+            dry-run) args+=(--batch) ;;
+            submit)  args+=(--submit) ;;
+            collect)
+              if [ -z "$BATCH_ID" ]; then echo "::error::batch_id est obligatoire en mode collect"; exit 2; fi
+              args+=(--collect "$BATCH_ID") ;;
+            reconcile) args+=(--reconcile) ;;
+          esac
+          mkdir -p pipeline-output
+          npx tsx pipeline/run.ts "${args[@]}" 2>&1 | tee pipeline-output/run.log
+
+      - name: Cohérence du registre après exécution
+        if: always() && inputs.mode != 'dry-run'
+        run: npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl --base pipeline/.store/ledger.base.jsonl
+
+      - name: Transmettre le registre
+        if: always() && inputs.mode != 'dry-run'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ledger-out
+          path: pipeline/.store/ledger.jsonl
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Résumé
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Pipeline \`${{ inputs.chapter }}\` — mode \`${{ inputs.mode }}\`"
+            echo '```'
+            cat pipeline-output/run.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+            echo "Sorties dans l'artefact du run : brouillons non publiés, à relire avant tout commit."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier les sorties (artefact, sans commit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lessons-${{ inputs.chapter }}-${{ inputs.mode }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: warn
+          path: |
+            pipeline-output/
+            pipeline/state/
+            research/dossiers/${{ inputs.chapter }}.md
+            src/lib/chapters/data/${{ inputs.chapter }}.ts
+            project/reports/*-QA-api.md
+
+  ledger-push:
+    needs: [ledger-pull, pipeline]
+    if: always() && inputs.mode != 'dry-run' && needs.ledger-pull.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store
+
+      - name: Recevoir le registre modifié
+        id: out
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ledger-out
+          path: ledger-out
+
+      - name: Registre perdu → opération inconnue (bloque tout envoi jusqu'à réconciliation)
+        # sorties absentes (job interrompu brutalement) = on ne sait pas : marquage prudent
+        if: steps.out.outcome != 'success' && needs.pipeline.outputs.started != 'false'
+        run: |
+          echo "::warning::registre de l'exécution non transmis : ajout d'une opération à l'issue inconnue"
+          node -e 'console.log(JSON.stringify({type:"unknown",id:"run-"+process.env.GITHUB_RUN_ID,at:new Date().toISOString(),error:"exécution interrompue sans registre"}))' >> pipeline/.store/ledger.jsonl
+
+      - name: Utiliser le registre modifié
+        if: steps.out.outcome == 'success'
+        run: cp ledger-out/ledger.jsonl pipeline/.store/ledger.jsonl
+
+      - name: Publier le registre (cohérence, ajout seul, SHA256, sauvegarde)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh push-ledger

@@ -17,7 +17,7 @@ export default async function RevisionsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="card p-5">
           <h2 className="text-xl font-bold">⏱ Défi chronométré</h2>
-          <p className="mb-4 text-sm text-slate-600">5 exercices tirés au hasard dans votre niveau, 10 minutes chrono, note sur 20.</p>
+          <p className="mb-4 text-sm text-slate-600">5 exercices tirés au hasard dans ton niveau, 10 minutes chrono, note sur 20.</p>
           <form action="/revisions/defi" className="grid gap-3 sm:grid-cols-3">
             <select name="matiere" className="input" aria-label="Matière" defaultValue="tout">
               <option value="tout">Maths + PC</option><option value="maths">Mathématiques</option><option value="pc">Physique-Chimie</option>
@@ -33,13 +33,13 @@ export default async function RevisionsPage() {
         </section>
         <section className="card p-5">
           <h2 className="text-xl font-bold">🎯 Défi du jour</h2>
-          <p className="mb-4 text-sm text-slate-600">Les mêmes 5 exercices pour tout le monde aujourd'hui : comparez vos résultats avec votre classe !</p>
+          <p className="mb-4 text-sm text-slate-600">Les mêmes 5 exercices pour tout le monde aujourd'hui : compare tes résultats avec ta classe !</p>
           <Link href="/revisions/defi-du-jour" className="btn-primary">Relever le défi du jour</Link>
         </section>
         <section className="card p-5 lg:col-span-2">
           <h2 className="text-xl font-bold">🩺 Mes points faibles</h2>
           {!user ? (
-            <p className="mt-2 text-sm text-slate-600"><Link href="/connexion" className="font-semibold text-indigo-600">Connectez-vous</Link> pour obtenir un programme de révision basé sur vos résultats.</p>
+            <p className="mt-2 text-sm text-slate-600"><Link href="/connexion" className="font-semibold text-indigo-600">Connecte-toi</Link> pour obtenir un programme de révision basé sur tes résultats.</p>
           ) : dash && dash.weak.length ? (
             <ul className="mt-3 grid gap-3 sm:grid-cols-2">
               {dash.weak.map((w) => {
@@ -56,7 +56,7 @@ export default async function RevisionsPage() {
                 );
               })}
             </ul>
-          ) : <div className="mt-3"><Empty>Aucun point faible détecté pour l'instant. Continuez à vous entraîner !</Empty></div>}
+          ) : <div className="mt-3"><Empty>Aucun point faible détecté pour l'instant. Continue à t'entraîner !</Empty></div>}
         </section>
         <section className="card p-5 lg:col-span-2">
           <h2 className="text-xl font-bold">📚 Fiches de révision par niveau</h2>

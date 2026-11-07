@@ -1,5 +1,5 @@
 // Moteur de correction : une fonction pure par type d'interaction.
-import type { CheckResult, ExerciseInstance, Interaction, NumAnswer, PartResult } from "./types";
+import type { CheckResult, ExerciseInstance, Interaction, Mistake, NumAnswer, PartResult } from "./types";
 import { fr, fracTex, frFixed, gcd, nearlyEqual, parseNumber, roundSig, sciTex, simplify } from "./numbers";
 import { convert } from "./units";
 import { equivalent, isReducedPolynomial, normalizeExpr, safeParse, usesUnknownSymbols } from "./expr";
@@ -43,7 +43,7 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
   let v = p.value;
   if (a.unit) {
     const u = String(unitSel ?? "");
-    if (!u) return { ok: false, partial: false, feedback: ["Précisez l'unité de votre résultat."] };
+    if (!u) return { ok: false, partial: false, feedback: ["Précise l'unité de ton résultat."] };
     const c = convert(v, u, a.unit.base);
     if (c === null) return { ok: false, partial: false, feedback: [`L'unité « ${u} » ne correspond pas à la grandeur demandée.`] };
     // valeur juste mais unité incohérente ?
@@ -51,7 +51,7 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
       for (const other of a.unit.choices) {
         const c2 = convert(v, other, a.unit.base);
         if (other !== u && c2 !== null && nearlyEqual(c2, a.value, a.tol ?? 0, 1e-3)) {
-          fb.push(`Votre valeur serait correcte en ${other}, pas en ${u} : vérifiez l'unité ou la conversion.`);
+          fb.push(`Ta valeur serait correcte en ${other}, pas en ${u} : vérifie l'unité ou la conversion.`);
           break;
         }
       }
@@ -65,13 +65,16 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
   const ok = nearlyEqual(v, exp, tolAbs);
   if (ok) {
     if (a.fraction && p.isFraction && p.num !== undefined && Number.isInteger(p.num) && Number.isInteger(p.den!) && gcd(p.num, p.den!) > 1) {
-      return { ok: false, partial: true, feedback: ["Valeur juste, mais la fraction n'est pas irréductible : simplifiez-la."] };
+      return { ok: false, partial: true, feedback: ["Valeur juste, mais la fraction n'est pas irréductible : simplifie-la."] };
+    }
+    if (a.tol && a.decimals !== undefined && !p.isFraction && p.decimals > a.decimals) {
+      return { ok: false, partial: true, feedback: [`Valeur juste, mais il faut arrondir le résultat${a.roundingLabel ? " " + a.roundingLabel : ` à ${a.decimals} chiffre${a.decimals > 1 ? "s" : ""} après la virgule`}.`] };
     }
     if (a.sigFigs && !p.isFraction && p.sigFigs !== a.sigFigs) {
       return {
         ok: false,
         partial: true,
-        feedback: [`Valeur juste, mais le résultat doit comporter ${a.sigFigs} chiffres significatifs (votre réponse en a ${p.sigFigs}).`],
+        feedback: [`Valeur juste, mais le résultat doit comporter ${a.sigFigs} chiffres significatifs (ta réponse en a ${p.sigFigs}).`],
       };
     }
     return { ok: true, partial: false, feedback: fb };
@@ -80,7 +83,7 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
   if (a.sigFigs && !p.isFraction && p.sigFigs !== a.sigFigs) {
     const tolUser = 0.5 * 10 ** (Math.floor(Math.log10(Math.abs(exp) || 1)) - p.sigFigs + 1) * 1.0001;
     if (nearlyEqual(v, exp, tolUser))
-      return { ok: false, partial: true, feedback: [`Valeur correcte à l'arrondi près, mais le résultat doit comporter ${a.sigFigs} chiffres significatifs (votre réponse en a ${p.sigFigs}).`] };
+      return { ok: false, partial: true, feedback: [`Valeur correcte à l'arrondi près, mais le résultat doit comporter ${a.sigFigs} chiffres significatifs (ta réponse en a ${p.sigFigs}).`] };
   }
   if (a.fraction && nearlyEqual(v, exp, 0.01 * Math.abs(exp) + 0.005)) {
     fb.push("Ceci est une valeur approchée : on attend la valeur exacte (fraction irréductible ou décimal exact).");
@@ -89,9 +92,9 @@ export function checkNumber(raw: unknown, unitSel: unknown, a: NumAnswer): NumCh
   } else if (exp !== 0 && v !== 0) {
     const r = Math.log10(Math.abs(v / exp));
     if (Math.abs(r - Math.round(r)) < 1e-6 && Math.round(r) !== 0)
-      fb.push(`Votre résultat est ${Math.round(r) > 0 ? "10^" + Math.round(r) + " fois trop grand" : "10^" + -Math.round(r) + " fois trop petit"} : vérifiez les conversions et les puissances de 10.`);
+      fb.push(`Ton résultat est ${Math.round(r) > 0 ? "10^" + Math.round(r) + " fois trop grand" : "10^" + -Math.round(r) + " fois trop petit"} : vérifie les conversions et les puissances de 10.`);
     else if (a.tol && nearlyEqual(v, exp, 10 * a.tol))
-      fb.push(`Presque : vérifiez l'arrondi${a.roundingLabel ? " (" + a.roundingLabel + ")" : ""}.`);
+      fb.push(`Presque : vérifie l'arrondi${a.roundingLabel ? " (" + a.roundingLabel + ")" : ""}.`);
   }
   return { ok: false, partial: false, feedback: fb };
 }
@@ -139,7 +142,7 @@ export function checkPart(it: Interaction, r: unknown): PartResult {
       let ok = false;
       let partial = false;
       if (!s.trim()) fb.push("Aucune réponse saisie.");
-      else if (!safeParse(s)) fb.push("Expression mal écrite (vérifiez les parenthèses et les opérations).");
+      else if (!safeParse(s)) fb.push("Expression mal écrite (vérifie les parenthèses et les opérations).");
       else {
         const unk = usesUnknownSymbols(s, it.variable);
         if (unk.length) fb.push(`Symbole(s) inattendu(s) : ${unk.join(", ")}. La variable est ${it.variable}.`);
@@ -151,11 +154,11 @@ export function checkPart(it: Interaction, r: unknown): PartResult {
             d = null;
           }
           if (d && equivalent(d, it.answer, it.variable)) ok = true;
-          else fb.push("La dérivée de votre expression n'est pas égale à la fonction donnée : ce n'est pas une primitive.");
+          else fb.push("La dérivée de ton expression n'est pas égale à la fonction donnée : ce n'est pas une primitive.");
         } else if (equivalent(s, it.answer, it.variable)) {
           if (it.form && !isReducedPolynomial(s, it.variable)) {
             partial = true;
-            fb.push(it.form === "reduite" ? "Votre expression est égale à la bonne réponse, mais elle n'est pas réduite." : "Votre expression est égale à la bonne réponse, mais elle n'est pas développée et réduite.");
+            fb.push(it.form === "reduite" ? "Ton expression est égale à la bonne réponse, mais elle n'est pas réduite." : "Ton expression est égale à la bonne réponse, mais elle n'est pas développée et réduite.");
           } else ok = true;
         } else fb.push("Cette expression n'est pas égale à la bonne réponse (testée pour plusieurs valeurs de " + it.variable + ").");
       }
@@ -254,8 +257,32 @@ export function checkPart(it: Interaction, r: unknown): PartResult {
   }
 }
 
+/** La réponse de l'élève correspond-elle à une erreur fréquente déclarée ? */
+export function matchesMistake(it: Interaction, r: unknown, m: Mistake): boolean {
+  switch (it.kind) {
+    case "numerique": {
+      const v = parseNumber(String((r as { value?: string } | undefined)?.value ?? ""));
+      const e = parseNumber(m.match);
+      return !!v && !!e && nearlyEqual(v.value, e.value, 0);
+    }
+    case "qcm": {
+      const sel = arr<number>(r).map(Number);
+      return sel.length === 1 && String(sel[0]) === m.match;
+    }
+    case "texte-libre":
+      return normText(String(r ?? "")) === normText(m.match);
+    default:
+      return false;
+  }
+}
+
 export function checkExercise(inst: ExerciseInstance, responses: unknown[]): CheckResult {
-  const parts = inst.parts.map((p, i) => checkPart(p.interaction, responses?.[i]));
+  const parts = inst.parts.map((p, i) => {
+    const res = checkPart(p.interaction, responses?.[i]);
+    if (res.status === "correct" || !p.mistakes) return res;
+    const hit = p.mistakes.find((m) => matchesMistake(p.interaction, responses?.[i], m));
+    return hit ? { ...res, feedback: [hit.feedback, ...res.feedback.filter((f) => f !== "Attention au signe !")] } : res;
+  });
   const score = parts.reduce((s, p) => s + p.score, 0) / Math.max(1, parts.length);
   return { parts, score, solution: inst.solution, rappel: inst.rappel };
 }

@@ -246,3 +246,21 @@ export function barChart(labels: string[], values: number[], title: string, yNam
   body += `<line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="${C.axis}" stroke-width="1.5"/>` + text(L, T - 4, yName, { size: 11, anchor: "start", color: C.axis, italic: true });
   return wrap(W, H, body, title);
 }
+
+// ---------- Droite graduée ----------
+export function numberLine(opts: { min: number; max: number; step: number; labelEvery?: number; labels?: "all" | "zero-unit"; points?: { x: number; label: string }[]; title: string }) {
+  const W = 480, H = 80, pad = 26;
+  const n = Math.round((opts.max - opts.min) / opts.step);
+  const X = (v: number) => pad + ((v - opts.min) / (opts.max - opts.min)) * (W - 2 * pad);
+  const every = opts.labelEvery ?? 1;
+  let body = `<line x1="${pad - 12}" y1="40" x2="${W - pad + 14}" y2="40" stroke="${C.ink}" stroke-width="2"/><path d="M${W - pad + 14},40 l-9,-5 v10 z" fill="${C.ink}"/>`;
+  for (let k = 0; k <= n; k++) {
+    const v = Math.round((opts.min + k * opts.step) * 1e6) / 1e6;
+    const zero = Math.abs(v) < 1e-9;
+    body += `<line x1="${X(v)}" y1="${zero ? 30 : 34}" x2="${X(v)}" y2="${zero ? 50 : 46}" stroke="${zero ? C.blue : C.axis}" stroke-width="${zero ? 2.5 : 1.4}"/>`;
+    const show = opts.labels === "zero-unit" ? zero || Math.abs(v - 1) < 1e-9 : zero || k % every === 0;
+    if (show) body += text(X(v), 64, fr(v, 3), { size: 12, color: zero ? C.blue : C.axis, weight: zero ? 700 : undefined });
+  }
+  for (const p of opts.points ?? []) body += `<circle cx="${X(p.x)}" cy="40" r="5" fill="${C.red}"/>` + text(X(p.x), 18, p.label, { size: 14, weight: 700, color: C.red });
+  return wrap(W, H, body, opts.title);
+}

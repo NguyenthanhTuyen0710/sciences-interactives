@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SUBJECTS, subjectFromSlug } from "@/lib/content/curriculum";
 import { getTree } from "@/lib/content/tree";
 import { Breadcrumbs, Empty } from "@/components/ui";
+import { chapterByTreeId } from "@/lib/chapters";
 
 export const dynamic = "force-dynamic";
 
@@ -29,13 +30,16 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
           <div className="grid gap-4 md:grid-cols-2">
             {level.chapters.filter((c) => c.theme === t).map((c) => {
               const ex = metas.filter((m) => m.chapterId === c.id);
+              const full = chapterByTreeId(c.id);
               return (
                 <Link key={c.id} href={`/${matiere}/${niveau}/${c.id}`} className="card block p-5 transition hover:border-indigo-300 hover:shadow-md">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-lg font-bold">{c.title}</h3>
                     <span className="chip shrink-0 bg-slate-100 text-slate-600">{ex.length} ex.</span>
                   </div>
-                  {c.notions.length ? (
+                  {full ? (
+                    <p className="mt-2 text-sm text-slate-600">Cours complet, exercices sur 5 niveaux et {full.games.length} activités interactives.</p>
+                  ) : c.notions.length ? (
                     <ul className="mt-2 space-y-0.5 text-sm text-slate-600">{c.notions.map((n) => <li key={n.id}>• {n.title}</li>)}</ul>
                   ) : (
                     <p className="mt-2 text-sm text-slate-400">Notions et exercices en cours de rédaction par l'équipe pédagogique.</p>

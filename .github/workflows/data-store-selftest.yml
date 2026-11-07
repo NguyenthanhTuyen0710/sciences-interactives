@@ -1,0 +1,120 @@
+# Test réel du stockage « data-store » sur une release brouillon JETABLE (tag propre au run, supprimée à la fin).
+# Vérifie : création, lecture, écriture, SHA256, ajout seul, modification concurrente, perte puis restauration.
+# Ne touche jamais au stockage réel « data-store » et ne publie aucune release.
+name: Data Store Self-test
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/scripts/data-store.sh
+      - .github/workflows/data-store-selftest.yml
+      - pipeline/ledger.ts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-store-selftest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # création / suppression de la release brouillon de test
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DATA_STORE_TAG: data-store-selftest-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Scénario complet
+        shell: bash
+        run: |
+          set -euo pipefail
+          S=.github/scripts/data-store.sh
+          step() { echo "::group::$1"; }
+          ok() { echo "OK : $1"; echo "::endgroup::"; echo "- ✅ $1" >> "$GITHUB_STEP_SUMMARY"; }
+          must_fail() { if "$@" > /tmp/out 2>&1; then cat /tmp/out; echo "::error::aurait dû échouer : $*"; exit 1; fi; cat /tmp/out; }
+          n_rel() { gh release list --limit 200 --json tagName -q "[.[] | select(.tagName == \"$DATA_STORE_TAG\")] | length"; }
+          sha() { sha256sum "$1" | cut -d' ' -f1; }
+          entry() { node -e 'console.log(JSON.stringify(Object.assign({at:new Date().toISOString()}, JSON.parse(process.argv[1]))))' "$1"; }
+          echo "### Test du stockage ($DATA_STORE_TAG)" >> "$GITHUB_STEP_SUMMARY"
+
+          step "Absent : la lecture échoue et ne crée rien"
+          must_fail bash $S pull-ledger
+          [ "$(n_rel)" = "0" ]
+          ok "stockage absent → lecture refusée, aucune création implicite"
+
+          step "Création"
+          bash $S init
+          [ "$(gh release view "$DATA_STORE_TAG" --json isDraft -q .isDraft)" = "true" ]
+          must_fail bash $S init
+          ok "création d'un brouillon (isDraft = true) ; seconde création refusée"
+
+          step "Lecture du registre vide"
+          bash $S pull-ledger
+          [ -z "$(tr -d '\n' < pipeline/.store/ledger.jsonl)" ]
+          ok "lecture avec SHA256 vérifié (registre vide)"
+
+          step "Écriture puis relecture"
+          entry '{"type":"reserve","id":"t1","chapter":"test","step":"dossier","inputHash":"h","mode":"batch","maxUsd":0.1}' >> pipeline/.store/ledger.jsonl
+          entry '{"type":"failed","id":"t1","reason":"test"}' >> pipeline/.store/ledger.jsonl
+          bash $S push-ledger
+          cp pipeline/.store/ledger.jsonl backup.jsonl
+          rm -rf pipeline/.store && bash $S pull-ledger
+          [ "$(sha pipeline/.store/ledger.jsonl)" = "$(sha backup.jsonl)" ]
+          gh release view "$DATA_STORE_TAG" --json assets -q '.assets[].name' | grep -qx ledger.backup.jsonl
+          ok "écriture, relecture identique (SHA256 $(sha backup.jsonl | cut -c1-12)…), version précédente sauvegardée"
+
+          step "Ajout seul et cohérence"
+          : > pipeline/.store/ledger.jsonl
+          must_fail bash $S push-ledger
+          cp backup.jsonl pipeline/.store/ledger.jsonl
+          entry '{"type":"actual","id":"inconnu","usd":1}' >> pipeline/.store/ledger.jsonl
+          must_fail bash $S push-ledger
+          ok "troncature refusée ; entrée incohérente refusée"
+
+          step "Modification concurrente"
+          cp backup.jsonl pipeline/.store/ledger.jsonl
+          cp backup.jsonl other.jsonl && entry '{"type":"reserve","id":"t2","chapter":"test","step":"chapter","inputHash":"h2","mode":"batch","maxUsd":0.2}' >> other.jsonl
+          bash $S restore-ledger other.jsonl
+          entry '{"type":"reserve","id":"t3","chapter":"test","step":"review","inputHash":"h3","mode":"batch","maxUsd":0.3}' >> pipeline/.store/ledger.jsonl
+          must_fail bash $S push-ledger
+          ok "publication refusée si le registre distant a changé depuis la lecture"
+
+          step "Altération détectée par SHA256"
+          d=$(mktemp -d); cp other.jsonl "$d/ledger.jsonl"; echo '{"type":"failed","id":"t2","at":"x","reason":"altéré"}' >> "$d/ledger.jsonl"
+          gh release upload "$DATA_STORE_TAG" "$d/ledger.jsonl" --clobber
+          rm -rf pipeline/.store
+          must_fail bash $S pull-ledger
+          ok "registre modifié sans empreinte → lecture refusée"
+
+          step "Perte puis restauration"
+          gh release delete "$DATA_STORE_TAG" --yes
+          [ "$(n_rel)" = "0" ]
+          must_fail bash $S pull-ledger
+          [ "$(n_rel)" = "0" ]
+          bash $S restore-ledger backup.jsonl
+          rm -rf pipeline/.store && bash $S pull-ledger
+          [ "$(sha pipeline/.store/ledger.jsonl)" = "$(sha backup.jsonl)" ]
+          [ "$(gh release view "$DATA_STORE_TAG" --json isDraft -q .isDraft)" = "true" ]
+          ok "brouillon supprimé → lecture refusée sans recréation ; restauration depuis la sauvegarde, SHA256 identique"
+
+      - name: Nettoyage (suppression de la release de test)
+        if: always()
+        run: |
+          gh release delete "$DATA_STORE_TAG" --yes --cleanup-tag 2>/dev/null || true
+          n=$(gh release list --limit 200 --json tagName -q "[.[] | select(.tagName == \"$DATA_STORE_TAG\")] | length")
+          echo "releases de test restantes : $n"; [ "$n" = "0" ]

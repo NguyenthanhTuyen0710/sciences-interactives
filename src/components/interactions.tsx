@@ -218,7 +218,7 @@ function GlisserDeposer({ it, value, onChange, result, locked }: P<"glisser-depo
         ))}
         {used.size === it.tokens.length && <span className="text-sm text-slate-400">Toutes les étiquettes sont placées.</span>}
       </div>
-      <p className="text-xs text-slate-500">Glissez une étiquette sur une case, ou touchez une étiquette puis une case.</p>
+      <p className="text-xs text-slate-500">Glisse une étiquette sur une case, ou touche une étiquette puis une case.</p>
       <div className="grid gap-2">
         {it.zones.map((z, i) => (
           <div key={i} data-zone={i} onDragOver={(e) => e.preventDefault()} onDrop={drop(i)} onClick={() => { if (sel !== null && !locked) { place(i, sel); setSel(null); } }}
@@ -252,7 +252,7 @@ function Classer({ it, value, onChange, result, locked }: P<"classer">) {
         {it.items.map((_, i) => v[i] === null && tok(i))}
         {v.every((x) => x !== null) && <span className="text-sm text-slate-400">Tous les éléments sont classés.</span>}
       </div>
-      <p className="text-xs text-slate-500">Glissez chaque élément dans une catégorie, ou touchez-le puis touchez la catégorie.</p>
+      <p className="text-xs text-slate-500">Glisse chaque élément dans une catégorie, ou touche-le puis touche la catégorie.</p>
       <div>
         <div className={`grid gap-3 ${it.categories.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
           {it.categories.map((c, ci) => (
@@ -282,7 +282,7 @@ function Associer({ it, value, onChange, result, locked }: P<"associer">) {
   };
   return (
     <div>
-      <p className="mb-2 text-xs text-slate-500">Touchez un élément à gauche puis l'élément correspondant à droite. Touchez à nouveau pour défaire une paire.</p>
+      <p className="mb-2 text-xs text-slate-500">Touche un élément à gauche puis l'élément correspondant à droite. Touche-le à nouveau pour défaire une paire.</p>
       <div className="grid grid-cols-2 gap-3 sm:gap-8">
         <div className="space-y-2">
           {it.left.map((l, i) => (
@@ -345,7 +345,7 @@ function SortableList({ items, order, onChange, locked, details, render }: { ite
 function Ordonner({ it, value, onChange, result, locked }: P<"ordonner">) {
   return (
     <div>
-      {it.hint && <p className="mb-2 text-xs text-slate-500">{it.hint} — glissez les éléments ou utilisez les flèches.</p>}
+      {it.hint && <p className="mb-2 text-xs text-slate-500">{it.hint} — glisse les éléments ou utilise les flèches.</p>}
       <SortableList items={it.items} order={value} onChange={onChange} locked={locked} details={result?.details} />
     </div>
   );
@@ -355,7 +355,7 @@ function Demonstration({ it, value, onChange, result, locked }: P<"demonstration
   const n = it.steps.length;
   return (
     <div>
-      <p className="mb-2 text-xs text-slate-500">Ordonnez les étapes (glisser ou flèches), puis choisissez la justification de chacune.</p>
+      <p className="mb-2 text-xs text-slate-500">Ordonne les étapes (glisser ou flèches), puis choisis la justification de chacune.</p>
       <SortableList items={it.steps} order={value.order} locked={locked} details={result?.details?.slice(0, n)} onChange={(o) => onChange({ ...value, order: o })}
         render={(idx) => (
           <select aria-label="Justification" disabled={locked} value={value.justifs[idx] ?? ""} onChange={(e) => onChange({ ...value, justifs: value.justifs.map((x: number | null, j: number) => (j === idx ? (e.target.value === "" ? null : Number(e.target.value)) : x)) })}
@@ -405,7 +405,7 @@ function Repere({ it, value, onChange, result, locked }: P<"repere">) {
           </button>
         ))}
       </div>
-      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} onClick={click} className={`w-full max-w-[420px] touch-manipulation select-none rounded-xl border border-slate-200 bg-white ${locked ? "" : "cursor-crosshair"}`} role="img" aria-label="Repère : cliquez pour placer le point sélectionné">
+      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} onClick={click} className={`w-full max-w-[420px] touch-manipulation select-none rounded-xl border border-slate-200 bg-white ${locked ? "" : "cursor-crosshair"}`} role="img" aria-label="Repère : clique pour placer le point sélectionné">
         {lines}
         <line x1={X(it.xmin)} x2={X(it.xmax)} y1={Y(0)} y2={Y(0)} stroke="#334155" strokeWidth="1.6" />
         <line y1={Y(it.ymin)} y2={Y(it.ymax)} x1={X(0)} x2={X(0)} stroke="#334155" strokeWidth="1.6" />
@@ -429,7 +429,7 @@ function Tableau({ it, value, onChange, result, locked }: P<"tableau">) {
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse text-sm">
         {it.headers.length > 0 && (
-          <thead><tr>{it.headers.map((h, i) => <th key={i} className="border border-slate-300 bg-slate-100 px-3 py-2 text-center font-semibold">{h}</th>)}</tr></thead>
+          <thead><tr>{it.headers.map((h, i) => <th key={i} className="border border-slate-300 bg-slate-100 px-3 py-2 text-center font-semibold"><MathInline text={h} /></th>)}</tr></thead>
         )}
         <tbody>
           {it.rows.map((r, ri) => (

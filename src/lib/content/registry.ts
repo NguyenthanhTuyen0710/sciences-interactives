@@ -7,8 +7,9 @@ import * as ML from "./maths-lycee";
 import * as PC from "./physique";
 import { customToGenerator } from "./custom";
 import { db, schema } from "../db";
+import { chapterGenerators, visibleChapters } from "../chapters";
 
-export const STATIC_GENERATORS: Generator[] = [...Object.values(MC), ...Object.values(ML), ...Object.values(PC)];
+export const STATIC_GENERATORS: Generator[] = [...Object.values(MC), ...Object.values(ML), ...Object.values(PC), ...chapterGenerators(visibleChapters())];
 const BY_ID = new Map(STATIC_GENERATORS.map((g) => [g.meta.id, g]));
 
 export async function getGenerator(id: string): Promise<Generator | null> {

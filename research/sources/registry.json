@@ -1,0 +1,305 @@
+{
+  "description": "Registre des sources du collecteur (pipeline/sources/run.ts). Une source n'est interrogée que si enabled = true ET g0.status = \"approved\" (décision humaine). Ses documents ne sont copiés dans le stockage data-store que si g0.storage = \"approved\" (droit de conservation confirmé par un humain). Les faits ci-dessous ont été relevés le 2026-11-07 ; ils ne valent pas autorisation.",
+  "userAgent": "SciencesInteractivesBot/0.1 (+https://github.com/NguyenthanhTuyen0710/sciences-interactives)",
+  "sources": [
+    {
+      "id": "bo",
+      "name": "Bulletin officiel de l'Éducation nationale",
+      "kind": "http",
+      "host": "www.education.gouv.fr",
+      "allowedPathPrefixes": [
+        "/bo/",
+        "/sites/default/files/"
+      ],
+      "role": "officiel",
+      "enabled": true,
+      "crawlDelaySeconds": 10,
+      "g0": {
+        "status": "approved",
+        "storage": "pending",
+        "checkedAt": "2026-11-07",
+        "robots": "User-agent: * → Crawl-delay: 10 ; Disallow: /recherche, /search, chemins Drupal ; Allow explicite : /*.pdf$ et /sites/default/files/. Aucun groupe dédié aux agents d'IA.",
+        "terms": "NON LU : /mentions-legales renvoie HTTP 403 (page Cloudflare « Attention Required ») au client automatisé.",
+        "access": "Pages HTML (/bo/…, /mentions-legales) : HTTP 403. PDF sous /sites/default/files/ : HTTP 200/206.",
+        "license": "non vérifiée (conditions de réutilisation non lues)",
+        "decision": "Décision du porteur de projet du 2026-11-07 : collecte des PDF officiels déjà contrôlés uniquement ; conservation dans data-store non autorisée (storage = pending)."
+      }
+    },
+    {
+      "id": "eduscol",
+      "name": "Éduscol",
+      "kind": "http",
+      "host": "eduscol.education.gouv.fr",
+      "allowedPathPrefixes": [
+        "/sites/default/files/"
+      ],
+      "role": "officiel",
+      "enabled": true,
+      "crawlDelaySeconds": 10,
+      "g0": {
+        "status": "approved",
+        "storage": "pending",
+        "checkedAt": "2026-11-07",
+        "robots": "Même fichier que education.gouv.fr : User-agent: * → Crawl-delay: 10 ; Allow /*.pdf$ et /sites/default/files/.",
+        "terms": "NON LU : /mentions-legales renvoie HTTP 403 (Cloudflare) au client automatisé.",
+        "access": "Pages HTML : HTTP 403. PDF sous /sites/default/files/ : HTTP 206.",
+        "license": "non vérifiée",
+        "decision": "Décision du porteur de projet du 2026-11-07 : collecte des PDF officiels déjà contrôlés uniquement ; conservation dans data-store non autorisée (storage = pending)."
+      }
+    },
+    {
+      "id": "math93",
+      "name": "Math93",
+      "kind": "http",
+      "host": "www.math93.com",
+      "allowedPathPrefixes": [],
+      "role": "reference",
+      "enabled": false,
+      "crawlDelaySeconds": 10,
+      "g0": {
+        "status": "pending",
+        "storage": "pending",
+        "checkedAt": "2026-11-07",
+        "robots": "User-agent: * → Disallow de dossiers techniques Joomla (/administrator/, /api/, /cache/, /components/, /modules/, /plugins/…). Pas de Crawl-delay, pas de règle pour les agents d'IA. Sitemap déclaré.",
+        "terms": "AUCUNE page de conditions ou de mentions légales trouvée : la page d'accueil n'affiche que « ©1999 / ISSN 2272-5318 / Contact » ; /mentions-legales et /index.php/mentions-legales → HTTP 404.",
+        "access": "Page d'accueil HTTP 200.",
+        "license": "aucune licence affichée",
+        "decisionNeeded": "Aucune licence ni condition d'utilisation affichée : autorisation écrite à demander (lien « Contact ») avant toute collecte automatisée ; consultation humaine seulement en attendant."
+      },
+      "purpose": "Référence pédagogique uniquement (structure des cours et fiches, typologie d'exercices, méthodes, erreurs fréquentes, sujets DNB/bac) ; ne définit jamais le contenu du programme.",
+      "restrictions": "Consultation humaine uniquement ; toute collecte automatisée nécessite une autorisation écrite distincte."
+    },
+    {
+      "id": "hachette-enseignants",
+      "name": "Hachette Éducation — site enseignants (collections Mission Indigo, Barbazo)",
+      "kind": "http",
+      "host": "www.enseignants.hachette-education.com",
+      "allowedPathPrefixes": [],
+      "role": "reference",
+      "enabled": false,
+      "crawlDelaySeconds": 10,
+      "purpose": "Référence pédagogique uniquement (organisation des chapitres, progression, typologie d'exercices) ; ne définit jamais le contenu du programme ; aucun contenu de manuel reproduit ou paraphrasé.",
+      "g0": {
+        "status": "pending",
+        "storage": "pending",
+        "checkedAt": "2026-11-07",
+        "robots": "User-agent: * → Disallow de paramètres de requête (?mode, ?sort_by, ?utm_source…), /api/, /_next/ ; pages /livre/… et /livres-collections-… non exclues.",
+        "terms": "CGU lues (https://www.enseignants.hachette-education.com/cgu/) : § 5.2 « TDM-RESERVATION: 1 » — l'éditeur s'oppose à toute fouille de textes et de données (art. L. 122-5-3 CPI) sur l'ensemble du site ; l'utilisation de systèmes automatisés pour extraire tout ou partie des contenus (y compris la structure) est interdite sans autorisation ; reproduction, adaptation, extraction interdites sans autorisation préalable. Mentions légales : site « œuvre protégée », mêmes réserves.",
+        "access": "Pages collections et deux fiches produit : HTTP 200 (consultées le 2026-11-07 avant lecture des CGU ; copies supprimées, aucune nouvelle requête automatisée).",
+        "license": "tous droits réservés ; réserve TDM explicite",
+        "decisionNeeded": "Toute collecte automatisée exige un accord écrit de l'éditeur. Sans accord : consultation humaine uniquement (manuel papier ou numérique sous licence de l'établissement)."
+      },
+      "restrictions": "Interdit : collecte du contenu des manuels, PDF enseignants, corrigés et de toute donnée couverte par la réserve TDM. Consultation humaine uniquement, sauf accord écrit de l'éditeur."
+    },
+    {
+      "id": "labolycee",
+      "name": "Labolycée",
+      "kind": "http",
+      "host": "www.labolycee.org",
+      "allowedPathPrefixes": [],
+      "role": "reference",
+      "enabled": false,
+      "crawlDelaySeconds": 10,
+      "g0": {
+        "status": "pending",
+        "storage": "pending",
+        "checkedAt": "2026-11-07",
+        "robots": "En-tête : contenu « pas destiné à la constitution de corpus d'entraînement » ; Disallow: / pour GPTBot, ClaudeBot, anthropic-ai, Claude-Web, CCBot, Wget, HTTrack, etc. ; Allow: / pour Claude-SearchBot, Claude-User, ChatGPT-User, PerplexityBot (consultation déclenchée par un utilisateur). User-agent: * → Disallow /admin, /compte, /api/, /recherche, /generateur/pdf, /generateur/mon-sujet, /static/pdfjs/.",
+        "terms": "Mentions légales lues (https://www.labolycee.org/mentions-legales, mise à jour 31-07-2026) : corrigés, notes pédagogiques et outils sous CC BY-NC-ND (attribution, pas d'usage commercial, pas de modification) ; réutilisation commerciale sur demande ; les sujets sont des épreuves officielles hors de cette licence.",
+        "access": "Page d'accueil et mentions légales HTTP 200.",
+        "license": "CC BY-NC-ND 4.0 (corrigés et notes) ; sujets : statut des épreuves officielles"
+      }
+    },
+    {
+      "id": "notion",
+      "name": "Notion du porteur de projet",
+      "kind": "connector",
+      "role": "reference",
+      "enabled": false,
+      "optional": true,
+      "g0": {
+        "status": "not_configured",
+        "checkedAt": "2026-11-07",
+        "terms": "Connecteur Notion non autorisé dans la session ; aucune page lue.",
+        "access": "SOURCE_INACCESSIBLE"
+      }
+    }
+  ],
+  "references": {
+    "description": "Références pédagogiques (jamais sources du programme). Chaque entrée : niveau, matière, chapitre, édition, version de programme correspondante, type de référence, URL, accès, droits. L'édition retenue est celle qui correspond au programme applicable en 2026-2027, pas la plus récente. Ces sources sont facultatives : leur absence ne bloque jamais la production de contenu original à partir des textes officiels (BO, Éduscol).",
+    "entries": [
+      {
+        "niveau": "6e",
+        "matiere": "mathematiques",
+        "collection": "Mission Indigo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2025",
+        "ean": "—",
+        "curriculumVersion": "Programme cycle 3 version 2025 (BO n° 16 du 17-04-2025) — concordant",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-mission-indigo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "5e",
+        "matiere": "mathematiques",
+        "collection": "Mission Indigo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2026",
+        "ean": "—",
+        "curriculumVersion": "Programme cycle 4 version 2026 (BO n° 10 du 05-03-2026) — concordant",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-mission-indigo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "4e",
+        "matiere": "mathematiques",
+        "collection": "Mission Indigo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2020 (parution 16-05-2020)",
+        "ean": "9782017025443",
+        "curriculumVersion": "Programme cycle 4 version 2020 — concordant (applicable en 4e en 2026-2027)",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livre/mission-indigo-mathematiques-cycle-4-4eme-livre-eleve-ed-2020-9782017025443/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)",
+        "note": "La page collection ne présente plus que le cahier d'activités 4e (éd. 2021)."
+      },
+      {
+        "niveau": "3e",
+        "matiere": "mathematiques",
+        "collection": "Mission Indigo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2020 (parution 16-05-2020)",
+        "ean": "9782017025467",
+        "curriculumVersion": "Programme cycle 4 version 2020 — concordant (applicable en 3e en 2026-2027 et 2027-2028)",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livre/mission-indigo-mathematiques-cycle-4-3eme-livre-eleve-ed-2020-9782017025467/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "2nde",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2026 (vérifiée par le porteur de projet)",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-barbazo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)",
+        "note": "Version de programme du lycée non inventoriée."
+      },
+      {
+        "niveau": "1re — spécialité",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Barbazo Maths 1ère – Livre élève, éd. 2019",
+        "ean": "9782013954860",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livre/barbazo-maths-1ere-livre-eleve-ed-2019-9782013954860/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "vérifié par le porteur de projet le 2026-11-07",
+        "note": "Ne pas assimiler à une édition 2026 ; sommaire non consulté (chapitres non déduits).",
+        "format": "livre papier"
+      },
+      {
+        "niveau": "1re — enseignement scientifique (partie maths)",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2023",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-barbazo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "Tle — spécialité",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2020 (manuel numérique éd. 2023)",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-barbazo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "Tle — mathématiques complémentaires",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2020",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-barbazo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "Tle — mathématiques expertes",
+        "matiere": "mathematiques",
+        "collection": "Barbazo",
+        "chapitre": "pending_verification",
+        "edition": "Livre élève, éd. 2020",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
+        "url": "https://www.enseignants.hachette-education.com/livres-collections-barbazo-mathematiques/",
+        "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
+        "droits": "G0 pending — réserve TDM, tous droits réservés",
+        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)"
+      },
+      {
+        "niveau": "collège (6e→3e)",
+        "matiere": "mathematiques",
+        "collection": "Math93 (site)",
+        "chapitre": "pending_verification",
+        "edition": "site web (pas d'édition)",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "cours/fiches, méthodes, erreurs fréquentes, sujets DNB/bac — consultation humaine uniquement",
+        "url": "https://www.math93.com/",
+        "acces": "accueil HTTP 200 ; aucune collecte",
+        "droits": "G0 pending — aucune licence affichée",
+        "provenance": "relevé G0 du 2026-11-07"
+      },
+      {
+        "niveau": "lycée (2nde→Tle)",
+        "matiere": "mathematiques",
+        "collection": "Math93 (site)",
+        "chapitre": "pending_verification",
+        "edition": "site web (pas d'édition)",
+        "ean": "—",
+        "curriculumVersion": "pending_verification",
+        "typeReference": "cours/fiches, méthodes, erreurs fréquentes, sujets DNB/bac — consultation humaine uniquement",
+        "url": "https://www.math93.com/",
+        "acces": "accueil HTTP 200 ; aucune collecte",
+        "droits": "G0 pending — aucune licence affichée",
+        "provenance": "relevé G0 du 2026-11-07"
+      }
+    ]
+  }
+}

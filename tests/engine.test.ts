@@ -15,6 +15,10 @@ describe("analyse des nombres", () => {
     expect(parseNumber("-7/4")?.value).toBe(-1.75);
     expect(parseNumber("2,5×10^-3")?.value).toBeCloseTo(0.0025);
     expect(parseNumber("12 000")?.value).toBe(12000);
+    expect(parseNumber("5,6.10^-6")?.value).toBeCloseTo(5.6e-6, 12);
+    expect(parseNumber("5,6×10⁻⁶")?.value).toBeCloseTo(5.6e-6, 12);
+    expect(parseNumber("35 %")?.value).toBe(35);
+    expect(parseNumber("12,50 €")?.value).toBe(12.5);
     expect(parseNumber("1,20")?.sigFigs).toBe(3);
     expect(parseNumber("0,0450")?.sigFigs).toBe(3);
     expect(parseNumber("abc")).toBeNull();

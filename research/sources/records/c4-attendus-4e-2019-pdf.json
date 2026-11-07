@@ -1,0 +1,39 @@
+{
+  "seedId": "c4-attendus-4e-2019-pdf",
+  "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+  "finalUrl": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+  "accessedAt": "2026-11-07T14:49:57.494Z",
+  "httpStatus": 200,
+  "contentType": "application/pdf",
+  "bytes": 1546128,
+  "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+  "etag": "\"61c071f2-179790\"",
+  "lastModified": "Mon, 20 Dec 2021 12:07:14 GMT",
+  "readable": true,
+  "text": {
+    "tool": "pdftotext",
+    "chars": 19093,
+    "sha256": "f6ad8511db9ecafaed05bd84663fed9916a4253206b3723347d7632575a12e77"
+  },
+  "extracted": {
+    "boRefs": [],
+    "cycles": [],
+    "applicabilitySnippets": []
+  },
+  "verification": {
+    "status": "verified",
+    "checks": [
+      {
+        "name": "contient « attendus de fin d'année »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "contient « Pythagore »",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "checkedAt": "2026-11-07T14:49:57.494Z"
+  }
+}

@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MathText, { MathInline } from "./MathText";
 import { Interaction, initValue } from "./interactions";
-import { KIND_LABELS } from "@/lib/engine/labels";
+import { KIND_LABELS, NIVEAUX } from "@/lib/engine/labels";
 import type { PublicExercise } from "@/lib/engine/public";
 import type { CheckResult, ExerciseMeta, Figure as Fig } from "@/lib/engine/types";
 
@@ -48,17 +48,21 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSolution, setShowSolution] = useState(false);
+  const [hintsShown, setHintsShown] = useState(0);
   const [timed, setTimed] = useState(startTimed);
   const limit = data.meta.timeLimit ?? 180;
   const [remaining, setRemaining] = useState(limit);
   const started = useRef(Date.now());
   const meta = data.meta;
+  // Un exercice de banque de chapitre (niveau fixé, sans tirage) n'a pas de variante à charger.
+  const canRenew = !(meta.niveau && meta.randomized === "banque");
 
   const reset = useCallback((d: Loaded) => {
     setData(d);
     setValues(d.exercise.parts.map((p) => initValue(p.interaction)));
     setResult(null);
     setShowSolution(false);
+    setHintsShown(0);
     setError("");
     started.current = Date.now();
     setRemaining(d.meta.timeLimit ?? 180);
@@ -76,7 +80,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
       reset(await r.json());
       setAttempt(1);
     } catch {
-      setError("Impossible de charger un nouvel exercice. Vérifiez votre connexion.");
+      setError("Impossible de charger un nouvel exercice. Vérifie ta connexion.");
     } finally {
       setLoading(false);
     }
@@ -96,7 +100,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
       saveRecent(meta, res.score);
       if (series) setShowSolution(true);
     } catch (e) {
-      setError((e as Error).message || "La correction a échoué. Réessayez.");
+      setError((e as Error).message || "La correction a échoué. Réessaie.");
     } finally {
       setLoading(false);
     }
@@ -131,7 +135,8 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
           {meta.randomized === "valeurs" && <span className="chip bg-violet-50 text-violet-700 ring-1 ring-violet-200">Valeurs aléatoires</span>}
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          {!series && (
+          {meta.niveau && <span className="chip bg-sky-50 text-sky-800 ring-1 ring-sky-200">Niveau {meta.niveau} · {NIVEAUX[meta.niveau]}</span>}
+          {!series && !meta.niveau && (
             <div className="inline-flex overflow-hidden rounded-lg border border-slate-300 bg-white text-xs font-semibold" role="group" aria-label="Difficulté">
               {[1, 2, 3].map((d) => (
                 <button key={d} type="button" disabled={loading} onClick={() => load(d)} aria-pressed={data.difficulty === d}
@@ -181,21 +186,32 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
           );
         })}
 
+        {!!data.exercise.hints?.length && (
+          <div className="space-y-2" aria-live="polite">
+            {data.exercise.hints.slice(0, hintsShown).map((h, k) => (
+              <p key={k} className="animate-pop rounded-xl bg-sky-50 p-3 text-sm text-sky-900"><span className="font-semibold">💡 Indice {k + 1} : </span><MathInline text={h} /></p>
+            ))}
+            {!result && hintsShown < data.exercise.hints.length && (
+              <button type="button" className="btn-ghost text-xs" onClick={() => setHintsShown((n) => n + 1)}>💡 {hintsShown ? "Indice suivant" : "Afficher un indice"} ({hintsShown}/{data.exercise.hints.length})</button>
+            )}
+          </div>
+        )}
+
         {error && <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700" role="alert">{error}</p>}
 
         {/* actions */}
         {!result ? (
           <div className="flex flex-wrap gap-2">
             <button className="btn-primary" onClick={submit} disabled={loading}>{loading ? "Correction…" : "Valider"}</button>
-            {!series && <button className="btn-ghost" onClick={() => load(data.difficulty)} disabled={loading}>↻ Autre exercice</button>}
+            {!series && canRenew && <button className="btn-ghost" onClick={() => load(data.difficulty)} disabled={loading}>↻ Autre exercice</button>}
           </div>
         ) : (
           <div className="space-y-4">
             <div className={`flex flex-wrap items-center gap-4 rounded-2xl p-4 ${result.score === 1 ? "bg-emerald-600 text-white" : result.score >= 0.5 ? "bg-amber-100 text-amber-900" : "bg-rose-100 text-rose-900"}`}>
               <div className="text-3xl font-black">{scorePct} %</div>
               <div className="flex-1 text-sm">
-                <p className="font-semibold">{result.score === 1 ? "Excellent, tout est juste !" : result.score >= 0.5 ? "Pas mal ! Regardez la correction pour progresser." : "Ce n'est pas encore ça : la correction détaillée va vous aider."}</p>
-                <p className="opacity-80">Tentative n° {attempt} · {result.saved ? "résultat enregistré dans Mon espace" : "connectez-vous pour enregistrer vos résultats"}</p>
+                <p className="font-semibold">{result.score === 1 ? "Excellent, tout est juste !" : result.score >= 0.5 ? "Pas mal ! Regarde la correction pour progresser." : "Ce n'est pas encore ça : la correction détaillée va t'aider."}</p>
+                <p className="opacity-80">Tentative n° {attempt} · {result.saved ? "résultat enregistré dans Mon espace" : "connecte-toi pour enregistrer tes résultats"}</p>
               </div>
             </div>
 
@@ -206,9 +222,11 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
                 <>
                   <button className="btn-ghost" onClick={() => setShowSolution((s) => !s)}>{showSolution ? "Masquer la correction" : "Voir la correction détaillée"}</button>
                   <button className="btn-ghost" onClick={() => { setAttempt((a) => a + 1); reset({ ...data }); }}>Réessayer le même</button>
-                  <button className="btn-primary" onClick={() => load(result.recommendedDifficulty)}>
-                    Nouvel exercice{result.recommendedDifficulty !== data.difficulty ? ` · niveau ${DIFF[result.recommendedDifficulty].toLowerCase()} conseillé` : ""} →
-                  </button>
+                  {canRenew && (
+                    <button className="btn-primary" onClick={() => load(meta.niveau ? data.difficulty : result.recommendedDifficulty)}>
+                      Nouvel exercice{!meta.niveau && result.recommendedDifficulty !== data.difficulty ? ` · niveau ${DIFF[result.recommendedDifficulty].toLowerCase()} conseillé` : ""} →
+                    </button>
+                  )}
                 </>
               )}
             </div>

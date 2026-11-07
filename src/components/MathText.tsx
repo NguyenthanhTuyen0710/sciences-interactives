@@ -7,7 +7,16 @@ function renderTex(tex: string, display: boolean) {
   return katex.renderToString(tex, { displayMode: display, throwOnError: false, strict: "ignore", output: "html" });
 }
 
-function inline(text: string, key: string): ReactNode[] {
+/** Typographie française : espaces insécables avant « ; : ! ? » et » », après «, et devant les unités courantes. */
+export function frTypo(t: string): string {
+  return t
+    .replace(/ ([;:!?»])/g, "\u202f$1")
+    .replace(/« /g, "«\u202f")
+    .replace(/(\d|^) (°C|%|€|km|kg|cm|mm|min|h|m|g|s|L)(?=[\s.,;:!?)]|$)/g, "$1\u00a0$2");
+}
+
+function inline(raw: string, key: string): ReactNode[] {
+  const text = frTypo(raw);
   const out: ReactNode[] = [];
   const re = /\*\*(.+?)\*\*|\*(.+?)\*/g;
   let last = 0;

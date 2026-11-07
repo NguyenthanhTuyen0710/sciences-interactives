@@ -43,7 +43,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
         <div><label className="label" htmlFor="teacherCode">Code d'invitation enseignant</label><input id="teacherCode" name="teacherCode" required className="input" /><p className="mt-1 text-xs text-slate-500">Fourni par l'administrateur de l'établissement.</p></div>
       )}
       {error && <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700" role="alert">{error}</p>}
-      <button className="btn-primary w-full" disabled={busy}>{busy ? "Patientez…" : mode === "login" ? "Se connecter" : "Créer mon compte"}</button>
+      <button className="btn-primary w-full" disabled={busy}>{busy ? "Patiente…" : mode === "login" ? "Se connecter" : "Créer mon compte"}</button>
       <p className="text-center text-sm text-slate-600">
         {mode === "login" ? <>Pas encore de compte ? <Link href="/inscription" className="font-semibold text-indigo-600">Inscription</Link></> : <>Déjà inscrit ? <Link href="/connexion" className="font-semibold text-indigo-600">Connexion</Link></>}
       </p>

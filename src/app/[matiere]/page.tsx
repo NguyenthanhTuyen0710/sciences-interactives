@@ -23,7 +23,7 @@ export default async function SubjectPage({ params }: { params: Promise<{ matier
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { label: S.label }]} />
       <header className="mb-6">
         <h1 className="text-3xl font-black">{S.label}</h1>
-        <p className="mt-1 text-slate-600">{S.description} Choisissez votre niveau, puis un chapitre.</p>
+        <p className="mt-1 text-slate-600">{S.description} Choisis ton niveau, puis un chapitre.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {levels.map((l) => {

@@ -1,0 +1,891 @@
+{
+ "grade": "3e",
+ "subject": "mathematiques",
+ "generatedAt": "2026-11-06",
+ "programme": {
+  "current": "Programme cycle 4 2020 (BO n° 31 du 30-07-2020) + repères annuels et attendus de fin de 3e (BO n° 22 du 29-05-2019) : applicable en 3e en 2026-2027 et 2027-2028.",
+  "future": "Programme cycle 4 2026 (BO n° 10 du 5-03-2026) : applicable en 3e à partir de la rentrée 2028 (non utilisé pour la 3e).",
+  "inventory": "research/curriculum/mathematiques/curriculum-math.json (16 chapitres, 44 objectifs 3e)"
+ },
+ "scopeLegend": {
+  "programme": "exigible en 3e (2020)",
+  "consolidation": "notion d'une classe antérieure, mobilisée en 3e et au DNB",
+  "complement": "hors programme 3e 2020 ; approfondissement balisé",
+  "programme+complement": "exigible avec une partie en approfondissement",
+  "methodologie": "compétences transversales du DNB",
+  "brevet": "annale officielle référencée"
+ },
+ "sourcePolicy": "Notion = source principale déclarée par le porteur de projet ; tant que les URL ne sont pas accessibles, contenu rédigé à partir des textes officiels (inventaire A1) et de références de contrôle (Éduscol, math93), sans copie.",
+ "themes": [
+  {
+   "group": "A. Nombres et calculs",
+   "title": "Calculs avec des fractions",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-puissances-calculs",
+    "math-3e-arithmetique"
+   ],
+   "objectiveIds": [
+    "M3-NC-07",
+    "M3-NC-02"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-002",
+   "treeChapterId": "m3-puissances",
+   "batch": 1,
+   "status": "TODO",
+   "note": "Prérequis 4e : math-4e-fractions-operations."
+  },
+  {
+   "group": "A. Nombres et calculs",
+   "title": "Puissances",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-puissances-calculs"
+   ],
+   "objectiveIds": [
+    "M3-NC-04",
+    "M3-NC-05",
+    "M3-NC-06"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-002",
+   "treeChapterId": "m3-puissances",
+   "batch": 1,
+   "status": "TODO",
+   "note": "Le chapitre inclut les racines carrées (M3-NC-06)."
+  },
+  {
+   "group": "A. Nombres et calculs",
+   "title": "Arithmétique : nombres premiers, PPCM et PGCD",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-arithmetique"
+   ],
+   "objectiveIds": [
+    "M3-NC-01",
+    "M3-NC-02",
+    "M3-NC-03"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-001",
+   "treeChapterId": "m3-arithmetique",
+   "batch": 1,
+   "status": "TODO",
+   "note": "Les sigles PGCD/PPCM ne sont pas exigibles (programme 2020) : notions utilisées comme outils de résolution."
+  },
+  {
+   "group": "A. Nombres et calculs",
+   "title": "Ratios et pourcentages",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-pourcentages-evolution",
+    "math-4e-proportionnalite"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-13",
+    "M4-OGDF-10"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-009",
+   "treeChapterId": "m3-pourcentages",
+   "batch": 1,
+   "status": "TODO",
+   "note": "Ratio : objectif de 4e (M4-OGDF-10), consolidé en 3e."
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Calcul littéral : simplifier, distribuer et factoriser",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-calcul-litteral"
+   ],
+   "objectiveIds": [
+    "M3-NC-08",
+    "M3-NC-09"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-003",
+   "treeChapterId": "m3-calcul-litteral",
+   "batch": 2,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Calcul littéral : identités remarquables",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-calcul-litteral"
+   ],
+   "objectiveIds": [
+    "M3-NC-10"
+   ],
+   "scope": "programme+complement",
+   "taskId": "SCI-3E-MATH-003",
+   "treeChapterId": "m3-calcul-litteral",
+   "batch": 2,
+   "status": "TODO",
+   "note": "Seule (a+b)(a−b)=a²−b² est exigible en 3e (programme 2020) ; (a±b)² en approfondissement (programme de 2nde)."
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Équations",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-equations"
+   ],
+   "objectiveIds": [
+    "M3-NC-12",
+    "M3-NC-13",
+    "M3-NC-14"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-004",
+   "treeChapterId": "m3-equations",
+   "batch": 2,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Inéquations",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-equations"
+   ],
+   "objectiveIds": [],
+   "scope": "complement",
+   "taskId": "SCI-3E-MATH-004",
+   "treeChapterId": "m3-equations",
+   "batch": 2,
+   "status": "TODO",
+   "note": "Hors programme 3e 2020 (inéquations : 2nde) ; à traiter en approfondissement balisé."
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Résoudre des problèmes avec le calcul littéral et les équations",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-calcul-litteral",
+    "math-3e-equations"
+   ],
+   "objectiveIds": [
+    "M3-NC-11",
+    "M3-NC-12"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-003",
+   "treeChapterId": "m3-equations",
+   "batch": 2,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "B. Calcul littéral et équations",
+   "title": "Utiliser des formules littérales",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-calcul-litteral",
+    "math-3e-volumes-grandeurs"
+   ],
+   "objectiveIds": [
+    "M3-NC-09",
+    "M3-GM-02"
+   ],
+   "scope": "consolidation",
+   "taskId": "SCI-3E-MATH-003",
+   "treeChapterId": "m3-calcul-litteral",
+   "batch": 2,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "C. Fonctions",
+   "title": "Notion de fonction",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-notion-fonction"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-07",
+    "M3-OGDF-08",
+    "M3-OGDF-09"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-007",
+   "treeChapterId": "m3-notion-fonction",
+   "batch": 3,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "C. Fonctions",
+   "title": "Fonctions linéaires : formule et graphique",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-fonctions-affines"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-10"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-008",
+   "treeChapterId": "m3-fonctions",
+   "batch": 3,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "C. Fonctions",
+   "title": "Fonctions linéaires et proportionnalité",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-fonctions-affines"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-11"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-008",
+   "treeChapterId": "m3-fonctions",
+   "batch": 3,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "C. Fonctions",
+   "title": "Fonctions affines : formule et graphique",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-fonctions-affines"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-10",
+    "M3-OGDF-12"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-008",
+   "treeChapterId": "m3-fonctions",
+   "batch": 3,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "C. Fonctions",
+   "title": "Représentation graphique d'une fonction et application au tableur",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-notion-fonction"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-08",
+    "M3-OGDF-09"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-007",
+   "treeChapterId": "m3-notion-fonction",
+   "batch": 3,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "D. Statistiques et probabilités",
+   "title": "Étendue, moyenne, médiane et quartiles",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-statistiques"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-02",
+    "M3-OGDF-03"
+   ],
+   "scope": "programme+complement",
+   "taskId": "SCI-3E-MATH-005",
+   "treeChapterId": "m3-statistiques",
+   "batch": 5,
+   "status": "TODO",
+   "note": "Quartiles : hors programme 3e 2020 (2nde) ; approfondissement balisé."
+  },
+  {
+   "group": "D. Statistiques et probabilités",
+   "title": "Représentation graphique des données statistiques",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-statistiques"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-01"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-005",
+   "treeChapterId": "m3-statistiques",
+   "batch": 5,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "D. Statistiques et probabilités",
+   "title": "Probabilités",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-probabilites"
+   ],
+   "objectiveIds": [
+    "M3-OGDF-04",
+    "M3-OGDF-05",
+    "M3-OGDF-06"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-006",
+   "treeChapterId": "m3-probabilites",
+   "batch": 5,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "E. Géométrie plane",
+   "title": "Théorème de Pythagore et réciproque",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-4e-pythagore",
+    "math-3e-automatismes"
+   ],
+   "objectiveIds": [
+    "M3-AUTO-03"
+   ],
+   "scope": "consolidation",
+   "taskId": "SCI-3E-MATH-017",
+   "treeChapterId": "m3-pythagore",
+   "batch": 4,
+   "status": "TODO",
+   "note": "Notion de 4e, mobilisée au DNB."
+  },
+  {
+   "group": "E. Géométrie plane",
+   "title": "Théorème de Thalès et réciproque",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-thales-semblables"
+   ],
+   "objectiveIds": [
+    "M3-EG-03"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-012",
+   "treeChapterId": "m3-thales",
+   "batch": 4,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "E. Géométrie plane",
+   "title": "Trigonométrie",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-trigonometrie"
+   ],
+   "objectiveIds": [
+    "M3-EG-05"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-013",
+   "treeChapterId": "m3-trigonometrie",
+   "batch": 4,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "E. Géométrie plane",
+   "title": "Triangles et angles",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-4e-triangles-egaux"
+   ],
+   "objectiveIds": [],
+   "scope": "consolidation",
+   "taskId": "SCI-3E-MATH-017",
+   "treeChapterId": "m3-pythagore",
+   "batch": 4,
+   "status": "TODO",
+   "note": "Somme des angles (5e), triangles égaux (4e) : révision."
+  },
+  {
+   "group": "E. Géométrie plane",
+   "title": "Triangles semblables",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-thales-semblables"
+   ],
+   "objectiveIds": [
+    "M3-EG-04"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-012",
+   "treeChapterId": "m3-thales",
+   "batch": 4,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "F. Transformations géométriques",
+   "title": "Symétrie centrale et symétrie axiale",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-rotations-homotheties"
+   ],
+   "objectiveIds": [
+    "M3-EG-07"
+   ],
+   "scope": "consolidation",
+   "taskId": "SCI-3E-MATH-014",
+   "treeChapterId": "m3-transformations",
+   "batch": 6,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "F. Transformations géométriques",
+   "title": "Rotation et translation",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-rotations-homotheties",
+    "math-4e-translation"
+   ],
+   "objectiveIds": [
+    "M3-EG-06",
+    "M3-EG-07"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-014",
+   "treeChapterId": "m3-transformations",
+   "batch": 6,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "F. Transformations géométriques",
+   "title": "Homothétie",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-rotations-homotheties"
+   ],
+   "objectiveIds": [
+    "M3-EG-06",
+    "M3-EG-08"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-014",
+   "treeChapterId": "m3-transformations",
+   "batch": 6,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "G. Géométrie dans l'espace",
+   "title": "Parallélépipède rectangle",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-sphere-sections",
+    "math-3e-volumes-grandeurs"
+   ],
+   "objectiveIds": [
+    "M3-EG-02",
+    "M3-GM-01"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-011",
+   "treeChapterId": "m3-espace",
+   "batch": 6,
+   "status": "TODO",
+   "note": "Sections planes et volumes."
+  },
+  {
+   "group": "G. Géométrie dans l'espace",
+   "title": "Sphère",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-sphere-sections",
+    "math-3e-volumes-grandeurs"
+   ],
+   "objectiveIds": [
+    "M3-EG-01",
+    "M3-EG-02",
+    "M3-GM-01"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-011",
+   "treeChapterId": "m3-espace",
+   "batch": 6,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "H. Algorithmique et Scratch",
+   "title": "Algorithmes : notations et vocabulaire",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-programmation"
+   ],
+   "objectiveIds": [
+    "M3-AP-02"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-015",
+   "treeChapterId": "m3-algorithmique",
+   "batch": 7,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "H. Algorithmique et Scratch",
+   "title": "Algorithmes : boucles",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-programmation"
+   ],
+   "objectiveIds": [
+    "M3-AP-01"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-015",
+   "treeChapterId": "m3-algorithmique",
+   "batch": 7,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "H. Algorithmique et Scratch",
+   "title": "Algorithmes : conditions",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-programmation"
+   ],
+   "objectiveIds": [
+    "M3-AP-01"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-015",
+   "treeChapterId": "m3-algorithmique",
+   "batch": 7,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "H. Algorithmique et Scratch",
+   "title": "Programmes Scratch : géométrie",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-programmation"
+   ],
+   "objectiveIds": [
+    "M3-AP-01",
+    "M3-AP-02"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-015",
+   "treeChapterId": "m3-algorithmique",
+   "batch": 7,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "H. Algorithmique et Scratch",
+   "title": "Programmes Scratch : expériences aléatoires",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-programmation",
+    "math-3e-probabilites"
+   ],
+   "objectiveIds": [
+    "M3-AP-03",
+    "M3-OGDF-05"
+   ],
+   "scope": "programme",
+   "taskId": "SCI-3E-MATH-015",
+   "treeChapterId": "m3-algorithmique",
+   "batch": 7,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "I. Méthodologie",
+   "title": "Choisir les données utiles",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "methodologie",
+   "taskId": "SCI-DNB-MATH-002",
+   "treeChapterId": null,
+   "batch": 8,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "I. Méthodologie",
+   "title": "Simplifier un énoncé ou une consigne",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "methodologie",
+   "taskId": "SCI-DNB-MATH-002",
+   "treeChapterId": null,
+   "batch": 8,
+   "status": "TODO",
+   "note": "Titre exact à vérifier dans la source Notion (inaccessible)."
+  },
+  {
+   "group": "I. Méthodologie",
+   "title": "Méthodes pour QCM",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [
+    "math-3e-automatismes"
+   ],
+   "objectiveIds": [
+    "M3-AUTO-01",
+    "M3-AUTO-02",
+    "M3-AUTO-03"
+   ],
+   "scope": "methodologie",
+   "taskId": "SCI-DNB-MATH-002",
+   "treeChapterId": null,
+   "batch": 8,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "J. Brevet — Annales",
+   "title": "Amérique du Nord — Mai 2023",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "brevet",
+   "taskId": "SCI-DNB-MATH-003",
+   "treeChapterId": null,
+   "batch": 9,
+   "status": "TODO",
+   "note": "Référencer le sujet officiel (lien) ; exercices originaux du même type, sans copie."
+  },
+  {
+   "group": "J. Brevet — Annales",
+   "title": "Polynésie — Juin 2023",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "brevet",
+   "taskId": "SCI-DNB-MATH-003",
+   "treeChapterId": null,
+   "batch": 9,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "J. Brevet — Annales",
+   "title": "Centres étrangers — Juin 2024",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "brevet",
+   "taskId": "SCI-DNB-MATH-003",
+   "treeChapterId": null,
+   "batch": 9,
+   "status": "TODO",
+   "note": ""
+  },
+  {
+   "group": "J. Brevet — Annales",
+   "title": "Asie — Juin 2024",
+   "notion": {
+    "url": null,
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "URL Notion absente du contexte de la session (historique effacé) et connecteur Notion non autorisé ; aucun contenu Notion lu."
+   },
+   "officialChapterIds": [],
+   "objectiveIds": [],
+   "scope": "brevet",
+   "taskId": "SCI-DNB-MATH-003",
+   "treeChapterId": null,
+   "batch": 9,
+   "status": "TODO",
+   "note": ""
+  }
+ ],
+ "officialChaptersWithoutTheme": [],
+ "taskIndex": {
+  "SCI-3E-MATH-001": "math-3e-arithmetique",
+  "SCI-3E-MATH-002": "math-3e-puissances-calculs",
+  "SCI-3E-MATH-003": "math-3e-calcul-litteral",
+  "SCI-3E-MATH-004": "math-3e-equations",
+  "SCI-3E-MATH-005": "math-3e-statistiques",
+  "SCI-3E-MATH-006": "math-3e-probabilites",
+  "SCI-3E-MATH-007": "math-3e-notion-fonction",
+  "SCI-3E-MATH-008": "math-3e-fonctions-affines",
+  "SCI-3E-MATH-009": "math-3e-pourcentages-evolution",
+  "SCI-3E-MATH-010": "math-3e-volumes-grandeurs",
+  "SCI-3E-MATH-011": "math-3e-sphere-sections",
+  "SCI-3E-MATH-012": "math-3e-thales-semblables",
+  "SCI-3E-MATH-013": "math-3e-trigonometrie",
+  "SCI-3E-MATH-014": "math-3e-rotations-homotheties",
+  "SCI-3E-MATH-015": "math-3e-programmation",
+  "SCI-3E-MATH-016": "math-3e-automatismes",
+  "SCI-3E-MATH-017": "consolidation 4e : Pythagore, triangles et angles (à créer)",
+  "SCI-DNB-MATH-002": "méthodologie DNB et automatismes (à créer)",
+  "SCI-DNB-MATH-003": "annales DNB référencées + sujets originaux du même type (à créer)"
+ }
+}

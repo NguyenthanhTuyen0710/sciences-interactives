@@ -18,7 +18,7 @@ export default async function ExercisesPage({ searchParams }: { searchParams: Pr
     <div>
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { label: "Exercices interactifs" }]} />
       <h1 className="mb-1 text-3xl font-black">Exercices interactifs</h1>
-      <p className="mb-6 text-slate-600">Chaque exercice est généré avec des valeurs aléatoires : vous pouvez vous entraîner à l'infini, avec correction automatique et solution détaillée.</p>
+      <p className="mb-6 text-slate-600">Chaque exercice est généré avec des valeurs aléatoires : tu peux t'entraîner à l'infini, avec correction automatique et solution détaillée.</p>
       <Catalog items={items} initial={sp} />
     </div>
   );

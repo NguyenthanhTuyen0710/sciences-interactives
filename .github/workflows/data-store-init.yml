@@ -1,0 +1,36 @@
+# Création unique du stockage « data-store » (release BROUILLON + registre des dépenses vide). Lancement manuel.
+# Refuse si le stockage existe déjà ; ne publie jamais de release.
+name: Data Store Init
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Taper CREER pour confirmer la création du brouillon data-store"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-store
+  cancel-in-progress: false
+
+jobs:
+  init:
+    if: inputs.confirm == 'CREER'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # création de la release brouillon
+    steps:
+      - uses: actions/checkout@v4
+      - name: Créer le brouillon et le registre vide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh init
+      - name: Relire (SHA256)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh pull-ledger
