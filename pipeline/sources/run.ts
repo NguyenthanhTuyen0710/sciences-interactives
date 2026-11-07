@@ -3,6 +3,7 @@
 //   npx tsx pipeline/sources/run.ts [check] [--offline]   défaut : contrôles (registre, G0, G1, préfixes, robots.txt) ; ne télécharge aucun document
 //   npx tsx pipeline/sources/run.ts fetch [--only <seed>]  télécharge les seeds autorisés (G0 + G1 approuvés, robots.txt), ≤ 20 par exécution
 //   npx tsx pipeline/sources/run.ts verify                 recalcule la vérification à partir du cache local (sans réseau)
+//   npx tsx pipeline/sources/run.ts match <chapitre>       rapproche les objectifs du chapitre des documents vérifiés (sans IA)
 //   npx tsx pipeline/sources/run.ts storable               liste les documents dont la conservation (data-store) est approuvée
 //   npx tsx pipeline/sources/run.ts apply <proposition.json>  applique à l'inventaire les changements APPROUVÉS et prouvés par citation
 //
@@ -13,7 +14,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { extractMetadata, gateSeed, groupFor, parseRobots, quoteFound, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
+import { extractMetadata, gateSeed, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const P = (f: string) => join(ROOT, f);
@@ -179,6 +180,28 @@ function apply(file: string) {
   console.log(`${applied} changement(s) appliqué(s) à ${INV}.`);
 }
 
+// ───────── Rapprochement des objectifs d'un chapitre avec les documents vérifiés (sans IA, sans réseau) ─────────
+function match(chapterId: string) {
+  if (!/^[a-z0-9-]+$/.test(chapterId)) fail("identifiant de chapitre invalide");
+  const spec = readJson<{ id: string; officialChapterIds: string[]; objectiveIds?: string[]; consolidationChapterIds: string[] }>(`pipeline/chapters/${chapterId}.json`);
+  const inv = readJson<{ grades: { domains: { chapters: { id: string; objectives: { id: string; text: string; officialRef?: string }[] }[] }[] }[] }>("research/curriculum/mathematiques/curriculum-math.json");
+  const all = inv.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters));
+  const pick = (ids: string[], keep?: string[]) => ids.flatMap((id) => (all.find((c) => c.id === id)?.objectives ?? []).filter((o) => !keep || keep.includes(o.id)).map((o) => ({ ...o, chapter: id })));
+  const objectives = [...pick(spec.officialChapterIds, spec.objectiveIds), ...pick(spec.consolidationChapterIds)];
+  const docs = seeds.flatMap((s) => {
+    const rec = loadRecord(s.id);
+    if (!rec || rec.verification.status !== "verified" || s.g1 !== "approved") return [];
+    const text = textOf(rec);
+    return text ? [{ seedId: s.id, sha256: rec.sha256!, text }] : [];
+  });
+  if (!docs.length) fail("aucun document vérifié disponible localement (lancer fetch)");
+  const results = objectives.map((o) => ({ objectiveId: o.id, chapter: o.chapter, text: o.text, officialRef: o.officialRef, ...matchObjective(o.text, docs) }));
+  const out = { chapter: spec.id, checkedAt: new Date().toISOString(), method: "citation mot pour mot (normalisation des espaces et de la typographie) ; sinon needs_manual_review avec passage candidat", documents: docs.map((d) => ({ seedId: d.seedId, sha256: d.sha256 })), results };
+  writeFile(`research/sources/verification/${spec.id}.json`, JSON.stringify(out, null, 2) + "\n");
+  for (const r of results) console.log(`${r.objectiveId} : ${r.status}${r.candidate ? ` (meilleur passage : ${r.candidate.seedId}, ${Math.round(r.candidate.wordCoverage * 100)} % des mots porteurs)` : ` (${r.evidence?.seedId})`}`);
+  console.log(`${results.filter((r) => r.status === "verified").length} verified / ${results.filter((r) => r.status !== "verified").length} needs_manual_review → research/sources/verification/${spec.id}.json`);
+}
+
 // ───────── Programme ─────────
 async function main() {
   if (cmd === "apply") return apply(opt("apply") ?? args[1] ?? fail("fichier de proposition manquant"));
@@ -194,6 +217,7 @@ async function main() {
     }
     return;
   }
+  if (cmd === "match") return match(args[1] ?? fail("chapitre manquant (fiche pipeline/chapters/<id>.json)"));
   if (cmd === "storable") { // documents dont la conservation dans data-store est approuvée (G0 + storage)
     for (const s of seeds) {
       const rec = loadRecord(s.id), src = sourceOf(s);

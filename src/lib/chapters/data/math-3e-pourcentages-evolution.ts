@@ -693,7 +693,7 @@ export const math3ePourcentagesEvolution: ChapterContent = {
   ],
   sources: [
     { id: "R1", title: "Programme de mathématiques du cycle 4 (version 2020), BO n° 31 du 30 juillet 2020", url: "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm", kind: "official", note: "thème B « Organisation et gestion de données, fonctions » : proportionnalité, pourcentages, ratio", verification: "pending_verification" },
-    { id: "R2", title: "Repères annuels de progression et attendus de fin d'année du cycle 4, BO n° 22 du 29 mai 2019", url: "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913384N.htm", kind: "official", note: "3e : relier taux d'évolution et coefficient multiplicateur ; 4e : quatrième proportionnelle", verification: "pending_verification" },
+    { id: "R2", title: "Repères annuels de progression et attendus de fin d'année du cycle 4, BO n° 22 du 29 mai 2019", url: "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913283N.htm", kind: "official", note: "3e : relier taux d'évolution et coefficient multiplicateur ; 4e : quatrième proportionnelle", verification: "pending_verification" },
     { id: "R3", title: "Inventaire interne des objectifs de mathématiques 2026-2027 (agent A1)", url: "https://github.com/NguyenthanhTuyen0710/sciences-interactives/blob/main/research/curriculum/mathematiques/curriculum-math.json", kind: "supplementary", note: "research/curriculum/mathematiques/curriculum-math.json ; le programme 2026 ne s'applique en 3e qu'à la rentrée 2028", verification: "pending_verification" },
   ],
   lesson: {

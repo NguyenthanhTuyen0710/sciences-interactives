@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractMetadata, gateSeed, groupFor, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
+import { extractMetadata, gateSeed, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
 import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
@@ -42,15 +42,19 @@ Disallow: /sites/default/files/prive/
 describe("registre, seeds et contrôles avant téléchargement", () => {
   const sources = registry.sources as SourceEntry[];
   const seeds = seedsFile.seeds as Seed[];
-  it("aucune source n'est approuvée sans décision humaine ; Math93 et Labolycée sont désactivées", () => {
-    for (const s of sources) expect(s.g0.status).not.toBe("approved");
-    expect(sources.filter((s) => s.role === "reference" && s.kind === "http").every((s) => !s.enabled)).toBe(true);
+  it("toute approbation G0 est tracée ; seules les sources officielles le sont ; Math93 et Labolycée désactivées ; aucune conservation autorisée", () => {
+    for (const s of sources) {
+      if (s.g0.status === "approved") { expect(s.role).toBe("officiel"); expect(String(s.g0.decision)).toMatch(/Décision du porteur de projet/); }
+      expect(s.g0.storage ?? "pending").not.toBe("approved");
+    }
+    expect(sources.filter((s) => s.role === "reference" && s.kind === "http").every((s) => !s.enabled && s.g0.status !== "approved")).toBe(true);
   });
-  it("les seeds ne visent que les sources officielles ; toute décision G1 est tracée ; rien ne passe sans G0", () => {
+  it("les seeds ne visent que les sources officielles ; toute décision G1 est tracée ; un seed ne passe qu'avec G0 et G1 approuvés", () => {
     for (const s of seeds as (Seed & { g1Note?: string })[]) {
       expect(["bo", "eduscol"]).toContain(s.sourceId);
       if (s.g1 !== "proposed") expect(s.g1Note).toMatch(/Décision du porteur de projet/);
-      expect(gateSeed(s, sources.find((x) => x.id === s.sourceId)).length).toBeGreaterThan(0);
+      const src = sources.find((x) => x.id === s.sourceId)!;
+      if (s.g1 !== "approved" || src.g0.status !== "approved") expect(gateSeed(s, src).length).toBeGreaterThan(0);
     }
   });
   it("autorise un seed uniquement si G0, G1, hôte et préfixe sont conformes", () => {
@@ -86,6 +90,19 @@ describe("extraction et vérification", () => {
     expect(quoteFound(text, "Applicable à compter de la rentrée 2028")).toBe(true);
     expect(quoteFound(text, "applicable dès la rentrée 2027 partout")).toBe(false);
     expect(quoteFound(text, "cycle 4")).toBe(false);
+  });
+});
+
+describe("rapprochement des objectifs", () => {
+  const docs = [{ seedId: "d", sha256: "s", text: "Thème D.\n- Le théorème de Pythagore et sa réciproque.\n- Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore." }];
+  it("verified seulement pour une citation mot pour mot", () => {
+    expect(matchObjective("Calculer une longueur dans un triangle  rectangle avec le théorème de Pythagore.", docs).status).toBe("verified");
+  });
+  it("paraphrase → needs_manual_review avec passage candidat, jamais verified", () => {
+    const m = matchObjective("Démontrer qu'un triangle est rectangle (réciproque).", docs);
+    expect(m.status).toBe("needs_manual_review");
+    expect(m.evidence).toBeUndefined();
+    expect(m.candidate?.excerpt).toMatch(/réciproque/);
   });
 });
 

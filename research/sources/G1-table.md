@@ -19,7 +19,7 @@ Aucun seed accessible ne contient le **programme 2020 du cycle 4** ni les **rep�
 - Approuvés (recherche contrôlée) : n° 1, 3, 4. Rejeté : n° 2 (doublon). La collecte reste bloquée tant que G0 n'est pas approuvé pour `bo` / `eduscol` ; aucune conservation dans data-store (droits non confirmés).
 - URL fournies pour remplacer n° 5 et 6 — toutes **HTTP 403 (Cloudflare)**, non lues, aucun contournement :
   - `bo/20/Hebdo31/MENE2018714A.htm` (programme 2020) ;
-  - `bo/19/Hebdo22/MENE1913283N.htm` (2019) — l'inventaire et le chapitre math-3e-pourcentages-evolution citent `MENE1913384N` : écart non résolu ;
+  - `bo/19/Hebdo22/MENE1913283N.htm` (2019). Écart résolu le 2026-11-07 : le PDF du « Bulletin officiel n° 22 du 29 mai 2019 » (`/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf`, 308 p., SHA256 `59c3cdd34dc2…`) contient « note de service n° 2019-072 du 28-5-2019 (NOR : MENE1913283N) — Attendus de fin d'année et repères annuels de progression … cycle 4 » ; `MENE1913384N` n'y figure pas. Seul le chapitre math-3e-pourcentages-evolution (source R2) citait ce mauvais code : corrigé (l'inventaire ne le citait pas) ;
   - `eduscol …/5736/ressources-d-accompagnement-…-cycle-4` (page HTML, hors des préfixes autorisés).
 - PDF officiels publics trouvés en remplacement (lus un par un hors dépôt ; **G1 à décider**) :
 

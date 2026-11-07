@@ -1,0 +1,53 @@
+{
+  "seedId": "c4-programme-2020-eduscol-pdf",
+  "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+  "finalUrl": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+  "accessedAt": "2026-11-07T14:49:44.189Z",
+  "httpStatus": 200,
+  "contentType": "application/pdf",
+  "bytes": 2146045,
+  "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+  "etag": "\"5f58cf54-20befd\"",
+  "lastModified": "Wed, 09 Sep 2020 12:49:24 GMT",
+  "readable": true,
+  "text": {
+    "tool": "pdftotext",
+    "chars": 428761,
+    "sha256": "4ef278006f3e4e8ddcd6a3bd34e3d7eee803bacbfc2a2be917fb88d98b13a41d"
+  },
+  "extracted": {
+    "boRefs": [
+      "BO n° 31 du 30 juillet 2020"
+    ],
+    "cycles": [
+      2,
+      3,
+      4
+    ],
+    "applicabilitySnippets": [
+      "Programme du cycle 4 En vigueur à la rentrée 2020 Cette version du texte met en évidence les modifications ap",
+      "et à l’information Par rapport à la version en vigueur à la rentrée 2019, les ajouts et modifications sont en vert, les suppressions"
+    ]
+  },
+  "verification": {
+    "status": "verified",
+    "checks": [
+      {
+        "name": "contient « En vigueur à la rentrée 2020 »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "contient « BOEN n° 31 du 30 juillet 2020 »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "cycle 4",
+        "ok": true,
+        "detail": "cycles trouvés : 2, 3, 4"
+      }
+    ],
+    "checkedAt": "2026-11-07T14:49:44.189Z"
+  }
+}

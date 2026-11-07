@@ -7,18 +7,22 @@
       "name": "Bulletin officiel de l'Éducation nationale",
       "kind": "http",
       "host": "www.education.gouv.fr",
-      "allowedPathPrefixes": ["/bo/", "/sites/default/files/"],
+      "allowedPathPrefixes": [
+        "/bo/",
+        "/sites/default/files/"
+      ],
       "role": "officiel",
       "enabled": true,
       "crawlDelaySeconds": 10,
       "g0": {
-        "status": "pending",
+        "status": "approved",
         "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "User-agent: * → Crawl-delay: 10 ; Disallow: /recherche, /search, chemins Drupal ; Allow explicite : /*.pdf$ et /sites/default/files/. Aucun groupe dédié aux agents d'IA.",
         "terms": "NON LU : /mentions-legales renvoie HTTP 403 (page Cloudflare « Attention Required ») au client automatisé.",
         "access": "Pages HTML (/bo/…, /mentions-legales) : HTTP 403. PDF sous /sites/default/files/ : HTTP 200/206.",
-        "license": "non vérifiée (conditions de réutilisation non lues)"
+        "license": "non vérifiée (conditions de réutilisation non lues)",
+        "decision": "Décision du porteur de projet du 2026-11-07 : collecte des PDF officiels déjà contrôlés uniquement ; conservation dans data-store non autorisée (storage = pending)."
       }
     },
     {
@@ -26,18 +30,21 @@
       "name": "Éduscol",
       "kind": "http",
       "host": "eduscol.education.gouv.fr",
-      "allowedPathPrefixes": ["/sites/default/files/"],
+      "allowedPathPrefixes": [
+        "/sites/default/files/"
+      ],
       "role": "officiel",
       "enabled": true,
       "crawlDelaySeconds": 10,
       "g0": {
-        "status": "pending",
+        "status": "approved",
         "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "Même fichier que education.gouv.fr : User-agent: * → Crawl-delay: 10 ; Allow /*.pdf$ et /sites/default/files/.",
         "terms": "NON LU : /mentions-legales renvoie HTTP 403 (Cloudflare) au client automatisé.",
         "access": "Pages HTML : HTTP 403. PDF sous /sites/default/files/ : HTTP 206.",
-        "license": "non vérifiée"
+        "license": "non vérifiée",
+        "decision": "Décision du porteur de projet du 2026-11-07 : collecte des PDF officiels déjà contrôlés uniquement ; conservation dans data-store non autorisée (storage = pending)."
       }
     },
     {

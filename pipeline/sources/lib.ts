@@ -118,3 +118,33 @@ export function verify(seed: Seed, text: string | null, httpStatus: number, extr
 
 /** Une citation est retrouvée mot pour mot (à la normalisation des espaces près) dans le texte. */
 export const quoteFound = (text: string, quote: string) => normalize(quote).length >= 20 && normalize(text).includes(normalize(quote));
+
+// ───────── Rapprochement objectif ↔ texte officiel (sans IA) ─────────
+const STOP = new Set(["avec", "dans", "pour", "dont", "sont", "leur", "leurs", "cette", "celui", "celle", "entre", "selon", "ainsi", "plus", "moins", "tout", "tous", "toute", "toutes", "être", "avoir"]);
+const words = (s: string) => normalize(s).replace(/[^\p{L}\p{N}' ]/gu, " ").split(" ").map((w) => w.replace(/^[a-z]'/, "")).filter((w) => w.length >= 4 && !STOP.has(w));
+
+export interface ObjectiveMatch {
+  status: "verified" | "needs_manual_review";
+  evidence?: { seedId: string; sha256: string; quote: string };
+  candidate?: { seedId: string; sha256: string; excerpt: string; wordCoverage: number };
+}
+
+/** « verified » uniquement si le texte de l'objectif figure mot pour mot (espaces et typographie normalisés) dans un
+ *  document ; sinon, meilleur passage candidat (part des mots porteurs retrouvés) pour relecture humaine. */
+export function matchObjective(objectiveText: string, docs: { seedId: string; sha256: string; text: string }[]): ObjectiveMatch {
+  const target = normalize(objectiveText).replace(/[.;]$/, "");
+  for (const d of docs) if (target.length >= 20 && normalize(d.text).includes(target)) return { status: "verified", evidence: { seedId: d.seedId, sha256: d.sha256, quote: objectiveText } };
+  const want = [...new Set(words(objectiveText))];
+  let best: ObjectiveMatch["candidate"];
+  for (const d of docs) {
+    const segs = d.text.split(/\n\s*\n|(?<=[.;:])\s+|\n(?=\s*[-•])/);
+    for (let i = 0; i < segs.length; i++) {
+      const excerpt = segs.slice(i, i + 2).join(" ").replace(/\s+/g, " ").trim();
+      if (excerpt.length < 15) continue;
+      const have = new Set(words(excerpt));
+      const cov = want.length ? want.filter((w) => have.has(w)).length / want.length : 0;
+      if (!best || cov > best.wordCoverage) best = { seedId: d.seedId, sha256: d.sha256, excerpt: excerpt.slice(0, 300), wordCoverage: Number(cov.toFixed(2)) };
+    }
+  }
+  return { status: "needs_manual_review", candidate: best };
+}

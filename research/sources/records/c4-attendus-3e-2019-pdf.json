@@ -1,0 +1,34 @@
+{
+  "seedId": "c4-attendus-3e-2019-pdf",
+  "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+  "finalUrl": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+  "accessedAt": "2026-11-07T14:50:10.048Z",
+  "httpStatus": 200,
+  "contentType": "application/pdf",
+  "bytes": 1320721,
+  "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+  "etag": "\"61c071f3-142711\"",
+  "lastModified": "Mon, 20 Dec 2021 12:07:15 GMT",
+  "readable": true,
+  "text": {
+    "tool": "pdftotext",
+    "chars": 18890,
+    "sha256": "a3287541c151e838dbcabc4e5d95264aaf8111065de49bdeff31d8d8abfe515e"
+  },
+  "extracted": {
+    "boRefs": [],
+    "cycles": [],
+    "applicabilitySnippets": []
+  },
+  "verification": {
+    "status": "verified",
+    "checks": [
+      {
+        "name": "contient « attendus de fin d'année »",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "checkedAt": "2026-11-07T14:50:10.048Z"
+  }
+}
