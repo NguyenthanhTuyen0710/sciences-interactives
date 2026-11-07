@@ -1,0 +1,113 @@
+# Production d'un chapitre par le pipeline existant (pipeline/run.ts) via l'API Claude.
+#   dry-run : contrôle des données + estimation des coûts, aucun appel API, aucune clé exposée.
+#   submit  : soumet la prochaine étape par Message Batches (refusé si pipeline/budget.json → creditVerified = false
+#             ou si le coût maximal dépasse le plafond limitUsd).
+#   collect : récupère le résultat d'un batch_id ; aucune nouvelle requête payante.
+# Les fichiers produits sont publiés comme artefact du run, jamais committés : relecture humaine obligatoire.
+name: Generate Lessons
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (estimation, sans API) | submit (Message Batches) | collect (résultat d'un batch)"
+        type: choice
+        options: [dry-run, submit, collect]
+        default: dry-run
+      level:
+        description: "Niveau (doit correspondre à la fiche du chapitre)"
+        type: choice
+        options: [3e]
+        default: 3e
+      subject:
+        description: "Matière (doit correspondre à la fiche du chapitre)"
+        type: choice
+        options: [mathematiques]
+        default: mathematiques
+      chapter:
+        description: "Identifiant de chapitre (fichier pipeline/chapters/<id>.json)"
+        type: choice
+        options: [math-3e-pythagore, math-3e-calcul-litteral]
+        default: math-3e-pythagore
+      exercise_count:
+        description: "Nombre d'exercices imposé (1-60) ; vide = règle normale (≥ 30)"
+        type: string
+        default: "5"
+      batch_id:
+        description: "Identifiant msgbatch_… (mode collect uniquement)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: generate-lessons-${{ inputs.chapter }}
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Pipeline (${{ inputs.mode }})
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          LEVEL: ${{ inputs.level }}
+          SUBJECT: ${{ inputs.subject }}
+          CHAPTER: ${{ inputs.chapter }}
+          EXERCISES: ${{ inputs.exercise_count }}
+          BATCH_ID: ${{ inputs.batch_id }}
+          # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
+          # et pipeline/run.ts ne l'affiche jamais.
+          ANTHROPIC_API_KEY: ${{ inputs.mode != 'dry-run' && secrets.ANTHROPIC_API_KEY || '' }}
+        run: |
+          args=("$CHAPTER" --level "$LEVEL" --subject "$SUBJECT")
+          if [ -n "$EXERCISES" ]; then args+=(--exercises "$EXERCISES"); fi
+          case "$MODE" in
+            dry-run) args+=(--batch) ;;
+            submit)  args+=(--submit) ;;
+            collect)
+              if [ -z "$BATCH_ID" ]; then echo "::error::batch_id est obligatoire en mode collect"; exit 2; fi
+              args+=(--collect "$BATCH_ID") ;;
+          esac
+          mkdir -p pipeline-output
+          npx tsx pipeline/run.ts "${args[@]}" 2>&1 | tee pipeline-output/run.log
+
+      - name: Résumé
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Pipeline \`${{ inputs.chapter }}\` — mode \`${{ inputs.mode }}\`"
+            echo '```'
+            cat pipeline-output/run.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+            echo "Sorties dans l'artefact du run : brouillons non publiés, à relire avant tout commit."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier les sorties (artefact, sans commit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lessons-${{ inputs.chapter }}-${{ inputs.mode }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: warn
+          path: |
+            pipeline-output/
+            pipeline/costs.jsonl
+            pipeline/state/
+            research/dossiers/${{ inputs.chapter }}.md
+            src/lib/chapters/data/${{ inputs.chapter }}.ts
+            project/reports/*-QA-api.md

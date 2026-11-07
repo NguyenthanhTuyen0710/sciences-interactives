@@ -1,0 +1,21 @@
+{
+  "id": "math-3e-pythagore",
+  "taskId": "SCI-3E-MATH-017",
+  "grade": "3e",
+  "subject": "mathematiques",
+  "treeChapterId": "m3-pythagore",
+  "title": "Théorème de Pythagore et réciproque",
+  "exportName": "math3ePythagore",
+  "exercisePrefix": "py3-",
+  "officialChapterIds": ["math-3e-automatismes"],
+  "objectiveIds": ["M3-AUTO-03"],
+  "consolidationChapterIds": ["math-4e-pythagore"],
+  "scopeNotes": [
+    "Programme 2020 en vigueur en 3e (BO n° 31 du 30-07-2020) + repères et attendus 2019 (BO n° 22 du 29-05-2019).",
+    "Thème de consolidation (manifest-3e.json) : le théorème de Pythagore et sa réciproque sont des notions de 4e (M4-EG-03, M4-EG-04), mobilisées au DNB.",
+    "Seul objectif 3e rattaché : M3-AUTO-03 (automatismes, images mentales de la configuration de Pythagore).",
+    "Exigible en 4e, consolidé en 3e : calculer une longueur dans un triangle rectangle ; démontrer qu'un triangle est rectangle (réciproque)."
+  ],
+  "exampleChapter": "src/lib/chapters/data/math-3e-arithmetique.ts",
+  "notion": { "status": "SOURCE_INACCESSIBLE", "reason": "URL Notion absente du contexte de la session et connecteur Notion non autorisé ; aucun contenu Notion lu." }
+}

@@ -3,6 +3,11 @@
 //   npx tsx pipeline/run.ts <chapitre>                    dry-run : prompts construits, coûts estimés, AUCUN appel
 //   npx tsx pipeline/run.ts <chapitre> --live             appels réels (clé + crédit vérifié obligatoires)
 //   options : --step dossier|chapter|fix|review  --force  --batch (dossier, chapter, review : -50 %, asynchrone)
+//             --exercises N   nombre d'exercices imposé (pilote ; justification ajoutée au chapitre)
+//             --level 3e --subject mathematiques   contrôle de cohérence avec la fiche du chapitre
+//   npx tsx pipeline/run.ts <chapitre> --submit           soumet la prochaine étape par Message Batches puis s'arrête
+//                                                         (aucun appel synchrone : la correction « fix » reste manuelle)
+//   npx tsx pipeline/run.ts <chapitre> --collect <batchId>  récupère le résultat d'un batch ; n'envoie aucune requête
 //
 // Étapes : dossier → chapter → (validation par script → fix ≤ 2 tours) → review. Chaque étape terminée est
 // enregistrée dans pipeline/state/<chapitre>.json et n'est pas refaite (sauf --force). Chaque appel est journalisé
@@ -30,18 +35,27 @@ const MAX_FIX_ROUNDS = 2;
 const CHARS_PER_TOKEN = 3; // estimation hors ligne prudente (français + code) ; remplacée par count_tokens en mode réel
 type Step = keyof typeof MAX_TOKENS;
 
-interface Spec { id: string; taskId: string; grade: string; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
+interface Spec { id: string; taskId: string; grade: string; subject: string; objectiveIds?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
 interface Price { input: number; output: number; cacheWrite1h: number; cacheRead: number }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const chapterId = args.find((a) => !a.startsWith("--"));
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject"];
+const chapterId = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTS.includes(args[i - 1]));
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
-const LIVE = flag("--live"), FORCE = flag("--force"), BATCH = flag("--batch"), ONLY = opt("--step") as Step | undefined;
+const SUBMIT = flag("--submit"), COLLECT = opt("--collect");
+const LIVE = flag("--live") || SUBMIT || !!COLLECT, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
+const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
 
-if (!chapterId) { console.error("Usage : npx tsx pipeline/run.ts <chapitre> [--live] [--step s] [--force] [--batch]"); process.exit(2); }
+function fail(msg: string, code = 2): never { console.error(`ARRÊT : ${msg}`); process.exit(code); }
+if (!chapterId) fail("Usage : npx tsx pipeline/run.ts <chapitre> [--live] [--step s] [--force] [--batch] [--submit | --collect <batchId>] [--exercises N] [--level g --subject s]");
+if (!/^[a-z0-9-]+$/.test(chapterId!)) fail(`identifiant de chapitre invalide : ${chapterId}`);
+if (!existsSync(P(`pipeline/chapters/${chapterId}.json`))) fail(`chapitre ${chapterId} absent du catalogue du pipeline (pipeline/chapters/)`);
+if (SUBMIT && COLLECT) fail("--submit et --collect sont exclusifs");
+if (COLLECT !== undefined && !/^msgbatch_[A-Za-z0-9]+$/.test(COLLECT)) fail("identifiant de batch invalide (attendu : msgbatch_…)");
+if (EXERCISES !== undefined && !(Number.isInteger(EXERCISES) && EXERCISES >= 1 && EXERCISES <= 60)) fail("--exercises doit être un entier entre 1 et 60");
 const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
 const prices = readJson<{ batchMultiplier: number; models: Record<string, Price> }>("pipeline/prices.json");
 const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline/budget.json");
@@ -52,6 +66,22 @@ const saveState = () => write(STATE_FILE, JSON.stringify(state, null, 2) + "\n")
 const CHAPTER_FILE = `src/lib/chapters/data/${spec.id}.ts`;
 const DOSSIER_FILE = `research/dossiers/${spec.id}.md`;
 const REPORT_FILE = `project/reports/${spec.taskId}-QA-api.md`;
+
+// ───────── Contrôle des données d'entrée (avant toute estimation ou tout appel) ─────────
+function checkInputs() {
+  const level = opt("--level"), subject = opt("--subject");
+  if (spec.id !== chapterId) fail(`la fiche pipeline/chapters/${chapterId}.json déclare l'id ${spec.id}`);
+  if (level && level !== spec.grade) fail(`niveau ${level} ≠ niveau du chapitre (${spec.grade})`);
+  if (subject && subject !== spec.subject) fail(`matière ${subject} ≠ matière du chapitre (${spec.subject})`);
+  if (spec.subject !== "mathematiques") fail("le pipeline ne produit que des chapitres de mathématiques (prompts et inventaire)");
+  const manifestFile = `research/curriculum/${spec.subject}/manifest-${spec.grade}.json`;
+  if (!existsSync(P(manifestFile))) fail(`aucun manifest pour ${spec.subject} ${spec.grade} (${manifestFile})`);
+  const themes = readJson<{ themes: { treeChapterId: string; taskId: string }[] }>(manifestFile).themes;
+  if (!themes.some((t) => t.treeChapterId === spec.treeChapterId && t.taskId === spec.taskId)) fail(`${spec.treeChapterId} / ${spec.taskId} absent de ${manifestFile}`);
+  if (!read("src/lib/content/curriculum.ts").includes(`"${spec.treeChapterId}"`)) console.log(`avertissement : ${spec.treeChapterId} pas encore dans l'arborescence du site (src/lib/content/curriculum.ts) ; à ajouter lors de l'intégration.`);
+  console.log(`contrôle des données : OK (${spec.grade}, ${spec.subject}, ${spec.treeChapterId}, ${spec.taskId}${EXERCISES ? `, ${EXERCISES} exercices imposés` : ""})`);
+}
+checkInputs();
 
 // ───────── Coûts ─────────
 const COSTS = "pipeline/costs.jsonl";
@@ -74,8 +104,14 @@ const SYSTEM = fill(read("pipeline/prompts/system.md"), {
 function objectives(): string {
   const inv = readJson<{ grades: { domains: { chapters: { id: string; objectives: unknown[] }[] }[] }[] }>("research/curriculum/mathematiques/curriculum-math.json");
   const all = inv.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters));
-  const pick = (ids: string[], kind: string) => ids.map((id) => { const c = all.find((x) => x.id === id); if (!c) throw new Error(`chapitre ${id} absent de l'inventaire`); return { chapter: id, kind, objectives: c.objectives }; });
-  return JSON.stringify([...pick(spec.officialChapterIds, "officiel 3e"), ...pick(spec.consolidationChapterIds, "consolidation")], null, 1);
+  const pick = (ids: string[], kind: string, keep?: string[]) => ids.map((id) => {
+    const c = all.find((x) => x.id === id);
+    if (!c) throw new Error(`chapitre ${id} absent de l'inventaire`);
+    const objectives = keep ? (c.objectives as { id: string }[]).filter((o) => keep.includes(o.id)) : c.objectives;
+    if (!objectives.length) throw new Error(`aucun objectif retenu pour ${id}`);
+    return { chapter: id, kind, objectives };
+  });
+  return JSON.stringify([...pick(spec.officialChapterIds, `officiel ${spec.grade}`, spec.objectiveIds), ...pick(spec.consolidationChapterIds, "consolidation")], null, 1);
 }
 const SPEC = JSON.stringify(spec, null, 1);
 
@@ -166,19 +202,47 @@ async function call(step: Step, user: string, hash: string): Promise<string | nu
     }
     throw new Error(`batch ${step} : aucun résultat`);
   }
+  if (SUBMIT && !batch) { console.log(`  submit : l'étape ${step} exige un appel synchrone, non autorisé dans ce mode ; à traiter localement après relecture.`); return null; }
   await guard(step, user, batch);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
   if (batch) {
     const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user) }] });
     state.steps[step] = { status: "batch-pending", hash, batchId: b.id, at: new Date().toISOString() };
     saveState();
-    console.log(`  batch ${step} soumis : relancer la même commande pour récupérer le résultat.`);
+    console.log(`  batch ${step} soumis : ${b.id} (récupérer avec --collect ${b.id}, ou relancer la même commande en local).`);
     return null;
   }
   const msg = await client.messages.stream(params(step, user)).finalMessage();
   systemCached = true;
   logCost(step, msg.usage, false);
   return textOf(msg, step);
+}
+
+// ───────── Écriture des sorties (jamais publiées : le chapitre reste « draft » et hors registre) ─────────
+type OutStep = Exclude<Step, "fix">;
+const OUT: Record<OutStep, { file: string; save: (t: string) => void }> = {
+  dossier: { file: DOSSIER_FILE, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
+  chapter: { file: CHAPTER_FILE, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
+  review: { file: REPORT_FILE, save: (t) => write(REPORT_FILE, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts ; à confirmer par un humain. -->\n` + t.trim() + "\n") },
+};
+
+/** Mode collect : lit le résultat d'un batch déjà soumis ; aucune nouvelle requête payante. */
+async function collect(batchId: string) {
+  const b = await client!.messages.batches.retrieve(batchId);
+  const c = b.request_counts;
+  console.log(`batch ${batchId} : ${b.processing_status} (réussis ${c.succeeded}, en cours ${c.processing}, erreurs ${c.errored}, expirés ${c.expired}, annulés ${c.canceled})`);
+  if (b.processing_status !== "ended") { console.log("résultat pas encore disponible : relancer collect plus tard."); return; }
+  for await (const r of await client!.messages.batches.results(batchId)) {
+    const step = r.custom_id.startsWith(`${spec.id}-`) ? r.custom_id.slice(spec.id.length + 1) : "";
+    if (!(step in OUT)) fail(`le batch ${batchId} ne correspond pas au chapitre ${spec.id} (custom_id ${r.custom_id})`);
+    const out = OUT[step as OutStep];
+    if (r.result.type !== "succeeded") fail(`batch ${step} : ${r.result.type}`, 1);
+    if (existsSync(P(out.file)) && !FORCE) fail(`${out.file} existe déjà ; utiliser --force pour le remplacer`, 5);
+    logCost(step as Step, r.result.message.usage, true, { batchId });
+    out.save(textOf(r.result.message, step as Step));
+    console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
+    if (step === "chapter") { const v = validate(); console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`); }
+  }
 }
 
 const hashOf = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 16);
@@ -188,12 +252,13 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${EFFORT}, mode ${LIVE ? "RÉEL" : "dry-run"}${BATCH ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${EFFORT}, mode ${COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
-    if (!budget.creditVerified) { console.error("ARRÊT : crédit API Startup et limite de dépense non confirmés (pipeline/budget.json → creditVerified)."); process.exit(4); }
+    if (!COLLECT && !budget.creditVerified) { console.error("ARRÊT : crédit API Startup et limite de dépense non confirmés (pipeline/budget.json → creditVerified)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 });
   }
+  if (COLLECT) return collect(COLLECT);
   const OBJ = objectives();
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
@@ -204,28 +269,33 @@ async function main() {
     else {
       console.log("dossier :");
       const t = await call("dossier", dossierUser, hDossier);
-      if (t !== null) { write(DOSSIER_FILE, t.trim() + "\n"); markDone("dossier", hDossier); }
+      if (t !== null) { OUT.dossier.save(t); markDone("dossier", hDossier); }
       else if (LIVE) return; // batch en attente
     }
   }
 
   // 2. Chapitre complet.
   const dossier = existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " ");
-  const chapterUser = fill(read("pipeline/prompts/chapter.md"), { ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier });
+  const chapterUser = fill(read("pipeline/prompts/chapter.md"), { ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
+    + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
   const hChapter = hashOf(SYSTEM, chapterUser);
   if (wanted("chapter") && !done("chapter", hChapter)) {
-    if (existsSync(P(CHAPTER_FILE)) && !FORCE) { console.error(`ARRÊT : ${CHAPTER_FILE} existe déjà (contenu potentiellement approuvé). Utiliser --force pour le régénérer.`); process.exit(5); }
-    console.log("chapter :");
-    const t = await call("chapter", chapterUser, hChapter);
-    if (t === null) { if (!LIVE) estimateRest(); return; }
-    write(CHAPTER_FILE, extractBlock(t, "ts") + "\n"); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
+    if (existsSync(P(CHAPTER_FILE)) && !FORCE) { console.log(`chapter : ${CHAPTER_FILE} existe déjà, conservé (--force pour le régénérer).`); markDone("chapter", hChapter, "fichier existant"); }
+    else {
+      console.log("chapter :");
+      const t = await call("chapter", chapterUser, hChapter);
+      if (t === null) { if (!LIVE) estimateRest(); return; }
+      OUT.chapter.save(t); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
+    }
   }
   if (!existsSync(P(CHAPTER_FILE))) return;
 
   // 3. Validation par script, puis corrections ciblées (≤ 2 tours, éditions minimales).
   let v = validate();
   console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
-  while (!v.ok && wanted("fix") && state.fixRounds < MAX_FIX_ROUNDS) {
+  // Un fichier préexistant (approuvé ou relu par un humain) n'est jamais modifié par l'IA.
+  const generatedHere = state.steps.chapter?.note !== "fichier existant";
+  while (!v.ok && generatedHere && wanted("fix") && state.fixRounds < MAX_FIX_ROUNDS) {
     state.fixRounds++; saveState();
     console.log(`fix (tour ${state.fixRounds}/${MAX_FIX_ROUNDS}) :`);
     const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE) });
@@ -246,7 +316,7 @@ async function main() {
     console.log("review :");
     const t = await call("review", reviewUser, hReview);
     if (t === null) return;
-    write(REPORT_FILE, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts ; à confirmer par un humain. -->\n` + t.trim() + "\n"); markDone("review", hReview);
+    OUT.review.save(t); markDone("review", hReview);
   }
   console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(budget.limitUsd)}.`);
 }

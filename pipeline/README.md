@@ -19,9 +19,17 @@ npx tsx pipeline/run.ts math-3e-calcul-litteral --live --batch   # dossier/chapi
 npx tsx pipeline/run.ts math-3e-calcul-litteral --live --step review --force   # refaire une seule étape
 ```
 
+## GitHub Actions (`.github/workflows/generate-lessons.yml`)
+Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), jamais sur push. Entrées : `mode`, `level`, `subject`, `chapter` (fiches de `pipeline/chapters/`), `exercise_count`, `batch_id`.
+- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, manifest) et estimation ; la clé n'est pas transmise.
+- `submit` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
+- `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.
+- Les sorties (dossier, chapitre `draft`, rapport, `costs.jsonl`, journal) sont publiées en **artefact du run**, jamais committées. Après relecture humaine, committer les fichiers retenus **avec `pipeline/costs.jsonl`** : c'est ce journal versionné qui alimente le contrôle du plafond lors des soumissions suivantes (un runner repart d'un dépôt propre).
+- Chaîne type : submit (dossier) → collect → relecture + commit du dossier → submit (chapitre) → collect → relecture → commit du brouillon.
+
 ## Reprise et non-régression
 - `state/<chapitre>.json` mémorise les étapes terminées (avec l'empreinte de leurs entrées) et les batchs en attente : une relance reprend là où le pipeline s'est arrêté.
-- Un fichier de chapitre existant n'est jamais écrasé sans `--force` ; un dossier existant est conservé.
+- Un fichier de chapitre ou de dossier existant n'est jamais écrasé sans `--force` : il est conservé et sert d'entrée aux étapes suivantes.
 - Le chapitre produit reste `draft` et n'est inscrit ni au registre ni au menu : l'intégration se fait après relecture humaine.
 
 ## Économies

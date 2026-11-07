@@ -2,6 +2,7 @@
   "id": "math-3e-calcul-litteral",
   "taskId": "SCI-3E-MATH-003",
   "grade": "3e",
+  "subject": "mathematiques",
   "treeChapterId": "m3-calcul-litteral",
   "title": "Calcul littéral : développer, factoriser, identités",
   "exportName": "math3eCalculLitteral",
