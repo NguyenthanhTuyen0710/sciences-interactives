@@ -123,28 +123,42 @@ export const quoteFound = (text: string, quote: string) => normalize(quote).leng
 const STOP = new Set(["avec", "dans", "pour", "dont", "sont", "leur", "leurs", "cette", "celui", "celle", "entre", "selon", "ainsi", "plus", "moins", "tout", "tous", "toute", "toutes", "être", "avoir"]);
 const words = (s: string) => normalize(s).replace(/[^\p{L}\p{N}' ]/gu, " ").split(" ").map((w) => w.replace(/^[a-z]'/, "")).filter((w) => w.length >= 4 && !STOP.has(w));
 
+export interface Candidate { seedId: string; sha256: string; page: number; excerpt: string; wordCoverage: number }
 export interface ObjectiveMatch {
   status: "verified" | "needs_manual_review";
-  evidence?: { seedId: string; sha256: string; quote: string };
-  candidate?: { seedId: string; sha256: string; excerpt: string; wordCoverage: number };
+  /** (a) citation mot pour mot vérifiée par le script */
+  evidence?: { seedId: string; sha256: string; page: number; quote: string };
+  /** (b) meilleur passage par document (texte officiel exact, espaces normalisés) — à relire par un humain */
+  candidates?: Candidate[];
 }
 
+const pageOf = (text: string, needle: string) => {
+  const pages = text.split("\f");
+  const i = pages.findIndex((p) => normalize(p).includes(needle));
+  return i >= 0 ? i + 1 : 0;
+};
+
 /** « verified » uniquement si le texte de l'objectif figure mot pour mot (espaces et typographie normalisés) dans un
- *  document ; sinon, meilleur passage candidat (part des mots porteurs retrouvés) pour relecture humaine. */
+ *  document ; sinon, meilleur passage de chaque document (part des mots porteurs retrouvés) pour relecture humaine.
+ *  La part de mots retrouvés n'est jamais une preuve. */
 export function matchObjective(objectiveText: string, docs: { seedId: string; sha256: string; text: string }[]): ObjectiveMatch {
   const target = normalize(objectiveText).replace(/[.;]$/, "");
-  for (const d of docs) if (target.length >= 20 && normalize(d.text).includes(target)) return { status: "verified", evidence: { seedId: d.seedId, sha256: d.sha256, quote: objectiveText } };
+  for (const d of docs) if (target.length >= 20 && normalize(d.text).includes(target)) return { status: "verified", evidence: { seedId: d.seedId, sha256: d.sha256, page: pageOf(d.text, target), quote: objectiveText } };
   const want = [...new Set(words(objectiveText))];
-  let best: ObjectiveMatch["candidate"];
+  const candidates: Candidate[] = [];
   for (const d of docs) {
-    const segs = d.text.split(/\n\s*\n|(?<=[.;:])\s+|\n(?=\s*[-•])/);
-    for (let i = 0; i < segs.length; i++) {
-      const excerpt = segs.slice(i, i + 2).join(" ").replace(/\s+/g, " ").trim();
-      if (excerpt.length < 15) continue;
-      const have = new Set(words(excerpt));
-      const cov = want.length ? want.filter((w) => have.has(w)).length / want.length : 0;
-      if (!best || cov > best.wordCoverage) best = { seedId: d.seedId, sha256: d.sha256, excerpt: excerpt.slice(0, 300), wordCoverage: Number(cov.toFixed(2)) };
-    }
+    let best: Candidate | undefined;
+    d.text.split("\f").forEach((pageText, p) => {
+      const segs = pageText.split(/\n\s*\n|(?<=[.;:])\s+|\n(?=\s*[-•])/);
+      for (let i = 0; i < segs.length; i++) {
+        const excerpt = segs.slice(i, i + 2).join(" ").replace(/\s+/g, " ").trim();
+        if (excerpt.length < 15) continue;
+        const have = new Set(words(excerpt));
+        const cov = want.length ? want.filter((w) => have.has(w)).length / want.length : 0;
+        if (!best || cov > best.wordCoverage) best = { seedId: d.seedId, sha256: d.sha256, page: p + 1, excerpt: excerpt.slice(0, 400), wordCoverage: Number(cov.toFixed(2)) };
+      }
+    });
+    if (best) candidates.push(best);
   }
-  return { status: "needs_manual_review", candidate: best };
+  return { status: "needs_manual_review", candidates: candidates.sort((a, b) => b.wordCoverage - a.wordCoverage) };
 }

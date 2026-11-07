@@ -1,0 +1,63 @@
+{
+  "seedId": "bo-2019-22-pdf",
+  "url": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+  "finalUrl": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+  "accessedAt": "2026-11-07T15:03:14.705Z",
+  "httpStatus": 200,
+  "contentType": "application/pdf",
+  "bytes": 11085782,
+  "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+  "etag": "\"64379c37-a927d6\"",
+  "lastModified": "Thu, 13 Apr 2023 06:07:51 GMT",
+  "readable": true,
+  "text": {
+    "tool": "pdftotext",
+    "chars": 754785,
+    "sha256": "cccbaadbfaaabc68de1d49175aa1b270c16bd836a5335d9e5c30faea92a023eb"
+  },
+  "extracted": {
+    "boRefs": [
+      "BO n° 22 du 29 mai 2019",
+      "BO n° 30 du 23 juillet 2015"
+    ],
+    "cycles": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "applicabilitySnippets": [
+      "908386K) Enseignements primaire et secondaire Circulaire de rentrée 2019 Les priorités pour l'école primaire note de service n° 2019",
+      "dération française du sport universitaire (FF Sport U) à la rentrée 2019-2020 avis (NOR : ESRS1900118V) © Ministère de l'éducation n",
+      "mai 2019 Enseignements primaire et secondaire Circulaire de rentrée 2019 Les priorités pour l'école primaire NOR : MENE1915810C note",
+      "d’enseignement privés du premier degré sous contrat Pour la rentrée 2019, l'école primaire reste à la première place des priorités d",
+      "lisation de l'ensemble des professeurs et des cadres dès la rentrée scolaire 2018 a été le facteur déterminant pour la réussite des évaluatio"
+    ]
+  },
+  "verification": {
+    "status": "verified",
+    "checks": [
+      {
+        "name": "contient « Bulletin officiel n°22 du 29 mai 2019 »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "contient « MENE1913283N »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "contient « Mathématiques : repères annuels de progression pour le cycle 4 »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "cycle 4",
+        "ok": true,
+        "detail": "cycles trouvés : 1, 2, 3, 4"
+      }
+    ],
+    "checkedAt": "2026-11-07T15:03:14.705Z"
+  }
+}

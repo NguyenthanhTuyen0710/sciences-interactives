@@ -1,7 +1,7 @@
 {
   "chapter": "math-3e-pythagore",
-  "checkedAt": "2026-11-07T14:50:56.919Z",
-  "method": "citation mot pour mot (normalisation des espaces et de la typographie) ; sinon needs_manual_review avec passage candidat",
+  "checkedAt": "2026-11-07T15:03:43.357Z",
+  "method": "(a) citation mot pour mot (espaces et typographie normalisés) → verified ; (b) sinon needs_manual_review avec le meilleur passage de chaque document (part de mots porteurs : indice de recherche, jamais une preuve)",
   "documents": [
     {
       "seedId": "c4-programme-2020-eduscol-pdf",
@@ -14,6 +14,10 @@
     {
       "seedId": "c4-attendus-3e-2019-pdf",
       "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065"
     }
   ],
   "results": [
@@ -23,12 +27,36 @@
       "text": "Images mentales des configurations de Pythagore, Thalès et des lignes trigonométriques.",
       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème D › Automatismes",
       "status": "needs_manual_review",
-      "candidate": {
-        "seedId": "c4-programme-2020-eduscol-pdf",
-        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
-        "excerpt": "Les définitions ponctuelles d’une rotation, d’une translation, d’une homothétie ne figurent pas au programme. À l’issue d’activités rituelles de construction et de verbalisation des procédures et la résolution de problèmes, effectuées tout au long du cycle, les élèves doivent avoir mémorisé des imag",
-        "wordCoverage": 1
-      }
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 137,
+          "excerpt": "Les définitions ponctuelles d’une rotation, d’une translation, d’une homothétie ne figurent pas au programme. À l’issue d’activités rituelles de construction et de verbalisation des procédures et la résolution de problèmes, effectuées tout au long du cycle, les élèves doivent avoir mémorisé des images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rect",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 292,
+          "excerpt": "Le théorème de Thalès et sa réciproque dans la configuration du papillon sont énoncés et utilisés (démonstration possible, utilisant une symétrie centrale pour se ramener à la configuration étudiée en quatrième). Les lignes trigonométriques (cosinus, sinus, tangente) dans le triangle rectangle sont utilisées pour calculer des longueurs ou des angles.",
+          "wordCoverage": 0.43
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 9,
+          "excerpt": "- le théorème de Thalès et sa réciproque dans la configuration des triangles emboîtés ; - le théorème de Pythagore et sa réciproque ;",
+          "wordCoverage": 0.29
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 8,
+          "excerpt": "une définition et une propriété caractéristique ; - les lignes trigonométriques dans le triangle rectangle :",
+          "wordCoverage": 0.29
+        }
+      ]
     },
     {
       "objectiveId": "M4-EG-03",
@@ -36,12 +64,36 @@
       "text": "Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore.",
       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (4e) ; Attendus de fin d'année de 4e (2019)",
       "status": "needs_manual_review",
-      "candidate": {
-        "seedId": "c4-programme-2020-eduscol-pdf",
-        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
-        "excerpt": "- Le théorème de Pythagore et sa réciproque. - Lignes trigonométriques dans le triangle rectangle :",
-        "wordCoverage": 0.67
-      }
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 136,
+          "excerpt": "- Le théorème de Pythagore et sa réciproque. - Lignes trigonométriques dans le triangle rectangle :",
+          "wordCoverage": 0.67
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 9,
+          "excerpt": "- le théorème de Pythagore et sa réciproque ; - le cosinus d’un angle d’un triangle rectangle ;",
+          "wordCoverage": 0.67
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 201,
+          "excerpt": "- le théorème de Pythagore et sa réciproque ; - le cosinus d’un angle d’un triangle rectangle ;",
+          "wordCoverage": 0.67
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 9,
+          "excerpt": " Il utilise les lignes trigonométriques dans un triangle rectangle pour calculer des longueurs ou des mesures d’angles.",
+          "wordCoverage": 0.5
+        }
+      ]
     },
     {
       "objectiveId": "M4-EG-04",
@@ -49,12 +101,36 @@
       "text": "Démontrer qu'un triangle est rectangle (réciproque).",
       "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser les notions de géométrie plane pour démontrer",
       "status": "needs_manual_review",
-      "candidate": {
-        "seedId": "c4-programme-2020-eduscol-pdf",
-        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
-        "excerpt": "- Le théorème de Pythagore et sa réciproque. - Lignes trigonométriques dans le triangle rectangle :",
-        "wordCoverage": 0.6
-      }
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 136,
+          "excerpt": "- Le théorème de Pythagore et sa réciproque. - Lignes trigonométriques dans le triangle rectangle :",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 9,
+          "excerpt": "- le théorème de Pythagore et sa réciproque ; - le cosinus d’un angle d’un triangle rectangle ;",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 76,
+          "excerpt": " Il sait dire qu'un triangle rectangle a 3 sommets, 3 côtés et 3 angles dont un droit.",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 8,
+          "excerpt": "une définition et une propriété caractéristique ; - les lignes trigonométriques dans le triangle rectangle :",
+          "wordCoverage": 0.4
+        }
+      ]
     }
   ]
 }

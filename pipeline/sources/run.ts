@@ -196,9 +196,9 @@ function match(chapterId: string) {
   });
   if (!docs.length) fail("aucun document vérifié disponible localement (lancer fetch)");
   const results = objectives.map((o) => ({ objectiveId: o.id, chapter: o.chapter, text: o.text, officialRef: o.officialRef, ...matchObjective(o.text, docs) }));
-  const out = { chapter: spec.id, checkedAt: new Date().toISOString(), method: "citation mot pour mot (normalisation des espaces et de la typographie) ; sinon needs_manual_review avec passage candidat", documents: docs.map((d) => ({ seedId: d.seedId, sha256: d.sha256 })), results };
+  const out = { chapter: spec.id, checkedAt: new Date().toISOString(), method: "(a) citation mot pour mot (espaces et typographie normalisés) → verified ; (b) sinon needs_manual_review avec le meilleur passage de chaque document (part de mots porteurs : indice de recherche, jamais une preuve)", documents: docs.map((d) => ({ seedId: d.seedId, sha256: d.sha256 })), results };
   writeFile(`research/sources/verification/${spec.id}.json`, JSON.stringify(out, null, 2) + "\n");
-  for (const r of results) console.log(`${r.objectiveId} : ${r.status}${r.candidate ? ` (meilleur passage : ${r.candidate.seedId}, ${Math.round(r.candidate.wordCoverage * 100)} % des mots porteurs)` : ` (${r.evidence?.seedId})`}`);
+  for (const r of results) console.log(`${r.objectiveId} : ${r.status}${r.evidence ? ` (a : ${r.evidence.seedId} p. ${r.evidence.page})` : ` (b : ${r.candidates?.map((c) => `${c.seedId} p. ${c.page} ${Math.round(c.wordCoverage * 100)} %`).join(" ; ")})`}`);
   console.log(`${results.filter((r) => r.status === "verified").length} verified / ${results.filter((r) => r.status !== "verified").length} needs_manual_review → research/sources/verification/${spec.id}.json`);
 }
 

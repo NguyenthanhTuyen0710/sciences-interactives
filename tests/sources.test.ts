@@ -102,7 +102,8 @@ describe("rapprochement des objectifs", () => {
     const m = matchObjective("Démontrer qu'un triangle est rectangle (réciproque).", docs);
     expect(m.status).toBe("needs_manual_review");
     expect(m.evidence).toBeUndefined();
-    expect(m.candidate?.excerpt).toMatch(/réciproque/);
+    expect(m.candidates?.[0].excerpt).toMatch(/réciproque/);
+    expect(m.candidates?.[0].page).toBe(1);
   });
 });
 

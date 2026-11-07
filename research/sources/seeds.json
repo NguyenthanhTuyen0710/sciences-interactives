@@ -258,6 +258,33 @@
       },
       "note": "Lu le 2026-11-07 : « 3e Mathématiques – ATTENDUS de fin d'année », 11 p., PDF du 24-04-2019 ; SHA256 49ccdca4d97b…",
       "g1Note": "Décision du porteur de projet du 2026-11-07 : collecte autorisée (pilote math-3e-pythagore) ; aucune conservation ni redistribution du PDF."
+    },
+    {
+      "id": "bo-2019-22-pdf",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+      "inventorySourceId": null,
+      "g1": "approved",
+      "g1Note": "Décision du porteur de projet du 2026-11-07 : ajouter les « Repères annuels de progression – Mathématiques cycle 4 ». PDF Éduscol à URL directe introuvable (page 5736 en HTTP 403) : substitut officiel public = BO n° 22 du 29 mai 2019 (annexe 26 « Mathématiques : repères annuels de progression pour le cycle 4 »). Aucune conservation ni redistribution.",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "BO n° 22 du 29 mai 2019, note de service n° 2019-072 du 28-5-2019 (NOR : MENE1913283N), annexe 26",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "Bulletin officiel n°22 du 29 mai 2019",
+          "MENE1913283N",
+          "Mathématiques : repères annuels de progression pour le cycle 4"
+        ]
+      },
+      "note": "308 p. ; seule l'annexe 26 (mathématiques, cycle 4) est utilisée."
     }
   ]
 }
