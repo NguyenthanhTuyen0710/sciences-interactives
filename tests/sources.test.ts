@@ -46,10 +46,10 @@ describe("registre, seeds et contrôles avant téléchargement", () => {
     for (const s of sources) expect(s.g0.status).not.toBe("approved");
     expect(sources.filter((s) => s.role === "reference" && s.kind === "http").every((s) => !s.enabled)).toBe(true);
   });
-  it("les seeds ne visent que les sources officielles et restent proposés", () => {
-    for (const s of seeds) {
+  it("les seeds ne visent que les sources officielles ; toute décision G1 est tracée ; rien ne passe sans G0", () => {
+    for (const s of seeds as (Seed & { g1Note?: string })[]) {
       expect(["bo", "eduscol"]).toContain(s.sourceId);
-      expect(s.g1).toBe("proposed");
+      if (s.g1 !== "proposed") expect(s.g1Note).toMatch(/Décision du porteur de projet/);
       expect(gateSeed(s, sources.find((x) => x.id === s.sourceId)).length).toBeGreaterThan(0);
     }
   });

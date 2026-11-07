@@ -14,3 +14,19 @@ Lecture unitaire de chaque URL (≥ 11 s d'intervalle) dans un répertoire tempo
 
 ## Constat important pour la 3e (programme 2020, en vigueur jusqu'en 2027-2028)
 Aucun seed accessible ne contient le **programme 2020 du cycle 4** ni les **repères/attendus 2019** : leurs pages BO renvoient 403 et l'inventaire actuel les a lus sur des copies académiques ou tierces (pi.ac3j.fr, ac-toulouse.fr), hors du périmètre « sources officielles uniquement ». Les chapitres 3e (dont Pythagore) ne peuvent donc pas obtenir de source « verified » avec la liste actuelle. Options à décider : fournir l'URL d'un PDF officiel accessible (education.gouv.fr ou eduscol, `/sites/default/files/`), ou admettre une copie académique en tant que source secondaire explicitement signalée.
+
+## Décisions du 2026-11-07 et URL de remplacement
+- Approuvés (recherche contrôlée) : n° 1, 3, 4. Rejeté : n° 2 (doublon). La collecte reste bloquée tant que G0 n'est pas approuvé pour `bo` / `eduscol` ; aucune conservation dans data-store (droits non confirmés).
+- URL fournies pour remplacer n° 5 et 6 — toutes **HTTP 403 (Cloudflare)**, non lues, aucun contournement :
+  - `bo/20/Hebdo31/MENE2018714A.htm` (programme 2020) ;
+  - `bo/19/Hebdo22/MENE1913283N.htm` (2019) — l'inventaire et le chapitre math-3e-pourcentages-evolution citent `MENE1913384N` : écart non résolu ;
+  - `eduscol …/5736/ressources-d-accompagnement-…-cycle-4` (page HTML, hors des préfixes autorisés).
+- PDF officiels publics trouvés en remplacement (lus un par un hors dépôt ; **G1 à décider**) :
+
+| Seed | Document (lu) | Contenu | Application | Accès | Droits |
+|---|---|---|---|---|---|
+| `c4-programme-2020-eduscol-pdf` | « Programme du cycle 4 – En vigueur à la rentrée 2020 – D'après le BOEN n° 31 du 30 juillet 2020 », 139 p. (toutes disciplines, dont mathématiques et physique-chimie), SHA256 `de42e9816d7d…` | Programme 2020 (cité « Pythagore ») | 3e : en vigueur jusqu'en 2027-2028 (inventaire) | 200 | Non mentionnés dans le PDF ; conditions Éduscol non lues (403) |
+| `c4-attendus-4e-2019-pdf` | « 4e Mathématiques – ATTENDUS de fin d'année », 12 p., 24-04-2019, SHA256 `d0edabd6a21d…` | Contient « le théorème de Pythagore et sa réciproque » | 4e (et consolidation 3e) | 200 | Idem |
+| `c4-attendus-3e-2019-pdf` | « 3e Mathématiques – ATTENDUS de fin d'année », 11 p., 24-04-2019, SHA256 `49ccdca4d97b…` | Attendus de 3e (Pythagore non cité) | 3e | 200 | Idem |
+
+Le PDF des **repères annuels de progression du cycle 4** n'a pas été trouvé à une URL directe publique : fichier ou URL à fournir.

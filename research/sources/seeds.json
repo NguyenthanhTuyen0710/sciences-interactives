@@ -6,58 +6,255 @@
       "sourceId": "bo",
       "url": "https://www.education.gouv.fr/sites/default/files/document/Annexe%202%20%E2%80%93%20Programme%20de%20math%C3%A9matiques%20pour%20le%20cycle%204-480716.pdf",
       "inventorySourceId": "S2",
-      "g1": "proposed",
-      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 10 du 5 mars 2026", "applicability": [{ "grade": "3e", "status": "a_venir", "from": "rentrée 2028" }] },
-      "expect": { "contains": ["cycle 4"] }
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "BO n° 10 du 5 mars 2026",
+        "applicability": [
+          {
+            "grade": "3e",
+            "status": "a_venir",
+            "from": "rentrée 2028"
+          }
+        ]
+      },
+      "expect": {
+        "contains": [
+          "cycle 4"
+        ]
+      },
+      "g1Note": "Décision du porteur de projet du 2026-11-07 : recherche contrôlée (collecte autorisée une fois G0 approuvé ; conservation dans data-store non autorisée tant que les droits ne sont pas confirmés)."
     },
     {
       "id": "c3-programme-2025-annexe2",
       "sourceId": "bo",
       "url": "https://www.education.gouv.fr/sites/default/files/ensel620_annexe2-v2.pdf",
       "inventorySourceId": "S4",
-      "g1": "proposed",
+      "g1": "rejected",
       "note": "Redirection 301 vers c3-programme-2025-439827 (même SHA256, relevé du 2026-11-07) : doublon, voir G1-table.md.",
-      "declared": { "subject": "mathematiques", "cycle": 3, "grades": ["6e"], "officialRef": "BO n° 16 du 17 avril 2025", "applicability": [] },
-      "expect": { "contains": ["cycle 3"] }
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 3,
+        "grades": [
+          "6e"
+        ],
+        "officialRef": "BO n° 16 du 17 avril 2025",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "cycle 3"
+        ]
+      },
+      "g1Note": "Décision du porteur de projet du 2026-11-07 : doublon (redirection 301)."
     },
     {
       "id": "c3-programme-2025-439827",
       "sourceId": "bo",
       "url": "https://www.education.gouv.fr/sites/default/files/programme-de-math-matiques-pour-le-cycle-3-439827.pdf",
       "inventorySourceId": null,
-      "g1": "proposed",
-      "declared": { "subject": "mathematiques", "cycle": 3, "grades": ["6e"], "officialRef": "BO n° 16 du 17 avril 2025", "applicability": [] },
-      "expect": { "contains": ["cycle 3"] },
-      "note": "Cité par math-5e-nombres-relatifs (R7) ; peut être identique à c3-programme-2025-annexe2 (le SHA256 le dira)."
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 3,
+        "grades": [
+          "6e"
+        ],
+        "officialRef": "BO n° 16 du 17 avril 2025",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "cycle 3"
+        ]
+      },
+      "note": "Cité par math-5e-nombres-relatifs (R7) ; peut être identique à c3-programme-2025-annexe2 (le SHA256 le dira).",
+      "g1Note": "Décision du porteur de projet du 2026-11-07 : recherche contrôlée (collecte autorisée une fois G0 approuvé ; conservation dans data-store non autorisée tant que les droits ne sont pas confirmés)."
     },
     {
       "id": "c4-exemples-mise-en-oeuvre-2026",
       "sourceId": "eduscol",
       "url": "https://eduscol.education.gouv.fr/sites/default/files/document/exemple-mise-en-oeuvre-c4-mathematiques0pdf-126080.pdf",
       "inventorySourceId": "S15",
-      "g1": "proposed",
-      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "document d'accompagnement (sans valeur réglementaire)", "applicability": [] },
-      "expect": { "contains": ["cycle 4"] }
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "document d'accompagnement (sans valeur réglementaire)",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "cycle 4"
+        ]
+      },
+      "g1Note": "Décision du porteur de projet du 2026-11-07 : recherche contrôlée (collecte autorisée une fois G0 approuvé ; conservation dans data-store non autorisée tant que les droits ne sont pas confirmés)."
     },
     {
       "id": "bo-2020-31-programme-c4",
       "sourceId": "bo",
       "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
       "inventorySourceId": null,
-      "g1": "proposed",
-      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 31 du 30 juillet 2020", "applicability": [{ "grade": "3e", "status": "en_vigueur", "until": "2027-2028" }] },
-      "expect": { "contains": ["cycle 4"] },
-      "note": "Page HTML : HTTP 403 le 2026-11-07 ; sera enregistrée « non lue » tant que l'accès est refusé."
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "BO n° 31 du 30 juillet 2020",
+        "applicability": [
+          {
+            "grade": "3e",
+            "status": "en_vigueur",
+            "until": "2027-2028"
+          }
+        ]
+      },
+      "expect": {
+        "contains": [
+          "cycle 4"
+        ]
+      },
+      "note": "Page HTML : HTTP 403 (Cloudflare) les 2026-11-07 ; non lue, aucun contournement. Substitut proposé : c4-programme-2020-eduscol-pdf.",
+      "g1Note": "Décision du porteur de projet du 2026-11-07"
     },
     {
       "id": "bo-2019-22-reperes-attendus",
       "sourceId": "bo",
-      "url": "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913384N.htm",
+      "url": "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913283N.htm",
+      "inventorySourceId": null,
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "BO n° 22 du 29 mai 2019 (intitulé selon un moteur de recherche : programmes de français, de mathématiques et d'EMC des cycles 2, 3 et 4 — non lu)",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "repères"
+        ]
+      },
+      "note": "Page HTML : HTTP 403 (Cloudflare) le 2026-11-07 ; non lue. Substituts proposés : c4-attendus-4e-2019-pdf, c4-attendus-3e-2019-pdf ; PDF des repères annuels cycle 4 : URL directe non trouvée.",
+      "g1Note": "Décision du porteur de projet du 2026-11-07 (URL fournie : MENE1913283N ; l'inventaire et le chapitre math-3e-pourcentages-evolution citent MENE1913384N — écart non résolu)."
+    },
+    {
+      "id": "eduscol-5736-ressources-c4",
+      "sourceId": "eduscol",
+      "url": "https://eduscol.education.gouv.fr/5736/ressources-d-accompagnement-du-programme-de-mathematiques-au-cycle-4",
+      "inventorySourceId": null,
+      "g1": "approved",
+      "g1Note": "Décision du porteur de projet du 2026-11-07",
+      "declared": {
+        "subject": "mathematiques",
+        "cycle": 4,
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "page de ressources d'accompagnement (non lue)",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "cycle 4"
+        ]
+      },
+      "note": "Page HTML : HTTP 403 (Cloudflare) le 2026-11-07 ; non lue. Chemin hors des préfixes autorisés (/sites/default/files/) : le collecteur la bloque."
+    },
+    {
+      "id": "c4-programme-2020-eduscol-pdf",
+      "sourceId": "eduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
       "inventorySourceId": null,
       "g1": "proposed",
-      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 22 du 29 mai 2019", "applicability": [] },
-      "expect": { "contains": ["repères"] },
-      "note": "Page HTML : probablement HTTP 403 comme les autres pages du BO (non testée)."
+      "declared": {
+        "subject": "mathematiques",
+        "grades": [
+          "5e",
+          "4e",
+          "3e"
+        ],
+        "officialRef": "BOEN n° 31 du 30 juillet 2020 (mention lue dans le PDF)",
+        "applicability": [
+          {
+            "grade": "3e",
+            "status": "en_vigueur",
+            "until": "2027-2028"
+          }
+        ],
+        "cycle": 4
+      },
+      "expect": {
+        "contains": [
+          "En vigueur à la rentrée 2020",
+          "BOEN n° 31 du 30 juillet 2020"
+        ]
+      },
+      "note": "Lu le 2026-11-07 : « Programme du cycle 4 – En vigueur à la rentrée 2020 – D'après le BOEN n° 31 du 30 juillet 2020 », 139 p., toutes disciplines du cycle 4 dont mathématiques ; SHA256 de42e9816d7d…"
+    },
+    {
+      "id": "c4-attendus-4e-2019-pdf",
+      "sourceId": "eduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+      "inventorySourceId": null,
+      "g1": "proposed",
+      "declared": {
+        "subject": "mathematiques",
+        "grades": [
+          "4e"
+        ],
+        "officialRef": "attendus de fin d'année 2019 (BO de référence non mentionné dans le PDF)",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "attendus de fin d'année",
+          "Pythagore"
+        ]
+      },
+      "note": "Lu le 2026-11-07 : « 4e Mathématiques – ATTENDUS de fin d'année », 12 p., PDF du 24-04-2019, contient « le théorème de Pythagore et sa réciproque » ; SHA256 d0edabd6a21d…"
+    },
+    {
+      "id": "c4-attendus-3e-2019-pdf",
+      "sourceId": "eduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+      "inventorySourceId": null,
+      "g1": "proposed",
+      "declared": {
+        "subject": "mathematiques",
+        "grades": [
+          "3e"
+        ],
+        "officialRef": "attendus de fin d'année 2019 (BO de référence non mentionné dans le PDF)",
+        "applicability": []
+      },
+      "expect": {
+        "contains": [
+          "attendus de fin d'année"
+        ]
+      },
+      "note": "Lu le 2026-11-07 : « 3e Mathématiques – ATTENDUS de fin d'année », 11 p., PDF du 24-04-2019 ; SHA256 49ccdca4d97b…"
     }
   ]
 }
