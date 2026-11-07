@@ -4,6 +4,8 @@ import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type Ledger
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
 import seedsFile from "../research/sources/seeds.json";
+import inventory from "../research/curriculum/mathematiques/curriculum-math.json";
+import { existsSync, readFileSync } from "node:fs";
 
 const UA = "SciencesInteractivesBot/0.1 (+https://example.org)";
 
@@ -109,6 +111,25 @@ describe("rapprochement des objectifs", () => {
     expect(m.evidence).toBeUndefined();
     expect(m.candidates?.[0].excerpt).toMatch(/réciproque/);
     expect(m.candidates?.[0].page).toBe(1);
+  });
+});
+
+describe("preuves G2 dans l'inventaire", () => {
+  type Ev = { seedId: string; sha256: string; quote: string; page: number; approvedBy: string; approvedAt: string; reason: string };
+  const objs = (inventory as unknown as { grades: { domains: { chapters: { objectives: { id: string; text: string; evidence?: Ev }[] }[] }[] }[] }).grades
+    .flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
+  it("chaque preuve est approuvée, datée, motivée et rattachée à un document vérifié de même SHA256", () => {
+    const withEv = objs.filter((o) => o.evidence);
+    expect(withEv.map((o) => o.id).sort()).toEqual(["M3-AUTO-03", "M4-EG-03", "M4-EG-04"]);
+    for (const o of withEv) {
+      const e = o.evidence!;
+      expect(e.approvedBy).toBeTruthy(); expect(e.approvedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/); expect(e.reason).toBeTruthy(); expect(e.page).toBeGreaterThan(0);
+      const f = `research/sources/records/${e.seedId}.json`;
+      expect(existsSync(f)).toBe(true);
+      const rec = JSON.parse(readFileSync(f, "utf8"));
+      expect(rec.sha256).toBe(e.sha256); expect(rec.verification.status).toBe("verified");
+      expect(e.quote).not.toBe(o.text); // la citation d'origine n'a pas remplacé l'objectif paraphrasé
+    }
   });
 });
 

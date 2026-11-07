@@ -1,6 +1,6 @@
 {
   "chapter": "math-3e-pythagore",
-  "status": "en attente d'approbation (G2) — apply refuse tant que approvedBy/approvedAt sont vides",
+  "status": "approuvé par le porteur de projet le 2026-11-07 (G2) ; appliqué par `run.ts apply` (attach_evidence)",
   "note": "Contrôle de type (b) : les formulations de l'inventaire sont des paraphrases ; chaque citation ci-dessous a été vérifiée mot pour mot dans le document (type a), mais la correspondance objectif ↔ citation reste une décision humaine. attach_evidence n'altère ni le texte ni le statut de l'objectif. Pages = numéros de page du PDF.",
   "changes": [
     {
@@ -9,11 +9,14 @@
       "evidence": {
         "seedId": "c4-attendus-4e-2019-pdf",
         "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
-        "quote": "Il sait calculer une longueur d’un côté d’un triangle rectangle à partir de la connaissance des longueurs des deux autres côtés."
+        "quote": "Il sait calculer une longueur d’un côté d’un triangle rectangle à partir de la connaissance des longueurs des deux autres côtés.",
+        "page": 10,
+        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif"
       },
       "page": 10,
-      "approvedBy": null,
-      "approvedAt": null
+      "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+      "approvedAt": "2026-11-07"
     },
     {
       "op": "attach_evidence",
@@ -21,11 +24,14 @@
       "evidence": {
         "seedId": "c4-attendus-4e-2019-pdf",
         "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
-        "quote": "Il démontre qu’un triangle est un triangle rectangle à partir de la connaissance des longueurs de ses côtés."
+        "quote": "Il démontre qu’un triangle est un triangle rectangle à partir de la connaissance des longueurs de ses côtés.",
+        "page": 10,
+        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif"
       },
       "page": 10,
-      "approvedBy": null,
-      "approvedAt": null
+      "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+      "approvedAt": "2026-11-07"
     },
     {
       "op": "attach_evidence",
@@ -33,11 +39,14 @@
       "evidence": {
         "seedId": "c4-programme-2020-eduscol-pdf",
         "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
-        "quote": "les élèves doivent avoir mémorisé des images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rectangle)"
+        "quote": "les élèves doivent avoir mémorisé des images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rectangle)",
+        "page": 137,
+        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif"
       },
       "page": 137,
-      "approvedBy": null,
-      "approvedAt": null
+      "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+      "approvedAt": "2026-11-07"
     }
   ],
   "complements": [

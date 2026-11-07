@@ -54,6 +54,6 @@
   ],
   "objectiveVerification": {
     "file": "research/sources/verification/math-3e-pythagore.json",
-    "summary": "0 verified / 3 needs_manual_review (formulations de l'inventaire = paraphrases)"
+    "summary": "script : 0 verified / 3 needs_manual_review (paraphrases) ; G2 : 3 correspondances approuvées manuellement le 2026-11-07 (evidence dans l'inventaire)"
   }
 }

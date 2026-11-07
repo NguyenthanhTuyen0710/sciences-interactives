@@ -66,7 +66,8 @@
         "license": "aucune licence affichée",
         "decisionNeeded": "Aucune licence ni condition d'utilisation affichée : autorisation écrite à demander (lien « Contact ») avant toute collecte automatisée ; consultation humaine seulement en attendant."
       },
-      "purpose": "Référence pédagogique uniquement (structure des cours et fiches, typologie d'exercices, méthodes, erreurs fréquentes, sujets DNB/bac) ; ne définit jamais le contenu du programme."
+      "purpose": "Référence pédagogique uniquement (structure des cours et fiches, typologie d'exercices, méthodes, erreurs fréquentes, sujets DNB/bac) ; ne définit jamais le contenu du programme.",
+      "restrictions": "Consultation humaine uniquement ; toute collecte automatisée nécessite une autorisation écrite distincte."
     },
     {
       "id": "hachette-enseignants",
@@ -87,7 +88,8 @@
         "access": "Pages collections et deux fiches produit : HTTP 200 (consultées le 2026-11-07 avant lecture des CGU ; copies supprimées, aucune nouvelle requête automatisée).",
         "license": "tous droits réservés ; réserve TDM explicite",
         "decisionNeeded": "Toute collecte automatisée exige un accord écrit de l'éditeur. Sans accord : consultation humaine uniquement (manuel papier ou numérique sous licence de l'établissement)."
-      }
+      },
+      "restrictions": "Interdit : collecte du contenu des manuels, PDF enseignants, corrigés et de toute donnée couverte par la réserve TDM. Consultation humaine uniquement, sauf accord écrit de l'éditeur."
     },
     {
       "id": "labolycee",
@@ -124,7 +126,7 @@
     }
   ],
   "references": {
-    "description": "Références pédagogiques (jamais sources du programme). Chaque entrée : niveau, matière, chapitre, édition, version de programme correspondante, type de référence, URL, accès, droits. L'édition retenue est celle qui correspond au programme applicable en 2026-2027, pas la plus récente.",
+    "description": "Références pédagogiques (jamais sources du programme). Chaque entrée : niveau, matière, chapitre, édition, version de programme correspondante, type de référence, URL, accès, droits. L'édition retenue est celle qui correspond au programme applicable en 2026-2027, pas la plus récente. Ces sources sont facultatives : leur absence ne bloque jamais la production de contenu original à partir des textes officiels (BO, Éduscol).",
     "entries": [
       {
         "niveau": "6e",
@@ -203,15 +205,16 @@
         "matiere": "mathematiques",
         "collection": "Barbazo",
         "chapitre": "pending_verification",
-        "edition": "Livre élève, éd. 2019 (parution 12-06-2019)",
+        "edition": "Barbazo Maths 1ère – Livre élève, éd. 2019",
         "ean": "9782013954860",
         "curriculumVersion": "pending_verification",
         "typeReference": "manuel scolaire : organisation des chapitres, progression, typologie d'exercices — consultation humaine uniquement",
         "url": "https://www.enseignants.hachette-education.com/livre/barbazo-maths-1ere-livre-eleve-ed-2019-9782013954860/",
         "acces": "page éditeur HTTP 200 ; collecte automatisée interdite (CGU § 5.2)",
         "droits": "G0 pending — réserve TDM, tous droits réservés",
-        "provenance": "résultats de moteur de recherche et pages éditeur consultées le 2026-11-07 ; à confirmer manuellement (réserve TDM)",
-        "note": "Édition relevée par moteur de recherche uniquement ; la fiche éditeur mentionnerait des ressources « nouveau programme 2026 » : concordance à vérifier."
+        "provenance": "vérifié par le porteur de projet le 2026-11-07",
+        "note": "Ne pas assimiler à une édition 2026 ; sommaire non consulté (chapitres non déduits).",
+        "format": "livre papier"
       },
       {
         "niveau": "1re — enseignement scientifique (partie maths)",

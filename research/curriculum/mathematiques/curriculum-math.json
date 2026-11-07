@@ -1852,13 +1852,37 @@
                   "id": "M4-EG-03",
                   "text": "Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (4e) ; Attendus de fin d'année de 4e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-attendus-4e-2019-pdf",
+                    "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+                    "quote": "Il sait calculer une longueur d’un côté d’un triangle rectangle à partir de la connaissance des longueurs des deux autres côtés.",
+                    "page": 10,
+                    "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                    "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                    "accessedAt": "2026-11-07T14:49:57.494Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+                    "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "approvedAt": "2026-11-07"
+                  }
                 },
                 {
                   "id": "M4-EG-04",
                   "text": "Démontrer qu'un triangle est rectangle (réciproque).",
                   "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser les notions de géométrie plane pour démontrer",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-attendus-4e-2019-pdf",
+                    "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+                    "quote": "Il démontre qu’un triangle est un triangle rectangle à partir de la connaissance des longueurs de ses côtés.",
+                    "page": 10,
+                    "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                    "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                    "accessedAt": "2026-11-07T14:49:57.494Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+                    "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "approvedAt": "2026-11-07"
+                  }
                 }
               ],
               "prerequisites": [
@@ -2496,7 +2520,19 @@
                   "id": "M3-AUTO-03",
                   "text": "Images mentales des configurations de Pythagore, Thalès et des lignes trigonométriques.",
                   "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème D › Automatismes",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-programme-2020-eduscol-pdf",
+                    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                    "quote": "les élèves doivent avoir mémorisé des images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rectangle)",
+                    "page": 137,
+                    "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                    "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                    "accessedAt": "2026-11-07T14:49:44.189Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                    "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "approvedAt": "2026-11-07"
+                  }
                 }
               ],
               "prerequisites": [],
