@@ -24,7 +24,9 @@ require() {
 assets() { gh release view "$TAG" --json assets -q '.assets[].name'; }
 remote_sha() { local d; d=$(mktemp -d); gh release download "$TAG" -p ledger.sha256 -D "$d" >/dev/null && cut -d' ' -f1 "$d/ledger.sha256"; }
 upload_ledger() { # $1 = fichier à publier comme ledger.jsonl
-  local d; d=$(mktemp -d); cp "$1" "$d/ledger.jsonl"; (cd "$d" && sha256sum ledger.jsonl > ledger.sha256)
+  local d; d=$(mktemp -d); cp "$1" "$d/ledger.jsonl"
+  [ -s "$d/ledger.jsonl" ] || echo > "$d/ledger.jsonl" # GitHub refuse un fichier vide ; une ligne vide = registre vide
+  (cd "$d" && sha256sum ledger.jsonl > ledger.sha256)
   gh release upload "$TAG" "$d/ledger.jsonl" "$d/ledger.sha256" --clobber
 }
 

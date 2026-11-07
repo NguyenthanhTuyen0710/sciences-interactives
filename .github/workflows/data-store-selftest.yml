@@ -65,7 +65,7 @@ jobs:
 
           step "Lecture du registre vide"
           bash $S pull-ledger
-          [ ! -s pipeline/.store/ledger.jsonl ]
+          [ -z "$(tr -d '\n' < pipeline/.store/ledger.jsonl)" ]
           ok "lecture avec SHA256 vérifié (registre vide)"
 
           step "Écriture puis relecture"
