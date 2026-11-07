@@ -64,6 +64,11 @@ describe("registre, seeds et contrôles avant téléchargement", () => {
     expect(gateSeed({ ...seed, url: "https://www.education.gouv.fr/recherche?q=x" }, src)[0]).toMatch(/hors des préfixes/);
     expect(gateSeed({ ...seed, url: "https://evil.example/sites/default/files/a.pdf" }, src)[0]).toMatch(/hôte/);
   });
+  it("références pédagogiques : champs complets, jamais sources du programme, aucune source de référence active", () => {
+    const refs = (registry as unknown as { references: { entries: Record<string, string>[] } }).references.entries;
+    for (const r of refs) for (const k of ["niveau", "matiere", "chapitre", "edition", "curriculumVersion", "typeReference", "url", "acces", "droits"]) expect(r[k], `${r.niveau} ${k}`).toBeTruthy();
+    expect(sources.filter((s) => s.role === "reference").every((s) => !s.enabled && s.g0.status !== "approved")).toBe(true);
+  });
   it("un connecteur non configuré (Notion) est ignoré sans bloquer le reste", () => {
     const notion = sources.find((s) => s.id === "notion")!;
     expect(notion.optional).toBe(true);
