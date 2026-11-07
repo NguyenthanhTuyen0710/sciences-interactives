@@ -3,6 +3,7 @@
 //   npx tsx pipeline/sources/run.ts [check] [--offline]   défaut : contrôles (registre, G0, G1, préfixes, robots.txt) ; ne télécharge aucun document
 //   npx tsx pipeline/sources/run.ts fetch [--only <seed>]  télécharge les seeds autorisés (G0 + G1 approuvés, robots.txt), ≤ 20 par exécution
 //   npx tsx pipeline/sources/run.ts verify                 recalcule la vérification à partir du cache local (sans réseau)
+//   npx tsx pipeline/sources/run.ts storable               liste les documents dont la conservation (data-store) est approuvée
 //   npx tsx pipeline/sources/run.ts apply <proposition.json>  applique à l'inventaire les changements APPROUVÉS et prouvés par citation
 //
 // Dans Git : research/sources/records/<seed>.json (URL, date d'accès, SHA256, statut). Documents et textes : .sources-cache/
@@ -190,6 +191,13 @@ async function main() {
       rec.verification = { ...verify(s, text, rec.httpStatus, rec.extracted), checkedAt: new Date().toISOString() };
       writeFile(recordFile(s.id), JSON.stringify(rec, null, 2) + "\n");
       console.log(`${s.id} : ${rec.verification.status}`);
+    }
+    return;
+  }
+  if (cmd === "storable") { // documents dont la conservation dans data-store est approuvée (G0 + storage)
+    for (const s of seeds) {
+      const rec = loadRecord(s.id), src = sourceOf(s);
+      if (rec?.sha256 && src?.g0.status === "approved" && src.g0.storage === "approved") console.log(`${rec.sha256}${rec.contentType.includes("pdf") ? ".pdf" : ".html"}`);
     }
     return;
   }

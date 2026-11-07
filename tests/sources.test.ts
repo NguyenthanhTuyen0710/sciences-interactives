@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { extractMetadata, gateSeed, groupFor, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
-import { ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
+import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
 import seedsFile from "../research/sources/seeds.json";
@@ -123,6 +123,14 @@ describe("registre des dépenses", () => {
     expect(spendBlockers([reserve("a"), { type: "submitted", id: "a", at: "t", batchId: "msgbatch_1" }], req, ready)[0]).toMatch(/déjà soumise/);
     expect(spendBlockers([reserve("a", "h2"), { type: "unknown", id: "a", at: "t", error: "ECONNRESET" }], req, ready)[0]).toMatch(/issue inconnue/);
     expect(spendBlockers([reserve("a", "h2"), { type: "actual", id: "a", at: "t", usd: 9.8 }], req, ready)[0]).toMatch(/plafond/);
+  });
+  it("détecte un registre incohérent", () => {
+    const good: LedgerEntry[] = [reserve("a"), { type: "submitted", id: "a", at: "t", batchId: "msgbatch_1" }, { type: "actual", id: "a", at: "t", usd: 0.1, batchId: "msgbatch_1" }];
+    expect(ledgerIssues(good)).toEqual([]);
+    expect(ledgerIssues([{ type: "actual", id: "z", at: "t", usd: 1 }])[0]).toMatch(/sans réservation/);
+    expect(ledgerIssues([...good, { type: "failed", id: "a", at: "t", reason: "x" }])[0]).toMatch(/après une issue finale/);
+    expect(ledgerIssues([...good, reserve("b"), { type: "submitted", id: "b", at: "t", batchId: "msgbatch_1" }])[0]).toMatch(/déjà rattaché/);
+    expect(ledgerIssues([{ type: "unknown", id: "run-42", at: "t", error: "interrompu" }, { type: "failed", id: "run-42", at: "t", reason: "aucun batch" }])).toEqual([]);
   });
   it("réconcilie sans deviner", () => {
     const op = ops([reserve("a")])[0];

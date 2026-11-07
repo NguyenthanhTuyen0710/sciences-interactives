@@ -271,6 +271,8 @@ async function collect(batchId: string) {
   }
 }
 
+const entriesAt = (id: string) => ledger().find((e) => e.id === id)?.at ?? new Date(0).toISOString();
+
 /** Mode reconcile : rattache chaque réservation à l'issue inconnue au batch réellement créé, ou la déclare échouée. */
 async function reconcile() {
   const open = ops(ledger()).filter((o) => o.state === "reserved" || o.state === "unknown");
@@ -279,7 +281,13 @@ async function reconcile() {
   for await (const b of client!.messages.batches.list({ limit: 100 })) { recent.push({ id: b.id, created_at: b.created_at }); if (recent.length >= 100) break; }
   const linked = new Set(ops(ledger()).flatMap((o) => (o.batchId ? [o.batchId] : [])));
   for (const o of open) {
-    if (o.reserve?.mode !== "batch") { console.log(`${o.id} : appel synchrone à l'issue inconnue — vérifier la consommation dans la Console Anthropic, puis solder l'entrée à la main (type « actual » ou « failed »).`); continue; }
+    if (!o.reserve) { // exécution interrompue sans registre (marqueur run-<id>) : batchs créés pendant la fenêtre du run ?
+      const end = Date.parse(entriesAt(o.id)), c = recent.filter((x) => Date.parse(x.created_at) >= end - 25 * 60_000 && Date.parse(x.created_at) <= end && !linked.has(x.id));
+      if (c.length === 0) { appendLedger(LEDGER, { type: "failed", id: o.id, at: new Date().toISOString(), reason: "aucun batch créé pendant l'exécution interrompue" }); console.log(`${o.id} : aucun batch créé → clos`); }
+      else console.log(`${o.id} : batch(s) créé(s) pendant l'exécution interrompue (${c.map((x) => x.id).join(", ")}) — décision humaine requise`);
+      continue;
+    }
+    if (o.reserve.mode !== "batch") { console.log(`${o.id} : appel synchrone à l'issue inconnue — vérifier la consommation dans la Console Anthropic, puis solder l'entrée à la main (type « actual » ou « failed »).`); continue; }
     const r = reconcileBatch(o, recent, linked);
     const at = new Date().toISOString();
     if ("batchId" in r) { appendLedger(LEDGER, { type: "submitted", id: o.id, at, batchId: r.batchId }); linked.add(r.batchId); console.log(`${o.id} : rattaché au batch ${r.batchId}`); }

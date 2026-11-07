@@ -6,6 +6,7 @@
 // toute nouvelle dépense jusqu'à réconciliation : aucune nouvelle tentative automatique, donc aucun doublon.
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { pathToFileURL } from "node:url";
 
 export const TRIAL_CAP_USD = 10; // plafond de la phase d'essai, non modifiable par budget.json
 
@@ -68,4 +69,51 @@ export function reconcileBatch(op: Op, candidates: { id: string; created_at: str
   if (c.length === 0) return { failed: true };
   if (c.length === 1) return { batchId: c[0].id };
   return { ambiguous: c.map((x) => x.id) };
+}
+
+/** Cohérence du registre : chaque entrée se rattache à une réservation, aucun état après une issue finale, batchs uniques. */
+export function ledgerIssues(entries: LedgerEntry[]): string[] {
+  const issues: string[] = [];
+  const reserved = new Set<string>(), closed = new Set<string>(), batchOwner = new Map<string, string>();
+  entries.forEach((e, i) => {
+    const at = `ligne ${i + 1} (${e.id})`;
+    if (e.type === "reserve") {
+      if (reserved.has(e.id)) issues.push(`${at} : réservation en double`);
+      if (!(e.maxUsd > 0 && Number.isFinite(e.maxUsd))) issues.push(`${at} : coût maximal invalide`);
+      reserved.add(e.id);
+      return;
+    }
+    if (!reserved.has(e.id) && !e.id.startsWith("run-")) issues.push(`${at} : « ${e.type} » sans réservation`);
+    if (closed.has(e.id)) issues.push(`${at} : « ${e.type} » après une issue finale`);
+    if (e.type === "submitted" || (e.type === "actual" && e.batchId)) {
+      const b = e.batchId!;
+      if (!/^msgbatch_[A-Za-z0-9]+$/.test(b)) issues.push(`${at} : identifiant de batch invalide`);
+      if (batchOwner.has(b) && batchOwner.get(b) !== e.id) issues.push(`${at} : batch ${b} déjà rattaché à ${batchOwner.get(b)}`);
+      batchOwner.set(b, e.id);
+    }
+    if (e.type === "actual" && !(e.usd >= 0 && Number.isFinite(e.usd))) issues.push(`${at} : coût réel invalide`);
+    if (e.type === "actual" || e.type === "failed") closed.add(e.id);
+  });
+  return issues;
+}
+
+// CLI : npx tsx pipeline/ledger.ts check <registre.jsonl> [--base <registre-initial.jsonl>]
+// Code 1 si le registre est incohérent, illisible, ou s'il ne prolonge pas exactement la version de base (ajout seul).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const [cmd, file] = process.argv.slice(2), base = process.argv.includes("--base") ? process.argv[process.argv.indexOf("--base") + 1] : undefined;
+  if (cmd !== "check" || !file) { console.error("usage : ledger.ts check <fichier> [--base <fichier>]"); process.exit(2); }
+  let entries: LedgerEntry[];
+  try { entries = readLedger(file); } catch (e) { console.error(`registre illisible : ${(e as Error).message}`); process.exit(1); }
+  const issues = ledgerIssues(entries);
+  if (base) {
+    const before = existsSync(base) ? readFileSync(base, "utf8") : "";
+    if (!(existsSync(file) ? readFileSync(file, "utf8") : "").startsWith(before)) issues.push("le registre ne prolonge pas la version de base (modification ou suppression d'entrées)");
+  }
+  const all = ops(entries), spent = spentUsd(entries);
+  console.log(`registre : ${entries.length} entrée(s), ${all.length} opération(s) ; dépense comptée ${spent.toFixed(3)} USD ; reste ${(TRIAL_CAP_USD - spent).toFixed(3)} / ${TRIAL_CAP_USD} USD`);
+  const open = all.filter((o) => o.state === "reserved" || o.state === "unknown" || o.state === "submitted");
+  for (const o of open) console.log(`  ouverte : ${o.id} (${o.state}${o.batchId ? `, ${o.batchId}` : ""})`);
+  for (const i of issues) console.error(`  ✗ ${i}`);
+  console.log(issues.length ? `INCOHÉRENT (${issues.length})` : "cohérent");
+  process.exit(issues.length ? 1 : 0);
 }

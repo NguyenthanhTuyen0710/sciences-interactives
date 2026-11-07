@@ -16,6 +16,7 @@
       "url": "https://www.education.gouv.fr/sites/default/files/ensel620_annexe2-v2.pdf",
       "inventorySourceId": "S4",
       "g1": "proposed",
+      "note": "Redirection 301 vers c3-programme-2025-439827 (même SHA256, relevé du 2026-11-07) : doublon, voir G1-table.md.",
       "declared": { "subject": "mathematiques", "cycle": 3, "grades": ["6e"], "officialRef": "BO n° 16 du 17 avril 2025", "applicability": [] },
       "expect": { "contains": ["cycle 3"] }
     },

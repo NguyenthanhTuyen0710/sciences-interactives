@@ -6,6 +6,8 @@
 #   collect   : récupère le résultat d'un batch_id et solde son coût ; aucune nouvelle requête payante.
 #   reconcile : rattache une réservation à l'issue inconnue au batch réellement créé (lecture seule côté API).
 # Les fichiers produits sont publiés comme artefact du run, jamais committés : relecture humaine obligatoire.
+# Droits : seuls les jobs ledger-pull et ledger-push (stockage « data-store ») ont contents: write ; le job qui
+# détient la clé API n'a que contents: read et reçoit le registre par artefact, vérifié par SHA256.
 name: Generate Lessons
 
 on:
@@ -41,16 +43,42 @@ on:
         default: ""
 
 permissions:
-  contents: write # écriture de la release brouillon « data-store » (registre des dépenses) ; aucun commit
+  contents: read
 
 concurrency:
-  group: data-store # un seul accès à la fois au stockage partagé (avec collect-sources.yml)
+  group: data-store # une seule exécution à la fois sur le registre partagé (avec collect-sources.yml)
   cancel-in-progress: false
 
 jobs:
+  ledger-pull:
+    if: inputs.mode != 'dry-run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # lecture d'une release brouillon (réservée aux jetons en écriture)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lire le registre des dépenses (SHA256 vérifié)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh pull-ledger
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store/
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error
+
   pipeline:
+    needs: ledger-pull
+    if: always() && (inputs.mode == 'dry-run' || needs.ledger-pull.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,11 +90,27 @@ jobs:
       - name: Installer les dépendances
         run: npm ci --no-audit --no-fund
 
-      - name: Restaurer le registre des dépenses (stockage hors Git)
+      - name: Aucun appel possible avant cette étape
+        run: echo "started=false" >> "$GITHUB_OUTPUT"
+        id: premark
+
+      - name: Recevoir le registre
         if: inputs.mode != 'dry-run'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash .github/scripts/data-store.sh pull-ledger
+        uses: actions/download-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store
+
+      - name: Vérifier le registre reçu
+        if: inputs.mode != 'dry-run'
+        run: |
+          (cd pipeline/.store && sha256sum -c ledger.sha256)
+          npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl
+          echo "PIPELINE_LEDGER_SYNCED=1" >> "$GITHUB_ENV"
+
+      - name: Marquer le début des appels possibles
+        id: mark
+        run: echo "started=true" >> "$GITHUB_OUTPUT"
 
       - name: Pipeline (${{ inputs.mode }})
         shell: bash
@@ -94,11 +138,19 @@ jobs:
           mkdir -p pipeline-output
           npx tsx pipeline/run.ts "${args[@]}" 2>&1 | tee pipeline-output/run.log
 
-      - name: Sauvegarder le registre des dépenses
+      - name: Cohérence du registre après exécution
         if: always() && inputs.mode != 'dry-run'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash .github/scripts/data-store.sh push-ledger
+        run: npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl --base pipeline/.store/ledger.base.jsonl
+
+      - name: Transmettre le registre
+        if: always() && inputs.mode != 'dry-run'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ledger-out
+          path: pipeline/.store/ledger.jsonl
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error
 
       - name: Résumé
         if: always()
@@ -121,8 +173,54 @@ jobs:
           if-no-files-found: warn
           path: |
             pipeline-output/
-            pipeline/.store/ledger.jsonl
             pipeline/state/
             research/dossiers/${{ inputs.chapter }}.md
             src/lib/chapters/data/${{ inputs.chapter }}.ts
             project/reports/*-QA-api.md
+
+  ledger-push:
+    needs: [ledger-pull, pipeline]
+    if: always() && inputs.mode != 'dry-run' && needs.ledger-pull.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ledger-in
+          path: pipeline/.store
+
+      - name: Recevoir le registre modifié
+        id: out
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ledger-out
+          path: ledger-out
+
+      - name: Registre perdu → opération inconnue (bloque tout envoi jusqu'à réconciliation)
+        # sorties absentes (job interrompu brutalement) = on ne sait pas : marquage prudent
+        if: steps.out.outcome != 'success' && needs.pipeline.outputs.started != 'false'
+        run: |
+          echo "::warning::registre de l'exécution non transmis : ajout d'une opération à l'issue inconnue"
+          node -e 'console.log(JSON.stringify({type:"unknown",id:"run-"+process.env.GITHUB_RUN_ID,at:new Date().toISOString(),error:"exécution interrompue sans registre"}))' >> pipeline/.store/ledger.jsonl
+
+      - name: Utiliser le registre modifié
+        if: steps.out.outcome == 'success'
+        run: cp ledger-out/ledger.jsonl pipeline/.store/ledger.jsonl
+
+      - name: Publier le registre (cohérence, ajout seul, SHA256, sauvegarde)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh push-ledger

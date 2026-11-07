@@ -1,5 +1,5 @@
 {
-  "description": "Registre des sources du collecteur (pipeline/sources/run.ts). Une source n'est interrogée que si enabled = true ET g0.status = \"approved\" (décision humaine). Les faits ci-dessous ont été relevés le 2026-11-07 ; ils ne valent pas autorisation.",
+  "description": "Registre des sources du collecteur (pipeline/sources/run.ts). Une source n'est interrogée que si enabled = true ET g0.status = \"approved\" (décision humaine). Ses documents ne sont copiés dans le stockage data-store que si g0.storage = \"approved\" (droit de conservation confirmé par un humain). Les faits ci-dessous ont été relevés le 2026-11-07 ; ils ne valent pas autorisation.",
   "userAgent": "SciencesInteractivesBot/0.1 (+https://github.com/NguyenthanhTuyen0710/sciences-interactives)",
   "sources": [
     {
@@ -13,6 +13,7 @@
       "crawlDelaySeconds": 10,
       "g0": {
         "status": "pending",
+        "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "User-agent: * → Crawl-delay: 10 ; Disallow: /recherche, /search, chemins Drupal ; Allow explicite : /*.pdf$ et /sites/default/files/. Aucun groupe dédié aux agents d'IA.",
         "terms": "NON LU : /mentions-legales renvoie HTTP 403 (page Cloudflare « Attention Required ») au client automatisé.",
@@ -31,6 +32,7 @@
       "crawlDelaySeconds": 10,
       "g0": {
         "status": "pending",
+        "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "Même fichier que education.gouv.fr : User-agent: * → Crawl-delay: 10 ; Allow /*.pdf$ et /sites/default/files/.",
         "terms": "NON LU : /mentions-legales renvoie HTTP 403 (Cloudflare) au client automatisé.",
@@ -49,6 +51,7 @@
       "crawlDelaySeconds": 10,
       "g0": {
         "status": "pending",
+        "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "User-agent: * → Disallow de dossiers techniques Joomla (/administrator/, /api/, /cache/, /components/, /modules/, /plugins/…). Pas de Crawl-delay, pas de règle pour les agents d'IA. Sitemap déclaré.",
         "terms": "AUCUNE page de conditions ou de mentions légales trouvée : la page d'accueil n'affiche que « ©1999 / ISSN 2272-5318 / Contact » ; /mentions-legales et /index.php/mentions-legales → HTTP 404.",
@@ -67,6 +70,7 @@
       "crawlDelaySeconds": 10,
       "g0": {
         "status": "pending",
+        "storage": "pending",
         "checkedAt": "2026-11-07",
         "robots": "En-tête : contenu « pas destiné à la constitution de corpus d'entraînement » ; Disallow: / pour GPTBot, ClaudeBot, anthropic-ai, Claude-Web, CCBot, Wget, HTTrack, etc. ; Allow: / pour Claude-SearchBot, Claude-User, ChatGPT-User, PerplexityBot (consultation déclenchée par un utilisateur). User-agent: * → Disallow /admin, /compte, /api/, /recherche, /generateur/pdf, /generateur/mon-sujet, /static/pdfjs/.",
         "terms": "Mentions légales lues (https://www.labolycee.org/mentions-legales, mise à jour 31-07-2026) : corrigés, notes pédagogiques et outils sous CC BY-NC-ND (attribution, pas d'usage commercial, pas de modification) ; réutilisation commerciale sur demande ; les sujets sont des épreuves officielles hors de cette licence.",
