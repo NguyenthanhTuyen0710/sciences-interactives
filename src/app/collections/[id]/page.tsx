@@ -23,7 +23,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
       <h1 className="text-3xl font-black">{c.title}</h1>
       {c.description && <p className="mb-4 text-slate-600">{c.description}</p>}
       {mode === "serie" ? (
-        <SeriesPlayer items={items.map((i, k) => ({ id: i.exerciseId, difficulty: i.difficulty, seed: seed + k }))} mode="collection" title={c.title} intro="Faites les exercices dans l'ordre ; votre note sur 20 s'affichera à la fin." />
+        <SeriesPlayer items={items.map((i, k) => ({ id: i.exerciseId, difficulty: i.difficulty, seed: seed + k }))} mode="collection" title={c.title} intro="Fais les exercices dans l'ordre ; ta note sur 20 s'affichera à la fin." />
       ) : (
         <>
           <a href="?mode=serie" className="btn-primary mb-6">▶ Faire la série complète (note sur 20)</a>

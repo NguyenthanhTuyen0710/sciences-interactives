@@ -1,0 +1,19 @@
+{
+  "id": "math-3e-calcul-litteral",
+  "taskId": "SCI-3E-MATH-003",
+  "grade": "3e",
+  "treeChapterId": "m3-calcul-litteral",
+  "title": "Calcul littéral : développer, factoriser, identités",
+  "exportName": "math3eCalculLitteral",
+  "exercisePrefix": "cl3-",
+  "officialChapterIds": ["math-3e-calcul-litteral"],
+  "consolidationChapterIds": ["math-4e-calcul-litteral"],
+  "scopeNotes": [
+    "Programme 2020 en vigueur en 3e (BO n° 31 du 30-07-2020) + repères et attendus 2019 (BO n° 22 du 29-05-2019).",
+    "Exigible : opposé d'une expression, double distributivité, factorisation par un facteur commun, a² − b² = (a + b)(a − b), démontrer ou réfuter avec le calcul littéral.",
+    "(a + b)² et (a − b)² : hors programme exigible en 3e (programme de 2nde) ; seulement en approfondissement explicitement signalé, jamais dans un exercice de niveau 1 à 3.",
+    "Programmes de calcul et formules (aires, périmètres) : supports de modélisation."
+  ],
+  "exampleChapter": "src/lib/chapters/data/math-3e-arithmetique.ts",
+  "notion": { "status": "SOURCE_INACCESSIBLE", "reason": "aucune URL Notion disponible dans la session ; connecteur Notion non autorisé" }
+}

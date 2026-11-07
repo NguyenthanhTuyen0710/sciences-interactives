@@ -9,7 +9,7 @@ export default function Lessons() {
     <div>
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { label: "Leçons animées" }]} />
       <h1 className="mb-1 text-3xl font-black">Leçons animées interactives</h1>
-      <p className="mb-6 text-slate-600">L'animation s'arrête pour vous poser des questions : répondez pour continuer.</p>
+      <p className="mb-6 text-slate-600">L'animation s'arrête pour te poser des questions : réponds pour continuer.</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {LESSON_META.map((l) => (
           <Link key={l.slug} href={`/lecons/${l.slug}`} className="card p-5 hover:border-indigo-300 hover:shadow-md">

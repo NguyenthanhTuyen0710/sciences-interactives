@@ -11,7 +11,7 @@ export default function RecentList() {
     try { setItems(JSON.parse(localStorage.getItem("recents") || "[]")); } catch { setItems([]); }
   }, []);
   if (items === null) return <div className="h-24 animate-pulse rounded-xl bg-slate-100" />;
-  if (!items.length) return <p className="text-sm text-slate-500">Aucun exercice récent sur cet appareil. Lancez-vous avec le défi du jour !</p>;
+  if (!items.length) return <p className="text-sm text-slate-500">Aucun exercice récent sur cet appareil. Lance-toi avec le défi du jour !</p>;
   return (
     <ul className="space-y-2">
       {items.slice(0, 5).map((it) => (

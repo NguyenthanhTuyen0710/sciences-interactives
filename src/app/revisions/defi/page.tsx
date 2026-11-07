@@ -14,7 +14,7 @@ export default async function DefiPage({ searchParams }: { searchParams: Promise
     <div>
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { href: "/revisions", label: "Révisions" }, { label: "Défi chronométré" }]} />
       {items.length ? (
-        <SeriesPlayer items={items} mode="defi" totalTime={600} title={`Défi chronométré · ${sp.niveau ?? "tous niveaux"}`} intro="Répondez au maximum d'exercices en 10 minutes. La correction s'affiche après chaque exercice." />
+        <SeriesPlayer items={items} mode="defi" totalTime={600} title={`Défi chronométré · ${sp.niveau ?? "tous niveaux"}`} intro="Réponds au maximum d'exercices en 10 minutes. La correction s'affiche après chaque exercice." />
       ) : <Empty>Pas encore assez d'exercices pour ce niveau et cette matière.</Empty>}
     </div>
   );

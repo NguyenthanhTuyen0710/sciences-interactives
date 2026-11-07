@@ -1,0 +1,9 @@
+{
+  "source": "Tarifs publics Anthropic (USD par million de tokens), relevés le 2026-11-07 dans la documentation de l'API. À vérifier dans la Console avant chaque campagne.",
+  "batchMultiplier": 0.5,
+  "models": {
+    "claude-sonnet-5-5": { "input": 2.0, "output": 10.0, "cacheWrite5m": 2.5, "cacheWrite1h": 4.0, "cacheRead": 0.2 },
+    "claude-haiku-5-5": { "input": 0.1, "output": 0.5, "cacheWrite5m": 0.125, "cacheWrite1h": 0.2, "cacheRead": 0.01 },
+    "claude-opus-5-5": { "input": 4.0, "output": 20.0, "cacheWrite5m": 5.0, "cacheWrite1h": 8.0, "cacheRead": 0.2 }
+  }
+}

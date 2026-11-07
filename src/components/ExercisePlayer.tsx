@@ -80,7 +80,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
       reset(await r.json());
       setAttempt(1);
     } catch {
-      setError("Impossible de charger un nouvel exercice. Vérifiez votre connexion.");
+      setError("Impossible de charger un nouvel exercice. Vérifie ta connexion.");
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
       saveRecent(meta, res.score);
       if (series) setShowSolution(true);
     } catch (e) {
-      setError((e as Error).message || "La correction a échoué. Réessayez.");
+      setError((e as Error).message || "La correction a échoué. Réessaie.");
     } finally {
       setLoading(false);
     }
@@ -210,8 +210,8 @@ export default function ExercisePlayer({ initial, mode = "libre", series, syncUr
             <div className={`flex flex-wrap items-center gap-4 rounded-2xl p-4 ${result.score === 1 ? "bg-emerald-600 text-white" : result.score >= 0.5 ? "bg-amber-100 text-amber-900" : "bg-rose-100 text-rose-900"}`}>
               <div className="text-3xl font-black">{scorePct} %</div>
               <div className="flex-1 text-sm">
-                <p className="font-semibold">{result.score === 1 ? "Excellent, tout est juste !" : result.score >= 0.5 ? "Pas mal ! Regardez la correction pour progresser." : "Ce n'est pas encore ça : la correction détaillée va vous aider."}</p>
-                <p className="opacity-80">Tentative n° {attempt} · {result.saved ? "résultat enregistré dans Mon espace" : "connectez-vous pour enregistrer vos résultats"}</p>
+                <p className="font-semibold">{result.score === 1 ? "Excellent, tout est juste !" : result.score >= 0.5 ? "Pas mal ! Regarde la correction pour progresser." : "Ce n'est pas encore ça : la correction détaillée va t'aider."}</p>
+                <p className="opacity-80">Tentative n° {attempt} · {result.saved ? "résultat enregistré dans Mon espace" : "connecte-toi pour enregistrer tes résultats"}</p>
               </div>
             </div>
 

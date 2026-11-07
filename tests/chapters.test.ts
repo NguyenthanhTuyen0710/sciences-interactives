@@ -1,8 +1,24 @@
 import { describe, expect, it } from "vitest";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
 import { createRng } from "../src/lib/engine/rng";
 import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type LineLevel } from "../src/lib/games/logic";
+
+describe("tutoiement de l'interface élève", () => {
+  it("aucun « vous / votre / vos » ni impératif en -ez hors espace enseignant", () => {
+    const root = join(__dirname, "../src");
+    const files = (readdirSync(root, { recursive: true }) as string[]).filter((f) => /\.tsx?$/.test(f) && !/(^|\/)admin\//.test(f));
+    const bad: string[] = [];
+    for (const f of files) {
+      readFileSync(join(root, f), "utf8").split("\n").forEach((line, i) => {
+        if (/\b(vous|votre|vos)\b/i.test(line) || /\b(?!(?:chez|assez|nez|rez)\b)[a-zéèêîô]{3,}ez\b(?!-de)/i.test(line.replace(/rez-de-chaussée/g, ""))) bad.push(`${f}:${i + 1}`);
+      });
+    }
+    expect(bad).toEqual([]);
+  });
+});
 
 describe("logique des jeux", () => {
   it("analyse des relatifs saisis", () => {

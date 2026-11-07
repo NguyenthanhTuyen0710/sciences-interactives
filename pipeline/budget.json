@@ -1,0 +1,5 @@
+{
+  "limitUsd": 10,
+  "creditVerified": false,
+  "creditNote": "Passer creditVerified à true UNIQUEMENT après vérification par le porteur de projet, dans la Console Anthropic, que le workspace de la clé utilise les crédits API Startup et qu'une limite de dépense mensuelle (≤ crédit disponible) est active. Tant que c'est false, le pipeline refuse tout appel payant."
+}

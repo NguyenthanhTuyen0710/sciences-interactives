@@ -1,6 +1,6 @@
 # État du projet et reprise
 
-_Mis à jour à chaque fin de session. Source de vérité des tâches : `project/ledger.json` ; tableau de bord : `npm run dashboard`._
+_Mis à jour à chaque fin de session. Maths 3e : voir `project/maths-3e-progress.md`. Source de vérité des tâches : `project/ledger.json` ; tableau de bord : `npm run dashboard`._
 
 ## Fait
 - **SCI-INFRA-001** audit du dépôt et base de référence (`project/reports/SCI-INFRA-001-orchestrateur.md`).
@@ -8,8 +8,9 @@ _Mis à jour à chaque fin de session. Source de vérité des tâches : `project
 - **Inventaires officiels 2026-2027** : maths (80 chapitres, 249 objectifs) et physique-chimie (36 chapitres, 125 objectifs) dans `research/curriculum/` ; format DNB 2027 dans `research/brevet/`.
 - **SCI-5E-MATH-001 Nombres relatifs (5e)** : cours, 36 exercices, 4 activités ; six revues QA, deux contre-vérifications indépendantes (six PASS) ; **publié** (couvre aussi `math-5e-relatifs-addition-soustraction` et `math-5e-reperage` de l'inventaire). Rapports : `project/reports/SCI-5E-MATH-001-*`.
 
-## Décision en attente (porteur de projet)
-- Tutoiement ou vouvoiement de l'interface existante (lecteur d'exercices, messages du moteur) : le chapitre et les jeux tutoient.
+## Décisions du porteur de projet
+- SCI-INFRA-004 (2026-11-07) : **tutoiement** dans tout le contenu élève et les messages du moteur ; `/admin` (enseignants) vouvoie. Garde-fou : test « tutoiement de l'interface élève ».
+- SCI-INFRA-005 (2026-11-07) : Haiku pour l'extraction, Sonnet pour le contenu, le code et la relecture, Opus seulement si nécessaire ; pipeline API limité à un chapitre pilote, plafond 10 USD (`pipeline/README.md`).
 
 ## Leçons de la tranche verticale
 - Lire le **code de sortie** des outils (`echo $?`), pas la dernière ligne affichée.

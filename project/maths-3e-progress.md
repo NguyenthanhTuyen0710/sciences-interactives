@@ -26,13 +26,18 @@ Rapports : `project/reports/SCI-3E-MATH-00{1,2,9}-*.md`.
 ## Tests passés (dernier état)
 - `npm test` 428/428 ; `tsc` 0 erreur ; ESLint 0 erreur ; `npm run build` OK ; e2e 3e 121/121 ; ui-check vert.
 
+## Pipeline API — pilote approuvé (2026-11-07)
+- Chapitre pilote : `math-3e-calcul-litteral` (SCI-3E-MATH-003), Sonnet 5.5, plafond 10 USD (`pipeline/`).
+- État : **prêt, non lancé** — dry-run OK (coût maximal ≈ 1,7 USD, ≈ 1,1 USD en batch) ; aucune clé API dans l'environnement et crédit Startup / limite de dépense non confirmés (`pipeline/budget.json` → `creditVerified: false`).
+- Aucun autre chapitre ne doit passer par le pipeline avant évaluation du pilote.
+
 ## Reste à faire
-1. Contre-vérification des mineurs de SCI-3E-MATH-002 (de préférence script `validate-chapter` + relecture Sonnet), puis publication.
-2. Batch 2 : **en attente d'approbation** (voir `project/reports/SCI-INFRA-005-ai-workflow.md`).
+1. SCI-3E-MATH-002 : `validate-chapter` vert (10 500 tirages) ; relecture des mineurs non refaite → reste en brouillon.
+2. Lancer le pilote dès que la clé et le crédit sont confirmés, puis rapport (coût réel, exercices, taux de réussite, défauts).
 
 ## Lacunes et points ouverts
 - Constats mineurs restants : aucune détection de réponse constante d'un `vary` (R-1) ; deux distracteurs faibles en chasse-erreurs (arithmétique) ; zéro final « 27,90 » au dixième = crédit partiel (choix moteur).
-- Décision du porteur de projet (SCI-INFRA-004) : tutoiement des chapitres vs vouvoiement des messages du moteur.
+- Tutoiement : appliqué partout côté élève (décision du 2026-11-07).
 
 ## Batches suivants (manifest)
 2 Calcul littéral et équations (SCI-3E-MATH-003, 004) · 3 Fonctions (007, 008) · 4 Géométrie plane (012, 013, 017) · 5 Statistiques et probabilités (005, 006) · 6 Transformations et espace (014, 011, 010) · 7 Algorithmique (015) · 8 Méthodologie DNB (SCI-DNB-MATH-002) · 9 Annales DNB (SCI-DNB-MATH-003).

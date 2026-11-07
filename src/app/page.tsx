@@ -103,7 +103,7 @@ export default async function Home() {
             </div>
           ) : (
             <div className="mt-3 space-y-3 text-sm text-slate-600">
-              <p>Créez un compte gratuit pour enregistrer vos résultats, suivre votre progression par chapitre et recevoir des recommandations adaptées.</p>
+              <p>Crée un compte gratuit pour enregistrer tes résultats, suivre ta progression par chapitre et recevoir des recommandations adaptées.</p>
               <div className="flex gap-2"><Link href="/inscription" className="btn-primary">Créer un compte</Link><Link href="/connexion" className="btn-ghost">Connexion</Link></div>
             </div>
           )}
@@ -118,7 +118,7 @@ export default async function Home() {
 
       {/* Recommandés */}
       <section>
-        <h2 className="mb-3 text-lg font-bold">✨ Recommandés pour vous</h2>
+        <h2 className="mb-3 text-lg font-bold">✨ Recommandés pour toi</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {recommended
             ? recommended.map((r) => byId.get(r.exerciseId) && <ExerciseCard key={r.exerciseId} m={byId.get(r.exerciseId)!} difficulty={r.difficulty} note={r.reason} />)
@@ -138,7 +138,7 @@ export default async function Home() {
         <span className="text-4xl">🎬</span>
         <div className="flex-1">
           <h2 className="text-lg font-bold">Nouveau : leçons animées interactives</h2>
-          <p className="text-sm text-slate-600">Une animation qui s'arrête pour vous poser des questions, comme une vidéo interactive.</p>
+          <p className="text-sm text-slate-600">Une animation qui s'arrête pour te poser des questions, comme une vidéo interactive.</p>
         </div>
         <Link href="/lecons/pythagore" className="btn-primary">Découvrir</Link>
       </section>
