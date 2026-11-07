@@ -9,7 +9,13 @@ Phase pilote approuvée : un seul chapitre 3e (`math-3e-calcul-litteral`), plafo
   1. le workspace de la clé consomme les crédits API Startup ;
   2. une limite de dépense est active et ne dépasse pas le crédit disponible (aucune recharge automatique).
 - Avant chaque appel, le script calcule le **coût maximal** possible (sortie à `max_tokens`, cache écrit) et s'arrête si `dépense déjà journalisée + coût maximal > limitUsd`.
-- Chaque appel est journalisé dans `costs.jsonl` (tokens d'entrée, cache écrit/lu, sortie, coût en USD selon `prices.json`).
+- Registre des dépenses `pipeline/.store/ledger.jsonl` (`pipeline/ledger.ts`, hors Git) : chaque appel payant est **réservé à son coût maximal et écrit avant l'envoi**, puis soldé par son coût réel (`prices.json`). Une réservation non soldée compte pour son maximum.
+- Un envoi réel n'est possible que si **toutes** ces conditions sont réunies, sinon il est bloqué (et le dry-run affiche ce qui bloquerait) :
+  1. registre synchronisé avec le stockage partagé (`PIPELINE_LEDGER_SYNCED=1`, posé par le workflow après téléchargement) ;
+  2. `creditVerified: true` ;
+  3. dépense comptée + coût maximal ≤ `limitUsd` ≤ 10 USD (plafond d'essai codé en dur) ;
+  4. aucune requête identique (chapitre, étape, empreinte des entrées) déjà soumise ou traitée ;
+  5. aucune opération à l'issue inconnue : un envoi payant n'est jamais retenté automatiquement (`maxRetries: 0`) ; une erreur le marque « inconnu » et `--reconcile` le rattache au batch réellement créé (ou le déclare échoué), sans deviner en cas d'ambiguïté.
 
 ## Commandes
 ```bash
@@ -24,7 +30,9 @@ Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), j
 - `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, manifest) et estimation ; la clé n'est pas transmise.
 - `submit` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
 - `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.
-- Les sorties (dossier, chapitre `draft`, rapport, `costs.jsonl`, journal) sont publiées en **artefact du run**, jamais committées. Après relecture humaine, committer les fichiers retenus **avec `pipeline/costs.jsonl`** : c'est ce journal versionné qui alimente le contrôle du plafond lors des soumissions suivantes (un runner repart d'un dépôt propre).
+- Le registre des dépenses est restauré puis sauvegardé dans la release GitHub **brouillon** `data-store` (`.github/scripts/data-store.sh`) ; tous les workflows qui y accèdent partagent le groupe de concurrence `data-store`.
+- Les sorties (dossier, chapitre `draft`, rapport, registre, journal) sont publiées en **artefact du run**, jamais committées.
+- `reconcile` : à lancer si un envoi a échoué avec une issue inconnue.
 - Chaîne type : submit (dossier) → collect → relecture + commit du dossier → submit (chapitre) → collect → relecture → commit du brouillon.
 
 ## Reprise et non-régression
@@ -33,6 +41,6 @@ Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), j
 - Le chapitre produit reste `draft` et n'est inscrit ni au registre ni au menu : l'intégration se fait après relecture humaine.
 
 ## Économies
-- Préfixe système identique pour toutes les étapes (règles + `schema.ts` + `types.ts` + un chapitre approuvé), mis en cache 1 h (`cache_control`), vérifiable avec `cache_read_input_tokens` dans `costs.jsonl`.
+- Préfixe système identique pour toutes les étapes (règles + `schema.ts` + `types.ts` + un chapitre approuvé), mis en cache 1 h (`cache_control`), vérifiable avec `cache_read_input_tokens` dans la réponse de l'API.
 - Toutes les vérifications déterministes sont faites par `scripts/validate-chapter.ts` et `tsc` ; l'IA ne reçoit que la liste des erreurs et répond par des remplacements ciblés, pas par un fichier entier.
 - Pas de bascule automatique vers un autre modèle en cas de refus : le script s'arrête (coût prévisible).

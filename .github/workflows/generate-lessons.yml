@@ -1,8 +1,10 @@
 # Production d'un chapitre par le pipeline existant (pipeline/run.ts) via l'API Claude.
 #   dry-run : contrôle des données + estimation des coûts, aucun appel API, aucune clé exposée.
-#   submit  : soumet la prochaine étape par Message Batches (refusé si pipeline/budget.json → creditVerified = false
-#             ou si le coût maximal dépasse le plafond limitUsd).
-#   collect : récupère le résultat d'un batch_id ; aucune nouvelle requête payante.
+#   submit    : soumet la prochaine étape par Message Batches. Refusé tant que l'une des conditions manque : registre
+#               des dépenses synchronisé (release brouillon « data-store »), creditVerified, plafond 10 USD, aucune
+#               requête identique déjà soumise, aucune opération à l'issue inconnue (pipeline/ledger.ts).
+#   collect   : récupère le résultat d'un batch_id et solde son coût ; aucune nouvelle requête payante.
+#   reconcile : rattache une réservation à l'issue inconnue au batch réellement créé (lecture seule côté API).
 # Les fichiers produits sont publiés comme artefact du run, jamais committés : relecture humaine obligatoire.
 name: Generate Lessons
 
@@ -10,9 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "dry-run (estimation, sans API) | submit (Message Batches) | collect (résultat d'un batch)"
+        description: "dry-run (estimation, sans API) | submit (Message Batches) | collect (résultat d'un batch) | reconcile"
         type: choice
-        options: [dry-run, submit, collect]
+        options: [dry-run, submit, collect, reconcile]
         default: dry-run
       level:
         description: "Niveau (doit correspondre à la fiche du chapitre)"
@@ -39,10 +41,10 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write # écriture de la release brouillon « data-store » (registre des dépenses) ; aucun commit
 
 concurrency:
-  group: generate-lessons-${{ inputs.chapter }}
+  group: data-store # un seul accès à la fois au stockage partagé (avec collect-sources.yml)
   cancel-in-progress: false
 
 jobs:
@@ -59,6 +61,12 @@ jobs:
 
       - name: Installer les dépendances
         run: npm ci --no-audit --no-fund
+
+      - name: Restaurer le registre des dépenses (stockage hors Git)
+        if: inputs.mode != 'dry-run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh pull-ledger
 
       - name: Pipeline (${{ inputs.mode }})
         shell: bash
@@ -81,9 +89,16 @@ jobs:
             collect)
               if [ -z "$BATCH_ID" ]; then echo "::error::batch_id est obligatoire en mode collect"; exit 2; fi
               args+=(--collect "$BATCH_ID") ;;
+            reconcile) args+=(--reconcile) ;;
           esac
           mkdir -p pipeline-output
           npx tsx pipeline/run.ts "${args[@]}" 2>&1 | tee pipeline-output/run.log
+
+      - name: Sauvegarder le registre des dépenses
+        if: always() && inputs.mode != 'dry-run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh push-ledger
 
       - name: Résumé
         if: always()
@@ -106,7 +121,7 @@ jobs:
           if-no-files-found: warn
           path: |
             pipeline-output/
-            pipeline/costs.jsonl
+            pipeline/.store/ledger.jsonl
             pipeline/state/
             research/dossiers/${{ inputs.chapter }}.md
             src/lib/chapters/data/${{ inputs.chapter }}.ts

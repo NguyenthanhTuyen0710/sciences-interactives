@@ -19,7 +19,12 @@ export const SourceSchema = z.object({
   url: z.string().url(),
   kind: z.enum(["official", "academic", "supplementary"]),
   note: z.string().optional(),
-});
+  /** Absent = « pending_verification ». « verified » exige l'empreinte et la date d'accès d'un enregistrement
+   *  du collecteur (research/sources/records), contrôlé par scripts/validate-chapter.ts. */
+  verification: z.enum(["verified", "pending_verification"]).optional(),
+  accessedAt: z.string().datetime().optional(),
+  sha256: z.string().regex(/^[0-9a-f]{64}$/).optional(),
+}).refine((s) => s.verification !== "verified" || (!!s.sha256 && !!s.accessedAt), { message: "source « verified » sans sha256 ni accessedAt" });
 
 const SvgIllustration = z.object({ svg: z.string().startsWith("<svg"), alt: z.string().min(5), caption: z.string().optional() });
 

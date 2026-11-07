@@ -2,8 +2,9 @@
 // Usage : npx tsx scripts/validate-chapter.ts <id-du-chapitre | chemin/vers/fichier.ts> [--seeds 500] [--json]
 // Code de sortie : 0 si aucun problème bloquant, 1 sinon. La sortie --json est compacte : elle sert d'entrée
 // au pipeline de contenu (on ne renvoie à l'IA que les erreurs, pas tout le chapitre).
-import { pathToFileURL } from "node:url";
-import { resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { join, resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
 import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
@@ -46,6 +47,7 @@ const dup = (a: string[]) => a.find((x, i) => a.indexOf(x) !== i);
 const VOUS = /\b(vous|votre|vos)\b/i;
 // Valeur d'attribut SVG contenant « < » : signe d'un gabarit tronqué.
 const BROKEN_SVG = /="[^"]*</;
+const RECORDS = fileURLToPath(new URL("../research/sources/records", import.meta.url));
 
 async function main() {
   if (!target) { console.error("Usage : npx tsx scripts/validate-chapter.ts <id|fichier.ts> [--seeds N] [--json]"); process.exit(2); }
@@ -57,6 +59,14 @@ async function main() {
   const parsed = ChapterSchema.safeParse(c);
   if (!parsed.success) for (const i of parsed.error.issues.slice(0, 20)) add(`schema:${i.path.join(".")}`, i.message);
   for (const d of doneIssues(c).filter((x) => !x.startsWith("revue "))) add("dod", d);
+  // Une source « verified » doit correspondre à un enregistrement vérifié du collecteur (même URL, même SHA256).
+  for (const s of c.sources.filter((x) => x.verification === "verified")) {
+    const rec = existsSync(RECORDS) ? readdirSync(RECORDS).map((f) => JSON.parse(readFileSync(join(RECORDS, f), "utf8")) as { url: string; sha256: string | null; verification: { status: string } })
+      .find((r) => r.url === s.url && r.sha256 === s.sha256) : undefined;
+    if (!rec) add(`sources:${s.id}`, "« verified » sans enregistrement correspondant (URL + SHA256) dans research/sources/records");
+    else if (rec.verification.status !== "verified") add(`sources:${s.id}`, `enregistrement non vérifié (${rec.verification.status})`);
+  }
+  const pendingSources = c.sources.filter((x) => x.verification !== "verified").length;
 
   // 2. Cours : langue et SVG.
   const lessonText = JSON.stringify(c.lesson);
@@ -113,10 +123,10 @@ async function main() {
   }
 
   const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
-  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, issues: issues.length, ok: issues.length === 0 };
+  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, issues: issues.length, ok: issues.length === 0 };
   if (asJson) console.log(JSON.stringify({ summary, issues }));
   else {
-    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés`);
+    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification`);
     for (const i of issues) console.log(`  ✘ ${i.where} : ${i.problem}${i.example ? ` (graine ${i.example})` : ""}`);
     console.log(summary.ok ? "  ✔ aucun problème détecté" : `  ${issues.length} problème(s)`);
   }

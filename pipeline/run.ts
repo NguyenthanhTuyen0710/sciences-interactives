@@ -8,16 +8,19 @@
 //   npx tsx pipeline/run.ts <chapitre> --submit           soumet la prochaine étape par Message Batches puis s'arrête
 //                                                         (aucun appel synchrone : la correction « fix » reste manuelle)
 //   npx tsx pipeline/run.ts <chapitre> --collect <batchId>  récupère le résultat d'un batch ; n'envoie aucune requête
+//   npx tsx pipeline/run.ts <chapitre> --reconcile        rattache une réservation à l'issue inconnue au batch réellement créé (lecture seule côté API)
+//   Toute dépense passe par pipeline/ledger.ts : registre synchronisé, réservation avant envoi, anti-doublon, plafond 10 USD.
 //
 // Étapes : dossier → chapter → (validation par script → fix ≤ 2 tours) → review. Chaque étape terminée est
 // enregistrée dans pipeline/state/<chapitre>.json et n'est pas refaite (sauf --force). Chaque appel est journalisé
-// dans pipeline/costs.jsonl. Avant chaque appel, le coût MAXIMAL possible (max_tokens en sortie) est ajouté à la
+// dans pipeline/.store/ledger.jsonl. Avant chaque appel, le coût MAXIMAL possible (max_tokens en sortie) est ajouté à la
 // dépense déjà réalisée : si le total dépasse budget.limitUsd, le pipeline s'arrête sans appeler l'API.
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
+import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -45,15 +48,15 @@ const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject"
 const chapterId = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTS.includes(args[i - 1]));
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
-const SUBMIT = flag("--submit"), COLLECT = opt("--collect");
-const LIVE = flag("--live") || SUBMIT || !!COLLECT, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
+const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
+const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
 
 function fail(msg: string, code = 2): never { console.error(`ARRÊT : ${msg}`); process.exit(code); }
 if (!chapterId) fail("Usage : npx tsx pipeline/run.ts <chapitre> [--live] [--step s] [--force] [--batch] [--submit | --collect <batchId>] [--exercises N] [--level g --subject s]");
 if (!/^[a-z0-9-]+$/.test(chapterId!)) fail(`identifiant de chapitre invalide : ${chapterId}`);
 if (!existsSync(P(`pipeline/chapters/${chapterId}.json`))) fail(`chapitre ${chapterId} absent du catalogue du pipeline (pipeline/chapters/)`);
-if (SUBMIT && COLLECT) fail("--submit et --collect sont exclusifs");
+if ([SUBMIT, !!COLLECT, RECONCILE].filter(Boolean).length > 1) fail("--submit, --collect et --reconcile sont exclusifs");
 if (COLLECT !== undefined && !/^msgbatch_[A-Za-z0-9]+$/.test(COLLECT)) fail("identifiant de batch invalide (attendu : msgbatch_…)");
 if (EXERCISES !== undefined && !(Number.isInteger(EXERCISES) && EXERCISES >= 1 && EXERCISES <= 60)) fail("--exercises doit être un entier entre 1 et 60");
 const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
@@ -84,8 +87,11 @@ function checkInputs() {
 checkInputs();
 
 // ───────── Coûts ─────────
-const COSTS = "pipeline/costs.jsonl";
-const spent = () => (existsSync(P(COSTS)) ? read(COSTS).trim().split("\n").filter(Boolean).reduce((s, l) => s + JSON.parse(l).usd, 0) : 0);
+// Registre des dépenses partagé (pipeline/ledger.ts) ; synchronisé avec le stockage « data-store » par le workflow.
+const LEDGER = P("pipeline/.store/ledger.jsonl");
+const ledger = () => readLedger(LEDGER);
+const spent = () => spentUsd(ledger());
+const readiness = () => ({ ledgerSynced: process.env.PIPELINE_LEDGER_SYNCED === "1", creditVerified: budget.creditVerified, limitUsd: budget.limitUsd });
 const usd = (n: number, perM: number) => (n * perM) / 1e6;
 const money = (x: number) => `$${x.toFixed(3)}`;
 
@@ -168,17 +174,33 @@ async function estimate(step: Step, user: string, batch: boolean) {
   return { sysTok, userTok, upper, exact };
 }
 
-async function guard(step: Step, user: string, batch: boolean) {
+/** Estime le coût maximal et applique TOUS les contrôles de dépense ; en dry-run, les affiche sans bloquer. */
+async function guard(step: Step, user: string, batch: boolean, hash: string) {
+  if (LIVE) { // conditions indépendantes du coût : vérifiées avant toute requête, même gratuite (count_tokens)
+    const pre = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: 0 }, readiness());
+    if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
+  }
   const e = await estimate(step, user, batch);
-  const already = spent();
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? "" : " (approx.)"}, coût maximal ${money(e.upper)} ; déjà dépensé ${money(already)} / plafond ${money(budget.limitUsd)}`);
-  if (already + e.upper > budget.limitUsd) { console.error(`  ARRÊT : budget insuffisant pour l'étape ${step} (il faudrait jusqu'à ${money(already + e.upper)}).`); process.exit(3); }
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? "" : " (approx.)"}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
+  if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
+  if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   return e;
 }
 
-function logCost(step: Step, usage: Anthropic.Usage, batch: boolean, extra: Record<string, unknown> = {}) {
+/** Réserve le coût maximal dans le registre AVANT l'envoi ; renvoie l'identifiant de l'opération. */
+function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number): string {
+  const id = `${spec.id}-${step}-${Date.now()}`;
+  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)) });
+  return id;
+}
+
+/** Solde une opération par son coût réel (une seule fois par opération ou par batch). */
+function logCost(step: Step, usage: Anthropic.Usage, batch: boolean, ref: { opId?: string; batchId?: string }) {
   const cost = actualCost(usage, batch);
-  appendFileSync(P(COSTS), JSON.stringify({ at: new Date().toISOString(), chapter: spec.id, step, model: MODEL, batch, usage: { input: usage.input_tokens, output: usage.output_tokens, cacheWrite: usage.cache_creation_input_tokens ?? 0, cacheRead: usage.cache_read_input_tokens ?? 0 }, usd: Number(cost.toFixed(5)), ...extra }) + "\n");
+  const op = ops(ledger()).find((o) => (ref.opId && o.id === ref.opId) || (ref.batchId && o.batchId === ref.batchId));
+  if (op?.state === "settled") { console.log(`  coût déjà enregistré pour ${op.id} (${money(op.usd ?? 0)}) : non compté deux fois`); return; }
+  appendLedger(LEDGER, { type: "actual", id: op?.id ?? `externe-${ref.batchId}`, at: new Date().toISOString(), usd: Number(cost.toFixed(5)), batchId: ref.batchId });
   console.log(`  coût réel ${money(cost)} (entrée ${usage.input_tokens}, cache écrit ${usage.cache_creation_input_tokens ?? 0}, cache lu ${usage.cache_read_input_tokens ?? 0}, sortie ${usage.output_tokens}) — total ${money(spent())}`);
 }
 
@@ -197,24 +219,28 @@ async function call(step: Step, user: string, hash: string): Promise<string | nu
     if (b.processing_status !== "ended") { console.log(`  batch ${step} en cours (${b.request_counts.processing} en traitement) : relancer plus tard.`); return null; }
     for await (const r of await client.messages.batches.results(st.batchId)) {
       if (r.result.type !== "succeeded") throw new Error(`batch ${step} : ${r.result.type}`);
-      logCost(step, r.result.message.usage, true);
+      logCost(step, r.result.message.usage, true, { batchId: st.batchId });
       return textOf(r.result.message, step);
     }
     throw new Error(`batch ${step} : aucun résultat`);
   }
   if (SUBMIT && !batch) { console.log(`  submit : l'étape ${step} exige un appel synchrone, non autorisé dans ce mode ; à traiter localement après relecture.`); return null; }
-  await guard(step, user, batch);
+  const e = await guard(step, user, batch, hash);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
+  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper);
+  // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
+  const unknown = (err: unknown): never => { appendLedger(LEDGER, { type: "unknown", id: opId, at: new Date().toISOString(), error: String((err as Error).message ?? err).slice(0, 300) }); throw err; };
   if (batch) {
-    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user) }] });
+    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user) }] }, { maxRetries: 0 }).catch(unknown);
+    appendLedger(LEDGER, { type: "submitted", id: opId, at: new Date().toISOString(), batchId: b.id });
     state.steps[step] = { status: "batch-pending", hash, batchId: b.id, at: new Date().toISOString() };
     saveState();
     console.log(`  batch ${step} soumis : ${b.id} (récupérer avec --collect ${b.id}, ou relancer la même commande en local).`);
     return null;
   }
-  const msg = await client.messages.stream(params(step, user)).finalMessage();
+  const msg = await client.messages.stream(params(step, user), { maxRetries: 0 }).finalMessage().catch(unknown);
   systemCached = true;
-  logCost(step, msg.usage, false);
+  logCost(step, msg.usage, false, { opId });
   return textOf(msg, step);
 }
 
@@ -245,6 +271,23 @@ async function collect(batchId: string) {
   }
 }
 
+/** Mode reconcile : rattache chaque réservation à l'issue inconnue au batch réellement créé, ou la déclare échouée. */
+async function reconcile() {
+  const open = ops(ledger()).filter((o) => o.state === "reserved" || o.state === "unknown");
+  if (!open.length) { console.log("aucune opération à réconcilier."); return; }
+  const recent: { id: string; created_at: string }[] = [];
+  for await (const b of client!.messages.batches.list({ limit: 100 })) { recent.push({ id: b.id, created_at: b.created_at }); if (recent.length >= 100) break; }
+  const linked = new Set(ops(ledger()).flatMap((o) => (o.batchId ? [o.batchId] : [])));
+  for (const o of open) {
+    if (o.reserve?.mode !== "batch") { console.log(`${o.id} : appel synchrone à l'issue inconnue — vérifier la consommation dans la Console Anthropic, puis solder l'entrée à la main (type « actual » ou « failed »).`); continue; }
+    const r = reconcileBatch(o, recent, linked);
+    const at = new Date().toISOString();
+    if ("batchId" in r) { appendLedger(LEDGER, { type: "submitted", id: o.id, at, batchId: r.batchId }); linked.add(r.batchId); console.log(`${o.id} : rattaché au batch ${r.batchId}`); }
+    else if ("failed" in r) { appendLedger(LEDGER, { type: "failed", id: o.id, at, reason: "aucun batch créé après la réservation" }); console.log(`${o.id} : aucun batch créé → échec, coût 0`); }
+    else console.log(`${o.id} : ambigu (${r.ambiguous.join(", ")}) — décision humaine requise`);
+  }
+}
+
 const hashOf = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 16);
 const done = (step: Step, hash: string) => !FORCE && state.steps[step]?.status === "done" && state.steps[step]!.hash === hash;
 const wanted = (step: Step) => !ONLY || ONLY === step;
@@ -252,13 +295,13 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${EFFORT}, mode ${COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${EFFORT}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
-    if (!COLLECT && !budget.creditVerified) { console.error("ARRÊT : crédit API Startup et limite de dépense non confirmés (pipeline/budget.json → creditVerified)."); process.exit(4); }
-    client = new Anthropic({ maxRetries: 2 });
+    client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
   }
   if (COLLECT) return collect(COLLECT);
+  if (RECONCILE) return reconcile();
   const OBJ = objectives();
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).

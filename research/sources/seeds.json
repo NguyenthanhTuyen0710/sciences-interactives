@@ -1,0 +1,62 @@
+{
+  "description": "Liste fermée des documents que le collecteur peut télécharger (pas d'exploration). Un document n'est téléchargé que si g1 = \"approved\" (décision humaine) et si sa source est autorisée dans registry.json. Les métadonnées « declared » reprennent l'inventaire research/curriculum (aucune n'est déduite d'un document non lu) ; « expect.contains » sert à vérifier l'identité du document téléchargé.",
+  "seeds": [
+    {
+      "id": "c4-programme-2026-annexe2",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/Annexe%202%20%E2%80%93%20Programme%20de%20math%C3%A9matiques%20pour%20le%20cycle%204-480716.pdf",
+      "inventorySourceId": "S2",
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 10 du 5 mars 2026", "applicability": [{ "grade": "3e", "status": "a_venir", "from": "rentrée 2028" }] },
+      "expect": { "contains": ["cycle 4"] }
+    },
+    {
+      "id": "c3-programme-2025-annexe2",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/sites/default/files/ensel620_annexe2-v2.pdf",
+      "inventorySourceId": "S4",
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 3, "grades": ["6e"], "officialRef": "BO n° 16 du 17 avril 2025", "applicability": [] },
+      "expect": { "contains": ["cycle 3"] }
+    },
+    {
+      "id": "c3-programme-2025-439827",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/sites/default/files/programme-de-math-matiques-pour-le-cycle-3-439827.pdf",
+      "inventorySourceId": null,
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 3, "grades": ["6e"], "officialRef": "BO n° 16 du 17 avril 2025", "applicability": [] },
+      "expect": { "contains": ["cycle 3"] },
+      "note": "Cité par math-5e-nombres-relatifs (R7) ; peut être identique à c3-programme-2025-annexe2 (le SHA256 le dira)."
+    },
+    {
+      "id": "c4-exemples-mise-en-oeuvre-2026",
+      "sourceId": "eduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/exemple-mise-en-oeuvre-c4-mathematiques0pdf-126080.pdf",
+      "inventorySourceId": "S15",
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "document d'accompagnement (sans valeur réglementaire)", "applicability": [] },
+      "expect": { "contains": ["cycle 4"] }
+    },
+    {
+      "id": "bo-2020-31-programme-c4",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/bo/20/Hebdo31/MENE2018714A.htm",
+      "inventorySourceId": null,
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 31 du 30 juillet 2020", "applicability": [{ "grade": "3e", "status": "en_vigueur", "until": "2027-2028" }] },
+      "expect": { "contains": ["cycle 4"] },
+      "note": "Page HTML : HTTP 403 le 2026-11-07 ; sera enregistrée « non lue » tant que l'accès est refusé."
+    },
+    {
+      "id": "bo-2019-22-reperes-attendus",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/bo/19/Hebdo22/MENE1913384N.htm",
+      "inventorySourceId": null,
+      "g1": "proposed",
+      "declared": { "subject": "mathematiques", "cycle": 4, "grades": ["5e", "4e", "3e"], "officialRef": "BO n° 22 du 29 mai 2019", "applicability": [] },
+      "expect": { "contains": ["repères"] },
+      "note": "Page HTML : probablement HTTP 403 comme les autres pages du BO (non testée)."
+    }
+  ]
+}

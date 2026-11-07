@@ -1,0 +1,97 @@
+# Collecteur de sources officielles (pipeline/sources/run.ts) — lancement manuel uniquement.
+#   check  (défaut) : contrôles registre / G0 / G1 / préfixes / robots.txt ; aucun document téléchargé.
+#   fetch  : télécharge uniquement les seeds approuvés (G0 + G1), ≤ 20, délai ≥ 10 s par hôte.
+#   verify : recalcule la vérification à partir des documents stockés (sans réseau vers les sources).
+# Documents : stockage hors Git (release brouillon « data-store ») + cache Actions. Les enregistrements
+# research/sources/records/*.json sont publiés en artefact, à relire puis committer à la main : aucun commit automatique.
+name: Collect Sources
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "check (sans téléchargement) | fetch (seeds approuvés) | verify"
+        type: choice
+        options: [check, fetch, verify]
+        default: check
+      only:
+        description: "Limiter à un seed (identifiant de research/sources/seeds.json) ; vide = tous"
+        type: string
+        default: ""
+
+permissions:
+  contents: write # écriture de la release brouillon « data-store » (documents) ; aucun commit
+
+concurrency:
+  group: data-store
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: |
+          npm ci --no-audit --no-fund
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+
+      - name: Cache local des sources (accélération uniquement)
+        uses: actions/cache@v4
+        with:
+          path: .sources-cache
+          key: sources-${{ github.run_id }}
+          restore-keys: sources-
+
+      - name: Restaurer les documents (stockage hors Git)
+        if: inputs.command != 'check'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh pull-docs
+
+      - name: Collecteur (${{ inputs.command }})
+        shell: bash
+        env:
+          COMMAND: ${{ inputs.command }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          args=("$COMMAND")
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          mkdir -p sources-output
+          npx tsx pipeline/sources/run.ts "${args[@]}" 2>&1 | tee sources-output/run.log
+
+      - name: Sauvegarder les nouveaux documents
+        if: inputs.command == 'fetch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/data-store.sh push-docs
+
+      - name: Résumé
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Collecteur — \`${{ inputs.command }}\`"
+            echo '```'
+            cat sources-output/run.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+            echo "Enregistrements dans l'artefact : à relire avant tout commit."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier les enregistrements (artefact, sans commit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sources-${{ inputs.command }}-${{ github.run_id }}
+          retention-days: 30
+          if-no-files-found: ignore
+          path: |
+            sources-output/
+            research/sources/records/
