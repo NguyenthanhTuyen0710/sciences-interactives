@@ -1,0 +1,25 @@
+
+name: Check Claude API Configuration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-api-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check API key environment
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ERROR: ANTHROPIC_API_KEY is missing"
+            exit 1
+          fi
+
+          echo "SUCCESS: Claude API key is configured"
+          echo "No API request was made"
