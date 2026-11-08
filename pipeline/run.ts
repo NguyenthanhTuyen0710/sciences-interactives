@@ -33,7 +33,9 @@ const write = (f: string, s: string) => { mkdirSync(dirname(P(f)), { recursive: 
 
 // ───────── Configuration ─────────
 const MODEL = "claude-sonnet-5-5"; // production de contenu et relecture (Sonnet, décision du porteur de projet)
-const EFFORT = "medium" as const;
+// Effort par étape. Relecture en « low » (décision du 2026-11-08) : au run #9, 11 260 des 12 000 tokens de sortie
+// étaient de la réflexion. L'effort n'entre pas dans l'empreinte anti-doublon (inputHash = texte du prompt).
+const EFFORT = { dossier: "medium", chapter: "medium", fix: "medium", review: "low" } as const;
 const MAX_TOKENS = { dossier: 8000, chapter: 64000, fix: 16000, review: 12000 } as const;
 const MAX_FIX_ROUNDS = 2;
 // Estimation hors ligne (dry-run) ; remplacée par count_tokens en mode réel. Mesuré sur les runs #5 à #8 (Sonnet 5.5,
@@ -160,7 +162,7 @@ const params = (step: Step, user: string): Anthropic.MessageCreateParamsNonStrea
   model: MODEL,
   max_tokens: MAX_TOKENS[step],
   // Relecture : JSON imposé par structured outputs (pris en charge par les Message Batches), revérifié par parseReview.
-  output_config: step === "review" ? { effort: EFFORT, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: EFFORT },
+  output_config: step === "review" ? { effort: EFFORT[step], format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: EFFORT[step] },
   system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral", ttl: "1h" } }],
   messages: [{ role: "user", content: user }],
 });
@@ -186,6 +188,8 @@ async function guard(step: Step, user: string, batch: boolean, hash: string) {
   }
   const e = await estimate(step, user, batch);
   console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, empreinte ${hash}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  const pr = params(step, user);
+  console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
   if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
@@ -324,7 +328,7 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${EFFORT}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${JSON.stringify(EFFORT)}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
