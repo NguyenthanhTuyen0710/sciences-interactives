@@ -8,7 +8,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
 import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
-import { checkExercise, matchesMistake } from "../src/lib/engine/check";
+import { checkExercise } from "../src/lib/engine/check";
+import { diagnosticIssues, specialValues } from "../src/lib/engine/diagnostics";
 import { perfect } from "../src/lib/engine/solve";
 import { toPublic } from "../src/lib/engine/public";
 import { gcd, parseNumber } from "../src/lib/engine/numbers";
@@ -75,6 +76,8 @@ async function main() {
 
   // 3. Exercices : chaque tirage est vérifié comme le ferait le serveur.
   let instances = 0;
+  // Couverture des cas limites (réponses numériques) : zéro, un, négatif, décimal, arrondi — par exercice, sur tous les tirages.
+  const special: Record<string, Record<string, number>> = {};
   for (const e of c.exercises) {
     const g = exerciseGenerator(c, e);
     const n = e.vary ? seeds : 1;
@@ -96,7 +99,8 @@ async function main() {
       res.parts.forEach((r, i) => { if (r.status !== "correct") add(e.id, `réponse parfaite non acceptée (partie ${i}) : ${r.feedback.join(" ")}`, seed); });
       if (checkExercise(inst, inst.parts.map(() => undefined)).score !== 0) add(e.id, "réponse vide non nulle", seed);
       inst.parts.forEach((p, i) => {
-        for (const m of p.mistakes ?? []) if (matchesMistake(p.interaction, responses[i], m)) add(e.id, `diagnostic « ${m.match} » égal à la bonne réponse (partie ${i})`, seed);
+        for (const d of diagnosticIssues(p.interaction, p.mistakes, responses[i], i)) add(e.id, d, seed);
+        for (const v of specialValues(p.interaction)) special[e.id] = { ...special[e.id], [v]: (special[e.id]?.[v] ?? 0) + 1 };
         for (const l of lists(p.interaction)) { const d = dup(l); if (d) add(e.id, `élément en double : ${d}`, seed); }
         if (p.interaction.kind === "ordonner" && p.interaction.answer.every((v, j) => v === j)) add(e.id, "ordre déjà correct au départ", seed);
       });
@@ -124,9 +128,11 @@ async function main() {
 
   const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
   const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, issues: issues.length, ok: issues.length === 0 };
-  if (asJson) console.log(JSON.stringify({ summary, issues }));
+  if (asJson) console.log(JSON.stringify({ summary, issues, special }));
   else {
     console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification`);
+    const cov = Object.entries(special).map(([id, v]) => `${id} ${Object.entries(v).map(([k, n]) => `${k}×${n}`).join(" ")}`);
+    if (cov.length) console.log(`  cas limites rencontrés (réponses numériques) : ${cov.join(" · ")}`);
     for (const i of issues) console.log(`  ✘ ${i.where} : ${i.problem}${i.example ? ` (graine ${i.example})` : ""}`);
     console.log(summary.ok ? "  ✔ aucun problème détecté" : `  ${issues.length} problème(s)`);
   }
