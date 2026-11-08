@@ -51,11 +51,17 @@ Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipelin
 | M14 | § 3 | Cache de prompt inopérant entre batchs : `cache lu 0` aux runs #5 et #7, préfixe de 49 643 tokens écrit (et payé) à chaque étape. Les batchs séparés de plus de quelques minutes ne profitent pas du cache. | § 3 |
 | M15 | § 5 | Mode `submit` : l'étape `fix` (synchrone) n'est jamais envoyée ; une erreur de validation exige une correction manuelle (faite ici en 1 ligne). | § 5 |
 | M16 | § 5 | Sortie tronquée : `run.ts` lève une erreur avant d'enregistrer le texte partiel (relecture payée mais perdue) ; `MAX_TOKENS.review` (12 000) trop bas pour un chapitre de 20 exercices. | § 5 |
+| M17 | § 3, § 5 | Pas de mécanisme de « nouvelle tentative motivée » pour une opération payée sans résultat utilisable (`outcome.usable = false`) : l'anti-doublon bloque toute requête de même empreinte, et l'empreinte de la relecture ne couvre que le texte du prompt (pas `max_tokens` ni `output_config`). À concevoir : entrée de registre « retry » liée à l'opération d'origine, motif obligatoire, une seule fois, coût compté. **Consigné, non implémenté.** | § 5 |
 | M13 | — | `pipeline/README.md` et `project/maths-3e-progress.md` désignent encore `math-3e-calcul-litteral` comme pilote, alors que le pilote lancé est `math-3e-pythagore`. | documentation |
 
 ## Relecture du dossier Pythagore (2026-11-08)
 - Conforme : 3 sources officielles seulement, objectifs M3-AUTO-03 / M4-EG-03 / M4-EG-04, consolidation 4e, méthodes, 9 erreurs typiques, 5 niveaux, tutoiement demandé.
 - À surveiller dans le chapitre : « démontrer qu'un triangle n'est pas rectangle » absent de la citation retenue (le dossier le signale) ; § 9 rappelle « au moins 30 exercices » alors que le pilote impose 20 (`--exercises 20`, justification ajoutée par le pipeline).
+
+## État des manques traités le 2026-11-08 (après le run #9)
+- **M14** analysé : `project/reports/M14-prompt-caching.md` (cause : écart entre étapes > TTL ; préfixe identique ; options A à D ; non implémenté).
+- **M15** traité : validateur étendu (`src/lib/engine/diagnostics.ts`), test de non-régression py3-12. Constat hors périmètre, **non corrigé** : `math-3e-pourcentages-evolution` (publié) a deux diagnostics de même valeur sur 7 tirages / 15 502 (pct3-07, pct3-10, pct3-20) ; `validate-chapter` de ce chapitre est désormais en échec.
+- **M16** traité : texte tronqué sauvegardé et inscrit au registre (`outcome`), relecture JSON à schéma. Cause mesurée de la troncature (run #10, relecture du batch déjà payé) : **11 260 tokens de réflexion sur 12 000** ; il ne restait que ≈ 740 tokens de texte. Texte récupéré : `project/reports/SCI-3E-MATH-017-review-TRUNCATED.md` (non valide comme rapport QA).
 
 ## 4. Suite proposée
 1. Collect du batch dossier (mode `collect`, sans dépense), relecture du dossier, puis chaîne chapitre → validate → review : **clôt le Gate 0**.

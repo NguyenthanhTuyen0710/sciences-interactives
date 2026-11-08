@@ -185,7 +185,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string) {
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
   const e = await estimate(step, user, batch);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, empreinte ${hash}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
   if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
