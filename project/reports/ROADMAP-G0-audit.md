@@ -15,7 +15,8 @@ Référence : `project/roadmap.md` § 4 (Gate 0) et § 3, 5, 6, 7. Audit en lect
 | Run #5 (collect, 2026-11-08) | succès | coût réel 0,123 $ (cache écrit 49 643 tokens, sortie 4 002) ; registre : 0,123 $ comptés, reste 9,877 / 10 $ ; dossier relu et committé (`research/dossiers/math-3e-pythagore.md`) |
 | Run #6 (submit chapitre) + #7 (collect) | succès | batch `msgbatch_012BLbnuvEzL6ekt9WYVkPDP` ; coût réel 0,336 $ (entrée 7 660, cache écrit 49 643, sortie 45 868) ; total pilote 0,459 / 10 $ ; 20 exercices (4 par niveau, 16 à tirage), 3 jeux |
 | validate-chapter | 1 défaut → corrigé à la main | py3-12 : diagnostic « $BC^2$ » égal à la réponse quand $BC = 1$ (triplet 3-4-5 × 2) ; filtre ciblé ; ensuite 8 004 tirages, 0 problème ; tsc, lint, 450/450 tests OK |
-| review (relecture IA) | à faire | ≈ 0,10 $ en batch |
+| Run #8 (submit review) | succès | pré-vol : HEAD 2608441 poussé (branche, 4 commits devant `main`), chapitre sha256 4757087…, draft, non inscrit ; registre 0,459 $ ; estimation exacte 0,189 $ (dry-run approx. 0,150 $) ; batch `msgbatch_019EqHN5QVtiojtrfEh95YVT` |
+| Run #9 (collect review) | **échec — gate non atteint** | coût réel 0,095 $ (entrée 30 099, **cache lu 49 643**, sortie 12 000) ; total 0,554 / 10 $ ; `sortie tronquée (max_tokens atteint)` : `MAX_TOKENS.review = 12000` insuffisant, texte de relecture non enregistré ; un nouvel envoi identique est bloqué par l'anti-doublon (opération soldée) |
 
 Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipeline/sources/run.ts check` OK. `budget.json` : `creditVerified: true` (commit du porteur de projet sur `main`).
 
@@ -49,6 +50,7 @@ Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipelin
 | M12 | Gate 4 | Le moteur d'exercices couvre déjà QCM, texte à trous, associer, glisser-déposer, classer, ordonner, vrai-faux, repère (`src/lib/engine/types.ts`) ; modèles de **jeux** : 5 (droite-graduee, calcul-mental, calcul-flash, chasse-erreurs, memory). Absents : manipulation géométrique, simulation physique, équilibrage d'équations. | Gate 4 |
 | M14 | § 3 | Cache de prompt inopérant entre batchs : `cache lu 0` aux runs #5 et #7, préfixe de 49 643 tokens écrit (et payé) à chaque étape. Les batchs séparés de plus de quelques minutes ne profitent pas du cache. | § 3 |
 | M15 | § 5 | Mode `submit` : l'étape `fix` (synchrone) n'est jamais envoyée ; une erreur de validation exige une correction manuelle (faite ici en 1 ligne). | § 5 |
+| M16 | § 5 | Sortie tronquée : `run.ts` lève une erreur avant d'enregistrer le texte partiel (relecture payée mais perdue) ; `MAX_TOKENS.review` (12 000) trop bas pour un chapitre de 20 exercices. | § 5 |
 | M13 | — | `pipeline/README.md` et `project/maths-3e-progress.md` désignent encore `math-3e-calcul-litteral` comme pilote, alors que le pilote lancé est `math-3e-pythagore`. | documentation |
 
 ## Relecture du dossier Pythagore (2026-11-08)
