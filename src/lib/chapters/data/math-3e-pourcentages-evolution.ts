@@ -6,6 +6,7 @@
 import type { ChapterContent, ChapterExercise, ChapterPart } from "../schema";
 import type { Mistake, Rng } from "../../engine/types";
 import { frFixed, roundTo, tex } from "../../engine/numbers";
+import { sameValue } from "../../engine/diagnostics";
 
 const T = (x: number) => tex(x);
 /** Montant en euros avec deux décimales (LaTeX). */
@@ -39,6 +40,8 @@ function shuffledQcm(rng: Rng, options: string[], answer: number, diag: Record<n
   return qcm(order.map((i) => options[i]), order.indexOf(answer), Object.entries(diag).map(([i, feedback]) => ({ match: String(order.indexOf(Number(i))), feedback })), prompt);
 }
 const m = (v: number, feedback: string): Mistake => ({ match: String(v), feedback });
+/** Retire les diagnostics de même valeur : la réponse ne permet pas de savoir quelle erreur a été commise. */
+const distinct = (ms: Mistake[]): Mistake[] => ms.filter((x) => !ms.some((y) => y !== x && sameValue(x.match, y.match)));
 /** « = x » si la valeur est exacte à `dec` décimales, sinon « ≈ x » (LaTeX). */
 const approx = (x: number, dec: number, fmt: (v: number) => string = T) => (roundTo(x, 6) === roundTo(x, dec) ? "=" : "\\approx") + " " + fmt(roundTo(x, dec));
 
@@ -157,7 +160,7 @@ const EXERCISES: ChapterExercise[] = [
       const p = roundTo((k * 100) / n, 2);
       return {
         statement: `Dans une classe de $${n}$ élèves, $${k}$ pratiquent un sport en club. Quel pourcentage des élèves de la classe cela représente-t-il ?`,
-        parts: [num(p, [m(k, "$" + k + "$ est un effectif, pas un pourcentage : il faut le comparer à l'effectif total."), m(roundTo(((n - k) * 100) / n, 2), "Tu as calculé le pourcentage des élèves qui **ne** pratiquent **pas** de sport en club.")], "Pourcentage (en %) :", undefined, "%")],
+        parts: [num(p, distinct([m(k, "$" + k + "$ est un effectif, pas un pourcentage : il faut le comparer à l'effectif total."), m(roundTo(((n - k) * 100) / n, 2), "Tu as calculé le pourcentage des élèves qui **ne** pratiquent **pas** de sport en club.")]), "Pourcentage (en %) :", undefined, "%")],
         solution: [`Proportion : $\\dfrac{${k}}{${n}}$.`, `$\\dfrac{${k}}{${n}} = ${T(k / n)} = \\dfrac{${T(p)}}{100}$.`, `Cela représente $${P(p)}$ des élèves.`],
       };
     },
@@ -204,7 +207,7 @@ const EXERCISES: ChapterExercise[] = [
       const p1 = r2((p0 * (100 - t)) / 100);
       return {
         statement: `Pendant les soldes, une veste à $${T(p0)}$ € est affichée à $-${P(t)}$. Quel est son prix soldé (en €) ?`,
-        parts: [num(p1, [m(p0 - t, `Tu as retiré $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant de la réduction** ; il faut le retirer du prix initial."), m(r2((p0 * (100 + t)) / 100), "Tu as appliqué une **hausse** au lieu d'une baisse.")], undefined, 2, "€")],
+        parts: [num(p1, distinct([m(p0 - t, `Tu as retiré $${t}$ euros, pas $${P(t)}$ du prix.`), m(r2((p0 * t) / 100), "Tu as calculé le **montant de la réduction** ; il faut le retirer du prix initial."), m(r2((p0 * (100 + t)) / 100), "Tu as appliqué une **hausse** au lieu d'une baisse.")]), undefined, 2, "€")],
         solution: [`Coefficient multiplicateur : $1 - \\dfrac{${t}}{100} = ${T((100 - t) / 100)}$.`, `$${T(p0)} \\times ${T((100 - t) / 100)} = ${E(p1)}$.`, `Le prix soldé est $${E(p1)}$ €.`],
       };
     },
@@ -378,7 +381,7 @@ const EXERCISES: ChapterExercise[] = [
         statement: `La TVA est une taxe ajoutée au prix hors taxes (HT) pour obtenir le prix toutes taxes comprises (TTC). Elle est de $20\\,\\%$ pour un aspirateur et de $5{,}5\\,\\%$ pour les produits alimentaires.`,
         parts: [
           num(ttc, [m(ht + 20, "La TVA est de $20\\,\\%$ du prix, pas de $20$ €."), m(r2(ht * 0.2), "C'est le montant de la TVA ; il faut l'ajouter au prix HT.")], `Un aspirateur coûte $${T(ht)}$ € HT. Son prix TTC (en €) :`, 2, "€"),
-          numR(ttc2, 2, "au centime", [m(r2(ht2 * 1.55), "$5{,}5\\,\\% = 0{,}055$ : le coefficient est $1{,}055$, et non $1{,}55$."), m(r2(ht2 + 5.5), "La TVA est de $5{,}5\\,\\%$ du prix, pas de $5{,}5$ €.")], `Un panier de courses coûte $${E(ht2)}$ € HT. Son prix TTC (en €, arrondi au centime) :`, "€"),
+          numR(ttc2, 2, "au centime", distinct([m(r2(ht2 * 1.55), "$5{,}5\\,\\% = 0{,}055$ : le coefficient est $1{,}055$, et non $1{,}55$."), m(r2(ht2 + 5.5), "La TVA est de $5{,}5\\,\\%$ du prix, pas de $5{,}5$ €.")]), `Un panier de courses coûte $${E(ht2)}$ € HT. Son prix TTC (en €, arrondi au centime) :`, "€"),
         ],
         solution: [`Aspirateur : coefficient $1 + 0{,}2 = 1{,}2$ ; $${T(ht)} \\times 1{,}2 = ${E(ttc)}$ €.`, `Courses : coefficient $1 + 0{,}055 = 1{,}055$ ; $${E(ht2)} \\times 1{,}055 ${roundTo(ttc2, 6) === roundTo(ttc2, 2) ? `= ${E(ttc2)}` : `= ${T(roundTo(ttc2, 4))} \\approx ${E(roundTo(ttc2, 2))}`}$ €.`],
       };

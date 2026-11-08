@@ -5,6 +5,8 @@ import { createRng } from "../src/lib/engine/rng";
 import { perfect } from "../src/lib/engine/solve";
 import type { Interaction } from "../src/lib/engine/types";
 import { math3ePythagore } from "../src/lib/chapters/data/math-3e-pythagore";
+import { math3ePourcentagesEvolution } from "../src/lib/chapters/data/math-3e-pourcentages-evolution";
+import { exerciseGenerator } from "../src/lib/chapters";
 
 const numInt = (value: number, extra: object = {}): Interaction => ({ kind: "numerique", answer: { value, ...extra } }) as Interaction;
 const issues = (it: Interaction, matches: string[]) => diagnosticIssues(it, matches.map((match) => ({ match, feedback: "…" })), perfect(it));
@@ -46,4 +48,15 @@ describe("non-régression py3-12 : triplet (3, 4, 5) × 2 → BC = 1 et BC² = 1
     expect((p.mistakes ?? []).map((m) => m.match)).not.toContain("1");
     expect(diagnosticIssues(p.interaction, p.mistakes, perfect(p.interaction))).toEqual([]);
   });
+});
+
+describe("non-régression pct3 : diagnostics de même valeur retirés (paires exercice/graine relevées le 2026-11-08)", () => {
+  const cases: [string, string, number][] = [["pct3-07", "v3", 0], ["pct3-07", "v8", 0], ["pct3-07", "v301", 0], ["pct3-07", "v395", 0], ["pct3-07", "v419", 0], ["pct3-10", "v419", 0], ["pct3-20", "v397", 1]];
+  for (const [id, seed, part] of cases) {
+    it(`${id} graine ${seed} partie ${part}`, () => {
+      const e = math3ePourcentagesEvolution.exercises.find((x) => x.id === id)!;
+      const p = exerciseGenerator(math3ePourcentagesEvolution, e).generate(createRng(seed), 1).parts[part];
+      expect(diagnosticIssues(p.interaction, p.mistakes, perfect(p.interaction), part)).toEqual([]);
+    });
+  }
 });
