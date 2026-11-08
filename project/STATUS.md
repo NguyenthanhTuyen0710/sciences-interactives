@@ -19,7 +19,7 @@ _Mis à jour à chaque fin de session. Maths 3e : voir `project/maths-3e-progres
 - Prévoir une contre-vérification indépendante après correction : elle a trouvé 2 bloquants.
 
 ## Prochaines actions
-0. **Feuille de route `project/roadmap.md`** (directive du 2026-11-08, gates 0→5). Gate 0 en cours : dossier et chapitre brouillon Pythagore produits par le pipeline (0,459 $ au total), `validate-chapter` vert ; prochaine étape : relecture (`review`, ≈ 0,10 $). Manques relevés : `project/reports/ROADMAP-G0-audit.md`.
+0. **Feuille de route `project/roadmap.md`** (directive du 2026-11-08, gates 0→5). Gate 0 : chaîne Pythagore complète (dossier → chapitre → validation → relecture IA valide), 0,692 $ au total ; en attente d'approbation et de la décision de fusion dans `main`. Lot de corrections QA proposé (non appliqué) : `project/reports/SCI-3E-MATH-017-QA-verification.md`. Manques relevés : `project/reports/ROADMAP-G0-audit.md`.
 1. SCI-INFRA-003 : erreur d'hydratation intermittente de `/admin/exercices/nouveau` pendant l'e2e.
 2. Chapitre suivant de la file : 5e (nouveau programme, en vigueur cette année), en commençant par les chapitres liés aux relatifs (`math-5e-expressions-litterales`, `math-5e-equations`) puis par domaine.
 3. Physique-chimie : premier chapitre pilote (dossier A3 puis production).
