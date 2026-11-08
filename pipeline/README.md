@@ -44,6 +44,10 @@ Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), j
 - Un fichier de chapitre ou de dossier existant n'est jamais écrasé sans `--force` : il est conservé et sert d'entrée aux étapes suivantes.
 - Le chapitre produit reste `draft` et n'est inscrit ni au registre ni au menu : l'intégration se fait après relecture humaine.
 
+## Sorties payées inutilisables
+- `stop_reason` = `max_tokens` ou `refusal`, ou relecture hors schéma : le texte reçu est **toujours** sauvegardé dans `pipeline-output/unusable/<chapitre>-<étape>-<stop_reason>.md` (artefact du run, marqué « TRUNCATED – pas un rapport QA valide »), une entrée `outcome` (`usable: false`, motif) est ajoutée au registre, et l'exécution s'arrête (code 7). L'entrée `outcome` ne change ni la dépense ni l'anti-doublon.
+- Relecture : JSON imposé par structured outputs (`output_config.format`, schéma `pipeline/review-format.ts`), revérifié localement ; rendu Markdown dans `project/reports/<tâche>-QA-api.md`.
+
 ## Économies
 - Préfixe système identique pour toutes les étapes (règles + `schema.ts` + `types.ts` + un chapitre approuvé), mis en cache 1 h (`cache_control`), vérifiable avec `cache_read_input_tokens` dans la réponse de l'API.
 - Toutes les vérifications déterministes sont faites par `scripts/validate-chapter.ts` et `tsc` ; l'IA ne reçoit que la liste des erreurs et répond par des remplacements ciblés, pas par un fichier entier.

@@ -18,6 +18,7 @@
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
+import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown } from "./review-format";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -35,7 +36,9 @@ const MODEL = "claude-sonnet-5-5"; // production de contenu et relecture (Sonnet
 const EFFORT = "medium" as const;
 const MAX_TOKENS = { dossier: 8000, chapter: 64000, fix: 16000, review: 12000 } as const;
 const MAX_FIX_ROUNDS = 2;
-const CHARS_PER_TOKEN = 3; // estimation hors ligne prudente (français + code) ; remplacée par count_tokens en mode réel
+// Estimation hors ligne (dry-run) ; remplacée par count_tokens en mode réel. Mesuré sur les runs #5 à #8 (Sonnet 5.5,
+// français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
+const CHARS_PER_TOKEN = 2;
 type Step = keyof typeof MAX_TOKENS;
 
 interface Spec { id: string; taskId: string; grade: string; subject: string; objectiveIds?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
@@ -156,7 +159,8 @@ let systemCached = false;
 const params = (step: Step, user: string): Anthropic.MessageCreateParamsNonStreaming => ({
   model: MODEL,
   max_tokens: MAX_TOKENS[step],
-  output_config: { effort: EFFORT },
+  // Relecture : JSON imposé par structured outputs (pris en charge par les Message Batches), revérifié par parseReview.
+  output_config: step === "review" ? { effort: EFFORT, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: EFFORT },
   system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral", ttl: "1h" } }],
   messages: [{ role: "user", content: user }],
 });
@@ -181,7 +185,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string) {
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
   const e = await estimate(step, user, batch);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? "" : " (approx.)"}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
   if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
@@ -199,15 +203,32 @@ function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: numbe
 function logCost(step: Step, usage: Anthropic.Usage, batch: boolean, ref: { opId?: string; batchId?: string }) {
   const cost = actualCost(usage, batch);
   const op = ops(ledger()).find((o) => (ref.opId && o.id === ref.opId) || (ref.batchId && o.batchId === ref.batchId));
-  if (op?.state === "settled") { console.log(`  coût déjà enregistré pour ${op.id} (${money(op.usd ?? 0)}) : non compté deux fois`); return; }
+  const thinking = usage.output_tokens_details?.thinking_tokens;
+  const detail = `entrée ${usage.input_tokens}, cache écrit ${usage.cache_creation_input_tokens ?? 0}, cache lu ${usage.cache_read_input_tokens ?? 0}, sortie ${usage.output_tokens}${thinking != null ? ` dont réflexion ${thinking}` : ""}`;
+  if (op?.state === "settled") { console.log(`  coût déjà enregistré pour ${op.id} (${money(op.usd ?? 0)}) : non compté deux fois (${detail})`); return; }
   appendLedger(LEDGER, { type: "actual", id: op?.id ?? `externe-${ref.batchId}`, at: new Date().toISOString(), usd: Number(cost.toFixed(5)), batchId: ref.batchId });
-  console.log(`  coût réel ${money(cost)} (entrée ${usage.input_tokens}, cache écrit ${usage.cache_creation_input_tokens ?? 0}, cache lu ${usage.cache_read_input_tokens ?? 0}, sortie ${usage.output_tokens}) — total ${money(spent())}`);
+  console.log(`  coût réel ${money(cost)} (${detail}) — total ${money(spent())}`);
 }
 
-function textOf(msg: Anthropic.Message, step: Step): string {
-  if (msg.stop_reason === "refusal") throw new Error(`étape ${step} : refus du modèle`);
-  if (msg.stop_reason === "max_tokens") throw new Error(`étape ${step} : sortie tronquée (max_tokens atteint)`);
-  return msg.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
+/**
+ * Résultat d'une opération soldée. Texte utilisable → renvoyé. Sinon (max_tokens, refus, relecture hors schéma) :
+ * le texte reçu est sauvegardé (jamais perdu), l'issue est écrite dans le registre (« outcome », sans effet sur la
+ * dépense ni l'anti-doublon) et l'exécution s'arrête (code 7) : ce n'est pas un résultat valide.
+ */
+function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchId?: string }): string {
+  const text = msg.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
+  const stop = msg.stop_reason ?? "inconnu";
+  const problem = outputProblem(step, msg.stop_reason, text);
+  const op = ops(ledger()).find((o) => (ref.opId && o.id === ref.opId) || (ref.batchId && o.batchId === ref.batchId));
+  const note = (usable: boolean, extra: { note?: string; saved?: string } = {}) => {
+    if (op?.state === "settled" && !op.outcome) appendLedger(LEDGER, { type: "outcome", id: op.id, at: new Date().toISOString(), stopReason: stop, usable, ...extra });
+  };
+  if (!problem) { note(true); return text; }
+  const saved = `pipeline-output/unusable/${spec.id}-${step}-${stop}.md`;
+  write(saved, `<!-- TRUNCATED – không phải báo cáo QA hợp lệ / résultat inutilisable, pas un rapport QA valide. Étape ${step}, stop_reason ${stop}, ${problem}. Opération ${op?.id ?? "?"}${ref.batchId ? `, batch ${ref.batchId}` : ""}. -->\n\n` + text + "\n");
+  note(false, { note: problem, saved });
+  console.error(`ARRÊT : étape ${step} : ${problem} ; texte reçu (${text.length} caractères) sauvegardé dans ${saved}, issue inscrite au registre.`);
+  process.exit(7);
 }
 
 /** Exécute une étape : renvoie le texte, ou null si un batch est en attente. */
@@ -220,7 +241,7 @@ async function call(step: Step, user: string, hash: string): Promise<string | nu
     for await (const r of await client.messages.batches.results(st.batchId)) {
       if (r.result.type !== "succeeded") throw new Error(`batch ${step} : ${r.result.type}`);
       logCost(step, r.result.message.usage, true, { batchId: st.batchId });
-      return textOf(r.result.message, step);
+      return finish(step, r.result.message, { batchId: st.batchId });
     }
     throw new Error(`batch ${step} : aucun résultat`);
   }
@@ -241,7 +262,7 @@ async function call(step: Step, user: string, hash: string): Promise<string | nu
   const msg = await client.messages.stream(params(step, user), { maxRetries: 0 }).finalMessage().catch(unknown);
   systemCached = true;
   logCost(step, msg.usage, false, { opId });
-  return textOf(msg, step);
+  return finish(step, msg, { opId });
 }
 
 // ───────── Écriture des sorties (jamais publiées : le chapitre reste « draft » et hors registre) ─────────
@@ -249,7 +270,7 @@ type OutStep = Exclude<Step, "fix">;
 const OUT: Record<OutStep, { file: string; save: (t: string) => void }> = {
   dossier: { file: DOSSIER_FILE, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
   chapter: { file: CHAPTER_FILE, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
-  review: { file: REPORT_FILE, save: (t) => write(REPORT_FILE, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts ; à confirmer par un humain. -->\n` + t.trim() + "\n") },
+  review: { file: REPORT_FILE, save: (t) => { const r = parseReview(t); if (!r.ok) fail(`relecture hors schéma : ${r.errors.join(" ; ")}`, 7); write(REPORT_FILE, reviewMarkdown(r.review, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->\n# Relecture QA (API) — ${spec.id}`)); } },
 };
 
 /** Mode collect : lit le résultat d'un batch déjà soumis ; aucune nouvelle requête payante. */
@@ -265,7 +286,7 @@ async function collect(batchId: string) {
     if (r.result.type !== "succeeded") fail(`batch ${step} : ${r.result.type}`, 1);
     if (existsSync(P(out.file)) && !FORCE) fail(`${out.file} existe déjà ; utiliser --force pour le remplacer`, 5);
     logCost(step as Step, r.result.message.usage, true, { batchId });
-    out.save(textOf(r.result.message, step as Step));
+    out.save(finish(step as Step, r.result.message, { batchId }));
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
     if (step === "chapter") { const v = validate(); console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`); }
   }

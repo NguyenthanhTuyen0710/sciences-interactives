@@ -1,9 +1,18 @@
-Review the chapter below as an independent QA reviewer. The deterministic validator has already checked the data contract, 500 random draws per exercise, perfect answers, empty answers, diagnostics, duplicates, answer leakage and "vous" — do not re-check those. Focus on what a script cannot see:
-- QA1 programme: scope versus the official objectives and scope notes; nothing out of programme presented as required.
-- QA2 accuracy: definitions, properties, worked examples, illustrations.
-- QA3 exercises: solve a sample of exercises yourself (at least one per level) before reading the key; ambiguity, missing equivalent answers, hints that give the answer, unrealistic data, level calibration.
-- QA4 games: correctness of items and pedagogical value.
-- QA6 language: French spelling and grammar, consistent "tu", terminology of the French programme.
+Review the chapter below as an independent QA reviewer and answer with the JSON object required by the output schema — nothing else.
+
+The deterministic validator has already passed (summary below): data contract, 500 random draws per exercise, perfect and empty answers, diagnostics equal or equivalent to the right answer, duplicate options, answer leakage, "vous". Do not re-check those and do not restate the chapter content. Report only what a script cannot see:
+- curriculum: scope versus the official objectives and scope notes; nothing out of programme presented as required.
+- accuracy: definitions, properties, worked examples, illustrations.
+- exercises: solve a sample yourself (at least one per level) before reading the key; ambiguity, missing equivalent answers, hints that give the answer away, unrealistic data, level calibration.
+- games: correctness of items and pedagogical value.
+- technical: code-level risks the validator cannot detect (e.g. a generator branch that can produce a misleading statement).
+- language: French spelling and grammar, consistent "tu", terminology of the French programme.
+
+Output rules (the answer has a hard length limit; the most important information must come first):
+1. `verdict`: PASS only if there is no BLOQUANT or MAJEUR finding; FAIL if at least one BLOQUANT; otherwise NEEDS_REVIEW.
+2. `criteria`: exactly one entry per criterion (curriculum, accuracy, exercises, games, technical, language).
+3. `findings`: only real defects, sorted BLOQUANT, then MAJEUR, then MINEUR; at most 15, one defect per entry, no praise, no repetition. `exerciseId` = the exercise or game id, or "" if the finding is general. `issue` and `fix`: one or two short sentences in French, with the concrete value or wording involved.
+4. If nothing is wrong: `verdict` PASS, every criterion PASS, `findings` empty.
 
 Validator summary: {{VALIDATOR}}
 
@@ -14,5 +23,3 @@ Chapter file:
 ```ts
 {{FILE}}
 ```
-
-Write the report in French Markdown: a table with a verdict per dimension (PASS / FAIL / NEEDS REVIEW), then numbered findings with exercise id, severity (BLOQUANT / MAJEUR / MINEUR), concrete example and proposed fix. Return only the report.
