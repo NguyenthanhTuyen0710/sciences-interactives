@@ -3,7 +3,7 @@
 Référence : `project/roadmap.md` § 4 (Gate 0) et § 3, 5, 6, 7. Audit en lecture seule : aucun code modifié, aucun appel API.
 
 ## Verdict
-**Gate 0 non atteint.** Le socle est sain (tests, types, contrôles, garde-fous de dépense vérifiés en conditions réelles), mais la démo Pythagore n'a pas abouti : le batch « dossier » a été soumis et n'a jamais été récupéré. Action débloquante : lancer `Generate Lessons` en mode **collect** avec `batch_id = msgbatch_01CT9aQexYLepseuqxZ932uw` (aucune nouvelle dépense).
+**Gate 0 non atteint.** Le socle est sain (tests, types, contrôles, garde-fous de dépense vérifiés en conditions réelles), mais la démo Pythagore n'a pas abouti : le batch « dossier » a été soumis et n'a jamais été récupéré. Mise à jour 2026-11-08 : dossier collecté (run #5) et committé ; reste la chaîne chapitre → validate → review.
 
 ## 1. Démo Pythagore (`math-3e-pythagore`)
 | Étape | État | Preuve |
@@ -12,8 +12,8 @@ Référence : `project/roadmap.md` § 4 (Gate 0) et § 3, 5, 6, 7. Audit en lect
 | Dry-run local | OK | contrôle des données OK ; coût maximal dossier 0,223 $, chapitre 0,789 $, fix ≤ 2 × 0,237 $, relecture 0,195 $ |
 | Run #3 (submit, `main`) | succès | batch dossier `msgbatch_01CT9aQexYLepseuqxZ932uw` soumis ; registre : 0,143 $ comptés, reste 9,857 / 10 $ |
 | Run #4 (submit, `main`) | échec **attendu** | `ARRÊT : requête identique déjà soumise` (code 3) : l'anti-doublon a fonctionné ; registre cohérent et republié |
-| collect dossier | **à faire** | — |
-| relecture + commit du dossier, submit chapitre, collect, validate-chapter, fix, review | à faire | — |
+| Run #5 (collect, 2026-11-08) | succès | coût réel 0,123 $ (cache écrit 49 643 tokens, sortie 4 002) ; registre : 0,123 $ comptés, reste 9,877 / 10 $ ; dossier relu et committé (`research/dossiers/math-3e-pythagore.md`) |
+| submit chapitre, collect, validate-chapter, fix, review | à faire | — |
 
 Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipeline/sources/run.ts check` OK. `budget.json` : `creditVerified: true` (commit du porteur de projet sur `main`).
 
@@ -44,8 +44,12 @@ Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipelin
 | M9 | § 3 | Un seul modèle (Sonnet) pour toutes les étapes : pas de palier « petit modèle » avant le grand. | § 3 (à décider) |
 | M10 | § 6 tầng 2 | Pas de contrôle de similarité avec les sources (originalité) ni de couverture de taxonomie. | Gate 3–4 |
 | M11 | § 7 | Matrice sans colonnes : types d'exercice couverts, jeux actifs, statut QA / publication par chapitre, coût API. | Gate 1 |
-| M12 | Gate 4 | Modèles de jeux : 5 (droite-graduee, calcul-mental, calcul-flash, chasse-erreurs, memory) ; absents : texte à trous, association, glisser-déposer, classement, manipulation géométrique, simulation physique, équilibrage d'équations. | Gate 4 |
+| M12 | Gate 4 | Le moteur d'exercices couvre déjà QCM, texte à trous, associer, glisser-déposer, classer, ordonner, vrai-faux, repère (`src/lib/engine/types.ts`) ; modèles de **jeux** : 5 (droite-graduee, calcul-mental, calcul-flash, chasse-erreurs, memory). Absents : manipulation géométrique, simulation physique, équilibrage d'équations. | Gate 4 |
 | M13 | — | `pipeline/README.md` et `project/maths-3e-progress.md` désignent encore `math-3e-calcul-litteral` comme pilote, alors que le pilote lancé est `math-3e-pythagore`. | documentation |
+
+## Relecture du dossier Pythagore (2026-11-08)
+- Conforme : 3 sources officielles seulement, objectifs M3-AUTO-03 / M4-EG-03 / M4-EG-04, consolidation 4e, méthodes, 9 erreurs typiques, 5 niveaux, tutoiement demandé.
+- À surveiller dans le chapitre : « démontrer qu'un triangle n'est pas rectangle » absent de la citation retenue (le dossier le signale) ; § 9 rappelle « au moins 30 exercices » alors que le pilote impose 20 (`--exercises 20`, justification ajoutée par le pipeline).
 
 ## 4. Suite proposée
 1. Collect du batch dossier (mode `collect`, sans dépense), relecture du dossier, puis chaîne chapitre → validate → review : **clôt le Gate 0**.
