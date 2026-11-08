@@ -15,7 +15,7 @@ Référence : `project/roadmap.md` § 4 (Gate 0) et § 3, 5, 6, 7. Audit en lect
 | Run #5 (collect, 2026-11-08) | succès | coût réel 0,123 $ (cache écrit 49 643 tokens, sortie 4 002) ; registre : 0,123 $ comptés, reste 9,877 / 10 $ ; dossier relu et committé (`research/dossiers/math-3e-pythagore.md`) |
 | Run #6 (submit chapitre) + #7 (collect) | succès | batch `msgbatch_012BLbnuvEzL6ekt9WYVkPDP` ; coût réel 0,336 $ (entrée 7 660, cache écrit 49 643, sortie 45 868) ; total pilote 0,459 / 10 $ ; 20 exercices (4 par niveau, 16 à tirage), 3 jeux |
 | validate-chapter | 1 défaut → corrigé à la main | py3-12 : diagnostic « $BC^2$ » égal à la réponse quand $BC = 1$ (triplet 3-4-5 × 2) ; filtre ciblé ; ensuite 8 004 tirages, 0 problème ; tsc, lint, 450/450 tests OK |
-| collect, validate-chapter, fix, review | à faire | — |
+| review (relecture IA) | à faire | ≈ 0,10 $ en batch |
 
 Tests locaux sur `main` (adbc6b3) : `npm test` 450/450, `tsc` 0 erreur, `pipeline/sources/run.ts check` OK. `budget.json` : `creditVerified: true` (commit du porteur de projet sur `main`).
 
