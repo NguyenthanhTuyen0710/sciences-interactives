@@ -9,7 +9,10 @@ Texte lu : programme du cycle 4 (2020), Éduscol, PDF sha256 `de42e981…` (= en
 | **A. 4e `pc-4e-electricite` (recommandée)** | `p4-electricite` existe (notions « Lois des circuits », « Loi d'Ohm », générateur `p4LoiOhm`) | P4-E-01…04 exigibles ; P3-E-07 (loi d'Ohm) rangé en 3e par l'inventaire | ordre libre 4e/3e (p. 103) : la loi d'Ohm peut être exigible en 4e ; énergie électrique (P3-E-08/09) laissée en 3e |
 | B. 3e (Ohm + rappel des lois) | pas de chapitre d'arbre dédié | P3-E-07, P3-E-10 exigibles ; P4-E-01…04 en consolidation | proche du modèle Pythagore ; arbre à compléter |
 
-Classement G1 « proposé » appliqué à P4-E-01…04, P3-E-07, P3-E-10 (niveaux selon l'option B, à ajuster si A est choisie ; compétences PC p. 97-98). Point à trancher : **P4-E-04** (« influence d'une résistance ») provient de l'aide Éduscol 2016, pas du BO.
+**Décision du porteur de projet (2026-11-15) : option A.** Classement G1 **validé** pour P4-E-01…04, P3-E-07, P3-E-10 (compétences PC p. 97-98) :
+- P4-E-01…03 : exigibles en 4e, consolidation en 3e ;
+- P3-E-07 (loi d'Ohm) et P3-E-10 (sécurité) : exigibles dès le chapitre 4e (ordre libre, p. 103), et encore en 3e s'ils n'ont pas été traités ;
+- **P4-E-04** (« influence d'une résistance ») : rattaché à « Exploiter les lois de l'électricité », niveau **approfondissement**, `required: false` (non compté comme objectif obligatoire), source notée « aide Éduscol 2016, document non prescriptif, pas le BO ».
 
 ## 2. Lycée : comparaison (programmes 2026 lus dans le BO n° 14 du 2-4-2026, PDF sha256 `34875c42…`)
 Constat préalable : **les programmes 2019 de 2nde et de 1re sont remplacés à la rentrée 2026-2027** (arrêtés du 26-2-2026, NOR MENE2602914A et MENE2602917A, article 2). La matrice de couverture indiquait encore « pending_verification ».
