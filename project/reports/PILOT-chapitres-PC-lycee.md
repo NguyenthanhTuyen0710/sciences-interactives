@@ -47,7 +47,76 @@ Principe : extension par paramètre de matière, sans nouveau fichier de configu
 
 Prérequis lycée (séparé de M3) : `src/lib/chapters/schema.ts` (GRADES, motifs `id` et `taskId` : 2nde, 1re, Tle, parcours), arborescence et routes du site, contrôle de cohérence de `run.ts` (manifest par niveau). À chiffrer après choix du chapitre lycée.
 
-## 4. Plan de l'étape 9 (pilote réel, non lancé — approbation séparée)
-- Pythagore : relecture (criblage Haiku + juge Sonnet), dépense maximale ≈ 0,126 $ (dry-run du 2026-11-15) ; remplace l'estimation de 0,145 $ (relecture Sonnet unique).
-- **Dossier : comparaison Haiku / Sonnet sur un même chapitre** (le chapitre PC retenu) : deux soumissions du dossier, `--dossier-model haiku` puis `--dossier-model sonnet`, mêmes entrées ; comparer le taux de réussite à la relecture humaine du dossier (sources, objectifs, erreurs typiques, progression), puis la validation du chapitre généré à partir de chacun, et le coût réel par modèle (registre). Le dossier retenu alimente seul la génération du chapitre.
-- Préalables : Gate 1 validé pour le chapitre choisi, M3 (PC) et, pour le lycée, extension du schéma des chapitres.
+## 4. Plan de l'étape 9 (pilote réel) — NON lancé, approbation séparée
+Dépense déjà comptée : 0,692 $ ; plafond 10 $ ; **reste 9,308 $**. Montants : dépense maximale des dry-runs du 2026-11-15 (batch, sortie au `max_tokens`, juge approfondi à préfixe court) ; « réaliste » : tokens réels de Pythagore (runs #5-#12) aux tarifs actuels.
+
+| # | Lot | Étapes (modèle) | Max sans correction | Max pire cas | Réaliste |
+|---|---|---|---|---|---|
+| 1 | Pythagore 3e : relecture | criblage (Haiku) + juge approfondi (Sonnet) | 0,075 $ | 0,075 $ | ≈ 0,02 $ |
+| 2 | PC 4e électricité (`pc-4e-electricite`) | dossier Haiku **et** dossier Sonnet (comparaison) 0,052 $ ; chapitre 0,385 $ ; criblage 0,004 $ ; juge 0,077 $ | 0,518 $ | 0,851 $ (2 tours de correction Sonnet) | ≈ 0,36 $ |
+| 3 | 1re spé « Second degré » (après M3 étape B) | même chaîne que les mathématiques | 0,46 $ | 0,79 $ (+ jusqu'à ≈ 0,6 $ si la démonstration passe au palier Opus) | ≈ 0,31 $ |
+| | **Total** | | **≈ 1,05 $** | **≈ 1,72 $** (≈ 2,3 $ avec Opus) | **≈ 0,69 $** |
+
+Après le pilote, dans le pire cas : 0,692 + 2,3 ≈ **3,0 $ / 10 $**.
+
+Ordre et points d'arrêt (un `pilot` puis un `collect` par étape, relecture humaine entre chaque) :
+1. Pythagore : criblage → collect → juge → collect → vérification humaine du rapport ; publication = décision séparée.
+2. PC : dossier Haiku → collect ; dossier Sonnet → collect ; comparaison humaine (sources, périmètre, protocoles et unités, erreurs typiques, progression) avec une grille commune ; le dossier retenu seul alimente le chapitre → chapitre → validate-chapter (unités, sigFigs) → correction(s) → criblage → juge.
+3. Lycée : seulement après M3 étape B (schéma, niveaux, arborescence) et Gate 1 de M1S-SD-01…06.
+
+Préalables (bloquants) :
+- 8c : chiffres de la Console comparés au registre (0,692 $) ; `creditVerified: true` posé par le porteur de projet.
+- Gate 1 PC : P5-E-04…06 (consolidation 5e) classés « proposé » ; à valider, ou consolidation retirée de la fiche.
+- **Comparaison des dossiers non réalisable en l'état** : l'empreinte anti-doublon du dossier (`hashOf(SYSTEM_LIGHT, dossierUser)`) n'inclut pas le modèle, donc la 2e soumission (Sonnet, mêmes entrées) serait refusée comme doublon ; et le workflow n'a pas d'entrée `dossier_model` / `force`. Correctif proposé (non codé) : ajouter le modèle à l'empreinte seulement si `--dossier-model` est donné (les empreintes existantes, dont le dossier Pythagore, restent identiques) ; deux entrées facultatives dans `generate-lessons.yml`.
+- Droit « Allow GitHub Actions to create and approve pull requests » effectif (run #15 refusé), pour publier le résultat par PR.
+
+## 5. Analyse de la sortie du chapitre (Pythagore, sans appel API)
+Mesures sur le fichier produit par le pipeline (commit `d4528b1`, 57 883 octets, 632 lignes) et le registre : sortie facturée 45 868 tokens (run #7). Rapport octets/token mesuré au run #12 (requête de 63 187 octets = 30 351 tokens) : 2,08. Le fichier ≈ 27 800 tokens ; **le reste, ≈ 18 000 tokens (≈ 39 % de la sortie), est de la réflexion** (effort medium, réflexion adaptative ; non mesurée directement à l'époque, `actual.tokens.thinking` l'enregistre désormais).
+
+| Partie du fichier | Octets | % | dont texte (chaînes) |
+|---|---|---|---|
+| exercices (20) | 28 433 | 50 % | 62 % |
+| cours | 11 315 | 20 % | 84 % |
+| jeux (3) | 7 677 | 14 % | 65 % |
+| en-tête, imports, helpers (`num`, `qcm`, `shuffledQcm`, `etapes`, `triple`, `NAMES`…) | 3 569 | 6 % | 21 % |
+| métadonnées (objectifs, sources, statuts) | 2 617 | 5 % | ≈ 65 % |
+| figures SVG et constantes rédigées | 2 901 | 5 % | 85 % |
+
+Constats :
+- Le chapitre est surtout du **texte pédagogique** (énoncés, corrections, indices, diagnostics, cours) : il ne se factorise pas sans perdre en qualité.
+- Le **squelette répétitif** est déjà réduit par des helpers locaux (`ex(…)` ×20, `vary` ×16, `shuffledQcm`/`num`/`etapes` ×17) ; le code hors chaînes des exercices = 10 663 octets (19 % du fichier), dont 2 328 d'indentation.
+- Ce qui est **réécrit à chaque chapitre** sans valeur ajoutée : les helpers génériques, les métadonnées entièrement déterminées par la fiche (objectifs, sources, statuts, version), la structure verbeuse des jeux (`{ q, answer, explanation }` ×24, `{ niveau, calc, correct, errors }`).
+
+Propositions (non codées) et gain estimé par chapitre (sortie visible ≈ 27 800 tokens) :
+
+| # | Proposition | Gain (octets) | Gain (tokens) | Risque |
+|---|---|---|---|---|
+| A | Métadonnées injectées par le pipeline après génération (objectifs, `sources` copiées de la fiche, statuts) : le modèle ne les écrit plus | ≈ 2 400 | ≈ 1 150 | nul ; supprime aussi le risque de source mal recopiée |
+| B | Module de helpers partagé (`num`, `qcm`, `shuffledQcm`, `etapes`, `vf`, `ex`, diagnostics en tuples) utilisé par le chapitre d'exemple : le modèle les importe | ≈ 3 000 | ≈ 1 450 | faible ; **nouveau fichier** `src/lib/chapters/kit.ts` → votre accord requis |
+| C | Constructeurs compacts des jeux (`flash([[q, réponse, explication], …])`, `memory`, `erreurs`) dans le même module | ≈ 1 500 | ≈ 700 | faible |
+| | **A + B + C** | **≈ 6 900 (≈ 12 %)** | **≈ 3 300** | |
+| D | Effort `low` (ou plafond de réflexion) pour l'étape chapitre | — | jusqu'à ≈ 9 000 (moitié de la réflexion) | **qualité** des générateurs : à mesurer au pilote avant décision |
+
+Effet en coût (Sonnet batch, sortie 5 $/MTok) : A+B+C ≈ 3 300 tokens ≈ **0,017 $ par chapitre** (≈ 6 % du coût réel de l'étape, 0,29 $), soit ≈ 1,8 $ sur les 106 chapitres restants ; D ≈ 0,045 $ par chapitre (≈ 4,8 $ sur 106). Le gain principal de A+B+C n'est pas le coût mais la fiabilité (moins de code réécrit, moins d'erreurs à corriger, moins de tours de correction à 0,166 $). Domain helpers (figures de géométrie, triplets, rédaction type) : à créer seulement quand un 2e chapitre du même domaine en a besoin (YAGNI). Reformater après génération (sortie sans indentation) : aucun formateur installé, gain ≈ 600 tokens : écarté.
+
+## 6. Estimation du coût de production du projet (sans appel API)
+Base : matrice de couverture (116 chapitres d'inventaire au collège ; 7 couverts par des chapitres publiés, 3 par des brouillons). **106 chapitres à produire**, en supposant un chapitre de contenu par chapitre d'inventaire (borne haute : plusieurs chapitres d'inventaire peuvent partager un chapitre de contenu, comme Pythagore). Tarifs actuels, Message Batches, paliers de modèles du 2026-11-15, juge à préfixe court.
+- **Réaliste** (0,31 $/chapitre) : tokens réels de Pythagore (chapitre : 61 400 en entrée, 45 900 en sortie ; dossier, criblage et juge mesurés ou estimés de même), aucune correction.
+- **Max sans correction** (0,46 $ maths, 0,47 $ PC) : sortie au `max_tokens` à chaque étape.
+- **Pire cas** (0,79 $ maths, 0,80 $ PC) : en plus, deux tours de correction Sonnet.
+
+| Niveau | Chapitres | Réaliste | Max sans correction | Pire cas |
+|---|---|---|---|---|
+| Maths 6e | 22 | 6,86 $ | 10,10 $ | 17,29 $ |
+| Maths 5e | 18 | 5,62 $ | 8,26 $ | 14,15 $ |
+| Maths 4e | 18 | 5,62 $ | 8,26 $ | 14,15 $ |
+| Maths 3e | 12 | 3,74 $ | 5,51 $ | 9,43 $ |
+| PC 6e | 8 | 2,50 $ | 3,74 $ | 6,41 $ |
+| PC 5e | 9 | 2,81 $ | 4,21 $ | 7,21 $ |
+| PC 4e | 9 | 2,81 $ | 4,21 $ | 7,21 $ |
+| PC 3e | 10 | 3,12 $ | 4,68 $ | 8,01 $ |
+| **Collège** | **106** | **≈ 33 $** | **≈ 49 $** | **≈ 84 $** |
+| Brouillon existant hors pilote (`math-3e-puissances-calculs`, relecture seule) | 1 | 0,02 $ | 0,075 $ | 0,075 $ |
+| Lycée connu (1re spé Second degré) | 1 | 0,31 $ | 0,46 $ | 0,79 $ (≈ 1,4 $ si chapitre au palier Opus) |
+
+Lecture : un budget de production collège de **≈ 50 $** couvre le cas « max sans correction » ; **≈ 85 $** couvre le pire cas. Le reste du lycée (2nde, 1re, Tle, maths et PC) n'est pas inventorié : non chiffrable sans inventaire ; à titre indicatif, au même coût unitaire, chaque tranche de 10 chapitres = 3,1 à 7,9 $ (davantage si les démonstrations passent par Opus). Non compris : relectures humaines, régénérations complètes, propositions A-D de la section 5 (≈ −2 à −7 $ sur 106 chapitres), et le Pythagore du pilote (section 4). À recalibrer avec les tokens réels du pilote (chapitre PC).
