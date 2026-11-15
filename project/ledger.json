@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-06T05:22:17.659Z",
+  "updatedAt": "2026-11-15T05:44:51.967Z",
   "tasks": [
     {
       "id": "SCI-INFRA-001",
@@ -1601,6 +1601,16 @@
         "Décision du porteur de projet"
       ],
       "next": "Appliquer la décision au lecteur d'exercices et au moteur de correction"
+    },
+    {
+      "id": "SCI-3E-MATH-017",
+      "kind": "chapter",
+      "title": "Théorème de Pythagore et réciproque",
+      "state": "QA_PENDING",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-pythagore",
+      "next": "Relecture humaine de la PR (revues QA), puis décision de publication"
     }
   ]
 }
