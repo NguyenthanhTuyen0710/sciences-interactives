@@ -11,7 +11,7 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
 
 /**
  * Étapes de pipeline/run.ts. system « light » : règles seules (sans schéma, types ni chapitre d'exemple), pour les
- * étapes qui n'écrivent pas de code (dossier, criblage) ; « full » : préfixe complet (chapitre, fix, relecture).
+ * étapes qui n'écrivent pas de code (dossier, criblage, juge approfondi) ; « full » : préfixe complet (chapitre, fix).
  * fix : modèle choisi par fixModel() ; review : juge approfondi limité aux constats signalés et aux niveaux 4-5.
  */
 export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light" }> = {
@@ -19,7 +19,9 @@ export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; 
   chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
   screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light" },
-  review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "full" },
+  // Juge approfondi : préfixe « light » (décision du 2026-11-15) : les erreurs de type sont déjà prises par ChapterSchema,
+  // tsc et validate-chapter (tier 1) ; la requête contient les extraits d'exercices à juger.
+  review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "light" },
 };
 
 /** Politique complète, y compris les tâches hors de run.ts (référence pour les scripts et les agents). */

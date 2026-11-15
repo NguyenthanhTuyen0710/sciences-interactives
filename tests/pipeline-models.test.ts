@@ -41,6 +41,8 @@ describe("paliers", () => {
     expect(STEP_CONFIG.chapter.model).toBe(MODELS.sonnet);
     expect(STEP_CONFIG.screen.model).toBe(MODELS.haiku);
     expect(STEP_CONFIG.review.model).toBe(MODELS.sonnet);
+    expect(STEP_CONFIG.review.system).toBe("light"); // juge approfondi sans schéma ni chapitre d'exemple
+    expect(STEP_CONFIG.chapter.system).toBe("full");
     expect(MODEL_POLICY.find((p) => p.task.startsWith("taxonomie"))).toMatchObject({ model: MODELS.opus, effort: "high" });
     for (const m of [...Object.values(STEP_CONFIG).map((c) => c.model), ...MODEL_POLICY.map((p) => p.model)]) expect(FORBIDDEN_MODEL.test(m)).toBe(false);
   });

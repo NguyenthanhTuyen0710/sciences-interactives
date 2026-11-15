@@ -1,0 +1,18 @@
+{
+  "chapter": "math-3e-pythagore",
+  "steps": {
+    "dossier": {
+      "status": "done",
+      "hash": "f1d5a39ab373563f",
+      "at": "2026-11-15T05:51:18.455Z",
+      "note": "fichier existant"
+    },
+    "chapter": {
+      "status": "done",
+      "hash": "2d9a92e38285a59b",
+      "at": "2026-11-15T05:51:18.456Z",
+      "note": "fichier existant"
+    }
+  },
+  "fixRounds": 0
+}
