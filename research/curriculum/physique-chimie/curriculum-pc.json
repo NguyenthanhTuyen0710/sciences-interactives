@@ -1012,25 +1012,128 @@
          "id": "P4-E-01",
          "text": "Élaborer et réaliser un protocole pour vérifier une loi de l'électricité.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "4e": "exigible",
+          "3e": "consolidation"
+         },
+         "notions": [
+          "protocole expérimental",
+          "ampèremètre, voltmètre (branchement)",
+          "loi de l'électricité à vérifier"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques",
+          "Concevoir, créer, réaliser"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+         },
+         "sourceCheck": {
+          "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "quote": "Élaborer et mettre en œuvre un protocole expérimental simple visant à réaliser un circuit électrique répondant à un cahier des charges simple ou à vérifier une loi de l’électricité.",
+          "page": 103,
+          "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+         }
         },
         {
          "id": "P4-E-02",
          "text": "Exploiter l'unicité de l'intensité dans un circuit série et l'additivité des intensités (circuit à deux mailles).",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "4e": "exigible",
+          "3e": "consolidation"
+         },
+         "notions": [
+          "intensité du courant (A)",
+          "unicité de l'intensité en série",
+          "additivité des intensités (deux mailles)"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques",
+          "S’approprier des outils et des méthodes"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+         },
+         "sourceCheck": {
+          "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "quote": "L’intensité du courant électrique est la même en tout point d’un circuit qui ne compte que des dipôles en série.",
+          "page": 103,
+          "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+         }
         },
         {
          "id": "P4-E-03",
          "text": "Exploiter l'additivité des tensions (une maille) et l'unicité des tensions (dérivation).",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "4e": "exigible",
+          "3e": "consolidation"
+         },
+         "notions": [
+          "tension électrique (V)",
+          "additivité des tensions (une maille)",
+          "unicité des tensions (dérivation)"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques",
+          "S’approprier des outils et des méthodes"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+         },
+         "sourceCheck": {
+          "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "quote": "Loi d’additivité des tensions (circuit à une seule maille).",
+          "page": 103,
+          "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+         }
         },
         {
          "id": "P4-E-04",
          "text": "Étudier l'influence d'une résistance dans un circuit.",
          "officialRef": "Eduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (non prescriptif)",
-         "verified": true
+         "verified": true,
+         "level": {
+          "4e": "exigible",
+          "3e": "consolidation"
+         },
+         "notions": [
+          "résistance (Ω)",
+          "influence d'une résistance sur l'intensité"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+          "warning": "Objectif issu de l'aide Éduscol 2016, non du BO : à confirmer ou à rattacher à « Exploiter les lois de l’électricité » (p. 103)."
+         }
         }
        ],
        "prerequisites": [
@@ -1449,7 +1552,34 @@
          "id": "P3-E-07",
          "text": "Exploiter la relation tension-courant : loi d'Ohm.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "3e": "exigible"
+         },
+         "notions": [
+          "relation tension-courant",
+          "loi d'Ohm U = R × I",
+          "caractéristique d'un dipôle ohmique"
+         ],
+         "competences": [
+          "Pratiquer des langages",
+          "S’approprier des outils et des méthodes"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+         },
+         "sourceCheck": {
+          "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "quote": "Relation tension-courant : loi d’Ohm.",
+          "page": 103,
+          "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+         }
         },
         {
          "id": "P3-E-08",
@@ -1467,7 +1597,32 @@
          "id": "P3-E-10",
          "text": "Mettre en relation les lois de l'électricité et les règles de sécurité électrique.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "3e": "exigible"
+         },
+         "notions": [
+          "règles de sécurité électrique",
+          "court-circuit, surintensité"
+         ],
+         "competences": [
+          "Adopter un comportement éthique et responsable"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+         },
+         "sourceCheck": {
+          "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "quote": "Mettre en relation les lois de l’électricité et les règles de sécurité dans ce domaine.",
+          "page": 103,
+          "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+         }
         }
        ],
        "prerequisites": [

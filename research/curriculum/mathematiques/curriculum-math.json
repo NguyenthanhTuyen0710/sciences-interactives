@@ -2644,6 +2644,231 @@
           ]
         }
       ]
+    },
+    {
+      "grade": "1re",
+      "track": "voie générale — enseignement de spécialité",
+      "cycle": null,
+      "curriculumVersion": "2026-2027",
+      "programme": {
+        "title": "Programme d'enseignement de spécialité de mathématiques de la classe de première de la voie générale (2026)",
+        "reference": "Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019)",
+        "nor": "MENE2602917A",
+        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+        "applicability": "Article 2 : en application à la rentrée scolaire 2026-2027.",
+        "status": "current"
+      },
+      "scope": "Inventaire partiel (G1 pilote) : seul le chapitre du second degré est relevé ; le reste du programme de 1re spécialité n'est pas inventorié.",
+      "domains": [
+        {
+          "id": "M1S-ALG",
+          "title": "Algèbre",
+          "chapters": [
+            {
+              "id": "math-1re-spe-second-degre",
+              "title": "Équations, fonctions polynômes du second degré",
+              "objectives": [
+                {
+                  "id": "M1S-SD-01",
+                  "text": "Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée.",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "exigible"
+                  },
+                  "notions": [
+                    "forme factorisée",
+                    "racines",
+                    "tableau de signes"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Raisonner"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Étudier le signe d’une fonction polynôme du second degré donnée sous forme factorisée.",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                },
+                {
+                  "id": "M1S-SD-02",
+                  "text": "Déterminer les fonctions polynômes du second degré s'annulant en deux nombres réels distincts.",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "exigible"
+                  },
+                  "notions": [
+                    "forme a(x − x1)(x − x2)",
+                    "racines"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Calculer"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Déterminer les fonctions polynômes du second degré s’annulant en deux nombres réels distincts.",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                },
+                {
+                  "id": "M1S-SD-03",
+                  "text": "Factoriser une fonction polynôme du second degré en diversifiant les stratégies (racine évidente, somme et produit des racines, identité remarquable, formules générales).",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "exigible"
+                  },
+                  "notions": [
+                    "discriminant",
+                    "somme et produit des racines",
+                    "identités remarquables",
+                    "factorisation"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Chercher"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Factoriser une fonction polynôme du second degré, en diversifiant les stratégies : racine évidente, détection des racines",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                },
+                {
+                  "id": "M1S-SD-04",
+                  "text": "Choisir une forme adaptée (développée réduite, canonique, factorisée) pour résoudre un problème (équation, inéquation, optimisation, variations).",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "exigible"
+                  },
+                  "notions": [
+                    "forme développée, canonique, factorisée",
+                    "forme canonique par complétion du carré (cas simples)",
+                    "optimisation"
+                  ],
+                  "competences": [
+                    "Modéliser",
+                    "Représenter",
+                    "Raisonner"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Choisir une forme adaptée (développée réduite, canonique, factorisée) d’une fonction polynôme du second degré dans le",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                },
+                {
+                  "id": "M1S-SD-05",
+                  "text": "Démontrer la résolution de l'équation du second degré.",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "exigible"
+                  },
+                  "notions": [
+                    "forme canonique",
+                    "discriminant",
+                    "nombre de solutions"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Communiquer"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Résolution de l’équation du second degré.",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                },
+                {
+                  "id": "M1S-SD-06",
+                  "text": "Approfondissement : déterminer deux réels connaissant leur somme et leur produit ; factoriser un polynôme du troisième degré admettant une racine.",
+                  "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                  "verified": false,
+                  "level": {
+                    "1re": "approfondissement"
+                  },
+                  "notions": [
+                    "somme et produit",
+                    "polynôme de degré 3"
+                  ],
+                  "competences": [
+                    "Chercher",
+                    "Raisonner"
+                  ],
+                  "sourceCheck": {
+                    "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                    "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                    "accessedAt": "2026-11-15",
+                    "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                    "quote": "Déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme",
+                    "page": 360
+                  },
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                  }
+                }
+              ],
+              "prerequisites": [
+                "2nde (2026) Fonctions : fonction carré (définition, courbe, signe, variations), identités remarquables"
+              ],
+              "notes": "Programme p. 359 : la forme canonique est déterminée « dans des cas simples » par complétion du carré ; « Le calcul effectif de la forme canonique dans le cas général n’est pas un attendu du programme. » Évaluée à l'épreuve anticipée de mathématiques (fin de 1re, session 2028 pour les élèves de 2026-2027 ; NS MENE2622640N, BO spécial n° 4 du 17-9-2026 : 2 h, sans calculatrice, automatismes 6 pts, exercices 14 pts)."
+            }
+          ]
+        }
+      ]
     }
   ],
   "sources": [
