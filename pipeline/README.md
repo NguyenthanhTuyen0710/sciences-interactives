@@ -47,6 +47,7 @@ Deux déclencheurs, jamais sur push :
 Modes :
 - `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, parcours, manifest) et estimation ; registre des dépenses lu (lecture seule, jamais republié) pour afficher la dépense réelle et appliquer le plafond ; la clé n'est pas transmise.
 - `production` : fermé pendant la phase d'essai (le job `setup` refuse).
+- `publish` : sans API ; inscrit le chapitre `chapitre` déjà présent sur la branche par défaut (`dashboard register`) et ouvre une PR (job `publish-pr`).
 - `pilot` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
 - `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.
 - Le registre des dépenses vit dans la release GitHub **brouillon** `data-store` (`.github/scripts/data-store.sh`), avec son SHA256 et la version précédente (`ledger.backup.jsonl`). Seuls les jobs `ledger-pull` / `ledger-push` ont `contents: write` ; le job qui détient la clé API n'a que `contents: read` et reçoit le registre par artefact. Tous les workflows qui touchent au stockage partagent le groupe de concurrence `data-store`.

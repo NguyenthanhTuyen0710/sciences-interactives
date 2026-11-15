@@ -20,9 +20,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "dry-run (sans API) | pilot (Message Batches, plafond d'essai) | production (fermé pendant l'essai) | collect (résultat d'un batch) | reconcile"
+        description: "dry-run (sans API) | pilot (Message Batches, plafond d'essai) | production (fermé pendant l'essai) | collect (résultat d'un batch) | reconcile | publish (sans API : inscrit le chapitre « chapitre » déjà présent et ouvre une PR)"
         type: choice
-        options: [dry-run, pilot, production, collect, reconcile]
+        options: [dry-run, pilot, production, collect, reconcile, publish]
         default: dry-run
       niveau:
         description: "Niveau (doit correspondre à la fiche du chapitre)"
@@ -77,7 +77,7 @@ jobs:
           if [ "$EVENT" = "workflow_run" ]; then mode="dry-run"; fi
           if [ "$mode" = "production" ]; then echo "::error::mode production fermé pendant la phase d'essai (décision du porteur de projet requise)"; exit 1; fi
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
-          if [ "$mode" = "dry-run" ]; then echo "api=false" >> "$GITHUB_OUTPUT"; else echo "api=true" >> "$GITHUB_OUTPUT"; fi
+          if [ "$mode" = "dry-run" ] || [ "$mode" = "publish" ]; then echo "api=false" >> "$GITHUB_OUTPUT"; else echo "api=true" >> "$GITHUB_OUTPUT"; fi
           echo "Déclencheur : $EVENT ; mode retenu : $mode"
 
   # Lecture du registre des dépenses pour TOUS les modes, dry-run compris : la dépense comptée et le plafond restant
@@ -106,7 +106,7 @@ jobs:
 
   pipeline:
     needs: [setup, ledger-pull]
-    if: always() && needs.setup.result == 'success' && needs.ledger-pull.result == 'success'
+    if: always() && needs.setup.result == 'success' && needs.setup.outputs.mode != 'publish' && needs.ledger-pull.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -236,14 +236,17 @@ jobs:
   # Prérequis côté dépôt : Settings → Actions → « Allow GitHub Actions to create and approve pull requests ».
   publish-pr:
     needs: [setup, pipeline]
-    if: needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun'
+    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
     steps:
+      # Base = branche par défaut : la PR ne contient que la publication, quelle que soit la branche du run.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
 
       - uses: actions/setup-node@v4
         with:
@@ -254,6 +257,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Récupérer les sorties du run
+        if: needs.setup.outputs.mode == 'collect'
         uses: actions/download-artifact@v4
         with:
           name: lessons-${{ needs.pipeline.outputs.chapter }}-collect-${{ github.run_id }}
@@ -262,7 +266,7 @@ jobs:
       - name: Copier, contrôler, inscrire
         id: apply
         env:
-          CHAPTER: ${{ needs.pipeline.outputs.chapter }}
+          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
           OUT: ${{ runner.temp }}/out
         run: |
           copied=0
@@ -284,7 +288,7 @@ jobs:
         if: steps.apply.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          CHAPTER: ${{ needs.pipeline.outputs.chapter }}
+          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
           OUT: ${{ runner.temp }}/out
           BASE: ${{ github.event.repository.default_branch }}
         run: |
