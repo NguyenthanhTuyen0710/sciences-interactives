@@ -31,7 +31,7 @@ Deux déclencheurs, jamais sur push :
 - **manuel** (*Actions → Generate Lessons → Run workflow*) : `mode`, `niveau`, `matiere`, `parcours`, `chapitre` (fiche de `pipeline/chapters/` ; vide = `--next`), `exercise_count`, `batch_id`.
 
 Modes :
-- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, parcours, manifest) et estimation ; la clé n'est pas transmise.
+- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, parcours, manifest) et estimation ; registre des dépenses lu (lecture seule, jamais republié) pour afficher la dépense réelle et appliquer le plafond ; la clé n'est pas transmise.
 - `production` : fermé pendant la phase d'essai (le job `setup` refuse).
 - `pilot` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
 - `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.

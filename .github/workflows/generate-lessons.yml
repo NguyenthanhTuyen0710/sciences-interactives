@@ -80,13 +80,16 @@ jobs:
           if [ "$mode" = "dry-run" ]; then echo "api=false" >> "$GITHUB_OUTPUT"; else echo "api=true" >> "$GITHUB_OUTPUT"; fi
           echo "Déclencheur : $EVENT ; mode retenu : $mode"
 
+  # Lecture du registre des dépenses pour TOUS les modes, dry-run compris : la dépense comptée et le plafond restant
+  # affichés (et le contrôle de budget) reposent sur le registre réel. Ce job ne fait que lire (pull-ledger) ;
+  # seul ledger-push écrit, et uniquement pour les modes qui appellent l'API.
   ledger-pull:
     needs: setup
-    if: needs.setup.outputs.api == 'true'
+    if: needs.setup.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write # lecture d'une release brouillon (réservée aux jetons en écriture)
+      contents: write # lecture d'une release brouillon (réservée aux jetons en écriture) ; aucune écriture dans ce job
     steps:
       - uses: actions/checkout@v4
       - name: Lire le registre des dépenses (SHA256 vérifié)
@@ -103,7 +106,7 @@ jobs:
 
   pipeline:
     needs: [setup, ledger-pull]
-    if: always() && needs.setup.result == 'success' && (needs.setup.outputs.api == 'false' || needs.ledger-pull.result == 'success')
+    if: always() && needs.setup.result == 'success' && needs.ledger-pull.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -126,15 +129,13 @@ jobs:
         run: echo "started=false" >> "$GITHUB_OUTPUT"
         id: premark
 
-      - name: Recevoir le registre
-        if: needs.setup.outputs.api == 'true'
+      - name: Recevoir le registre (lecture seule en dry-run)
         uses: actions/download-artifact@v4
         with:
           name: ledger-in
           path: pipeline/.store
 
       - name: Vérifier le registre reçu
-        if: needs.setup.outputs.api == 'true'
         run: |
           (cd pipeline/.store && sha256sum -c ledger.sha256)
           npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl
