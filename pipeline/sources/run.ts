@@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { extractMetadata, gateSeed, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
+import { applyChanges, extractMetadata, gateSeed, type Change, type Inventory, groupFor, matchObjective, parseRobots, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const P = (f: string) => join(ROOT, f);
@@ -139,42 +139,15 @@ function textOf(rec: SourceRecord): string | null {
   return text;
 }
 
-// ───────── Mise à jour de l'inventaire : uniquement des changements approuvés et prouvés ─────────
-interface Evidence { seedId: string; sha256: string; quote: string }
-type Change =
-  | { op: "add_objective"; chapterId: string; objective: { id: string; text: string; officialRef: string }; evidence: Evidence; approvedBy?: string; approvedAt?: string }
-  | { op: "attach_evidence"; objectiveId: string; evidence: Evidence; approvedBy?: string; approvedAt?: string };
-
+// ───────── Mise à jour de l'inventaire : uniquement des changements approuvés et prouvés (applyChanges, lib.ts) ─────────
 function apply(file: string) {
   const INV = "research/curriculum/mathematiques/curriculum-math.json";
-  const inv = readJson<{ grades: { domains: { chapters: { id: string; objectives: Record<string, unknown>[] }[] }[] }[] }>(INV);
-  const chapters = inv.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters));
-  const objectives = chapters.flatMap((c) => c.objectives);
+  const inv = readJson<Inventory>(INV);
   const { changes } = JSON.parse(readFileSync(file, "utf8")) as { changes: Change[] };
-  const errors: string[] = [];
-  let applied = 0;
-  for (const [i, ch] of changes.entries()) {
-    const where = `changement ${i + 1} (${ch.op})`;
-    if (!ch.approvedBy || !/^\d{4}-\d{2}-\d{2}/.test(ch.approvedAt ?? "")) { errors.push(`${where} : non approuvé (approvedBy/approvedAt)`); continue; }
-    const rec = loadRecord(ch.evidence.seedId);
-    if (!rec || rec.sha256 !== ch.evidence.sha256) { errors.push(`${where} : aucun enregistrement ${ch.evidence.seedId} avec ce SHA256`); continue; }
-    if (rec.verification.status !== "verified") { errors.push(`${where} : document ${ch.evidence.seedId} non vérifié (${rec.verification.status})`); continue; }
-    const text = textOf(rec);
-    if (!text) { errors.push(`${where} : document absent du cache local (restaurer le stockage ou lancer fetch)`); continue; }
-    if (!quoteFound(text, ch.evidence.quote)) { errors.push(`${where} : citation introuvable dans le document (≥ 20 caractères, mot pour mot)`); continue; }
-    const evidence = { ...ch.evidence, accessedAt: rec.accessedAt, url: rec.url, approvedBy: ch.approvedBy, approvedAt: ch.approvedAt };
-    if (ch.op === "add_objective") {
-      const c = chapters.find((x) => x.id === ch.chapterId);
-      if (!c) { errors.push(`${where} : chapitre ${ch.chapterId} absent`); continue; }
-      if (objectives.some((o) => o.id === ch.objective.id)) { errors.push(`${where} : objectif ${ch.objective.id} déjà présent (aucune modification d'un objectif existant)`); continue; }
-      c.objectives.push({ ...ch.objective, verified: true, evidence });
-    } else {
-      const o = objectives.find((x) => x.id === ch.objectiveId);
-      if (!o) { errors.push(`${where} : objectif ${ch.objectiveId} absent`); continue; }
-      o.evidence = evidence; // le texte et le statut existants ne sont pas modifiés
-    }
-    applied++;
-  }
+  const { applied, errors } = applyChanges(inv, changes, (seedId) => {
+    const rec = loadRecord(seedId);
+    return rec ? { record: rec, text: textOf(rec) } : null;
+  });
   if (errors.length) { console.error(errors.map((e) => `  ✗ ${e}`).join("\n")); fail(`${errors.length} changement(s) refusé(s) ; inventaire inchangé`); }
   writeFile(INV, JSON.stringify(inv, null, 2) + "\n");
   console.log(`${applied} changement(s) appliqué(s) à ${INV}.`);

@@ -2766,7 +2766,7 @@
                 },
                 {
                   "id": "M1S-SD-04",
-                  "text": "Choisir une forme adaptée (développée réduite, canonique, factorisée) pour résoudre un problème (équation, inéquation, optimisation, variations).",
+                  "text": "Choisir une forme adaptée (développée réduite, canonique, factorisée) d'une fonction polynôme du second degré dans le cadre de la résolution d'un problème (équation, inéquation, optimisation, variations).",
                   "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
                   "verified": false,
                   "level": {
@@ -2794,7 +2794,8 @@
                     "status": "proposé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »",
+                    "textNote": "Texte aligné mot pour mot sur le BO n° 14, p. 360 (décision du porteur de projet du 2026-11-15)."
                   }
                 },
                 {
@@ -2831,15 +2832,17 @@
                 },
                 {
                   "id": "M1S-SD-06",
-                  "text": "Approfondissement : déterminer deux réels connaissant leur somme et leur produit ; factoriser un polynôme du troisième degré admettant une racine.",
+                  "text": "Approfondissements possibles : factorisation d'un polynôme du troisième degré admettant une racine et résolution de l'équation associée ; factorisation de xⁿ – 1 par x – 1, de xⁿ – aⁿ par x – a ; déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme x ↦ x² – sx + p.",
                   "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
                   "verified": false,
                   "level": {
                     "1re": "approfondissement"
                   },
                   "notions": [
-                    "somme et produit",
-                    "polynôme de degré 3"
+                    "factorisation d'un polynôme de degré 3 admettant une racine",
+                    "résolution de l'équation associée",
+                    "factorisation de xⁿ – aⁿ par x – a",
+                    "somme et produit des racines"
                   ],
                   "competences": [
                     "Chercher",
@@ -2857,7 +2860,8 @@
                     "status": "proposé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                    "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »",
+                    "textNote": "Texte aligné mot pour mot sur le BO n° 14, p. 360 (décision du porteur de projet du 2026-11-15)."
                   }
                 }
               ],
