@@ -2,6 +2,16 @@
 // Module pur (sans E/S) : utilisé par pipeline/run.ts et testé par tests/pipeline-models.test.ts.
 // Tarifs : pipeline/prices.json (page officielle https://platform.claude.com/docs/en/about-claude/pricing).
 
+import { createHash } from "node:crypto";
+
+/**
+ * Empreinte anti-doublon d'une requête (texte du prompt). `explicitModel` n'est ajouté que si le modèle a été imposé
+ * (`--dossier-model`, comparaison du pilote) : sans lui, l'empreinte est identique à celle déjà inscrite au registre.
+ */
+export function inputHash(parts: string[], explicitModel?: string): string {
+  return createHash("sha256").update((explicitModel ? [...parts, `model=${explicitModel}`] : parts).join("\u0000")).digest("hex").slice(0, 16);
+}
+
 export const MODELS = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5", opus: "claude-opus-5-5" } as const;
 /** Familles exclues par décision du porteur de projet. */
 export const FORBIDDEN_MODEL = /fable|mythos/i;

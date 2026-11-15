@@ -679,12 +679,13 @@
           "Pratiquer des démarches scientifiques"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
-         }
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         },
         {
          "id": "P5-E-05",
@@ -705,12 +706,13 @@
           "Pratiquer des langages"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
-         }
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         },
         {
          "id": "P5-E-06",
@@ -731,12 +733,13 @@
           "S’approprier des outils et des méthodes"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
-         }
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         }
        ],
        "prerequisites": [

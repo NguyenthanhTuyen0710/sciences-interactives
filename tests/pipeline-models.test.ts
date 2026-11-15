@@ -1,9 +1,10 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, rateFor, STEP_CONFIG, subjectSections, SUBJECTS, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, subjectSections, SUBJECTS, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { spentByModel, type LedgerEntry } from "../pipeline/ledger";
 
 const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Prices;
@@ -97,5 +98,29 @@ describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
     expect(out).toContain("contrôle des données : OK (4e, physique-chimie, p4-electricite, SCI-4E-PC-007)");
     expect(out).toContain("mode dry-run");
     expect(out).not.toMatch(/soumis|coût réel/);
+  }, 60_000);
+});
+
+describe("empreinte du dossier : modèle imposé pour la comparaison du pilote", () => {
+  it("sans modèle imposé : formule historique inchangée (empreintes du registre conservées)", () => {
+    const old = (...p: string[]) => createHash("sha256").update(p.join("\u0000")).digest("hex").slice(0, 16);
+    expect(inputHash(["système", "requête"])).toBe(old("système", "requête"));
+    expect(inputHash(["x"])).toBe(old("x"));
+  });
+  it("modèle imposé : empreinte distincte par modèle", () => {
+    const base = inputHash(["s", "u"]);
+    const h = inputHash(["s", "u"], MODELS.haiku), so = inputHash(["s", "u"], MODELS.sonnet);
+    expect(new Set([base, h, so]).size).toBe(3);
+  });
+  it("dry-run : --dossier-model sonnet change l'empreinte du dossier, pas celle du chapitre", () => {
+    const hashes = (extra: string[]) => {
+      const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "pc-4e-electricite", "--batch", ...extra], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
+      expect(r.status, r.stdout + r.stderr).toBe(0);
+      return Object.fromEntries([...(r.stdout).matchAll(/estimation (\w+) \(batch\).*?empreinte ([0-9a-f]{16})/g)].map((m) => [m[1], m[2]]));
+    };
+    const d = hashes([]), s = hashes(["--dossier-model", "sonnet"]);
+    expect(d.dossier).toMatch(/^[0-9a-f]{16}$/);
+    expect(s.dossier).not.toBe(d.dossier);
+    expect(s.chapter).toBe(d.chapter);
   }, 60_000);
 });

@@ -63,6 +63,7 @@ Modes :
 - Initialisation (une seule fois, après décision) : workflow `Data Store Init` (saisir CREER), ou `bash .github/scripts/data-store.sh init`. Test réel du mécanisme : workflow `Data Store Self-test` (release jetable).
 - Les sorties (dossier, chapitre `draft`, rapport, registre, journal) sont publiées en **artefact du run**, jamais committées.
 - `reconcile` : à lancer si un envoi a échoué avec une issue inconnue.
+- `dossier_model` (defaut | haiku | sonnet) : impose le modèle du dossier (comparaison du pilote) ; le modèle n'entre dans l'empreinte anti-doublon que s'il est imposé (empreintes existantes inchangées). `force` : `--force`, sur décision seulement. Un chapitre n'est jamais généré sans le dossier committé (relu et retenu).
 - Chaîne type : pilot (dossier) → collect → relecture + commit du dossier → pilot (chapitre) → collect → relecture → commit du brouillon. Le résumé du job reprend `pipeline-output/summary.md` (dépense, tokens, QA, needs-human, manques).
 
 ## Reprise et non-régression

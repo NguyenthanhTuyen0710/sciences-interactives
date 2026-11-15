@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, subjectSections, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, subjectSections, inputHash, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -412,7 +412,7 @@ async function reconcile() {
   }
 }
 
-const hashOf = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 16);
+const hashOf = (...parts: string[]) => inputHash(parts);
 // Étape faite : état local (pipeline/state) ou, à défaut, registre partagé (data-store) — opération soldée de même
 // empreinte et résultat utilisable. Le registre survit aux runs GitHub, l'état local non : il assure la reprise (M1).
 const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && o.reserve.inputHash === hash && o.state === "settled" && o.outcome?.usable !== false);
@@ -451,7 +451,8 @@ async function main() {
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
   const dossierUser = fill(read("pipeline/prompts/dossier.md"), { SPEC, OBJECTIVES: OBJ });
-  const hDossier = hashOf(SYSTEM_LIGHT, dossierUser);
+  // Modèle imposé (--dossier-model, comparaison) : ajouté à l'empreinte ; sinon empreinte inchangée.
+  const hDossier = inputHash([SYSTEM_LIGHT, dossierUser], opt("--dossier-model") ? DOSSIER_MODEL : undefined);
   const dossierText = () => (existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " "));
   const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { SUBJECT: spec.subject, ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
     + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
@@ -472,6 +473,7 @@ async function main() {
   if (wanted("chapter") && !done("chapter", hChapter)) {
     if (existsSync(P(CHAPTER_FILE)) && !FORCE) { console.log(`chapter : ${CHAPTER_FILE} existe déjà, conservé (--force pour le régénérer).`); markDone("chapter", hChapter, "fichier existant"); }
     else {
+      if (LIVE && !existsSync(P(DOSSIER_FILE))) fail(`chapter : ${DOSSIER_FILE} absent — committer le dossier relu (et retenu, en cas de comparaison) avant de générer le chapitre.`);
       console.log("chapter :");
       const t = await call("chapter", chapterUser, hChapter, STEP_CONFIG.chapter.model);
       if (t === null) return;
