@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyChanges, extractMetadata, gateSeed, type Change, type Inventory, type SourceRecord, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
+import { applyChanges, normalize, extractMetadata, gateSeed, type Change, type Inventory, type SourceRecord, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
 import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
@@ -120,7 +120,7 @@ describe("preuves G2 dans l'inventaire", () => {
     .flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
   it("chaque preuve est approuvée, datée, motivée et rattachée à un document vérifié de même SHA256", () => {
     const withEv = objs.filter((o) => o.evidence);
-    expect(withEv.map((o) => o.id).sort()).toEqual(["M3-AUTO-03", "M4-EG-03", "M4-EG-04"]);
+    expect(withEv.map((o) => o.id).sort()).toEqual(["M1S-SD-01", "M1S-SD-02", "M1S-SD-03", "M1S-SD-04", "M1S-SD-05", "M1S-SD-06", "M3-AUTO-03", "M4-EG-03", "M4-EG-04"]);
     for (const o of withEv) {
       const e = o.evidence!;
       expect(e.approvedBy).toBeTruthy(); expect(e.approvedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/); expect(e.reason).toBeTruthy(); expect(e.page).toBeGreaterThan(0);
@@ -128,7 +128,9 @@ describe("preuves G2 dans l'inventaire", () => {
       expect(existsSync(f)).toBe(true);
       const rec = JSON.parse(readFileSync(f, "utf8"));
       expect(rec.sha256).toBe(e.sha256); expect(rec.verification.status).toBe("verified");
-      expect(e.quote).not.toBe(o.text); // la citation d'origine n'a pas remplacé l'objectif paraphrasé
+      // Objectif paraphrasé (type b) : la citation d'origine ne l'a pas remplacé. Type a : texte aligné mot pour mot.
+      if (!String(e.matchType ?? "b").startsWith("a")) expect(e.quote).not.toBe(o.text);
+      else expect(normalize(e.quote)).toContain(normalize(o.text).replace(/\.$/, ""));
     }
   });
 });

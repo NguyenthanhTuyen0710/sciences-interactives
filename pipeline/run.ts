@@ -57,6 +57,8 @@ const RUN = {
   chapter: "" as string, mode: "", newCostUsd: 0, tokens: { input: 0, cacheWrite: 0, cacheRead: 0, output: 0, thinking: 0 },
   qa: [] as { check: string; ok: boolean; detail: string }[], needsHuman: [] as string[], missing: [] as string[], notes: [] as string[],
   byModel: {} as ByModel, plan: [] as string[],
+  /** Gate 1 du chapitre : null = non évalué dans ce run (collect, reconcile, arrêt avant). */
+  gate1: null as null | { ok: boolean; missing: string[] },
 };
 function writeSummary(code: number) {
   try {
@@ -65,6 +67,7 @@ function writeSummary(code: number) {
       `- Dépense de ce run : $${RUN.newCostUsd.toFixed(3)} · cumul registre : ${LEDGER_TOTAL()}`,
       `- Tokens : entrée ${RUN.tokens.input}, cache écrit ${RUN.tokens.cacheWrite}, cache lu ${RUN.tokens.cacheRead}, sortie ${RUN.tokens.output} (dont réflexion ${RUN.tokens.thinking})`,
       ...Object.entries(RUN.byModel).map(([m, u]) => `  - ${m} : $${u.usd.toFixed(3)} · entrée ${u.input}, cache écrit ${u.cacheWrite}, cache lu ${u.cacheRead}, sortie ${u.output} (réflexion ${u.thinking})`),
+      `- Gate 1 : ${RUN.gate1 === null ? "non évalué dans ce run" : RUN.gate1.ok ? "atteint" : `non atteint (${RUN.gate1.missing.join(", ")})`}`,
       ...(RUN.plan.length ? ["", "Dépense maximale prévue par étape et par modèle (batch) :", "", ...RUN.plan] : []),
       `- QA : ${RUN.qa.length ? `${passed}/${RUN.qa.length} contrôle(s) réussi(s) (${Math.round((100 * passed) / RUN.qa.length)} %)` : "aucun contrôle dans ce run"}${RUN.qa.map((q) => `\n  - ${q.ok ? "✔" : "✘"} ${q.check} : ${q.detail}`).join("")}`,
       `- needs-human : ${RUN.needsHuman.length}${RUN.needsHuman.map((n) => `\n  - ${n}`).join("")}`,
@@ -450,6 +453,7 @@ async function main() {
   type Classified = { id: string; level?: unknown; notions?: unknown[]; competences?: unknown[]; classification?: { status?: string } };
   const unclassified = (JSON.parse(OBJ) as { objectives: Classified[] }[]).flatMap((g) => g.objectives)
     .filter((o) => !(o.level && o.notions?.length && o.competences?.length && o.classification?.status === "validé")).map((o) => o.id);
+  RUN.gate1 = { ok: unclassified.length === 0, missing: unclassified };
   if (unclassified.length) {
     const msg = `Gate 1 non atteint : objectif(s) sans classement validé (niveau, notions, compétences) : ${unclassified.join(", ")}`;
     if (LIVE) fail(`${msg} — aucun envoi.`, 8);

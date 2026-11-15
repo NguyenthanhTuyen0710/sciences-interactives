@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-15 10:33 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-15 10:54 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -10,9 +10,9 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 |---|---|---|---|---|---|---|---|---|
 | mathematiques | 6e | Arrêté du 10 avril 2025, BO n°16 du 17 avril 2025 (annexe) | 22 | 69 (69) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | mathematiques | 5e | Arrêté du 18 février 2026, BO n°10 du 5 mars 2026 | 21 | 80 (80) | 3 (14 %) | 3 (14 %) | 3 (14 %) | 3 (14 %) |
-| mathematiques | 4e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 21 | 56 (56) | 0 (0 %) | 2 (10 %) | 2 (10 %) | 2 (10 %) |
-| mathematiques | 3e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 16 | 44 (44) | 0 (0 %) | 3 (19 %) | 2 (13 %) | 2 (13 %) |
-| mathematiques | 1re | Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019) | 1 | 6 (0) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
+| mathematiques | 4e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 21 | 56 (56) | 0 (0 %) | 3 (14 %) | 2 (10 %) | 2 (10 %) |
+| mathematiques | 3e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 16 | 44 (44) | 0 (0 %) | 4 (25 %) | 2 (13 %) | 2 (13 %) |
+| mathematiques | 1re | Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019) | 1 | 6 (6) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 6e | Arrêté du 15 juin 2023 (JO du 21/06/2023) modifiant l'arrêté du 9 novembre 2015 ; BO n°25 du 22 juin 2023 | 8 | 38 (38) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 5e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 24 (24) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 4e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 33 (29) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
@@ -51,6 +51,14 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 - Exercices : 33 (niveaux 1:6 2:7 3:8 4:6 5:6) · activités : 3
 - Revues QA : curriculum = pass · accuracy = pass · exercises = pass · games = pass · technical = pass · language = pass
 - Écarts à la Definition of Done : aucun
+
+### SCI-3E-MATH-017 — Théorème de Pythagore et réciproque (3e, mathematiques)
+
+- Publication : **draft**
+- Objectifs officiels : 3 · couverts par le cours : 3 · par des exercices : 3 · par des jeux : 3
+- Exercices : 20 (niveaux 1:4 2:4 3:4 4:4 5:4) · activités : 3
+- Revues QA : curriculum = pending · accuracy = pending · exercises = pending · games = pending · technical = pending · language = pending
+- Écarts à la Definition of Done : revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending ; revue games : pending ; revue technical : pending ; revue language : pending
 
 ## Registre des tâches
 

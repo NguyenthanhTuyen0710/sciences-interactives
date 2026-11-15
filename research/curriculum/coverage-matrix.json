@@ -1,6 +1,6 @@
 {
  "note": "Généré par `npm run dashboard` — ne pas modifier à la main. États : todo → researched → draft → qa-passed → published. apiCostUsd null = registre des dépenses absent localement (data-store).",
- "costsAvailable": false,
+ "costsAvailable": true,
  "summary": [
   {
    "subject": "mathematiques",
@@ -1190,7 +1190,7 @@
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
     "sha256": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
-    "registered": false,
+    "registered": true,
     "publication": "draft",
     "exercises": 20,
     "perLevel": [
@@ -1210,7 +1210,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": null
+    "apiCostUsd": 0.69214
    },
    "missing": [
     "revue curriculum : pending",
@@ -1674,7 +1674,7 @@
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
     "sha256": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
-    "registered": false,
+    "registered": true,
     "publication": "draft",
     "exercises": 20,
     "perLevel": [
@@ -1694,7 +1694,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": null
+    "apiCostUsd": 0.69214
    },
    "missing": [
     "revue curriculum : pending",
@@ -1716,7 +1716,7 @@
    "state": "todo",
    "objectives": {
     "total": 6,
-    "verified": 0
+    "verified": 6
    },
    "pipelineSpec": "math-1re-spe-second-degre",
    "content": null,
