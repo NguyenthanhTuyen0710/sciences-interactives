@@ -1,0 +1,50 @@
+{
+  "seedId": "bo-2026-14-pdf",
+  "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+  "finalUrl": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+  "accessedAt": "2026-11-15T09:46:34.190Z",
+  "httpStatus": 200,
+  "contentType": "application/pdf",
+  "bytes": 4979291,
+  "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+  "etag": "\"69ce17b0-4bfa5b\"",
+  "lastModified": "Thu, 02 Apr 2026 07:16:00 GMT",
+  "readable": true,
+  "text": {
+    "tool": "pdftotext",
+    "chars": 2119077,
+    "sha256": "a33cc53c6b9807d5cdef5c4a0e871551bfe730bb0eea95b03c376f0691705ef0"
+  },
+  "extracted": {
+    "boRefs": [
+      "BO n° 14 du 2 avril 2026",
+      "BO n° 5 du 31 octobre 2024",
+      "BO n° 7 du 19 décembre 2024"
+    ],
+    "cycles": [
+      4
+    ],
+    "applicabilitySnippets": [
+      "dispositions du présent arrêté entrent en application à la rentrée scolaire 2026-2027. Article 3 – Le présent arrêté sera publié au Journal",
+      "dispositions du présent arrêté entrent en application à la rentrée scolaire 2027-2028. Article 3 – Le présent arrêté sera publié au Journal",
+      "achement dans le corps des IA-IPR ou des IEN prend fin à la rentrée scolaire 2026 doivent opter pour : — une intégration dans le corps au sei",
+      "ue les agents puissent exprimer leur demande au titre de la rentrée scolaire 2026, un formulaire dématérialisé est disponible sur le portail"
+    ]
+  },
+  "verification": {
+    "status": "verified",
+    "checks": [
+      {
+        "name": "contient « MENE2602917A »",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "contient « Équations, fonctions polynômes du second degré »",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "checkedAt": "2026-11-15T09:46:34.190Z"
+  }
+}
