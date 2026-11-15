@@ -1,7 +1,21 @@
 # Pipeline de contenu par l'API Claude (phase pilote)
 
-Produit **un** chapitre à la fois : dossier → chapitre → validation par script → corrections ciblées (≤ 2 tours) → relecture.
-Phase pilote approuvée : un seul chapitre 3e (`math-3e-calcul-litteral`), plafond **10 USD** au total, modèle Sonnet 5.5.
+Produit **un** chapitre à la fois : dossier → chapitre → validation par script → corrections ciblées (≤ 2 tours) → criblage → relecture approfondie.
+Phase pilote : chapitre Pythagore 3e produit (0,692 $) ; pilote élargi (PC, lycée) soumis à approbation. Plafond **10 USD** au total.
+
+## Paliers de modèles (décision du 2026-11-15 ; `pipeline/models.ts`, tarifs `pipeline/prices.json`)
+| Tâche | Modèle |
+|---|---|
+| Extraction de sources, BO → inventaire, proposition de classement G1 | Haiku 5.5 |
+| Taxonomie G3 | Opus 5.5, effort high |
+| Dossier | Haiku 5.5 (`--dossier-model sonnet` pour la comparaison du pilote) |
+| Chapitre (une requête, D4) | Sonnet 5.5 |
+| Correction : tour 1 si tous les problèmes sont mineurs (vouvoiement, flottants, doublons, options équivalentes) | Haiku 5.5 |
+| Correction : problème majeur, ou tour 2 (escalade après un échec) | Sonnet 5.5 ; au-delà de 2 tours : needs-human |
+| Juge 1 : criblage du chapitre entier (langue, tutoiement, ton ; signale le reste) | Haiku 5.5, effort low |
+| Juge 2 : exercices signalés et niveaux 4-5 seulement | Sonnet 5.5, effort low |
+| Démonstrations lycée, sujets bac, juge d'examens (G5) | Opus 5.5 |
+Fable et Mythos sont refusés par le script. Toutes les étapes de production passent par Message Batches (`--submit`), correction comprise ; le cache n'est posé que sur un appel synchrone suivi d'autres appels au même préfixe. Le dry-run affiche la dépense maximale par étape et par modèle, comparée à la même chaîne entièrement sur Sonnet, et avertit quand une requête Haiku dépasse 100 000 tokens (tarif × 5, découpage proposé). Le registre (`reserve.model`, `actual.model`, `actual.tokens`) et le rapport de run ventilent coûts et tokens par modèle ; `ledger.ts check` affiche la dépense par modèle (entrées antérieures : Sonnet 5.5).
 
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.
@@ -26,9 +40,15 @@ npx tsx pipeline/run.ts math-3e-calcul-litteral --live --step review --force   #
 ```
 
 ## GitHub Actions (`.github/workflows/generate-lessons.yml`)
-Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), jamais sur push. Entrées : `mode`, `level`, `subject`, `chapter` (fiches de `pipeline/chapters/`), `exercise_count`, `batch_id`.
-- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, manifest) et estimation ; la clé n'est pas transmise.
-- `submit` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
+Deux déclencheurs, jamais sur push :
+- **automatique** (`workflow_run`, après un run réussi de *Collect Sources*) : **toujours dry-run** sur le prochain chapitre de la matrice de couverture (`run.ts --next`), sans clé API ;
+- **manuel** (*Actions → Generate Lessons → Run workflow*) : `mode`, `niveau`, `matiere`, `parcours`, `chapitre` (fiche de `pipeline/chapters/` ; vide = `--next`), `exercise_count`, `batch_id`.
+
+Modes :
+- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, parcours, manifest) et estimation ; registre des dépenses lu (lecture seule, jamais republié) pour afficher la dépense réelle et appliquer le plafond ; la clé n'est pas transmise.
+- `production` : fermé pendant la phase d'essai (le job `setup` refuse).
+- `publish` : sans API ; inscrit le chapitre `chapitre` déjà présent sur la branche par défaut (`dashboard register`) et ouvre une PR (job `publish-pr`).
+- `pilot` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
 - `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.
 - Le registre des dépenses vit dans la release GitHub **brouillon** `data-store` (`.github/scripts/data-store.sh`), avec son SHA256 et la version précédente (`ledger.backup.jsonl`). Seuls les jobs `ledger-pull` / `ledger-push` ont `contents: write` ; le job qui détient la clé API n'a que `contents: read` et reçoit le registre par artefact. Tous les workflows qui touchent au stockage partagent le groupe de concurrence `data-store`.
 - Lecture : refusée (donc aucun envoi) si le brouillon est absent, publié, en double, ou si l'empreinte ne correspond pas ; jamais de recréation implicite. Écriture : refusée si le registre n'est pas cohérent (`npx tsx pipeline/ledger.ts check`), s'il ne prolonge pas la version lue (ajout seul) ou si la version distante a changé entre-temps.
@@ -37,12 +57,16 @@ Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), j
 - Initialisation (une seule fois, après décision) : workflow `Data Store Init` (saisir CREER), ou `bash .github/scripts/data-store.sh init`. Test réel du mécanisme : workflow `Data Store Self-test` (release jetable).
 - Les sorties (dossier, chapitre `draft`, rapport, registre, journal) sont publiées en **artefact du run**, jamais committées.
 - `reconcile` : à lancer si un envoi a échoué avec une issue inconnue.
-- Chaîne type : submit (dossier) → collect → relecture + commit du dossier → submit (chapitre) → collect → relecture → commit du brouillon.
+- Chaîne type : pilot (dossier) → collect → relecture + commit du dossier → pilot (chapitre) → collect → relecture → commit du brouillon. Le résumé du job reprend `pipeline-output/summary.md` (dépense, tokens, QA, needs-human, manques).
 
 ## Reprise et non-régression
 - `state/<chapitre>.json` mémorise les étapes terminées (avec l'empreinte de leurs entrées) et les batchs en attente : une relance reprend là où le pipeline s'est arrêté.
 - Un fichier de chapitre ou de dossier existant n'est jamais écrasé sans `--force` : il est conservé et sert d'entrée aux étapes suivantes.
 - Le chapitre produit reste `draft` et n'est inscrit ni au registre ni au menu : l'intégration se fait après relecture humaine.
+
+## Sorties payées inutilisables
+- `stop_reason` = `max_tokens` ou `refusal`, ou relecture hors schéma : le texte reçu est **toujours** sauvegardé dans `pipeline-output/unusable/<chapitre>-<étape>-<stop_reason>.md` (artefact du run, marqué « TRUNCATED – pas un rapport QA valide »), une entrée `outcome` (`usable: false`, motif) est ajoutée au registre, et l'exécution s'arrête (code 7). L'entrée `outcome` ne change ni la dépense ni l'anti-doublon.
+- Relecture : JSON imposé par structured outputs (`output_config.format`, schéma `pipeline/review-format.ts`), revérifié localement ; rendu Markdown dans `project/reports/<tâche>-QA-api.md`.
 
 ## Économies
 - Préfixe système identique pour toutes les étapes (règles + `schema.ts` + `types.ts` + un chapitre approuvé), mis en cache 1 h (`cache_control`), vérifiable avec `cache_read_input_tokens` dans la réponse de l'API.

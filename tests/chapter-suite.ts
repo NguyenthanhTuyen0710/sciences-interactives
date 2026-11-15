@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import { exerciseGenerator } from "../src/lib/chapters";
 import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
-import { checkExercise, matchesMistake } from "../src/lib/engine/check";
+import { checkExercise } from "../src/lib/engine/check";
+import { diagnosticIssues } from "../src/lib/engine/diagnostics";
 import { perfect } from "../src/lib/engine/solve";
 import { toPublic } from "../src/lib/engine/public";
 import { flashFeedback, type FlashLevel, type LineLevel } from "../src/lib/games/logic";
@@ -86,7 +87,7 @@ export function describeChapter(c: ChapterContent) {
             if (r.status !== "correct") throw new Error(`${e.id} seed s${k} partie ${i} : ${r.status} ${r.feedback.join(" | ")}`);
           });
           inst.parts.forEach((p, i) => {
-            for (const m of p.mistakes ?? []) expect(matchesMistake(p.interaction, responses[i], m), `${e.id} : diagnostic « ${m.match} » = bonne réponse`).toBe(false);
+            expect(diagnosticIssues(p.interaction, p.mistakes, responses[i], i), `${e.id} seed s${k}`).toEqual([]);
           });
           expect(checkExercise(inst, inst.parts.map(() => undefined)).score).toBe(0);
         }

@@ -55,5 +55,19 @@
   "objectiveVerification": {
     "file": "research/sources/verification/math-3e-pythagore.json",
     "summary": "script : 0 verified / 3 needs_manual_review (paraphrases) ; G2 : 3 correspondances approuvées manuellement le 2026-11-07 (evidence dans l'inventaire)"
-  }
+  },
+  "objectiveLevels": {
+    "M3-AUTO-03": "exigible",
+    "M4-EG-03": "consolidation",
+    "M4-EG-04": "consolidation"
+  },
+  "extensions": [
+    {
+      "id": "PY-EXT-01",
+      "level": "approfondissement",
+      "text": "Démontrer qu'un triangle n'est pas rectangle (contraposée du théorème de Pythagore, raisonnement par l'absurde).",
+      "basis": "Non nommé dans les Attendus 4e (2019) ni le programme 2020 lus ; le programme du cycle 4 (2020, p. 127) initie au « raisonnement par disjonction de cas ou par l'absurde ». À étiqueter « prolongement » pour l'élève.",
+      "status": "validé"
+    }
+  ]
 }

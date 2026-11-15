@@ -4,6 +4,7 @@ Plateforme Next.js 15 / TypeScript / PostgreSQL (Drizzle) d'exercices de maths e
 
 ## Où lire l'état du projet (ne pas relire tout le dépôt)
 - Maths 3e : `project/maths-3e-progress.md` (source unique) ; manifest des thèmes : `research/curriculum/mathematiques/manifest-3e.json`.
+- Feuille de route (gates 0→5, règles d'économie, budget) : `project/roadmap.md` ; Gate 0 : `project/reports/ROADMAP-G0-audit.md`.
 - Projet global : `project/STATUS.md` ; tâches : `project/ledger.json` ; rôles QA : `project/agents.md`.
 - Programmes officiels déjà inventoriés : `research/curriculum/` — ne pas refaire la recherche.
 

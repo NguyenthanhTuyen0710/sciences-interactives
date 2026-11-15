@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
@@ -113,3 +113,36 @@ describe("logique des jeux", () => {
 });
 
 for (const c of ALL_CHAPTERS) describeChapter(c);
+
+describe("correspondance d'objectifs inventaire → chapitre (research/curriculum/*/objective-map.json)", () => {
+  for (const subject of ["mathematiques", "physique-chimie"]) {
+    const file = `research/curriculum/${subject}/objective-map.json`;
+    if (!existsSync(file)) continue;
+    const map = JSON.parse(readFileSync(file, "utf8")).chapters as Record<string, Record<string, string[]>>;
+    for (const [chapterId, entries] of Object.entries(map)) {
+      it(`${chapterId} : toutes les cibles existent dans le chapitre`, () => {
+        const c = ALL_CHAPTERS.find((x) => x.id === chapterId);
+        expect(c, `chapitre ${chapterId} non inscrit`).toBeDefined();
+        const own = new Set(c!.officialObjectives.map((o) => o.id));
+        for (const [inv, targets] of Object.entries(entries)) for (const t of targets) expect(own.has(t), `${inv} → ${t}`).toBe(true);
+      });
+    }
+  }
+});
+
+describe("inventaire : niveaux d'exigence et compétences (8a)", () => {
+  const LEVELS = ["exigible", "consolidation", "approfondissement"];
+  const COMPETENCES = ["Chercher", "Modéliser", "Représenter", "Raisonner", "Calculer", "Communiquer"];
+  const inv = JSON.parse(readFileSync("research/curriculum/mathematiques/curriculum-math.json", "utf8"));
+  const objs = inv.grades.flatMap((g: { domains: { chapters: { objectives: Record<string, unknown>[] }[] }[] }) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
+  it("valeurs autorisées seulement (programme cycle 4 2020, p. 129)", () => {
+    for (const o of objs.filter((x: Record<string, unknown>) => x.level || x.competences)) {
+      for (const l of Object.values(o.level as Record<string, string>)) expect(LEVELS, `${o.id}`).toContain(l);
+      for (const c of o.competences as string[]) expect(COMPETENCES, `${o.id}`).toContain(c);
+      expect((o.notions as string[]).length, `${o.id}`).toBeGreaterThan(0);
+    }
+  });
+  it("objectifs du pilote Pythagore classés", () => {
+    for (const id of ["M4-EG-03", "M4-EG-04", "M3-AUTO-03"]) expect(objs.find((o: { id: string }) => o.id === id)?.level, id).toBeDefined();
+  });
+});
