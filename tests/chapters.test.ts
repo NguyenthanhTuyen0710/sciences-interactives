@@ -3,17 +3,18 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
+import { chapterTexts, instanceTexts, vouvoiement, vouvoiementIssues } from "../src/lib/engine/diagnostics";
 import { createRng } from "../src/lib/engine/rng";
 import { adapt, calcFeedback, calcQuestion, erreursConfig, flashAnswerTex, flashConfig, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type ErrItem, type FlashLevel, type LineLevel } from "../src/lib/games/logic";
 
 describe("tutoiement de l'interface élève", () => {
   it("aucun « vous / votre / vos » ni impératif en -ez hors espace enseignant", () => {
     const root = join(__dirname, "../src");
-    const files = (readdirSync(root, { recursive: true }) as string[]).filter((f) => /\.tsx?$/.test(f) && !/(^|\/)admin\//.test(f));
+    const files = (readdirSync(root, { recursive: true }) as string[]).filter((f) => /\.tsx?$/.test(f) && !/(^|\/)admin\//.test(f) && f !== join("lib", "engine", "diagnostics.ts")); // diagnostics.ts : définition de la règle (aucun texte élève)
     const bad: string[] = [];
     for (const f of files) {
       readFileSync(join(root, f), "utf8").split("\n").forEach((line, i) => {
-        if (/\b(vous|votre|vos)\b/i.test(line) || /\b(?!(?:chez|assez|nez|rez)\b)[a-zéèêîô]{3,}ez\b(?!-de)/i.test(line.replace(/rez-de-chaussée/g, ""))) bad.push(`${f}:${i + 1}`);
+        if (vouvoiement(line)) bad.push(`${f}:${i + 1}`); // même règle que validate-chapter
       });
     }
     expect(bad).toEqual([]);
@@ -203,4 +204,69 @@ describe("proposition C : constructeurs compacts des jeux = écriture développ�
     const erows = err.items.map((i) => (i.correct ? [i.niveau, i.calc, i.explanation] : [i.niveau, i.calc, i.explanation, i.errors!, i.error!]) as Parameters<typeof erreursConfig>[0][number]);
     expect(erreursConfig(erows)).toEqual(err);
   });
+});
+
+describe("tutoiement : tous les textes élève contrôlés par validate-chapter", () => {
+  const base = ALL_CHAPTERS.find((x) => x.id === "math-3e-arithmetique")!;
+  const clone = () => JSON.parse(JSON.stringify({ ...base, exercises: base.exercises.map(({ vary: _v, ...e }) => e) }));
+  const flagged = (c: Parameters<typeof chapterTexts>[0]) => vouvoiementIssues(chapterTexts(c)).map((i) => i.where);
+  it("règle : vous / votre / vos et impératif en -ez ; exceptions chez, assez, nez, rez-de-chaussée", () => {
+    expect(vouvoiement("Calculez la somme.")).toBe("Calculez");
+    expect(vouvoiement("Donne votre réponse.")).toBe("votre");
+    expect(vouvoiement("Vos résultats")).toBe("Vos");
+    for (const ok of ["Calcule la somme.", "Il habite chez Léa, au rez-de-chaussée.", "C'est assez grand, le nez en l'air.", "$x = 2$"]) expect(vouvoiement(ok)).toBeNull();
+  });
+  const chapterCases: [string, (c: any) => void, RegExp][] = [
+    ["titre du chapitre", (c) => { c.title = "Révisez"; }, /^chapter\.title$/],
+    ["prérequis", (c) => { c.prerequisites[0].text = "Connaissez les multiples."; }, /^chapter\.prerequisites\[0\]\.text$/],
+    ["texte d'objectif (résumé d'exercice)", (c) => { c.officialObjectives[0].text = "Vous savez décomposer."; }, /^chapter\.officialObjectives\[0\]$/],
+    ["cours : introduction", (c) => { c.lesson.introduction = "Vous allez apprendre."; }, /^lesson\.introduction$/],
+    ["cours : définition", (c) => { c.lesson.definitions[0].text = "Retenez ceci."; }, /^lesson\.definitions\[0\]\.text$/],
+    ["cours : exemple résolu (étape)", (c) => { c.lesson.workedExamples[0].steps[0] = "Divisez par 2."; }, /^lesson\.workedExamples\[0\]\.steps\[0\]$/],
+    ["cours : illustration (alt)", (c) => { c.lesson.illustrations[0].alt = "Observez la figure."; }, /^lesson\.illustrations\[0\]\.alt$/],
+    ["cours : erreur fréquente", (c) => { c.lesson.commonMistakes[0].why = "Vous oubliez un facteur."; }, /^lesson\.commonMistakes\[0\]\.why$/],
+    ["cours : méthode", (c) => { c.lesson.methods[0].steps[0] = "Cherchez un diviseur."; }, /^lesson\.methods\[0\]\.steps\[0\]$/],
+    ["cours : résumé et fiche de révision", (c) => { c.lesson.summary[0] = "Notez bien."; c.lesson.revisionSheet.skills[0] = "Vérifiez."; }, /^lesson\.(summary|revisionSheet\.skills)\[0\]$/],
+    ["cours : mini-quiz (question, option, explication)", (c) => { c.lesson.miniQuiz[0].options[1] = "Votre choix"; }, /^lesson\.miniQuiz\[0\]\.options\[1\]$/],
+    ["exercice : titre", (c) => { c.exercises[0].title = "Repérez votre hypoténuse"; }, /^ari3-01\.title$/],
+    ["exercice : raisonnement", (c) => { c.exercises[0].reasoning = "Pensez au PGCD."; }, /^ari3-01\.reasoning$/],
+    ["exercice : indice", (c) => { c.exercises[0].hints[0] = "Essayez 2."; }, /^ari3-01\.hints\[0\]$/],
+    ["jeu : titre, objectif, consignes", (c) => { c.games[0].instructions = "Répondez vite."; }, /^ari3-jeu-flash\.instructions$/],
+    ["jeu : question et explication flash", (c) => { c.games[0].config.levels[0].items[0].explanation = "Vous divisez."; }, /^ari3-jeu-flash\.config\.levels\[0\]\.items\[0\]\.explanation$/],
+    ["jeu : chasse-erreurs (calcul, erreurs proposées)", (c) => { c.games[1].config.items[0].errors[0] = "Vous avez oublié 1"; }, /^ari3-jeu-erreurs\.config\.items\[0\]\.errors\[0\]$/],
+    ["jeu : memory (carte)", (c) => { c.games[2].config.pairs[0][1] = "votre carte"; }, /^ari3-jeu-memory\.config\.pairs\[0\]\[1\]$/],
+  ];
+  for (const [name, mutate, where] of chapterCases) it(`signalé : ${name}`, () => {
+    const c = clone(); mutate(c);
+    const w = flagged(c);
+    expect(w.length, w.join(", ")).toBeGreaterThan(0);
+    expect(w.every((x) => where.test(x)), w.join(", ")).toBe(true);
+  });
+  it("code SVG et motifs de saisie (match) ignorés ; chapitre d'origine sans signalement", () => {
+    const c = clone();
+    c.lesson.illustrations[0].svg = '<svg aria-label="Regardez"></svg>';
+    expect(flagged(c)).toEqual([]);
+    expect(vouvoiementIssues(instanceTexts({ statement: "s", parts: [{ interaction: { kind: "numerique", answer: { value: 1 } }, mistakes: [{ match: "vous", feedback: "Revois la règle." }] }], solution: ["ok"] }, "x"))).toEqual([]);
+  });
+  const inter = (interaction: object, extra: object = {}) => vouvoiementIssues(instanceTexts({ statement: "Énoncé.", parts: [{ interaction, ...extra }], solution: ["Correction."] } as never, "ex")).map((i) => i.where);
+  const instanceCases: [string, () => string[], string][] = [
+    ["énoncé", () => vouvoiementIssues(instanceTexts({ statement: "Calculez $x$.", parts: [], solution: [] } as never, "ex")).map((i) => i.where), "ex.statement"],
+    ["correction", () => vouvoiementIssues(instanceTexts({ statement: "s", parts: [], solution: ["Vous obtenez 4."] } as never, "ex")).map((i) => i.where), "ex.solution[0]"],
+    ["figure (étiquette)", () => vouvoiementIssues(instanceTexts({ statement: "s", figure: { kind: "x", labels: ["Placez A"] }, parts: [], solution: [] } as never, "ex")).map((i) => i.where), "ex.figure.labels[0]"],
+    ["consigne de partie", () => inter({ kind: "numerique", answer: { value: 1 } }, { prompt: "Donnez la valeur." }), "ex.parts[0].prompt"],
+    ["diagnostic (feedback)", () => inter({ kind: "numerique", answer: { value: 1 } }, { mistakes: [{ match: "2", feedback: "Vous avez doublé." }] }), "ex.parts[0].mistakes[0].feedback"],
+    ["QCM : option", () => inter({ kind: "qcm", options: ["a", "Votre réponse"], answer: [0] }), "ex.parts[0].interaction.options[1]"],
+    ["vrai-faux : affirmation", () => inter({ kind: "vrai-faux", items: ["Vous avez raison"], answer: [true] }), "ex.parts[0].interaction.items[0]"],
+    ["numérique : label et suffixe", () => inter({ kind: "numerique", label: "Entrez $x$", answer: { value: 1 } }), "ex.parts[0].interaction.label"],
+    ["texte à trous : gabarit", () => inter({ kind: "texte-trous", template: "Complétez [[0]]", blanks: [] }), "ex.parts[0].interaction.template"],
+    ["texte à trous : options de liste", () => inter({ kind: "texte-trous", template: "[[0]]", blanks: [{ type: "select", options: ["oui", "Choisissez"], answer: 0 }] }), "ex.parts[0].interaction.blanks[0].options[1]"],
+    ["texte libre : réponse acceptée affichée", () => inter({ kind: "texte-libre", answer: ["vous"] }), "ex.parts[0].interaction.answer[0]"],
+    ["glisser-déposer : zones et étiquettes", () => inter({ kind: "glisser-deposer", zones: ["Votre zone"], tokens: ["a"], answer: [0] }), "ex.parts[0].interaction.zones[0]"],
+    ["associer : colonnes", () => inter({ kind: "associer", left: ["a"], right: ["vos nombres"], answer: [0] }), "ex.parts[0].interaction.right[0]"],
+    ["classer : catégories", () => inter({ kind: "classer", categories: ["Vos premiers"], items: ["2"], answer: [0] }), "ex.parts[0].interaction.categories[0]"],
+    ["ordonner : indice", () => inter({ kind: "ordonner", items: ["a", "b"], answer: [1, 0], hint: "Commencez par a" }), "ex.parts[0].interaction.hint"],
+    ["étapes : consigne d'étape", () => inter({ kind: "etapes", steps: [{ prompt: "Calculez $a$", answer: { value: 1 } }] }), "ex.parts[0].interaction.steps[0].prompt"],
+    ["repère : nom de point", () => inter({ kind: "repere", xmin: 0, xmax: 1, ymin: 0, ymax: 1, step: 1, points: [{ label: "Placez A", answer: [0, 0] }] }), "ex.parts[0].interaction.points[0].label"],
+  ];
+  for (const [name, run, where] of instanceCases) it(`signalé dans un tirage : ${name}`, () => expect(run()).toEqual([where]));
 });
