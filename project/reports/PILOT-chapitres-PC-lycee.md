@@ -32,7 +32,7 @@ Constat préalable : **les programmes 2019 de 2nde et de 1re sont remplacés à 
 - Le second degré fait partie du programme de spécialité de 1re (BO n° 14, MENE2602917A, p. 359-360), et sa liste d'automatismes contient « Déterminer le signe d'une expression du premier degré, d'une expression factorisée du second degré » (**p. 359**) : le chapitre relève donc des deux parties de l'épreuve (automatismes 6 pts, exercices 14 pts).
 - Limite : la note ne fixe pas les chapitres tirés à chaque session ; « liée à l'examen » signifie « dans le programme évalué », non « présent à chaque sujet ». La partie « Examen » ci-dessus reste exacte.
 
-## 3. M3 — prise en charge de la physique-chimie par le pipeline (proposition, non codée)
+## 3. M3 — prise en charge de la physique-chimie (étape A) et du lycée (étape B) : faites
 Principe : extension par paramètre de matière, sans nouveau fichier de configuration ni nouveau pipeline.
 
 | Fichier | Modification |
@@ -47,7 +47,8 @@ Principe : extension par paramètre de matière, sans nouveau fichier de configu
 
 **Étape A : faite** (2026-11-15) — `run.ts` (matière, inventaire, manifest), blocs `{{#pc}}` des 4 prompts (prompts de mathématiques inchangés octet pour octet), `unitIssues` dans `validate-chapter`, fiche `pc-4e-electricite.json`, tests, dry-run PC dans `pr-checks.yml`.
 
-### Étape B (lycée) — proposition détaillée, NON codée
+### Étape B (lycée) — faite le 2026-11-15 (commit « M3 étape B »), d'après la proposition ci-dessous
+Écarts : aucun titre « Type … » n'était contrôlé par `doneIssues` (consigne portée par le bloc `{{#lycee}}` du prompt) ; `master-curriculum.json` ne contenait aucune donnée propre (comparaison champ à champ : 0 champ absent des sources, 1 valeur périmée), il est désormais régénéré à chaque `npm run dashboard`.
 Constat : le moteur (`LevelId` de `src/lib/engine/types.ts`) et l'arborescence du site (`src/lib/content/curriculum.ts`, niveaux 2nde/1re/Tle, routes `[matiere]/[niveau]`) connaissent déjà le lycée ; seuls le contrat des chapitres complets, le pipeline et la matrice sont limités au collège.
 
 | Fichier | Modification | Pourquoi |
@@ -64,28 +65,26 @@ Constat : le moteur (`LevelId` de `src/lib/engine/types.ts`) et l'arborescence d
 
 Hors étape B : inventaire complet du lycée (autres chapitres), épreuves du bac, PC lycée.
 
-## 4. Plan de l'étape 9 (pilote réel) — NON lancé, approbation séparée
-Dépense déjà comptée : 0,692 $ ; plafond 10 $ ; **reste 9,308 $**. Montants : dépense maximale des dry-runs du 2026-11-15 (batch, sortie au `max_tokens`, juge approfondi à préfixe court) ; « réaliste » : tokens réels de Pythagore (runs #5-#12) aux tarifs actuels.
+## 4. Plan de l'étape 9 (pilote réel) — prêt sauf Gate 1 du lot 3 ; NON lancé, approbation séparée
+Dépense comptée : 0,692 $ ; plafond 10 $ ; **reste 9,308 $**. Dry-runs du 2026-11-15 après M3 A+B, juge à préfixe court et propositions A+C (batch, sortie au `max_tokens`).
 
-| # | Lot | Étapes (modèle) | Max sans correction | Max pire cas | Réaliste |
-|---|---|---|---|---|---|
-| 1 | Pythagore 3e : relecture | criblage (Haiku) + juge approfondi (Sonnet) | 0,075 $ | 0,075 $ | ≈ 0,02 $ |
-| 2 | PC 4e électricité (`pc-4e-electricite`) | dossier Haiku **et** dossier Sonnet (comparaison) 0,052 $ ; chapitre 0,385 $ ; criblage 0,004 $ ; juge 0,077 $ | 0,518 $ | 0,851 $ (2 tours de correction Sonnet) | ≈ 0,36 $ |
-| 3 | 1re spé « Second degré » (après M3 étape B) | même chaîne que les mathématiques | 0,46 $ | 0,79 $ (+ jusqu'à ≈ 0,6 $ si la démonstration passe au palier Opus) | ≈ 0,31 $ |
-| | **Total** | | **≈ 1,05 $** | **≈ 1,72 $** (≈ 2,3 $ avec Opus) | **≈ 0,69 $** |
+| Lot | Étapes (modèle) | Gate 1 | Dry-run | Max sans correction | Max pire cas | Réaliste |
+|---|---|---|---|---|---|---|
+| 1. Pythagore 3e — relecture | criblage Haiku 0,004 $ + juge Sonnet 0,071 $ | atteint | OK (empreintes inchangées) | 0,075 $ | 0,075 $ | ≈ 0,02 $ |
+| 2. PC 4e électricité | dossier Haiku 0,003 $ **et** Sonnet 0,050 $ ; chapitre Sonnet 0,386 $ ; criblage 0,004 $ ; juge 0,077 $ ; correction 2 × 0,167 $ au pire | atteint (9 objectifs validés) | OK | 0,520 $ | 0,854 $ | ≈ 0,33 $ |
+| 3. 1re spé Second degré | dossier Haiku 0,002 $ ; chapitre **Opus** 0,767 $ (démonstration exigible) ; criblage 0,004 $ ; juge 0,077 $ ; correction 2 × 0,167 $ au pire | **non atteint** : M1S-SD-01…06 « proposé » | OK (refus d'envoi réel tant que G1 manque) | 0,850 $ | 1,183 $ | ≈ 0,61 $ |
+| **Total** | | | | **1,445 $** | **2,112 $** | **≈ 0,96 $** |
 
-Après le pilote, dans le pire cas : 0,692 + 2,3 ≈ **3,0 $ / 10 $**.
+Après le pilote, au pire : 0,692 + 2,112 = **2,804 $ / 10 $**.
 
-Ordre et points d'arrêt (un `pilot` puis un `collect` par étape, relecture humaine entre chaque) :
-1. Pythagore : criblage → collect → juge → collect → vérification humaine du rapport ; publication = décision séparée.
-2. PC : dossier Haiku → collect ; dossier Sonnet → collect ; comparaison humaine (sources, périmètre, protocoles et unités, erreurs typiques, progression) avec une grille commune ; le dossier retenu seul alimente le chapitre → chapitre → validate-chapter (unités, sigFigs) → correction(s) → criblage → juge.
-3. Lycée : seulement après M3 étape B (schéma, niveaux, arborescence) et Gate 1 de M1S-SD-01…06.
+Ordre et points d'arrêt (un `pilot` puis un `collect` par étape ; relecture humaine entre chaque) :
+1. Pythagore : criblage → juge → vérification humaine du rapport ; publication = décision séparée.
+2. PC : dossier (`dossier_model` = haiku) puis dossier (`dossier_model` = sonnet), mêmes entrées, empreintes distinctes ; comparaison humaine sur une grille commune ; commit du dossier retenu seul (le chapitre réel est refusé sans dossier committé) → chapitre → validate-chapter (unités, sigFigs) → correction(s) → criblage → juge.
+3. 1re : après validation G1 de M1S-SD-01…06 ; mêmes étapes, chapitre au palier Opus.
 
-Préalables (bloquants) :
-- 8c : chiffres de la Console comparés au registre (0,692 $) ; `creditVerified: true` posé par le porteur de projet.
-- Gate 1 PC : P5-E-04…06 (consolidation 5e) classés « proposé » ; à valider, ou consolidation retirée de la fiche.
-- **Comparaison des dossiers non réalisable en l'état** : l'empreinte anti-doublon du dossier (`hashOf(SYSTEM_LIGHT, dossierUser)`) n'inclut pas le modèle, donc la 2e soumission (Sonnet, mêmes entrées) serait refusée comme doublon ; et le workflow n'a pas d'entrée `dossier_model` / `force`. Correctif proposé (non codé) : ajouter le modèle à l'empreinte seulement si `--dossier-model` est donné (les empreintes existantes, dont le dossier Pythagore, restent identiques) ; deux entrées facultatives dans `generate-lessons.yml`.
-- Droit « Allow GitHub Actions to create and approve pull requests » effectif (run #15 refusé), pour publier le résultat par PR.
+Préalables restants : 8c (chiffres de la Console) et `creditVerified: true` ; Gate 1 du lot 3 ; droit de création de PR des Actions effectif (Việc 1).
+
+Après le pilote (non mesuré pendant le pilote, décision du 2026-11-15) : **essai D** sur un seul chapitre : étape chapitre en effort `low`, comparée à l'effort `medium` (tokens de réflexion, validate-chapter, tours de correction, relecture) ; B (`kit.ts`) réexaminé ; budget de production proposé **par niveau** à partir des coûts réels du pilote.
 
 ## 5. Analyse de la sortie du chapitre (Pythagore, sans appel API)
 Mesures sur le fichier produit par le pipeline (commit `d4528b1`, 57 883 octets, 632 lignes) et le registre : sortie facturée 45 868 tokens (run #7). Rapport octets/token mesuré au run #12 (requête de 63 187 octets = 30 351 tokens) : 2,08. Le fichier ≈ 27 800 tokens ; **le reste, ≈ 18 000 tokens (≈ 39 % de la sortie), est de la réflexion** (effort medium, réflexion adaptative ; non mesurée directement à l'époque, `actual.tokens.thinking` l'enregistre désormais).
