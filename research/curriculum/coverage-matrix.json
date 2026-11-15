@@ -40,6 +40,14 @@
    }
   },
   {
+   "subject": "mathematiques",
+   "grade": "1re",
+   "chapters": 1,
+   "byState": {
+    "todo": 1
+   }
+  },
+  {
    "subject": "physique-chimie",
    "grade": "6e",
    "chapters": 8,
@@ -1700,6 +1708,23 @@
    ]
   },
   {
+   "subject": "mathematiques",
+   "grade": "1re",
+   "domain": "M1S-ALG",
+   "chapterId": "math-1re-spe-second-degre",
+   "title": "Équations, fonctions polynômes du second degré",
+   "state": "todo",
+   "objectives": {
+    "total": 6,
+    "verified": 0
+   },
+   "pipelineSpec": "math-1re-spe-second-degre",
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
    "subject": "physique-chimie",
    "grade": "6e",
    "domain": "pc-c3-6e-mmei",
@@ -2101,7 +2126,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "pc-4e-electricite",
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2288,7 +2313,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "pc-4e-electricite",
    "content": null,
    "missing": [
     "chapitre complet"

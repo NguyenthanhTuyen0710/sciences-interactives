@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
 import { createRng } from "../src/lib/engine/rng";
-import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type LineLevel } from "../src/lib/games/logic";
+import { adapt, calcFeedback, calcQuestion, erreursConfig, flashAnswerTex, flashConfig, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type ErrItem, type FlashLevel, type LineLevel } from "../src/lib/games/logic";
 
 describe("tutoiement de l'interface élève", () => {
   it("aucun « vous / votre / vos » ni impératif en -ez hors espace enseignant", () => {
@@ -144,5 +144,63 @@ describe("inventaire : niveaux d'exigence et compétences (8a)", () => {
   });
   it("objectifs du pilote Pythagore classés", () => {
     for (const id of ["M4-EG-03", "M4-EG-04", "M3-AUTO-03"]) expect(objs.find((o: { id: string }) => o.id === id)?.level, id).toBeDefined();
+  });
+});
+
+describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master généré", () => {
+  // Instantané du 2026-11-15 (avant l'étape B) : une modification légitime d'un chapitre met à jour cette liste dans le même commit.
+  const COLLEGE = {
+    "math-3e-arithmetique": "d0cf16f9d03ddd26128e8063073984b7065803cab1c4b2ebbdc22d91cbca985c",
+    "math-3e-pourcentages-evolution": "006db69983018ecf2ff05232d80325760722bc4f75309180312835c296a1643b",
+    "math-3e-puissances-calculs": "7239a34eb246c59efd5d4486ebdaba4e2167ca918f464c3dc39cd2fcf569adec",
+    "math-3e-pythagore": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
+    "math-5e-nombres-relatifs": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
+  };
+  it("chapitres du collège : mêmes identifiants, mêmes empreintes de fichier, toujours conformes au schéma", async () => {
+    const { createHash } = await import("node:crypto");
+    const { ChapterSchema } = await import("../src/lib/chapters/schema");
+    for (const [id, sha] of Object.entries(COLLEGE)) {
+      expect(createHash("sha256").update(readFileSync(`src/lib/chapters/data/${id}.ts`)).digest("hex"), id).toBe(sha);
+      const mod = (await import(`../src/lib/chapters/data/${id}`)) as Record<string, { id: string }>;
+      const c = Object.values(mod).find((v) => v && typeof v === "object" && "lesson" in v)!;
+      expect(c.id).toBe(id);
+      expect(ChapterSchema.safeParse(c).success, id).toBe(true);
+    }
+  });
+  it("schéma : lycée avec parcours obligatoire ; collège sans parcours ; niveau de l'id = grade", async () => {
+    const { ChapterSchema } = await import("../src/lib/chapters/schema");
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const ok = (o: object) => ChapterSchema.safeParse({ ...base, ...o }).success;
+    expect(ok({ id: "math-1re-spe-second-degre", taskId: "SCI-1RE-MATH-001", grade: "1re", parcours: "specialite" })).toBe(true);
+    expect(ok({ id: "math-tle-x", taskId: "SCI-TLE-MATH-001", grade: "Tle", parcours: "maths-expertes" })).toBe(true);
+    expect(ok({ id: "math-1re-spe-second-degre", taskId: "SCI-1RE-MATH-001", grade: "1re" })).toBe(false);
+    expect(ok({ parcours: "specialite" })).toBe(false);
+    expect(ok({ grade: "4e" })).toBe(false);
+  });
+  it("objectif required: false : hors critère d'achèvement", async () => {
+    const { doneIssues } = await import("../src/lib/chapters/schema");
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const extra = { id: "X-99", text: "Objectif de consolidation", source: "test" };
+    expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, extra] })).toContain("objectif X-99 sans exercice");
+    expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, { ...extra, required: false }] })).not.toContain("objectif X-99 sans exercice");
+  });
+  it("master-curriculum.json = fusion exacte des curriculum-*.json (généré par npm run dashboard, jamais à la main)", () => {
+    const read = (f: string) => JSON.parse(readFileSync(f, "utf8"));
+    const master = read("research/curriculum/master-curriculum.json");
+    const src = [read("research/curriculum/mathematiques/curriculum-math.json"), read("research/curriculum/physique-chimie/curriculum-pc.json")];
+    expect(master.subjects).toEqual(src);
+    expect(master.generatedAt).toBe(src.map((s) => s.generatedAt).sort().pop());
+  });
+});
+
+describe("proposition C : constructeurs compacts des jeux = écriture développée", () => {
+  it("calcul-flash et chasse-erreurs de l'arithmétique 3e reconstruits à l'identique", () => {
+    const c = ALL_CHAPTERS.find((x) => x.id === "math-3e-arithmetique")!;
+    const flash = c.games.find((g) => g.template === "calcul-flash")!.config as { duration: number; practiceCount: number; levels: FlashLevel[] };
+    const rows = flash.levels.map((l) => [l.label, l.items.map((i) => [i.q, i.answer, i.explanation, ...(i.irreducible ? [true] : [])])] as [string, [string, string, string, boolean?][]]);
+    expect(flashConfig(rows, flash.duration, flash.practiceCount)).toEqual(flash);
+    const err = c.games.find((g) => g.template === "chasse-erreurs")!.config as { items: ErrItem[] };
+    const erows = err.items.map((i) => (i.correct ? [i.niveau, i.calc, i.explanation] : [i.niveau, i.calc, i.explanation, i.errors!, i.error!]) as Parameters<typeof erreursConfig>[0][number]);
+    expect(erreursConfig(erows)).toEqual(err);
   });
 });

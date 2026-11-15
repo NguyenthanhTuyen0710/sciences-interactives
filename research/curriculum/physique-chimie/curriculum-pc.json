@@ -664,19 +664,82 @@
          "id": "P5-E-04",
          "text": "Élaborer et réaliser un circuit électrique répondant à un cahier des charges simple.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "circuit électrique simple",
+          "cahier des charges",
+          "schéma normalisé"
+         ],
+         "competences": [
+          "Concevoir, créer, réaliser",
+          "Pratiquer des démarches scientifiques"
+         ],
+         "classification": {
+          "status": "validé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         },
         {
          "id": "P5-E-05",
          "text": "Distinguer dipôles en série et dipôles en dérivation.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "dipôles en série",
+          "dipôles en dérivation",
+          "boucle, maille"
+         ],
+         "competences": [
+          "S’approprier des outils et des méthodes",
+          "Pratiquer des langages"
+         ],
+         "classification": {
+          "status": "validé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         },
         {
          "id": "P5-E-06",
          "text": "Aborder qualitativement le courant et la tension (premières mesures à l'ampèremètre et au voltmètre).",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Repères de progressivité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "courant électrique",
+          "tension électrique",
+          "ampèremètre (en série), voltmètre (en dérivation)"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques",
+          "S’approprier des outils et des méthodes"
+         ],
+         "classification": {
+          "status": "validé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+          "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+         },
+         "required": false
         }
        ],
        "prerequisites": [
@@ -1027,11 +1090,11 @@
           "Concevoir, créer, réaliser"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
          },
          "sourceCheck": {
           "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
@@ -1061,11 +1124,11 @@
           "S’approprier des outils et des méthodes"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
          },
          "sourceCheck": {
           "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
@@ -1095,11 +1158,11 @@
           "S’approprier des outils et des méthodes"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
          },
          "sourceCheck": {
           "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
@@ -1113,11 +1176,10 @@
         {
          "id": "P4-E-04",
          "text": "Étudier l'influence d'une résistance dans un circuit.",
-         "officialRef": "Eduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (non prescriptif)",
+         "officialRef": "Éduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (document d'accompagnement non prescriptif, pas un texte du BO)",
          "verified": true,
          "level": {
-          "4e": "exigible",
-          "3e": "consolidation"
+          "4e": "approfondissement"
          },
          "notions": [
           "résistance (Ω)",
@@ -1127,13 +1189,14 @@
           "Pratiquer des démarches scientifiques"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
-          "warning": "Objectif issu de l'aide Éduscol 2016, non du BO : à confirmer ou à rattacher à « Exploiter les lois de l’électricité » (p. 103)."
-         }
+          "levelNote": "Décision du porteur de projet (2026-11-15) : rattaché à « Exploiter les lois de l'électricité », niveau approfondissement, non compté comme objectif obligatoire (source : aide Éduscol 2016, pas le BO).",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+         },
+         "required": false,
+         "mergedInto": "Exploiter les lois de l'électricité (programme du cycle 4 2020, p. 103)"
         }
        ],
        "prerequisites": [
@@ -1554,6 +1617,7 @@
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
          "verified": true,
          "level": {
+          "4e": "exigible",
           "3e": "exigible"
          },
          "notions": [
@@ -1566,11 +1630,11 @@
           "S’approprier des outils et des méthodes"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ». Option A : traité dès le chapitre 4e pc-4e-electricite ; reste exigible en 3e s'il n'a pas été traité en 4e.",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
          },
          "sourceCheck": {
           "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
@@ -1599,6 +1663,7 @@
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
          "verified": true,
          "level": {
+          "4e": "exigible",
           "3e": "exigible"
          },
          "notions": [
@@ -1609,11 +1674,11 @@
           "Adopter un comportement éthique et responsable"
          ],
          "classification": {
-          "status": "proposé",
+          "status": "validé",
           "by": "Claude Code (session du 2026-11-15)",
-          "toValidate": "porteur de projet",
           "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
-          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose »."
+          "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ». Option A : traité dès le chapitre 4e pc-4e-electricite ; reste exigible en 3e s'il n'a pas été traité en 4e.",
+          "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
          },
          "sourceCheck": {
           "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",

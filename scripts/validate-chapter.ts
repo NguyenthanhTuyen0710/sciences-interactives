@@ -9,7 +9,7 @@ import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
 import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise } from "../src/lib/engine/check";
-import { diagnosticIssues, specialValues } from "../src/lib/engine/diagnostics";
+import { diagnosticIssues, specialValues, unitIssues } from "../src/lib/engine/diagnostics";
 import { perfect } from "../src/lib/engine/solve";
 import { toPublic } from "../src/lib/engine/public";
 import { gcd, parseNumber } from "../src/lib/engine/numbers";
@@ -100,6 +100,7 @@ async function main() {
       if (checkExercise(inst, inst.parts.map(() => undefined)).score !== 0) add(e.id, "réponse vide non nulle", seed);
       inst.parts.forEach((p, i) => {
         for (const d of diagnosticIssues(p.interaction, p.mistakes, responses[i], i)) add(e.id, d, seed);
+        if (c.subject === "physique-chimie") for (const u of unitIssues(p.interaction)) add(e.id, `partie ${i} : ${u}`, seed);
         for (const v of specialValues(p.interaction)) special[e.id] = { ...special[e.id], [v]: (special[e.id]?.[v] ?? 0) + 1 };
         for (const l of lists(p.interaction)) { const d = dup(l); if (d) add(e.id, `élément en double : ${d}`, seed); }
         if (p.interaction.kind === "ordonner" && p.interaction.answer.every((v, j) => v === j)) add(e.id, "ordre déjà correct au départ", seed);

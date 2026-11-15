@@ -27,7 +27,7 @@ on:
       niveau:
         description: "Niveau (doit correspondre à la fiche du chapitre)"
         type: choice
-        options: [3e, 4e, 5e, 6e]
+        options: [3e, 4e, 5e, 6e, 2nde, 1re, Tle]
         default: 3e
       matiere:
         description: "Matière (doit correspondre à la fiche du chapitre)"
@@ -35,7 +35,7 @@ on:
         options: [mathematiques, physique-chimie]
         default: mathematiques
       parcours:
-        description: "Parcours (collège : « college » ; lycée : tronc commun, spécialité… quand l'inventaire existera)"
+        description: "Parcours : « college » au collège ; lycée : tronc-commun | specialite | maths-complementaires | maths-expertes"
         type: string
         default: college
       chapitre:
@@ -50,6 +50,15 @@ on:
         description: "Identifiant msgbatch_… (mode collect uniquement)"
         type: string
         default: ""
+      dossier_model:
+        description: "Modèle imposé pour le dossier (comparaison du pilote) ; « defaut » = palier normal, empreinte inchangée"
+        type: choice
+        options: [defaut, haiku, sonnet]
+        default: defaut
+      force:
+        description: "Refaire une étape déjà faite ou un fichier existant (--force) ; à n'utiliser que sur décision"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -156,6 +165,8 @@ jobs:
           CHAPTER: ${{ inputs.chapitre }}
           EXERCISES: ${{ inputs.exercise_count }}
           BATCH_ID: ${{ inputs.batch_id }}
+          DOSSIER_MODEL: ${{ inputs.dossier_model || 'defaut' }}
+          FORCE: ${{ inputs.force && 'true' || 'false' }}
           # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
           # et pipeline/run.ts ne l'affiche jamais. workflow_run → dry-run → aucune clé.
           ANTHROPIC_API_KEY: ${{ needs.setup.outputs.api == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
@@ -163,6 +174,8 @@ jobs:
           if [ -n "$CHAPTER" ]; then args=("$CHAPTER"); else args=(--next); fi
           args+=(--level "$LEVEL" --subject "$SUBJECT" --parcours "$PARCOURS")
           if [ -n "$EXERCISES" ]; then args+=(--exercises "$EXERCISES"); fi
+          if [ "$DOSSIER_MODEL" != "defaut" ]; then args+=(--dossier-model "$DOSSIER_MODEL"); fi
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
           case "$MODE" in
             dry-run) args+=(--batch) ;;
             pilot)   args+=(--submit) ;;

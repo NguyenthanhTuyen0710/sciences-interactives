@@ -2,6 +2,16 @@
 // Module pur (sans E/S) : utilisé par pipeline/run.ts et testé par tests/pipeline-models.test.ts.
 // Tarifs : pipeline/prices.json (page officielle https://platform.claude.com/docs/en/about-claude/pricing).
 
+import { createHash } from "node:crypto";
+
+/**
+ * Empreinte anti-doublon d'une requête (texte du prompt). `explicitModel` n'est ajouté que si le modèle a été imposé
+ * (`--dossier-model`, comparaison du pilote) : sans lui, l'empreinte est identique à celle déjà inscrite au registre.
+ */
+export function inputHash(parts: string[], explicitModel?: string): string {
+  return createHash("sha256").update((explicitModel ? [...parts, `model=${explicitModel}`] : parts).join("\u0000")).digest("hex").slice(0, 16);
+}
+
 export const MODELS = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5", opus: "claude-opus-5-5" } as const;
 /** Familles exclues par décision du porteur de projet. */
 export const FORBIDDEN_MODEL = /fable|mythos/i;
@@ -11,7 +21,7 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
 
 /**
  * Étapes de pipeline/run.ts. system « light » : règles seules (sans schéma, types ni chapitre d'exemple), pour les
- * étapes qui n'écrivent pas de code (dossier, criblage) ; « full » : préfixe complet (chapitre, fix, relecture).
+ * étapes qui n'écrivent pas de code (dossier, criblage, juge approfondi) ; « full » : préfixe complet (chapitre, fix).
  * fix : modèle choisi par fixModel() ; review : juge approfondi limité aux constats signalés et aux niveaux 4-5.
  */
 export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light" }> = {
@@ -19,7 +29,9 @@ export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; 
   chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
   screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light" },
-  review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "full" },
+  // Juge approfondi : préfixe « light » (décision du 2026-11-15) : les erreurs de type sont déjà prises par ChapterSchema,
+  // tsc et validate-chapter (tier 1) ; la requête contient les extraits d'exercices à juger.
+  review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "light" },
 };
 
 /** Politique complète, y compris les tâches hors de run.ts (référence pour les scripts et les agents). */
@@ -80,6 +92,36 @@ export function addUsage(acc: ByModel, model: string, u: UsageLike & { thinking?
   return acc;
 }
 
+/**
+ * Matières prises en charge (M3). `key` sélectionne les blocs propres à la matière dans les prompts ; `manifest` : un
+ * manifest de niveau (research/curriculum/<matière>/manifest-<niveau>.json) est exigé.
+ */
+export const SUBJECTS = {
+  mathematiques: { key: "maths", inventory: "research/curriculum/mathematiques/curriculum-math.json", manifest: true },
+  "physique-chimie": { key: "pc", inventory: "research/curriculum/physique-chimie/curriculum-pc.json", manifest: false },
+} as const;
+export type SubjectSlug = keyof typeof SUBJECTS;
+
+/** Clés de blocs des prompts : matière (`maths`, `pc`) et cycle (`college`, `lycee`). */
+export const SECTION_KEYS = ["maths", "pc", "college", "lycee"] as const;
+const LYCEE = ["2nde", "1re", "Tle"];
+export const isLycee = (grade: string) => LYCEE.includes(grade);
+/** Blocs actifs pour un chapitre : sa matière et son cycle. */
+export const sectionKeys = (subject: SubjectSlug, grade: string): string[] => [SUBJECTS[subject].key, isLycee(grade) ? "lycee" : "college"];
+
+/** Garde les blocs `{{#clé}}…{{/clé}}` actifs (imbrication de clés différentes permise), retire les autres ; clé inconnue = erreur. */
+export function promptSections(tpl: string, active: string[]): string {
+  let out = tpl, prev;
+  do {
+    prev = out;
+    out = out.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k: string, body: string) => {
+      if (!(SECTION_KEYS as readonly string[]).includes(k)) throw new Error(`bloc inconnu dans un prompt : ${k}`);
+      return active.includes(k) ? body : "";
+    });
+  } while (out !== prev);
+  return out;
+}
+
 /** Exercices d'un fichier de chapitre : blocs de source par identifiant (préfixe donné) et niveau. */
 export function exerciseBlocks(src: string, prefix: string): { id: string; niveau: number; text: string }[] {
   const re = new RegExp(`id: "(${prefix.replace(/[-]/g, "\\-")}\\d+)"`, "g");
@@ -89,4 +131,55 @@ export function exerciseBlocks(src: string, prefix: string): { id: string; nivea
     const text = src.slice(s.at, i + 1 < starts.length ? starts[i + 1].at : end > 0 ? end : undefined);
     return { id: s.id, niveau: Number(/niveau: (\d)/.exec(text)?.[1] ?? 0), text };
   });
+}
+
+// ───────── Métadonnées du chapitre injectées par le pipeline (proposition A) ─────────
+export interface MetaSpec {
+  id: string; taskId: string; grade: string; subject: string; parcours?: string; treeChapterId: string; title: string;
+  officialChapterIds?: string[]; consolidationChapterIds?: string[];
+  objectiveLevels?: Record<string, string>;
+  officialSources?: { seedId?: string | null; title: string; url: string; sha256?: string; accessedAt?: string; verification?: string }[];
+}
+export interface ObjectiveGroup { chapter: string; kind: string; objectives: { id: string; text: string; officialRef?: string; required?: boolean }[] }
+export const META_START = "// <pipeline:meta> générée par pipeline/run.ts depuis la fiche et l'inventaire — ne pas modifier à la main";
+export const META_END = "// </pipeline:meta>";
+
+/**
+ * Bloc `const META = {…}` : champs entièrement déterminés par la fiche et l'inventaire (identité, objectifs, sources,
+ * statuts). Le modèle ne les écrit plus et étale `...META`. `required: false` : objectif non exigé par l'inventaire ou
+ * marqué « approfondissement » dans la fiche.
+ */
+export function metaBlock(spec: MetaSpec, groups: ObjectiveGroup[]): string {
+  const objectives = groups.flatMap((g) => g.objectives.map((o) => ({
+    id: o.id, text: o.text,
+    source: `${o.officialRef ?? g.chapter}${g.kind === "consolidation" ? " (consolidation)" : ""}`,
+    ...(o.required === false || spec.objectiveLevels?.[o.id] === "approfondissement" ? { required: false } : {}),
+  })));
+  const sources = (spec.officialSources ?? []).map((s, i) => ({
+    id: s.seedId ?? `source-${i + 1}`, title: s.title, url: s.url, kind: "official",
+    verification: s.verification ?? "verified", ...(s.sha256 ? { sha256: s.sha256 } : {}), ...(s.accessedAt ? { accessedAt: s.accessedAt } : {}),
+  }));
+  // Chapitres d'inventaire couverts (matrice de couverture), si différents de l'id du chapitre.
+  const covered = [...(spec.officialChapterIds ?? []), ...(spec.consolidationChapterIds ?? [])];
+  const curriculumChapterIds = covered.length === 1 && covered[0] === spec.id ? [] : covered;
+  const meta = {
+    id: spec.id, taskId: spec.taskId, grade: spec.grade, subject: spec.subject, ...(spec.parcours && spec.parcours !== "college" ? { parcours: spec.parcours } : {}),
+    treeChapterId: spec.treeChapterId, ...(curriculumChapterIds.length ? { curriculumChapterIds } : {}), curriculumVersion: "2026-2027", title: spec.title,
+    officialObjectives: objectives, sources,
+    reviewStatus: { curriculum: "pending", accuracy: "pending", exercises: "pending", games: "pending", technical: "pending", language: "pending" },
+    publicationStatus: "draft",
+  };
+  return `${META_START}\nconst META = ${JSON.stringify(meta, null, 2)} satisfies Partial<import("../schema").ChapterContent>;\n${META_END}`;
+}
+
+/** Insère (ou remplace) le bloc META après la dernière instruction `import` du fichier produit. */
+export function injectMeta(file: string, block: string): string {
+  const start = file.indexOf(META_START);
+  if (start >= 0) {
+    const end = file.indexOf(META_END, start);
+    return file.slice(0, start) + block + file.slice(end + META_END.length);
+  }
+  const imports = [...file.matchAll(/^import\b[^;]*;[ \t]*$/gm)];
+  const at = imports.length ? imports[imports.length - 1].index! + imports[imports.length - 1][0].length : 0;
+  return `${file.slice(0, at)}\n\n${block}\n${file.slice(at)}`;
 }

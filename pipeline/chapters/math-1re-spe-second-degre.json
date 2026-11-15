@@ -1,0 +1,62 @@
+{
+  "id": "math-1re-spe-second-degre",
+  "taskId": "SCI-1RE-MATH-001",
+  "grade": "1re",
+  "subject": "mathematiques",
+  "parcours": "specialite",
+  "treeChapterId": "m1-second-degre",
+  "title": "Équations, fonctions polynômes du second degré",
+  "exportName": "math1reSecondDegre",
+  "exercisePrefix": "sd1-",
+  "officialChapterIds": [
+    "math-1re-spe-second-degre"
+  ],
+  "objectiveIds": [
+    "M1S-SD-01",
+    "M1S-SD-02",
+    "M1S-SD-03",
+    "M1S-SD-04",
+    "M1S-SD-05",
+    "M1S-SD-06"
+  ],
+  "consolidationChapterIds": [],
+  "demonstrations": [
+    "Résolution de l'équation du second degré (M1S-SD-05, démonstration exigible du programme, BO n° 14 p. 359-360)"
+  ],
+  "scopeNotes": [
+    "Programme d'enseignement de spécialité de mathématiques de première, voie générale (arrêté du 26-2-2026, BO n° 14 du 2-4-2026, MENE2602917A), en application à la rentrée 2026-2027 ; partie « Algèbre », « Équations, fonctions polynômes du second degré » (p. 359-360).",
+    "Forme canonique « dans des cas simples » par complétion du carré ; « Le calcul effectif de la forme canonique dans le cas général n'est pas un attendu du programme » (p. 359).",
+    "Approfondissement, non obligatoire : M1S-SD-06 (somme et produit, polynôme du troisième degré) ; à étiqueter « Approfondissement » pour l'élève.",
+    "Prérequis de 2nde (programme 2026, non inventorié) : fonction carré, identités remarquables ; à rappeler dans le cours, sans exercice compté comme objectif.",
+    "Évaluation finale : exercices de niveau 5 « Type épreuve anticipée — … » : épreuve anticipée de mathématiques de fin de première (NS MENE2622640N, BO spécial n° 4 du 17-9-2026, p. 44), 2 h, sans calculatrice, automatismes (6 pts) et exercices (14 pts) ; aucune calculatrice supposée dans les énoncés de niveau 5.",
+    "Automatisme du programme à entraîner (p. 359) : « Déterminer le signe d'une expression du premier degré, d'une expression factorisée du second degré ».",
+    "Sources : aucune n'a d'enregistrement vérifié du collecteur ; les citer avec verification « pending_verification » (jamais « verified »)."
+  ],
+  "exampleChapter": "src/lib/chapters/data/math-3e-arithmetique.ts",
+  "officialSources": [
+    {
+      "seedId": null,
+      "title": "Bulletin officiel n° 14 du 2 avril 2026 — programme de l'enseignement de spécialité de mathématiques de première de la voie générale (MENE2602917A)",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+      "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+      "accessedAt": "2026-11-15T05:17:44.000Z",
+      "verification": "pending_verification"
+    },
+    {
+      "seedId": null,
+      "title": "Bulletin officiel spécial n° 4 du 17 septembre 2026 — épreuve anticipée de mathématiques (note de service MENE2622640N)",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/20260917boenjsspe4pdf-520753.pdf",
+      "sha256": "63e1f2316c7c88b11a1376071c780e7c1f28d36ce59fb3f707f173bc6ad23537",
+      "accessedAt": "2026-11-15T05:18:30.000Z",
+      "verification": "pending_verification"
+    }
+  ],
+  "objectiveLevels": {
+    "M1S-SD-01": "exigible",
+    "M1S-SD-02": "exigible",
+    "M1S-SD-03": "exigible",
+    "M1S-SD-04": "exigible",
+    "M1S-SD-05": "exigible",
+    "M1S-SD-06": "approfondissement"
+  }
+}

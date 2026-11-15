@@ -13,9 +13,26 @@ Phase pilote : chapitre Pythagore 3e produit (0,692 $) ; pilote élargi (PC, lyc
 | Correction : tour 1 si tous les problèmes sont mineurs (vouvoiement, flottants, doublons, options équivalentes) | Haiku 5.5 |
 | Correction : problème majeur, ou tour 2 (escalade après un échec) | Sonnet 5.5 ; au-delà de 2 tours : needs-human |
 | Juge 1 : criblage du chapitre entier (langue, tutoiement, ton ; signale le reste) | Haiku 5.5, effort low |
-| Juge 2 : exercices signalés et niveaux 4-5 seulement | Sonnet 5.5, effort low |
+| Juge 2 : exercices signalés et niveaux 4-5 seulement | Sonnet 5.5, effort low, préfixe court (sans schéma, types ni chapitre d'exemple : décision du 2026-11-15) |
 | Démonstrations lycée, sujets bac, juge d'examens (G5) | Opus 5.5 |
 Fable et Mythos sont refusés par le script. Toutes les étapes de production passent par Message Batches (`--submit`), correction comprise ; le cache n'est posé que sur un appel synchrone suivi d'autres appels au même préfixe. Le dry-run affiche la dépense maximale par étape et par modèle, comparée à la même chaîne entièrement sur Sonnet, et avertit quand une requête Haiku dépasse 100 000 tokens (tarif × 5, découpage proposé). Le registre (`reserve.model`, `actual.model`, `actual.tokens`) et le rapport de run ventilent coûts et tokens par modèle ; `ledger.ts check` affiche la dépense par modèle (entrées antérieures : Sonnet 5.5).
+
+## Matières (M3, étape A)
+- `mathematiques` et `physique-chimie` (`SUBJECTS` dans `pipeline/models.ts`) : l'inventaire est lu selon la matière de la fiche (`curriculum-math.json` / `curriculum-pc.json`) ; le manifest de niveau est exigé en mathématiques, facultatif en physique-chimie (contrôle par l'inventaire et la matrice).
+- Prompts : blocs `{{#maths}}…{{/maths}}` et `{{#pc}}…{{/pc}}` gardés pour la seule matière du chapitre (unités SI, chiffres significatifs, schémas normalisés, sécurité, exactitude physique) ; les prompts de mathématiques sont identiques octet pour octet à ceux d'avant M3.
+- `validate-chapter` : pour un chapitre de physique-chimie, toute réponse numérique porte son unité (`suffix` ou `answer.unit`), `sigFigs` entier de 1 à 6, unité de base parmi les choix et convertible (`unitIssues`, `src/lib/engine/diagnostics.ts`).
+- Fiche pilote : `pipeline/chapters/pc-4e-electricite.json` ; dry-run dans `pr-checks.yml`.
+
+## Lycée (M3, étape B)
+- `ChapterSchema` : niveaux 2nde, 1re, Tle ; motifs `id` (`math-1re-…`) et `taskId` (`SCI-1RE-MATH-…`) ; `parcours` obligatoire au lycée, interdit au collège ; `officialObjectives[].required: false` = objectif hors critère d'achèvement.
+- `run.ts` : manifest exigé pour les mathématiques du collège seulement ; parcours de la fiche contrôlé contre le `track` de l'inventaire ; blocs `{{#college}}` / `{{#lycee}}` des prompts (empreintes des prompts du collège inchangées, test) ; chapitre au palier **Opus** si la fiche lycée liste des `demonstrations` exigibles, Sonnet sinon.
+- `npm run dashboard` régénère à chaque exécution `master-curriculum.json` (fusion des `curriculum-*.json`, test d'égalité) et la matrice, désormais lue directement dans les inventaires.
+- Fiche pilote : `pipeline/chapters/math-1re-spe-second-degre.json` ; dry-run dans `pr-checks.yml`.
+
+## Sortie du chapitre allégée (propositions A et C, 2026-11-15)
+- **A** : le bloc `const META = {…}` (id, taskId, niveau, matière, parcours, arborescence, `curriculumChapterIds`, objectifs avec `required`, sources de la fiche, statuts) est construit par `metaBlock` (`pipeline/models.ts`) et inséré après les imports (`injectMeta`) à l'enregistrement du chapitre ; le modèle écrit `{ ...META, prerequisites, lesson, exercises, games }`. Mesuré sur Pythagore : −3,9 ko de sortie (≈ 1 850 tokens).
+- **C** : `flashConfig` et `erreursConfig` (`src/lib/games/logic.ts`) : lignes compactes, même forme à l'exécution (test sur l'arithmétique). Mesuré sur les 4 chapitres publiés : −0,7 à −1,7 ko par chapitre.
+- Seule l'empreinte de l'étape « chapitre » change (prompt `chapter.md`) ; dossier, correction, criblage et relecture inchangés ; un chapitre existant n'est jamais régénéré sans `--force`.
 
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.
@@ -57,6 +74,7 @@ Modes :
 - Initialisation (une seule fois, après décision) : workflow `Data Store Init` (saisir CREER), ou `bash .github/scripts/data-store.sh init`. Test réel du mécanisme : workflow `Data Store Self-test` (release jetable).
 - Les sorties (dossier, chapitre `draft`, rapport, registre, journal) sont publiées en **artefact du run**, jamais committées.
 - `reconcile` : à lancer si un envoi a échoué avec une issue inconnue.
+- `dossier_model` (defaut | haiku | sonnet) : impose le modèle du dossier (comparaison du pilote) ; le modèle n'entre dans l'empreinte anti-doublon que s'il est imposé (empreintes existantes inchangées). `force` : `--force`, sur décision seulement. Un chapitre n'est jamais généré sans le dossier committé (relu et retenu).
 - Chaîne type : pilot (dossier) → collect → relecture + commit du dossier → pilot (chapitre) → collect → relecture → commit du brouillon. Le résumé du job reprend `pipeline-output/summary.md` (dépense, tokens, QA, needs-human, manques).
 
 ## Reprise et non-régression

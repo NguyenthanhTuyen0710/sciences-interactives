@@ -285,6 +285,36 @@
         ]
       },
       "note": "308 p. ; seule l'annexe 26 (mathématiques, cycle 4) est utilisée."
+    },
+    {
+      "id": "bo-2026-14-pdf",
+      "sourceId": "bo",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+      "inventorySourceId": null,
+      "g1": "approved",
+      "declared": {
+        "subject": "mathematiques",
+        "grades": [
+          "2nde",
+          "1re"
+        ],
+        "officialRef": "Bulletin officiel n° 14 du 2 avril 2026 : arrêtés du 26-2-2026 (MENE2602914A, 2nde ; MENE2602917A, 1re spécialité)",
+        "applicability": [
+          {
+            "grade": "1re",
+            "status": "en_vigueur",
+            "from": "2026-2027"
+          }
+        ]
+      },
+      "expect": {
+        "contains": [
+          "MENE2602917A",
+          "Équations, fonctions polynômes du second degré"
+        ]
+      },
+      "note": "Lu manuellement le 2026-11-15 (pdftotext) : programmes 2026 de 2nde et de 1re spécialité ; second degré p. 359-360 ; SHA256 34875c42a0cf… (copie de session).",
+      "g1Note": "Décision du porteur de projet du 2026-11-15 : passage par le collecteur pour vérifier l'inventaire 1re (pilote math-1re-spe-second-degre) ; aucune conservation ni redistribution du PDF."
     }
   ]
 }

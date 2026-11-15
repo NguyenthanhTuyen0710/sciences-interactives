@@ -162,3 +162,51 @@ export function matchObjective(objectiveText: string, docs: { seedId: string; sh
   }
   return { status: "needs_manual_review", candidates: candidates.sort((a, b) => b.wordCoverage - a.wordCoverage) };
 }
+
+// ───────── Mise à jour de l'inventaire (G2) : uniquement des changements approuvés et prouvés ─────────
+export interface Evidence { seedId: string; sha256: string; quote: string; page?: number }
+export type Change =
+  | { op: "add_objective"; chapterId: string; objective: { id: string; text: string; officialRef: string }; evidence: Evidence; approvedBy?: string; approvedAt?: string }
+  | { op: "attach_evidence"; objectiveId: string; evidence: Evidence; approvedBy?: string; approvedAt?: string };
+export interface Inventory { grades: { domains: { chapters: { id: string; objectives: Record<string, unknown>[] }[] }[] }[] }
+
+/**
+ * Applique des changements à l'inventaire (modifié en place seulement si aucun n'est refusé). Chaque changement exige :
+ * (1) une approbation humaine du rapprochement citation ↔ objectif (`approvedBy` + `approvedAt` daté) ;
+ * (2) un document enregistré avec le même SHA256 et le statut `verified` ;
+ * (3) la citation (≥ 20 caractères) présente mot pour mot dans ce document.
+ * `add_objective` ajoute un objectif `verified: true` ; `attach_evidence` ajoute la preuve et passe l'objectif existant à
+ * `verified: true` (son texte n'est pas modifié). Aucun passage à `verified` sans les trois conditions.
+ */
+export function applyChanges(inv: Inventory, changes: Change[], docOf: (seedId: string) => { record: SourceRecord; text: string | null } | null): { applied: number; errors: string[] } {
+  const draft: Inventory = JSON.parse(JSON.stringify(inv));
+  const chapters = draft.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters));
+  const objectives = chapters.flatMap((c) => c.objectives);
+  const errors: string[] = [];
+  let applied = 0;
+  for (const [i, ch] of changes.entries()) {
+    const where = `changement ${i + 1} (${ch.op})`;
+    if (!ch.approvedBy?.trim() || !/^\d{4}-\d{2}-\d{2}/.test(ch.approvedAt ?? "")) { errors.push(`${where} : non approuvé (approvedBy/approvedAt)`); continue; }
+    const doc = docOf(ch.evidence.seedId);
+    const rec = doc?.record;
+    if (!rec || rec.sha256 !== ch.evidence.sha256) { errors.push(`${where} : aucun enregistrement ${ch.evidence.seedId} avec ce SHA256`); continue; }
+    if (rec.verification.status !== "verified") { errors.push(`${where} : document ${ch.evidence.seedId} non vérifié (${rec.verification.status})`); continue; }
+    if (!doc!.text) { errors.push(`${where} : document absent du cache local (restaurer le stockage ou lancer fetch)`); continue; }
+    if (!quoteFound(doc!.text, ch.evidence.quote)) { errors.push(`${where} : citation introuvable dans le document (≥ 20 caractères, mot pour mot)`); continue; }
+    const evidence = { ...ch.evidence, accessedAt: rec.accessedAt, url: rec.url, approvedBy: ch.approvedBy, approvedAt: ch.approvedAt };
+    if (ch.op === "add_objective") {
+      const c = chapters.find((x) => x.id === ch.chapterId);
+      if (!c) { errors.push(`${where} : chapitre ${ch.chapterId} absent`); continue; }
+      if (objectives.some((o) => o.id === ch.objective.id)) { errors.push(`${where} : objectif ${ch.objective.id} déjà présent (aucune modification d'un objectif existant)`); continue; }
+      c.objectives.push({ ...ch.objective, verified: true, evidence });
+    } else {
+      const o = objectives.find((x) => x.id === ch.objectiveId);
+      if (!o) { errors.push(`${where} : objectif ${ch.objectiveId} absent`); continue; }
+      o.evidence = evidence; // le texte existant n'est pas modifié
+      o.verified = true; // conditions (1) à (3) remplies
+    }
+    applied++;
+  }
+  if (!errors.length) Object.assign(inv, draft);
+  return { applied: errors.length ? 0 : applied, errors };
+}

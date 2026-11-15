@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractMetadata, gateSeed, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
+import { applyChanges, extractMetadata, gateSeed, type Change, type Inventory, type SourceRecord, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
 import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
@@ -182,5 +182,44 @@ describe("registre des dépenses", () => {
     expect(reconcileBatch(op, [{ id: "msgbatch_x", created_at: "2026-11-07T10:00:05Z" }], new Set())).toEqual({ batchId: "msgbatch_x" });
     expect(reconcileBatch(op, [{ id: "msgbatch_old", created_at: "2026-11-06T10:00:00Z" }], new Set())).toEqual({ failed: true });
     expect("ambiguous" in reconcileBatch(op, [{ id: "x1", created_at: "2026-11-07T10:01:00Z" }, { id: "x2", created_at: "2026-11-07T10:02:00Z" }], new Set())).toBe(true);
+  });
+});
+
+describe("G2 : attach_evidence passe un objectif à verified seulement si la citation est prouvée ET le rapprochement approuvé", () => {
+  const SHA = "a".repeat(64);
+  const rec = { seedId: "doc", url: "https://www.education.gouv.fr/x.pdf", accessedAt: "2026-11-15T00:00:00.000Z", sha256: SHA, verification: { status: "verified", checks: [] } } as unknown as SourceRecord;
+  const text = "Capacités attendues − Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée.";
+  const inv = (): Inventory => ({ grades: [{ domains: [{ chapters: [{ id: "c", objectives: [{ id: "O1", text: "Étudier le signe…", verified: false }] }] }] }] });
+  const ev = { seedId: "doc", sha256: SHA, quote: "Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée." };
+  const ok: Change = { op: "attach_evidence", objectiveId: "O1", evidence: ev, approvedBy: "porteur de projet", approvedAt: "2026-11-15" };
+  const docOf = () => ({ record: rec, text });
+  const obj = (i: Inventory) => i.grades[0].domains[0].chapters[0].objectives[0];
+  it("accepté : verified true, preuve avec approbation, texte inchangé", () => {
+    const i = inv();
+    expect(applyChanges(i, [ok], docOf)).toEqual({ applied: 1, errors: [] });
+    expect(obj(i)).toMatchObject({ verified: true, text: "Étudier le signe…", evidence: { approvedBy: "porteur de projet", approvedAt: "2026-11-15", sha256: SHA } });
+  });
+  const refused: [string, Change, typeof docOf][] = [
+    ["sans approbation", { ...ok, approvedBy: undefined }, docOf],
+    ["approbation sans date", { ...ok, approvedAt: "hier" }, docOf],
+    ["citation absente du document", { ...ok, evidence: { ...ev, quote: "Étudier le signe d'une fonction affine quelconque sur un intervalle." } }, docOf],
+    ["SHA256 différent", { ...ok, evidence: { ...ev, sha256: "b".repeat(64) } }, docOf],
+    ["document non vérifié", ok, () => ({ record: { ...rec, verification: { status: "needs_review", checks: [] } } as SourceRecord, text })],
+    ["document absent du cache", ok, () => ({ record: rec, text: null })],
+  ];
+  for (const [name, change, d] of refused) it(`refusé : ${name} (objectif inchangé, verified false)`, () => {
+    const i = inv();
+    const r = applyChanges(i, [change], d);
+    expect(r.applied).toBe(0);
+    expect(r.errors).toHaveLength(1);
+    expect(obj(i).verified).toBe(false);
+    expect(obj(i).evidence).toBeUndefined();
+  });
+  it("tout ou rien : un refus annule les changements valides du même lot", () => {
+    const i = inv();
+    i.grades[0].domains[0].chapters[0].objectives.push({ id: "O2", text: "x", verified: false });
+    const r = applyChanges(i, [ok, { ...ok, objectiveId: "O2", approvedBy: "" }], docOf);
+    expect(r.errors).toHaveLength(1);
+    expect(obj(i).verified).toBe(false);
   });
 });

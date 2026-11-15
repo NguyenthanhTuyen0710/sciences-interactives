@@ -1,7 +1,8 @@
 // Registre de tâches et tableau de bord.
 //   npm run dashboard          → régénère project/dashboard.md à partir des enregistrements réels
-//   npm run dashboard -- sync  → fusionne les inventaires A1/A3 dans research/curriculum/master-curriculum.json
-//                                et crée une tâche TODO par chapitre officiel absent du registre
+//   Chaque exécution régénère aussi research/curriculum/master-curriculum.json (fusion des curriculum-*.json, seule
+//   source ; jamais éditée à la main) et crée une tâche TODO par chapitre officiel absent du registre
+//   (`-- sync` reste accepté, sans effet supplémentaire).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { doneIssues, REVIEW_KEYS } from "../src/lib/chapters/schema";
@@ -23,15 +24,16 @@ const LEDGER = "project/ledger.json";
 const ledger = readJson<Ledger>(LEDGER) ?? { version: 1, updatedAt: "", tasks: [] };
 const save = () => { ledger.updatedAt = new Date().toISOString(); writeFileSync(P(LEDGER), JSON.stringify(ledger, null, 2) + "\n"); };
 
+/** Inventaires sources (seule source de vérité) ; master-curriculum.json n'en est qu'une fusion générée. */
 function curricula(): Curriculum[] {
-  const master = readJson<{ subjects: Curriculum[] }>("research/curriculum/master-curriculum.json");
-  if (master) return master.subjects;
   return [readJson<Curriculum>("research/curriculum/mathematiques/curriculum-math.json"), readJson<Curriculum>("research/curriculum/physique-chimie/curriculum-pc.json")].filter(Boolean) as Curriculum[];
 }
 
+/** Fusion déterministe (date = plus récente des sources, pas l'horloge) + tâches des nouveaux chapitres. */
 function sync() {
-  const subjects = [readJson<Curriculum>("research/curriculum/mathematiques/curriculum-math.json"), readJson<Curriculum>("research/curriculum/physique-chimie/curriculum-pc.json")].filter(Boolean) as Curriculum[];
-  writeFileSync(P("research/curriculum/master-curriculum.json"), JSON.stringify({ generatedAt: new Date().toISOString().slice(0, 10), note: "Fusion générée par scripts/dashboard.ts sync — ne pas éditer à la main.", subjects }, null, 2) + "\n");
+  const subjects = curricula() as (Curriculum & { generatedAt?: string })[];
+  const generatedAt = subjects.map((s) => s.generatedAt ?? "").sort().pop() ?? "";
+  writeFileSync(P("research/curriculum/master-curriculum.json"), JSON.stringify({ generatedAt, note: "Fusion générée par scripts/dashboard.ts (chaque exécution) à partir de curriculum-math.json et curriculum-pc.json — ne pas éditer à la main.", subjects }, null, 2) + "\n");
   let added = 0;
   for (const s of subjects) {
     const sub = s.subject === "mathematiques" ? "MATH" : "PC";
@@ -43,8 +45,8 @@ function sync() {
       added++;
     }
   }
-  save();
-  console.log(`master-curriculum.json écrit ; ${added} tâche(s) ajoutée(s).`);
+  if (added) save();
+  console.log(`master-curriculum.json régénéré ; ${added} tâche(s) ajoutée(s).`);
 }
 
 const pct = (a: number, b: number) => (b ? `${Math.round((100 * a) / b)} %` : "—");
@@ -240,7 +242,7 @@ async function register(id: string) {
 }
 
 (async () => {
-  if (process.argv[2] === "sync") sync();
+  sync();
   if (process.argv[2] === "register") await register(process.argv[3] ?? "");
   render();
   await matrix();

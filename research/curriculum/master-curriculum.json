@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-11-06",
-  "note": "Fusion générée par scripts/dashboard.ts sync — ne pas éditer à la main.",
+  "note": "Fusion générée par scripts/dashboard.ts (chaque exécution) à partir de curriculum-math.json et curriculum-pc.json — ne pas éditer à la main.",
   "subjects": [
     {
       "subject": "mathematiques",
@@ -1856,13 +1856,82 @@
                       "id": "M4-EG-03",
                       "text": "Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore.",
                       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (4e) ; Attendus de fin d'année de 4e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-attendus-4e-2019-pdf",
+                        "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+                        "quote": "Il sait calculer une longueur d’un côté d’un triangle rectangle à partir de la connaissance des longueurs des deux autres côtés.",
+                        "page": 10,
+                        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                        "accessedAt": "2026-11-07T14:49:57.494Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+                        "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "approvedAt": "2026-11-07"
+                      },
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "triangle rectangle, hypoténuse",
+                        "théorème de Pythagore",
+                        "carré et racine carrée d'un nombre",
+                        "valeur exacte, valeur approchée"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Modéliser",
+                        "Raisonner"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                        "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "validatedAt": "2026-11-15"
+                      }
                     },
                     {
                       "id": "M4-EG-04",
                       "text": "Démontrer qu'un triangle est rectangle (réciproque).",
                       "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser les notions de géométrie plane pour démontrer",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-attendus-4e-2019-pdf",
+                        "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+                        "quote": "Il démontre qu’un triangle est un triangle rectangle à partir de la connaissance des longueurs de ses côtés.",
+                        "page": 10,
+                        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                        "accessedAt": "2026-11-07T14:49:57.494Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+                        "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "approvedAt": "2026-11-07"
+                      },
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "réciproque du théorème de Pythagore",
+                        "plus grand côté d'un triangle",
+                        "comparaison de deux nombres calculés séparément"
+                      ],
+                      "competences": [
+                        "Raisonner",
+                        "Calculer",
+                        "Communiquer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                        "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "validatedAt": "2026-11-15"
+                      }
                     }
                   ],
                   "prerequisites": [
@@ -2488,23 +2557,323 @@
                       "id": "M3-AUTO-01",
                       "text": "Identité a²−b²=(a−b)(a+b), distributivités, résolution de ax=b et a+x=b.",
                       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Automatismes",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "identité a² − b² = (a − b)(a + b)",
+                        "distributivité simple et double",
+                        "équations ax = b et a + x = b"
+                      ],
+                      "competences": [
+                        "Calculer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                        "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "validatedAt": "2026-11-15"
+                      }
                     },
                     {
                       "id": "M3-AUTO-02",
                       "text": "Recherche d'image et d'antécédent ; allure d'une fonction affine ou linéaire.",
                       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème B › Automatismes",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "image et antécédent",
+                        "fonction affine, fonction linéaire (allure de la représentation)"
+                      ],
+                      "competences": [
+                        "Représenter",
+                        "Calculer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                        "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "validatedAt": "2026-11-15"
+                      }
                     },
                     {
                       "id": "M3-AUTO-03",
                       "text": "Images mentales des configurations de Pythagore, Thalès et des lignes trigonométriques.",
                       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème D › Automatismes",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "quote": "les élèves doivent avoir mémorisé des images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rectangle)",
+                        "page": 137,
+                        "reason": "phê duyệt sự phù hợp về nội dung giữa mục tiêu diễn giải và trích dẫn gốc (approbation de la correspondance de contenu entre l'objectif paraphrasé et la citation d'origine)",
+                        "matchType": "b — objectif paraphrasé ; la citation n'est pas le texte de l'objectif",
+                        "accessedAt": "2026-11-07T14:49:44.189Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "approvedAt": "2026-11-07"
+                      },
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "configuration de Pythagore (carrés construits sur les côtés)",
+                        "configuration de Thalès",
+                        "lignes trigonométriques dans le triangle rectangle"
+                      ],
+                      "competences": [
+                        "Représenter",
+                        "Calculer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                        "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                        "validatedAt": "2026-11-15"
+                      }
                     }
                   ],
                   "prerequisites": [],
                   "notes": "Préparation à la partie automatismes de l'épreuve de mathématiques du DNB (format à confirmer pour la session 2027)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "grade": "1re",
+          "track": "voie générale — enseignement de spécialité",
+          "cycle": null,
+          "curriculumVersion": "2026-2027",
+          "programme": {
+            "title": "Programme d'enseignement de spécialité de mathématiques de la classe de première de la voie générale (2026)",
+            "reference": "Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019)",
+            "nor": "MENE2602917A",
+            "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+            "applicability": "Article 2 : en application à la rentrée scolaire 2026-2027.",
+            "status": "current"
+          },
+          "scope": "Inventaire partiel (G1 pilote) : seul le chapitre du second degré est relevé ; le reste du programme de 1re spécialité n'est pas inventorié.",
+          "domains": [
+            {
+              "id": "M1S-ALG",
+              "title": "Algèbre",
+              "chapters": [
+                {
+                  "id": "math-1re-spe-second-degre",
+                  "title": "Équations, fonctions polynômes du second degré",
+                  "objectives": [
+                    {
+                      "id": "M1S-SD-01",
+                      "text": "Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée.",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "exigible"
+                      },
+                      "notions": [
+                        "forme factorisée",
+                        "racines",
+                        "tableau de signes"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Raisonner"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Étudier le signe d’une fonction polynôme du second degré donnée sous forme factorisée.",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                      }
+                    },
+                    {
+                      "id": "M1S-SD-02",
+                      "text": "Déterminer les fonctions polynômes du second degré s'annulant en deux nombres réels distincts.",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "exigible"
+                      },
+                      "notions": [
+                        "forme a(x − x1)(x − x2)",
+                        "racines"
+                      ],
+                      "competences": [
+                        "Raisonner",
+                        "Calculer"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Déterminer les fonctions polynômes du second degré s’annulant en deux nombres réels distincts.",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                      }
+                    },
+                    {
+                      "id": "M1S-SD-03",
+                      "text": "Factoriser une fonction polynôme du second degré en diversifiant les stratégies (racine évidente, somme et produit des racines, identité remarquable, formules générales).",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "exigible"
+                      },
+                      "notions": [
+                        "discriminant",
+                        "somme et produit des racines",
+                        "identités remarquables",
+                        "factorisation"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Chercher"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Factoriser une fonction polynôme du second degré, en diversifiant les stratégies : racine évidente, détection des racines",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                      }
+                    },
+                    {
+                      "id": "M1S-SD-04",
+                      "text": "Choisir une forme adaptée (développée réduite, canonique, factorisée) d'une fonction polynôme du second degré dans le cadre de la résolution d'un problème (équation, inéquation, optimisation, variations).",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "exigible"
+                      },
+                      "notions": [
+                        "forme développée, canonique, factorisée",
+                        "forme canonique par complétion du carré (cas simples)",
+                        "optimisation"
+                      ],
+                      "competences": [
+                        "Modéliser",
+                        "Représenter",
+                        "Raisonner"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Choisir une forme adaptée (développée réduite, canonique, factorisée) d’une fonction polynôme du second degré dans le",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »",
+                        "textNote": "Texte aligné mot pour mot sur le BO n° 14, p. 360 (décision du porteur de projet du 2026-11-15)."
+                      }
+                    },
+                    {
+                      "id": "M1S-SD-05",
+                      "text": "Démontrer la résolution de l'équation du second degré.",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "exigible"
+                      },
+                      "notions": [
+                        "forme canonique",
+                        "discriminant",
+                        "nombre de solutions"
+                      ],
+                      "competences": [
+                        "Raisonner",
+                        "Communiquer"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Résolution de l’équation du second degré.",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »"
+                      }
+                    },
+                    {
+                      "id": "M1S-SD-06",
+                      "text": "Approfondissements possibles : factorisation d'un polynôme du troisième degré admettant une racine et résolution de l'équation associée ; factorisation de xⁿ – 1 par x – 1, de xⁿ – aⁿ par x – a ; déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme x ↦ x² – sx + p.",
+                      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+                      "verified": false,
+                      "level": {
+                        "1re": "approfondissement"
+                      },
+                      "notions": [
+                        "factorisation d'un polynôme de degré 3 admettant une racine",
+                        "résolution de l'équation associée",
+                        "factorisation de xⁿ – aⁿ par x – a",
+                        "somme et produit des racines"
+                      ],
+                      "competences": [
+                        "Chercher",
+                        "Raisonner"
+                      ],
+                      "sourceCheck": {
+                        "url": "https://www.education.gouv.fr/sites/default/files/document/Bulletin%20officiel%20n%C2%B0%2014%20du%202%20avril%202026-515432.pdf",
+                        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+                        "accessedAt": "2026-11-15",
+                        "method": "lecture manuelle (téléchargement et pdftotext), hors collecteur : à enregistrer par le collecteur après approbation G1",
+                        "quote": "Déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme",
+                        "page": 360
+                      },
+                      "classification": {
+                        "status": "proposé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme de 1re spécialité (2026) : « six compétences mathématiques : chercher, modéliser, représenter, raisonner, calculer, communiquer »",
+                        "textNote": "Texte aligné mot pour mot sur le BO n° 14, p. 360 (décision du porteur de projet du 2026-11-15)."
+                      },
+                      "required": false
+                    }
+                  ],
+                  "prerequisites": [
+                    "2nde (2026) Fonctions : fonction carré (définition, courbe, signe, variations), identités remarquables"
+                  ],
+                  "notes": "Programme p. 359 : la forme canonique est déterminée « dans des cas simples » par complétion du carré ; « Le calcul effectif de la forme canonique dans le cas général n’est pas un attendu du programme. » Évaluée à l'épreuve anticipée de mathématiques (fin de 1re, session 2028 pour les élèves de 2026-2027 ; NS MENE2622640N, BO spécial n° 4 du 17-9-2026, p. 44 : 2 h, sans calculatrice, automatismes 6 pts, exercices 14 pts). Vérifié le 2026-11-15 : l'épreuve « comprend trois sujets différents, chacun correspondant à un programme de mathématiques de première » et le candidat de spécialité compose sur le sujet « enseignement de spécialité de mathématiques de la voie générale » (BO spécial n° 4, p. 44) ; le second degré appartient à ce programme (BO n° 14, p. 359-360) et figure dans ses automatismes : « Déterminer le signe d'une expression du premier degré, d'une expression factorisée du second degré » (BO n° 14, p. 359). La note de service ne liste pas les chapitres tirés à chaque session."
                 }
               ]
             }
@@ -2687,7 +3056,12 @@
         "Le découpage en chapitres est une proposition éditoriale fondée sur les contenus officiels, non un découpage officiel ; les formulations des objectifs sont des paraphrases.",
         "Le format de l'épreuve de mathématiques du DNB 2027 (partie automatismes) n'a pas été vérifié.",
         "Les conditions de licence/réutilisation des textes officiels n'ont pas été vérifiées : aucun passage long n'est reproduit."
-      ]
+      ],
+      "classificationLegend": {
+        "level": "Niveau d'exigence par niveau scolaire : exigible (attendu de fin d'année du niveau), consolidation (notion d'un niveau antérieur reprise), approfondissement (prolongement non exigible, à signaler aux élèves).",
+        "notions": "Notions mobilisées par l'objectif.",
+        "competences": "Compétences travaillées du programme du cycle 4 (2020), p. 129."
+      }
     },
     {
       "subject": "physique-chimie",
@@ -3355,19 +3729,82 @@
                       "id": "P5-E-04",
                       "text": "Élaborer et réaliser un circuit électrique répondant à un cahier des charges simple.",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "5e": "exigible",
+                        "4e": "consolidation"
+                      },
+                      "notions": [
+                        "circuit électrique simple",
+                        "cahier des charges",
+                        "schéma normalisé"
+                      ],
+                      "competences": [
+                        "Concevoir, créer, réaliser",
+                        "Pratiquer des démarches scientifiques"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+                        "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+                      },
+                      "required": false
                     },
                     {
                       "id": "P5-E-05",
                       "text": "Distinguer dipôles en série et dipôles en dérivation.",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "5e": "exigible",
+                        "4e": "consolidation"
+                      },
+                      "notions": [
+                        "dipôles en série",
+                        "dipôles en dérivation",
+                        "boucle, maille"
+                      ],
+                      "competences": [
+                        "S’approprier des outils et des méthodes",
+                        "Pratiquer des langages"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+                        "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+                      },
+                      "required": false
                     },
                     {
                       "id": "P5-E-06",
                       "text": "Aborder qualitativement le courant et la tension (premières mesures à l'ampèremètre et au voltmètre).",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Repères de progressivité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "5e": "exigible",
+                        "4e": "consolidation"
+                      },
+                      "notions": [
+                        "courant électrique",
+                        "tension électrique",
+                        "ampèremètre (en série), voltmètre (en dérivation)"
+                      ],
+                      "competences": [
+                        "Pratiquer des démarches scientifiques",
+                        "S’approprier des outils et des méthodes"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json).",
+                        "validatedBy": "porteur de projet (2026-11-15) : consolidation de pc-4e-electricite, contrôle des prérequis, non compté dans l'achèvement du chapitre"
+                      },
+                      "required": false
                     }
                   ],
                   "prerequisites": [
@@ -3703,25 +4140,128 @@
                       "id": "P4-E-01",
                       "text": "Élaborer et réaliser un protocole pour vérifier une loi de l'électricité.",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "protocole expérimental",
+                        "ampèremètre, voltmètre (branchement)",
+                        "loi de l'électricité à vérifier"
+                      ],
+                      "competences": [
+                        "Pratiquer des démarches scientifiques",
+                        "Concevoir, créer, réaliser"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "sourceCheck": {
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "quote": "Élaborer et mettre en œuvre un protocole expérimental simple visant à réaliser un circuit électrique répondant à un cahier des charges simple ou à vérifier une loi de l’électricité.",
+                        "page": 103,
+                        "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+                      }
                     },
                     {
                       "id": "P4-E-02",
                       "text": "Exploiter l'unicité de l'intensité dans un circuit série et l'additivité des intensités (circuit à deux mailles).",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "intensité du courant (A)",
+                        "unicité de l'intensité en série",
+                        "additivité des intensités (deux mailles)"
+                      ],
+                      "competences": [
+                        "Pratiquer des démarches scientifiques",
+                        "S’approprier des outils et des méthodes"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "sourceCheck": {
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "quote": "L’intensité du courant électrique est la même en tout point d’un circuit qui ne compte que des dipôles en série.",
+                        "page": 103,
+                        "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+                      }
                     },
                     {
                       "id": "P4-E-03",
                       "text": "Exploiter l'additivité des tensions (une maille) et l'unicité des tensions (dérivation).",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "tension électrique (V)",
+                        "additivité des tensions (une maille)",
+                        "unicité des tensions (dérivation)"
+                      ],
+                      "competences": [
+                        "Pratiquer des démarches scientifiques",
+                        "S’approprier des outils et des méthodes"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ».",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "sourceCheck": {
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "quote": "Loi d’additivité des tensions (circuit à une seule maille).",
+                        "page": 103,
+                        "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+                      }
                     },
                     {
                       "id": "P4-E-04",
                       "text": "Étudier l'influence d'une résistance dans un circuit.",
-                      "officialRef": "Eduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (non prescriptif)",
-                      "verified": true
+                      "officialRef": "Éduscol (juin 2016), Aide à la construction d'une progression en PC au cycle 4 – niveau 4e (document d'accompagnement non prescriptif, pas un texte du BO)",
+                      "verified": true,
+                      "level": {
+                        "4e": "approfondissement"
+                      },
+                      "notions": [
+                        "résistance (Ω)",
+                        "influence d'une résistance sur l'intensité"
+                      ],
+                      "competences": [
+                        "Pratiquer des démarches scientifiques"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Décision du porteur de projet (2026-11-15) : rattaché à « Exploiter les lois de l'électricité », niveau approfondissement, non compté comme objectif obligatoire (source : aide Éduscol 2016, pas le BO).",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "required": false,
+                      "mergedInto": "Exploiter les lois de l'électricité (programme du cycle 4 2020, p. 103)"
                     }
                   ],
                   "prerequisites": [
@@ -4140,7 +4680,35 @@
                       "id": "P3-E-07",
                       "text": "Exploiter la relation tension-courant : loi d'Ohm.",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "relation tension-courant",
+                        "loi d'Ohm U = R × I",
+                        "caractéristique d'un dipôle ohmique"
+                      ],
+                      "competences": [
+                        "Pratiquer des langages",
+                        "S’approprier des outils et des méthodes"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ». Option A : traité dès le chapitre 4e pc-4e-electricite ; reste exigible en 3e s'il n'a pas été traité en 4e.",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "sourceCheck": {
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "quote": "Relation tension-courant : loi d’Ohm.",
+                        "page": 103,
+                        "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+                      }
                     },
                     {
                       "id": "P3-E-08",
@@ -4158,7 +4726,33 @@
                       "id": "P3-E-10",
                       "text": "Mettre en relation les lois de l'électricité et les règles de sécurité électrique.",
                       "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "règles de sécurité électrique",
+                        "court-circuit, surintensité"
+                      ],
+                      "competences": [
+                        "Adopter un comportement éthique et responsable"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-15)",
+                        "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+                        "levelNote": "Programme 2020 p. 103 : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose ». Option A : traité dès le chapitre 4e pc-4e-electricite ; reste exigible en 3e s'il n'a pas été traité en 4e.",
+                        "validatedBy": "porteur de projet (2026-11-15, option A : chapitre pc-4e-electricite)"
+                      },
+                      "sourceCheck": {
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "quote": "Mettre en relation les lois de l’électricité et les règles de sécurité dans ce domaine.",
+                        "page": 103,
+                        "matchType": "texte du programme (lecture manuelle du PDF dont l'empreinte est celle de l'enregistrement du collecteur)"
+                      }
                     }
                   ],
                   "prerequisites": [

@@ -129,3 +129,18 @@ export function flashFeedback(item: FlashItem, raw: string): { ok: boolean; mess
 
 /** Graine stable pour une partie (permet de rejouer à l'identique dans les tests). */
 export const gameRng = (seed: string) => createRng(seed);
+
+// ───────── Constructeurs compacts des configurations (proposition C) ─────────
+// Même forme à l'exécution que l'écriture développée ; écriture plus courte pour les chapitres produits par le pipeline.
+/** [question, réponse, explication, irréductible ?] */
+export type FlashRow = [q: string, answer: string, explanation: string, irreducible?: boolean];
+/** Configuration « calcul-flash » : niveaux [libellé, lignes]. */
+export function flashConfig(levels: [label: string, rows: FlashRow[]][], duration = 90, practiceCount = 15): { duration: number; practiceCount: number; levels: FlashLevel[] } {
+  return { duration, practiceCount, levels: levels.map(([label, rows]) => ({ label, items: rows.map(([q, answer, explanation, irr]) => ({ q, answer, ...(irr ? { irreducible: true } : {}), explanation })) })) };
+}
+/** Ligne « chasse-erreurs » : juste [niveau, calcul, explication] ; fausse [niveau, calcul, explication, erreurs proposées, indice de la bonne erreur]. */
+export type ErrRow = [niveau: number, calc: string, explanation: string] | [niveau: number, calc: string, explanation: string, errors: string[], error: number];
+export interface ErrItem { niveau: number; calc: string; correct: boolean; errors?: string[]; error?: number; explanation: string }
+export function erreursConfig(rows: ErrRow[]): { items: ErrItem[] } {
+  return { items: rows.map((r) => (r.length === 3 ? { niveau: r[0], calc: r[1], correct: true, explanation: r[2] } : { niveau: r[0], calc: r[1], correct: false, errors: r[3], error: r[4], explanation: r[2] })) };
+}

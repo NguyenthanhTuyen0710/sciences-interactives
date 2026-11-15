@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { MathInline, frTypo } from "../MathText";
 import type { ChapterGame } from "@/lib/chapters/schema";
-import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, frRel, gameRng, lineFeedback, lineRound, parseRel, type Adapt, type CalcLevel, type FlashLevel, type LineLevel, type LineRound } from "@/lib/games/logic";
+import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, frRel, gameRng, lineFeedback, lineRound, parseRel, type Adapt, type CalcLevel, type ErrItem, type FlashLevel, type LineLevel, type LineRound } from "@/lib/games/logic";
 import { randomSeed } from "@/lib/engine/rng";
 import type { Rng } from "@/lib/engine/types";
 
@@ -326,7 +326,6 @@ function CalculFlash({ game }: { game: ChapterGame }) {
 }
 
 // ───────── Chasse aux erreurs ─────────
-interface ErrItem { niveau: number; calc: string; correct: boolean; errors?: string[]; error?: number; explanation: string }
 function ChasseErreurs({ game }: { game: ChapterGame }) {
   const all = game.config.items as ErrItem[];
   const [seed, setSeed] = useState(randomSeed);

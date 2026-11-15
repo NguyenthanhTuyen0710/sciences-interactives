@@ -1,0 +1,231 @@
+{
+  "chapter": "math-1re-spe-second-degre",
+  "checkedAt": "2026-11-15T09:46:49.078Z",
+  "method": "(a) citation mot pour mot (espaces et typographie normalisés) → verified ; (b) sinon needs_manual_review avec le meilleur passage de chaque document (part de mots porteurs : indice de recherche, jamais une preuve)",
+  "documents": [
+    {
+      "seedId": "c4-programme-2020-eduscol-pdf",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9"
+    },
+    {
+      "seedId": "c4-attendus-4e-2019-pdf",
+      "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966"
+    },
+    {
+      "seedId": "c4-attendus-3e-2019-pdf",
+      "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065"
+    },
+    {
+      "seedId": "bo-2026-14-pdf",
+      "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836"
+    }
+  ],
+  "results": [
+    {
+      "objectiveId": "M1S-SD-01",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée.",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "verified",
+      "evidence": {
+        "seedId": "bo-2026-14-pdf",
+        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+        "page": 360,
+        "quote": "Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée."
+      }
+    },
+    {
+      "objectiveId": "M1S-SD-02",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Déterminer les fonctions polynômes du second degré s'annulant en deux nombres réels distincts.",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "verified",
+      "evidence": {
+        "seedId": "bo-2026-14-pdf",
+        "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+        "page": 360,
+        "quote": "Déterminer les fonctions polynômes du second degré s'annulant en deux nombres réels distincts."
+      }
+    },
+    {
+      "objectiveId": "M1S-SD-03",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Factoriser une fonction polynôme du second degré en diversifiant les stratégies (racine évidente, somme et produit des racines, identité remarquable, formules générales).",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2026-14-pdf",
+          "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+          "page": 360,
+          "excerpt": "− Factoriser une fonction polynôme du second degré, en diversifiant les stratégies : racine évidente, détection des racines par leur somme et leur produit, identité remarquable, application des formules générales.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 0.19
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 0.19
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 46,
+          "excerpt": "Travailler et réfléchir sur les langues entre elles, y compris sur le français et les langues anciennes, doit contribuer à la mise en place et au transfert de stratégies diversifiées et réfléchies d’apprentissage et de communication que mobilisent directement les compétences et connaissances langagières, lexicales et culturelles. Ainsi, dans l’apprentissage de la deuxième langue étrangère ou régio",
+          "wordCoverage": 0.13
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 5,
+          "excerpt": " Il détermine de manière algébrique l’antécédent par une fonction, dans des cas se ramenant à la résolution d’une équation du premier degré.",
+          "wordCoverage": 0.13
+        }
+      ]
+    },
+    {
+      "objectiveId": "M1S-SD-04",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Choisir une forme adaptée (développée réduite, canonique, factorisée) pour résoudre un problème (équation, inéquation, optimisation, variations).",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2026-14-pdf",
+          "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+          "page": 360,
+          "excerpt": "− Choisir une forme adaptée (développée réduite, canonique, factorisée) d’une fonction polynôme du second degré dans le cadre de la résolution d’un problème (équation, inéquation, optimisation, variations). Démonstration − Résolution de l’équation du second degré.",
+          "wordCoverage": 0.92
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Mettre un problème en équation en vue de sa résolution. - Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a.",
+          "wordCoverage": 0.23
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Il met en équation le problème suivant : On juxtapose un triangle équilatéral et un carré comme shématisé cicontre.",
+          "wordCoverage": 0.15
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 287,
+          "excerpt": "Elles permettent d’aborder la mise en équation d’un problème et la résolution Les élèves testent des égalités par essais erreurs, à algébrique d’une équation du premier degré. la main ou à l’aide d’une calculatrice ou d’un Les équations sont travaillées tout au long de l’année tableur, des valeurs numériques dans des par un choix progressif des coefficients de l’équation.",
+          "wordCoverage": 0.15
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 2,
+          "excerpt": "Indication générale Utiliser les nombres pour comparer, calculer et résoudre des problèmes Nombres Ce que sait faire l’élève ",
+          "wordCoverage": 0.08
+        }
+      ]
+    },
+    {
+      "objectiveId": "M1S-SD-05",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Démontrer la résolution de l'équation du second degré.",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2026-14-pdf",
+          "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+          "page": 360,
+          "excerpt": "Factorisation éventuelle. Résolution d’une équation du second degré.",
+          "wordCoverage": 0.8
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "Les élèves abordent les bases du calcul littéral, qu’ils mettent en œuvre pour modéliser une situation, démontrer une propriété générale et résoudre des problèmes se ramenant à des équations du premier degré. Les élèves sont progressivement familiarisés aux différents statuts de la lettre (indéterminée, variable, inconnue, paramètre) et du signe égal (pour fournir le résultat d’une opération, pour",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 5,
+          "excerpt": " Il détermine de manière algébrique l’antécédent par une fonction, dans des cas se ramenant à la résolution d’une équation du premier degré.",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 215,
+          "excerpt": " Il détermine de manière algébrique l’antécédent par une fonction, dans des cas se ramenant à la résolution d’une équation du premier degré.",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": " Il résout algébriquement une équation du premier degré.",
+          "wordCoverage": 0.4
+        }
+      ]
+    },
+    {
+      "objectiveId": "M1S-SD-06",
+      "chapter": "math-1re-spe-second-degre",
+      "text": "Approfondissement : déterminer deux réels connaissant leur somme et leur produit ; factoriser un polynôme du troisième degré admettant une racine.",
+      "officialRef": "Programme de spécialité de mathématiques de 1re (2026), Algèbre › Équations, fonctions polynômes du second degré",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2026-14-pdf",
+          "sha256": "34875c42a0cf9f8cb1417e6cfd387aa59fa575df6e733d046f4533ae2f37c836",
+          "page": 360,
+          "excerpt": "− Factorisation de 𝑥𝑛 – 1 par 𝑥 – 1, de 𝑥𝑛 – a𝑛 par 𝑥 – a. − Déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme 𝑥 ↦ 𝑥² – s𝑥 + p.",
+          "wordCoverage": 0.54
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "- Somme, différence, produit, quotient de nombres décimaux, de deux nombres rationnels. - Puissance d’un nombre (exposants entiers, positifs ou négatifs).",
+          "wordCoverage": 0.23
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale. ",
+          "wordCoverage": 0.23
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 286,
+          "excerpt": "La propriété de distributivité simple est formalisée et est utilisée pour développer un produit, factoriser une somme, réduire une expression littérale. La double distributivité est abordée.",
+          "wordCoverage": 0.23
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 2,
+          "excerpt": "À chaque rebond, elle rebondit aux troisquarts de la hauteur d’où elle est tombée. Quelle est la hauteur de la balle au troisième rebond ?",
+          "wordCoverage": 0.08
+        }
+      ]
+    }
+  ]
+}

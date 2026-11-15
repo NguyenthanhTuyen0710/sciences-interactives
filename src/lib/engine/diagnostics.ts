@@ -2,7 +2,8 @@
 // Partagé par scripts/validate-chapter.ts et tests/chapter-suite.ts : une seule définition des règles.
 import { checkPart, matchesMistake } from "./check";
 import { nearlyEqual, parseNumber } from "./numbers";
-import type { Interaction, Mistake } from "./types";
+import { convert } from "./units";
+import type { Interaction, Mistake, NumAnswer } from "./types";
 
 const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -56,4 +57,24 @@ export function specialValues(it: Interaction): string[] {
   if (!Number.isInteger(v)) s.push("décimal");
   if ((it.answer.tol ?? 0) > 0 || it.answer.decimals !== undefined || it.answer.sigFigs !== undefined) s.push("arrondi");
   return s;
+}
+
+/**
+ * Physique-chimie : toute réponse numérique porte son unité (`suffix` ou `answer.unit` ; dans un texte à trous, l'unité
+ * est écrite dans le gabarit) ; `sigFigs` entier de 1 à 6 ; unité de base proposée parmi les choix et convertible.
+ */
+export function unitIssues(it: Interaction): string[] {
+  const nums: { a: NumAnswer; hasUnit: boolean; where: string }[] = [];
+  if (it.kind === "numerique") nums.push({ a: it.answer, hasUnit: !!it.suffix?.trim() || !!it.answer.unit, where: "réponse numérique" });
+  if (it.kind === "texte-trous") it.blanks.forEach((b, i) => { if (b.type === "number") nums.push({ a: b.answer, hasUnit: true, where: `trou ${i}` }); });
+  const out: string[] = [];
+  for (const { a, hasUnit, where } of nums) {
+    if (!hasUnit) out.push(`${where} sans unité (suffix ou answer.unit)`);
+    if (a.sigFigs !== undefined && !(Number.isInteger(a.sigFigs) && a.sigFigs >= 1 && a.sigFigs <= 6)) out.push(`${where} : sigFigs invalide (${a.sigFigs})`);
+    if (a.unit) {
+      if (!a.unit.choices.includes(a.unit.base)) out.push(`${where} : unité de base « ${a.unit.base} » absente des choix`);
+      for (const u of a.unit.choices) if (convert(1, u, a.unit.base) === null) out.push(`${where} : unité « ${u} » non convertible en ${a.unit.base}`);
+    }
+  }
+  return out;
 }

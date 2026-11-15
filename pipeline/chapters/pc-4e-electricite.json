@@ -1,0 +1,53 @@
+{
+  "id": "pc-4e-electricite",
+  "taskId": "SCI-4E-PC-007",
+  "grade": "4e",
+  "subject": "physique-chimie",
+  "treeChapterId": "p4-electricite",
+  "title": "Électricité : intensité, tension et loi d'Ohm",
+  "exportName": "pc4eElectricite",
+  "exercisePrefix": "el4-",
+  "officialChapterIds": [
+    "pc-4e-lois-electricite",
+    "pc-3e-puissance-energie-electrique"
+  ],
+  "objectiveIds": [
+    "P4-E-01",
+    "P4-E-02",
+    "P4-E-03",
+    "P4-E-04",
+    "P3-E-07",
+    "P3-E-10"
+  ],
+  "consolidationChapterIds": [
+    "pc-5e-circuits-electriques"
+  ],
+  "scopeNotes": [
+    "Programme du cycle 4 en vigueur (BO n° 31 du 30-07-2020), physique-chimie, « Exploiter les lois de l'électricité » (p. 103) : « En classes de 4e et de 3e, les différentes lois de l'électricité peuvent être abordées sans qu'un ordre précis ne s'impose » ; décision du porteur de projet (2026-11-15) : chapitre 4e (option A).",
+    "Exigible : unicité de l'intensité en série, additivité des intensités (deux mailles), additivité des tensions (une maille), unicité des tensions (dérivation), protocole de vérification d'une loi, loi d'Ohm U = R × I, lien entre lois de l'électricité et sécurité électrique.",
+    "Approfondissement, non obligatoire : P4-E-04 (influence d'une résistance), issu de l'aide Éduscol 2016 (document non prescriptif, pas le BO) ; à étiqueter « Approfondissement » pour l'élève.",
+    "Hors chapitre : puissance et énergie électriques (P3-E-08, P3-E-09), réservées à la 3e (« Les aspects énergétiques peuvent être réservés à la classe de 3e », p. 103).",
+    "Consolidation (5e) : circuits série et dérivation, schémas normalisés.",
+    "Unités SI et chiffres significatifs : toute réponse numérique porte son unité ; données de mesure avec `sigFigs`.",
+    "Évaluation finale du chapitre : exercices de niveau 5 « Type Brevet » (épreuve de sciences du DNB).",
+    "Sources : reprendre exactement les entrées officialSources dans `sources` du chapitre (kind « official », verification « verified », sha256, accessedAt) ; l'aide Éduscol 2016 n'a pas d'enregistrement vérifié du collecteur : ne pas la citer comme vérifiée."
+  ],
+  "exampleChapter": "src/lib/chapters/data/math-3e-arithmetique.ts",
+  "officialSources": [
+    {
+      "seedId": "c4-programme-2020-eduscol-pdf",
+      "title": "Programme du cycle 4 en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+      "accessedAt": "2026-11-07T14:49:44.189Z"
+    }
+  ],
+  "objectiveLevels": {
+    "P4-E-01": "exigible",
+    "P4-E-02": "exigible",
+    "P4-E-03": "exigible",
+    "P4-E-04": "approfondissement",
+    "P3-E-07": "exigible",
+    "P3-E-10": "exigible"
+  }
+}

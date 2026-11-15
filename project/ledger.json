@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-06T05:22:17.659Z",
+  "updatedAt": "2026-11-15T06:09:14.214Z",
   "tasks": [
     {
       "id": "SCI-INFRA-001",
@@ -1601,6 +1601,19 @@
         "Décision du porteur de projet"
       ],
       "next": "Appliquer la décision au lecteur d'exercices et au moteur de correction"
+    },
+    {
+      "id": "SCI-1RE-MATH-001",
+      "kind": "chapter",
+      "title": "Équations, fonctions polynômes du second degré",
+      "state": "TODO",
+      "grade": "1re",
+      "subject": "mathematiques",
+      "chapterId": "math-1re-spe-second-degre",
+      "dependsOn": [
+        "SCI-INFRA-002"
+      ],
+      "next": "A2/A3 : dossier de recherche"
     }
   ]
 }
