@@ -404,6 +404,16 @@ async function main() {
   const passed = rows.find((r) => r.content?.qaPassed && r.content.sha256 === current);
   if (passed && !FORCE) { RUN.notes.push(`déjà validé (QA pass, sha256 ${current!.slice(0, 16)} inchangé) : aucune étape relancée`); console.log(`${spec.id} : déjà validé, empreinte inchangée — rien à faire (--force pour forcer).`); return; }
   const OBJ = objectives();
+  // Gate 1 : tout objectif utilisé par le chapitre doit être classé (niveau, notions, compétences) et validé.
+  type Classified = { id: string; level?: unknown; notions?: unknown[]; competences?: unknown[]; classification?: { status?: string } };
+  const unclassified = (JSON.parse(OBJ) as { objectives: Classified[] }[]).flatMap((g) => g.objectives)
+    .filter((o) => !(o.level && o.notions?.length && o.competences?.length && o.classification?.status === "validé")).map((o) => o.id);
+  if (unclassified.length) {
+    const msg = `Gate 1 non atteint : objectif(s) sans classement validé (niveau, notions, compétences) : ${unclassified.join(", ")}`;
+    if (LIVE) fail(`${msg} — aucun envoi.`, 8);
+    console.log(`avertissement : ${msg} (un envoi réel serait refusé).`);
+    RUN.notes.push(msg);
+  }
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
   const dossierUser = fill(read("pipeline/prompts/dossier.md"), { SPEC, OBJECTIVES: OBJ });

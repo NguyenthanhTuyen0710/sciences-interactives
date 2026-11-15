@@ -28,7 +28,7 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 ## Remarques
 - Les chiffres « Cours / exercices / jeux » comptent : fiches de notion de l'arbre + cours complets (`src/lib/chapters`), générateurs d'exercices + exercices des chapitres complets, jeux des chapitres complets.
 - `research/curriculum/mathematiques/manifest-3e.json` : statut des thèmes dérivé automatiquement des chapitres complets par `npm run dashboard` (2026-11-15 : 2 PUBLISHED, 4 QA_PENDING, 34 TODO).
-- Niveaux d'exigence et notions → compétences : renseignés (statut « proposé ») pour les objectifs des chapitres d'inventaire du pilote Pythagore (`math-4e-pythagore`, `math-3e-automatismes`) ; approfondissement du pilote dans `pipeline/chapters/math-3e-pythagore.json` (`extensions`).
+- Niveaux d'exigence et notions → compétences : renseignés et **validés** (2026-11-15) pour les objectifs des chapitres d'inventaire du pilote Pythagore (`math-4e-pythagore`, `math-3e-automatismes`) ; approfondissement du pilote dans `pipeline/chapters/math-3e-pythagore.json` (`extensions`).
 - Physique-chimie 4e/3e : 4 et 7 objectifs non `verified` dans l'inventaire (lus uniquement sur une reproduction non institutionnelle).
 - Non couverts par cette matrice : enseignement scientifique (tronc commun 1re/Tle), voies technologique et professionnelle.
 

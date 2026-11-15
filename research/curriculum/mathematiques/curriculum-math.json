@@ -1881,10 +1881,12 @@
                     "Raisonner"
                   ],
                   "classification": {
-                    "status": "proposé",
+                    "status": "validé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                    "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "validatedAt": "2026-11-15"
                   }
                 },
                 {
@@ -1919,10 +1921,12 @@
                     "Communiquer"
                   ],
                   "classification": {
-                    "status": "proposé",
+                    "status": "validé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                    "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "validatedAt": "2026-11-15"
                   }
                 }
               ],
@@ -2562,10 +2566,12 @@
                     "Calculer"
                   ],
                   "classification": {
-                    "status": "proposé",
+                    "status": "validé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                    "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "validatedAt": "2026-11-15"
                   }
                 },
                 {
@@ -2585,10 +2591,12 @@
                     "Calculer"
                   ],
                   "classification": {
-                    "status": "proposé",
+                    "status": "validé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                    "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "validatedAt": "2026-11-15"
                   }
                 },
                 {
@@ -2621,10 +2629,12 @@
                     "Calculer"
                   ],
                   "classification": {
-                    "status": "proposé",
+                    "status": "validé",
                     "by": "Claude Code (session du 2026-11-15)",
                     "toValidate": "porteur de projet",
-                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+                    "validatedBy": "NguyenthanhTuyen0710 (porteur de projet)",
+                    "validatedAt": "2026-11-15"
                   }
                 }
               ],
