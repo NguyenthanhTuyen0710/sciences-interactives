@@ -1864,6 +1864,27 @@
                     "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
                     "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
                     "approvedAt": "2026-11-07"
+                  },
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "triangle rectangle, hypoténuse",
+                    "théorème de Pythagore",
+                    "carré et racine carrée d'un nombre",
+                    "valeur exacte, valeur approchée"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Modéliser",
+                    "Raisonner"
+                  ],
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
                   }
                 },
                 {
@@ -1882,6 +1903,26 @@
                     "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
                     "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
                     "approvedAt": "2026-11-07"
+                  },
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "réciproque du théorème de Pythagore",
+                    "plus grand côté d'un triangle",
+                    "comparaison de deux nombres calculés séparément"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Calculer",
+                    "Communiquer"
+                  ],
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
                   }
                 }
               ],
@@ -2508,13 +2549,47 @@
                   "id": "M3-AUTO-01",
                   "text": "Identité a²−b²=(a−b)(a+b), distributivités, résolution de ax=b et a+x=b.",
                   "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Automatismes",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "identité a² − b² = (a − b)(a + b)",
+                    "distributivité simple et double",
+                    "équations ax = b et a + x = b"
+                  ],
+                  "competences": [
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                  }
                 },
                 {
                   "id": "M3-AUTO-02",
                   "text": "Recherche d'image et d'antécédent ; allure d'une fonction affine ou linéaire.",
                   "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème B › Automatismes",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "image et antécédent",
+                    "fonction affine, fonction linéaire (allure de la représentation)"
+                  ],
+                  "competences": [
+                    "Représenter",
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
+                  }
                 },
                 {
                   "id": "M3-AUTO-03",
@@ -2532,6 +2607,24 @@
                     "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
                     "approvedBy": "NguyenthanhTuyen0710 (porteur de projet)",
                     "approvedAt": "2026-11-07"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "configuration de Pythagore (carrés construits sur les côtés)",
+                    "configuration de Thalès",
+                    "lignes trigonométriques dans le triangle rectangle"
+                  ],
+                  "competences": [
+                    "Représenter",
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "proposé",
+                    "by": "Claude Code (session du 2026-11-15)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer"
                   }
                 }
               ],
@@ -2719,5 +2812,10 @@
     "Le découpage en chapitres est une proposition éditoriale fondée sur les contenus officiels, non un découpage officiel ; les formulations des objectifs sont des paraphrases.",
     "Le format de l'épreuve de mathématiques du DNB 2027 (partie automatismes) n'a pas été vérifié.",
     "Les conditions de licence/réutilisation des textes officiels n'ont pas été vérifiées : aucun passage long n'est reproduit."
-  ]
+  ],
+  "classificationLegend": {
+    "level": "Niveau d'exigence par niveau scolaire : exigible (attendu de fin d'année du niveau), consolidation (notion d'un niveau antérieur reprise), approfondissement (prolongement non exigible, à signaler aux élèves).",
+    "notions": "Notions mobilisées par l'objectif.",
+    "competences": "Compétences travaillées du programme du cycle 4 (2020), p. 129."
+  }
 }

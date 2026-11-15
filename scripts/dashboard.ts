@@ -155,6 +155,25 @@ async function matrix() {
       missing,
     };
   }))));
+
+  // Manifests de thèmes (research/curriculum/<matière>/manifest-*.json) : statut dérivé du chapitre complet portant
+  // la même tâche (published → PUBLISHED ; six revues pass → APPROVED ; sinon brouillon → QA_PENDING ; absent → TODO).
+  for (const subject of ["mathematiques", "physique-chimie"]) {
+    const dir = P(`research/curriculum/${subject}`);
+    if (!existsSync(dir)) continue;
+    for (const f of readdirSync(dir).filter((x) => /^manifest-.*\.json$/.test(x))) {
+      const file = `research/curriculum/${subject}/${f}`;
+      const man = readJson<{ themes: { taskId: string; status: string }[] }>(file)!;
+      let changed = 0;
+      for (const t of man.themes) {
+        const c = loaded.find((l) => l.c.taskId === t.taskId)?.c;
+        const status = !c ? "TODO" : c.publicationStatus === "published" ? "PUBLISHED" : REVIEW_KEYS.every((k) => c.reviewStatus[k] === "pass") ? "APPROVED" : "QA_PENDING";
+        if (t.status !== status) { t.status = status; changed++; }
+      }
+      if (changed) { writeFileSync(P(file), JSON.stringify(man, null, 1) + "\n"); console.log(`${file} : ${changed} statut(s) de thème mis à jour.`); }
+    }
+  }
+
   const summary = Object.values(rows.reduce<Record<string, { subject: string; grade: string; chapters: number; byState: Record<string, number> }>>((acc, r) => {
     const k = `${r.subject}/${r.grade}`;
     acc[k] ??= { subject: r.subject, grade: r.grade, chapters: 0, byState: {} };

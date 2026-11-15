@@ -37,7 +37,7 @@
    "taskId": "SCI-3E-MATH-002",
    "treeChapterId": "m3-puissances",
    "batch": 1,
-   "status": "TODO",
+   "status": "QA_PENDING",
    "note": "Prérequis 4e : math-4e-fractions-operations."
   },
   {
@@ -60,7 +60,7 @@
    "taskId": "SCI-3E-MATH-002",
    "treeChapterId": "m3-puissances",
    "batch": 1,
-   "status": "TODO",
+   "status": "QA_PENDING",
    "note": "Le chapitre inclut les racines carrées (M3-NC-06)."
   },
   {
@@ -83,7 +83,7 @@
    "taskId": "SCI-3E-MATH-001",
    "treeChapterId": "m3-arithmetique",
    "batch": 1,
-   "status": "TODO",
+   "status": "PUBLISHED",
    "note": "Les sigles PGCD/PPCM ne sont pas exigibles (programme 2020) : notions utilisées comme outils de résolution."
   },
   {
@@ -106,7 +106,7 @@
    "taskId": "SCI-3E-MATH-009",
    "treeChapterId": "m3-pourcentages",
    "batch": 1,
-   "status": "TODO",
+   "status": "PUBLISHED",
    "note": "Ratio : objectif de 4e (M4-OGDF-10), consolidé en 3e."
   },
   {
@@ -434,7 +434,7 @@
    "taskId": "SCI-3E-MATH-017",
    "treeChapterId": "m3-pythagore",
    "batch": 4,
-   "status": "TODO",
+   "status": "QA_PENDING",
    "note": "Notion de 4e, mobilisée au DNB."
   },
   {
@@ -495,7 +495,7 @@
    "taskId": "SCI-3E-MATH-017",
    "treeChapterId": "m3-pythagore",
    "batch": 4,
-   "status": "TODO",
+   "status": "QA_PENDING",
    "note": "Somme des angles (5e), triangles égaux (4e) : révision."
   },
   {
