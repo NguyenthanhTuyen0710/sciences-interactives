@@ -1,5 +1,16 @@
 {
-  "limitUsd": 10,
+  "limitUsd": 2.892,
   "creditVerified": true,
-  "creditNote": "Passer creditVerified à true UNIQUEMENT après vérification par le porteur de projet, dans la Console Anthropic, que le workspace de la clé utilise les crédits API Startup et qu'une limite de dépense mensuelle (≤ crédit disponible) est active. Tant que c'est false, le pipeline refuse tout appel payant."
+  "creditNote": "Passer creditVerified à true UNIQUEMENT après vérification par le porteur de projet, dans la Console Anthropic, que le workspace de la clé utilise les crédits API Startup et qu'une limite de dépense mensuelle (≤ crédit disponible) est active. Tant que c'est false, le pipeline refuse tout appel payant.",
+  "limitNote": "Pilote élargi (décision du porteur de projet du 2026-11-15) : plafond propre au pilote 2,20 $ ajouté aux 0,692 $ déjà dépensés = plafond cumulé 2,892 $. Ne pas relever sans décision.",
+  "creditCheck": {
+    "date": "2026-11-15",
+    "by": "Nguyễn Thanh Tuyền (porteur de projet)",
+    "source": "Console Anthropic, platform.claude.com/cost, 30 derniers jours, données jusqu'à 10:39 UTC le 15-11-2026, tous workspaces, clés API et modèles",
+    "consoleTotalUsd": 0.69,
+    "detail": "100 % coûts de tokens ; recherche web, exécution de code, durée de session : 0,00 $",
+    "ledgerUsd": 0.692,
+    "ecart": "dans l'arrondi (≤ 0,02 $)",
+    "soldeCreditUsd": 1039.93
+  }
 }
