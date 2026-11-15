@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { STATIC_GENERATORS } from "../src/lib/content/registry-static";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise, checkNumber, checkPart } from "../src/lib/engine/check";
-import { parseNumber, fr, simplify } from "../src/lib/engine/numbers";
+import { parseNumber, fr } from "../src/lib/engine/numbers";
 import { equivalent, isReducedPolynomial } from "../src/lib/engine/expr";
 import { toPublic } from "../src/lib/engine/public";
 import type { Difficulty, Interaction } from "../src/lib/engine/types";

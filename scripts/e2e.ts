@@ -14,7 +14,6 @@ import { perfect } from "../src/lib/engine/solve";
 import type { Difficulty, Interaction } from "../src/lib/engine/types";
 
 const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { chromium, devices } = require("playwright") as typeof import("playwright");
 type Page = import("playwright").Page;
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";

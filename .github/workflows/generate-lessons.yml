@@ -100,12 +100,12 @@ jobs:
     permissions:
       contents: write # lecture d'une release brouillon (réservée aux jetons en écriture) ; aucune écriture dans ce job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Lire le registre des dépenses (SHA256 vérifié)
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash .github/scripts/data-store.sh pull-ledger
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ledger-in
           path: pipeline/.store/
@@ -124,9 +124,9 @@ jobs:
       started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
       chapter: ${{ steps.run.outputs.chapter }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -139,7 +139,7 @@ jobs:
         id: premark
 
       - name: Recevoir le registre (lecture seule en dry-run)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ledger-in
           path: pipeline/.store
@@ -203,7 +203,7 @@ jobs:
 
       - name: Transmettre le registre
         if: always() && needs.setup.outputs.api == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ledger-out
           path: pipeline/.store/ledger.jsonl
@@ -230,7 +230,7 @@ jobs:
 
       - name: Publier les sorties (artefact, sans commit)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: lessons-${{ steps.run.outputs.chapter || 'aucun' }}-${{ needs.setup.outputs.mode }}-${{ github.run_id }}
           retention-days: 30
@@ -257,11 +257,11 @@ jobs:
       pull-requests: write
     steps:
       # Base = branche par défaut : la PR ne contient que la publication, quelle que soit la branche du run.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -271,7 +271,7 @@ jobs:
 
       - name: Récupérer les sorties du run
         if: needs.setup.outputs.mode == 'collect'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: lessons-${{ needs.pipeline.outputs.chapter }}-collect-${{ github.run_id }}
           path: ${{ runner.temp }}/out
@@ -329,9 +329,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -339,7 +339,7 @@ jobs:
       - name: Installer les dépendances
         run: npm ci --no-audit --no-fund
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: ledger-in
           path: pipeline/.store
@@ -347,7 +347,7 @@ jobs:
       - name: Recevoir le registre modifié
         id: out
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ledger-out
           path: ledger-out
