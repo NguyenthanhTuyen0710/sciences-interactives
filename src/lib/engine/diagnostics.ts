@@ -3,7 +3,8 @@
 import { checkPart, matchesMistake } from "./check";
 import { nearlyEqual, parseNumber } from "./numbers";
 import { convert } from "./units";
-import type { Interaction, Mistake, NumAnswer } from "./types";
+import type { ExerciseInstance, Interaction, Mistake, NumAnswer } from "./types";
+import type { ChapterContent } from "../chapters/schema";
 
 const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -77,4 +78,51 @@ export function unitIssues(it: Interaction): string[] {
     }
   }
   return out;
+}
+
+// ───────── Tutoiement : une seule règle pour le test du code source et validate-chapter ─────────
+/** « vous / votre / vos » ; impératif en -ez (sauf chez, assez, nez, rez, rez-de-chaussée). */
+export const VOUS_RE = /\b(vous|votre|vos)\b/i;
+export const IMPERATIF_EZ_RE = /\b(?!(?:chez|assez|nez|rez)\b)[a-zéèêîô]{3,}ez\b(?!-de)/i;
+/** Mot de vouvoiement trouvé dans un texte élève, ou null. */
+export function vouvoiement(text: string): string | null {
+  const t = text.replace(/rez-de-chaussée/gi, "");
+  return (t.match(VOUS_RE) ?? t.match(IMPERATIF_EZ_RE))?.[0] ?? null;
+}
+
+/** Clés jamais affichées comme texte à l'élève (identifiants, types, motifs de saisie, code SVG, nombres). */
+const NOT_TEXT = new Set(["id", "kind", "svg", "match", "objectives", "answer", "irreducible", "niveau", "correct", "error", "url", "sha256", "accessedAt"]);
+/** Toutes les chaînes affichables d'une valeur (objet, tableau, chaîne), avec leur chemin. */
+export function displayedTexts(value: unknown, path: string, out: { where: string; text: string }[] = []): { where: string; text: string }[] {
+  if (typeof value === "string") out.push({ where: path, text: value });
+  else if (Array.isArray(value)) value.forEach((v, i) => displayedTexts(v, `${path}[${i}]`, out));
+  else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) {
+    // texte-libre : les réponses acceptées sont affichées dans la correction ; ailleurs `answer` est numérique ou indiciel.
+    if (NOT_TEXT.has(k) && !(k === "answer" && Array.isArray(v) && v.every((x) => typeof x === "string"))) continue;
+    displayedTexts(v, path ? `${path}.${k}` : k, out);
+  }
+  return out;
+}
+
+/** Vouvoiement dans des textes élève : un message par champ fautif (« vouvoiement » : problème mineur pour le pipeline). */
+export function vouvoiementIssues(texts: { where: string; text: string }[]): { where: string; problem: string }[] {
+  return texts.flatMap(({ where, text }) => { const w = vouvoiement(text); return w ? [{ where, problem: `vouvoiement (« ${w} »)` }] : []; });
+}
+
+/**
+ * Textes élève d'un chapitre hors tirages : titre, prérequis, textes des objectifs (résumé d'exercice) ; cours entier
+ * sauf le code SVG (alt et légende compris) ; titre, raisonnement et indices des exercices ; titre, objectif, consignes
+ * et configuration des jeux.
+ */
+export function chapterTexts(c: Pick<ChapterContent, "title" | "prerequisites" | "officialObjectives" | "lesson" | "exercises" | "games">): { where: string; text: string }[] {
+  return [
+    ...displayedTexts({ title: c.title, prerequisites: c.prerequisites, officialObjectives: c.officialObjectives.map((o) => o.text) }, "chapter"),
+    ...displayedTexts(c.lesson, "lesson"),
+    ...c.exercises.flatMap((e) => displayedTexts({ title: e.title, reasoning: e.reasoning, hints: e.hints }, e.id)),
+    ...c.games.flatMap((g) => displayedTexts({ title: g.title, objective: g.objective, instructions: g.instructions, config: g.config }, g.id)),
+  ];
+}
+/** Textes élève d'un tirage : énoncé, figure, parties (consigne, interaction, diagnostics), correction. */
+export function instanceTexts(inst: Pick<ExerciseInstance, "statement" | "figure" | "parts" | "solution">, exerciseId: string): { where: string; text: string }[] {
+  return displayedTexts({ statement: inst.statement, figure: inst.figure, parts: inst.parts, solution: inst.solution }, exerciseId);
 }

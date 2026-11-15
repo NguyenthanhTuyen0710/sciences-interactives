@@ -9,7 +9,7 @@ import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
 import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise } from "../src/lib/engine/check";
-import { diagnosticIssues, specialValues, unitIssues } from "../src/lib/engine/diagnostics";
+import { chapterTexts, diagnosticIssues, instanceTexts, specialValues, unitIssues, vouvoiementIssues } from "../src/lib/engine/diagnostics";
 import { perfect } from "../src/lib/engine/solve";
 import { toPublic } from "../src/lib/engine/public";
 import { gcd, parseNumber } from "../src/lib/engine/numbers";
@@ -45,7 +45,6 @@ function lists(it: Interaction): string[][] {
   }
 }
 const dup = (a: string[]) => a.find((x, i) => a.indexOf(x) !== i);
-const VOUS = /\b(vous|votre|vos)\b/i;
 // Valeur d'attribut SVG contenant « < » : signe d'un gabarit tronqué.
 const BROKEN_SVG = /="[^"]*</;
 const RECORDS = fileURLToPath(new URL("../research/sources/records", import.meta.url));
@@ -69,13 +68,16 @@ async function main() {
   }
   const pendingSources = c.sources.filter((x) => x.verification !== "verified").length;
 
-  // 2. Cours : langue et SVG.
-  const lessonText = JSON.stringify(c.lesson);
-  if (VOUS.test(lessonText)) add("lesson", "vouvoiement dans le cours (le contenu élève tutoie)");
+  // 2. Tutoiement sur tous les textes élève hors tirages (chapitre, cours, exercices, jeux) ; SVG du cours.
+  //    Champs : titre, prérequis, textes des objectifs (résumé d'exercice) ; cours entier sauf le code SVG (alt et
+  //    légende compris) ; titre, raisonnement et indices des exercices ; titre, objectif, consignes et configuration des jeux.
+  const staticTexts = chapterTexts(c);
+  for (const i of vouvoiementIssues(staticTexts)) add(i.where, i.problem);
   for (const [i, ill] of c.lesson.illustrations.entries()) if (BROKEN_SVG.test(ill.svg)) add(`lesson.illustrations[${i}]`, "SVG mal formé (attribut contenant « < »)");
 
   // 3. Exercices : chaque tirage est vérifié comme le ferait le serveur.
   let instances = 0;
+  const vousSeen = new Set<string>();
   // Couverture des cas limites (réponses numériques) : zéro, un, négatif, décimal, arrondi — par exercice, sur tous les tirages.
   const special: Record<string, Record<string, number>> = {};
   for (const e of c.exercises) {
@@ -91,7 +93,11 @@ async function main() {
       const raw = JSON.stringify(inst);
       if (/NaN|undefined|Infinity/.test(raw)) { add(e.id, "valeur NaN / undefined / Infinity", seed); continue; }
       if (/\d\.\d*0{6,}\d|\d\.\d*9{6,}\d/.test(inst.statement + inst.solution.join(" "))) add(e.id, "artefact de virgule flottante dans l'énoncé ou la correction", seed);
-      if (VOUS.test(raw)) add(e.id, "vouvoiement", seed);
+      // Tirage : énoncé, figure, parties (consigne, interaction, diagnostics), correction ; un signalement par champ.
+      for (const i of vouvoiementIssues(instanceTexts(inst, e.id))) {
+        const key = i.where.replace(/\[\d+\]/g, "[]");
+        if (!vousSeen.has(key)) { vousSeen.add(key); add(i.where, i.problem, seed); }
+      }
       const pub = JSON.stringify(toPublic(inst));
       if (pub.includes('"answer"') || pub.includes('"mistakes"')) add(e.id, "fuite de la réponse vers le navigateur", seed);
       const responses = inst.parts.map((p) => perfect(p.interaction));
@@ -124,7 +130,6 @@ async function main() {
       }
     }
     if (gm.template === "memory") { const d = dup((cfg.pairs as [string, string][]).flat()); if (d) add(gm.id, `carte en double : ${d}`); }
-    if (VOUS.test(JSON.stringify(gm))) add(gm.id, "vouvoiement");
   }
 
   const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
