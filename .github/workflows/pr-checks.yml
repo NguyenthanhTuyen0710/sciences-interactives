@@ -47,3 +47,12 @@ jobs:
           grep -q "mode dry-run" dry-run.log
           if grep -qE "soumis|coût réel" dry-run.log; then echo "::error::le dry-run a tenté un appel API"; exit 1; fi
           { echo '### Dry-run pipeline'; echo '```'; cat dry-run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dry-run du pipeline (physique-chimie 4e, électricité, sans clé ni appel API)
+        shell: bash
+        run: |
+          npx tsx pipeline/run.ts pc-4e-electricite --level 4e --subject physique-chimie --exercises 5 --batch 2>&1 | tee dry-run-pc.log
+          grep -q "mode dry-run" dry-run-pc.log
+          grep -q "contrôle des données : OK (4e, physique-chimie" dry-run-pc.log
+          if grep -qE "soumis|coût réel" dry-run-pc.log; then echo "::error::le dry-run a tenté un appel API"; exit 1; fi
+          { echo '### Dry-run pipeline (PC)'; echo '```'; cat dry-run-pc.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

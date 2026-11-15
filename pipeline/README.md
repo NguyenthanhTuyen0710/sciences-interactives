@@ -17,6 +17,12 @@ Phase pilote : chapitre Pythagore 3e produit (0,692 $) ; pilote élargi (PC, lyc
 | Démonstrations lycée, sujets bac, juge d'examens (G5) | Opus 5.5 |
 Fable et Mythos sont refusés par le script. Toutes les étapes de production passent par Message Batches (`--submit`), correction comprise ; le cache n'est posé que sur un appel synchrone suivi d'autres appels au même préfixe. Le dry-run affiche la dépense maximale par étape et par modèle, comparée à la même chaîne entièrement sur Sonnet, et avertit quand une requête Haiku dépasse 100 000 tokens (tarif × 5, découpage proposé). Le registre (`reserve.model`, `actual.model`, `actual.tokens`) et le rapport de run ventilent coûts et tokens par modèle ; `ledger.ts check` affiche la dépense par modèle (entrées antérieures : Sonnet 5.5).
 
+## Matières (M3, étape A)
+- `mathematiques` et `physique-chimie` (`SUBJECTS` dans `pipeline/models.ts`) : l'inventaire est lu selon la matière de la fiche (`curriculum-math.json` / `curriculum-pc.json`) ; le manifest de niveau est exigé en mathématiques, facultatif en physique-chimie (contrôle par l'inventaire et la matrice).
+- Prompts : blocs `{{#maths}}…{{/maths}}` et `{{#pc}}…{{/pc}}` gardés pour la seule matière du chapitre (unités SI, chiffres significatifs, schémas normalisés, sécurité, exactitude physique) ; les prompts de mathématiques sont identiques octet pour octet à ceux d'avant M3.
+- `validate-chapter` : pour un chapitre de physique-chimie, toute réponse numérique porte son unité (`suffix` ou `answer.unit`), `sigFigs` entier de 1 à 6, unité de base parmi les choix et convertible (`unitIssues`, `src/lib/engine/diagnostics.ts`).
+- Fiche pilote : `pipeline/chapters/pc-4e-electricite.json` ; dry-run dans `pr-checks.yml`. Lycée (étape B) : non pris en charge.
+
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.
 - `budget.json` : `limitUsd` (plafond cumulé de toute la phase) et `creditVerified`. Tant que `creditVerified` vaut `false`, le mode réel refuse de démarrer. Le porteur de projet le passe à `true` après avoir vérifié dans la Console Anthropic que :

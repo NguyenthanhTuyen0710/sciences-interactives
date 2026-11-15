@@ -6,4 +6,6 @@ Chapter specification (JSON):
 Official objectives from the verified inventory (JSON):
 {{OBJECTIVES}}
 
-Return only the Markdown document.
+{{#pc}}Physique-chimie: in section 5 give the measurement protocols (instrument, placement in the circuit, unit, significant figures) and the laws written with symbols and units; in section 8 include the safety rules.
+
+{{/pc}}Return only the Markdown document.

@@ -1,7 +1,7 @@
 // Règles de cohérence des diagnostics (src/lib/engine/diagnostics.ts) et non-régression py3-12 (Pythagore 3e).
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { diagnosticIssues, sameValue, specialValues } from "../src/lib/engine/diagnostics";
+import { diagnosticIssues, sameValue, specialValues, unitIssues } from "../src/lib/engine/diagnostics";
 import { createRng } from "../src/lib/engine/rng";
 import { perfect } from "../src/lib/engine/solve";
 import type { Interaction } from "../src/lib/engine/types";
@@ -125,5 +125,23 @@ describe("taxonomie Pythagore verrouillée (Việc 2, 2026-11-15)", () => {
     expect(byId["PY-T09"].countsTowardCompleteness).toBe(false);
     for (const id of ["PY-T08", "PY-T10"]) expect(byId[id].requiredVariants.length, id).toBe(2);
     expect(tax.redactionCriterionRequiredFor).toEqual(["PY-T06", "PY-T07", "PY-T10"]);
+  });
+});
+
+describe("physique-chimie : unités et chiffres significatifs (M3)", () => {
+  it("réponse numérique sans unité refusée ; suffix ou answer.unit acceptés", () => {
+    expect(unitIssues(numInt(2.5))).toEqual(["réponse numérique sans unité (suffix ou answer.unit)"]);
+    expect(unitIssues({ kind: "numerique", suffix: "V", answer: { value: 2.5 } })).toEqual([]);
+    expect(unitIssues(numInt(0.12, { unit: { base: "A", choices: ["A", "mA"] }, sigFigs: 2 }))).toEqual([]);
+  });
+  it("sigFigs invalide, unité de base absente des choix, unité non convertible", () => {
+    expect(unitIssues(numInt(1, { unit: { base: "V", choices: ["V"] }, sigFigs: 0 }))).toEqual(["réponse numérique : sigFigs invalide (0)"]);
+    expect(unitIssues(numInt(1, { unit: { base: "V", choices: ["mV"] } }))).toEqual(["réponse numérique : unité de base « V » absente des choix"]);
+    expect(unitIssues(numInt(1, { unit: { base: "V", choices: ["V", "A"] } }))).toEqual(["réponse numérique : unité « A » non convertible en V"]);
+  });
+  it("texte à trous : unité dans le gabarit, seul sigFigs contrôlé ; autres interactions ignorées", () => {
+    const tt = { kind: "texte-trous", template: "U = [] V", blanks: [{ type: "number", answer: { value: 6, sigFigs: 9 } }] } as Interaction;
+    expect(unitIssues(tt)).toEqual(["trou 0 : sigFigs invalide (9)"]);
+    expect(unitIssues({ kind: "qcm", options: ["a", "b"], answer: [0] })).toEqual([]);
   });
 });

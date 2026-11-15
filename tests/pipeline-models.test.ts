@@ -1,7 +1,9 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, rateFor, STEP_CONFIG, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, rateFor, STEP_CONFIG, subjectSections, SUBJECTS, type Prices } from "../pipeline/models";
+import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { spentByModel, type LedgerEntry } from "../pipeline/ledger";
 
 const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Prices;
@@ -69,4 +71,29 @@ describe("registre : dépense par modèle", () => {
     ];
     expect(spentByModel(l)).toEqual({ [MODELS.sonnet]: 0.3, [MODELS.haiku]: 0.004 });
   });
+});
+
+describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
+  it("blocs {{#maths}} / {{#pc}} gardés pour la seule matière du chapitre ; clé inconnue refusée", () => {
+    const t = "A{{#maths}}M{{/maths}}{{#pc}}P\n{{/pc}}B";
+    expect(subjectSections(t, "mathematiques")).toBe("AMB");
+    expect(subjectSections(t, "physique-chimie")).toBe("AP\nB");
+    expect(() => subjectSections("{{#svt}}x{{/svt}}", "mathematiques")).toThrow(/inconnu/);
+  });
+  it("chaque prompt contient un bloc PC et aucune clé inconnue", () => {
+    for (const f of ["system", "dossier", "chapter", "review"]) {
+      const t = readFileSync(`pipeline/prompts/${f}.md`, "utf8");
+      expect(t).toContain("{{#pc}}");
+      expect(subjectSections(t, "physique-chimie")).not.toMatch(/\{\{[#/]/);
+    }
+    for (const s of Object.values(SUBJECTS)) expect(existsSync(s.inventory)).toBe(true);
+  });
+  it("dry-run de la fiche pc-4e-electricite : sans appel, inventaire PC, objectifs du chapitre", () => {
+    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "pc-4e-electricite", "--level", "4e", "--subject", "physique-chimie", "--batch"], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
+    const out = r.stdout + r.stderr;
+    expect(r.status, out).toBe(0);
+    expect(out).toContain("contrôle des données : OK (4e, physique-chimie, p4-electricite, SCI-4E-PC-007)");
+    expect(out).toContain("mode dry-run");
+    expect(out).not.toMatch(/soumis|coût réel/);
+  }, 60_000);
 });

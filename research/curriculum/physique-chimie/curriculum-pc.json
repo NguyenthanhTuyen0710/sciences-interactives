@@ -664,19 +664,79 @@
          "id": "P5-E-04",
          "text": "Élaborer et réaliser un circuit électrique répondant à un cahier des charges simple.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "circuit électrique simple",
+          "cahier des charges",
+          "schéma normalisé"
+         ],
+         "competences": [
+          "Concevoir, créer, réaliser",
+          "Pratiquer des démarches scientifiques"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
+         }
         },
         {
          "id": "P5-E-05",
          "text": "Distinguer dipôles en série et dipôles en dérivation.",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Réaliser des circuits électriques simples et exploiter les lois de l'électricité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "dipôles en série",
+          "dipôles en dérivation",
+          "boucle, maille"
+         ],
+         "competences": [
+          "S’approprier des outils et des méthodes",
+          "Pratiquer des langages"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
+         }
         },
         {
          "id": "P5-E-06",
          "text": "Aborder qualitativement le courant et la tension (premières mesures à l'ampèremètre et au voltmètre).",
          "officialRef": "BO n°31 du 30/07/2020, annexe 3, Physique-chimie cycle 4 – L'énergie, ses transferts et ses conversions – Repères de progressivité",
-         "verified": true
+         "verified": true,
+         "level": {
+          "5e": "exigible",
+          "4e": "consolidation"
+         },
+         "notions": [
+          "courant électrique",
+          "tension électrique",
+          "ampèremètre (en série), voltmètre (en dérivation)"
+         ],
+         "competences": [
+          "Pratiquer des démarches scientifiques",
+          "S’approprier des outils et des méthodes"
+         ],
+         "classification": {
+          "status": "proposé",
+          "by": "Claude Code (session du 2026-11-15)",
+          "toValidate": "porteur de projet",
+          "competencesSource": "Programme du cycle 4 (2020), physique-chimie, compétences travaillées p. 97-98",
+          "levelNote": "Consolidation du chapitre pc-4e-electricite (pipeline/chapters/pc-4e-electricite.json)."
+         }
         }
        ],
        "prerequisites": [

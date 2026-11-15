@@ -80,6 +80,25 @@ export function addUsage(acc: ByModel, model: string, u: UsageLike & { thinking?
   return acc;
 }
 
+/**
+ * Matières prises en charge (M3). `key` sélectionne les blocs propres à la matière dans les prompts ; `manifest` : un
+ * manifest de niveau (research/curriculum/<matière>/manifest-<niveau>.json) est exigé.
+ */
+export const SUBJECTS = {
+  mathematiques: { key: "maths", inventory: "research/curriculum/mathematiques/curriculum-math.json", manifest: true },
+  "physique-chimie": { key: "pc", inventory: "research/curriculum/physique-chimie/curriculum-pc.json", manifest: false },
+} as const;
+export type SubjectSlug = keyof typeof SUBJECTS;
+
+/** Garde `{{#maths}}…{{/maths}}` / `{{#pc}}…{{/pc}}` pour la matière donnée, retire les autres ; clé inconnue = erreur. */
+export function subjectSections(tpl: string, subject: SubjectSlug): string {
+  const keys = Object.values(SUBJECTS).map((s) => s.key as string);
+  return tpl.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k: string, body: string) => {
+    if (!keys.includes(k)) throw new Error(`bloc de matière inconnu dans un prompt : ${k}`);
+    return k === SUBJECTS[subject].key ? body : "";
+  });
+}
+
 /** Exercices d'un fichier de chapitre : blocs de source par identifiant (préfixe donné) et niveau. */
 export function exerciseBlocks(src: string, prefix: string): { id: string; niveau: number; text: string }[] {
   const re = new RegExp(`id: "(${prefix.replace(/[-]/g, "\\-")}\\d+)"`, "g");

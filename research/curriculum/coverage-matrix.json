@@ -2101,7 +2101,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "pc-4e-electricite",
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2288,7 +2288,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "pc-4e-electricite",
    "content": null,
    "missing": [
     "chapitre complet"

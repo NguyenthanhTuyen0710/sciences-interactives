@@ -3,7 +3,8 @@ Review the chapter below as an independent QA reviewer and answer with the JSON 
 The deterministic validator has already passed (summary below): data contract, 500 random draws per exercise, perfect and empty answers, diagnostics equal or equivalent to the right answer, duplicate options, answer leakage, "vous". Do not re-check those and do not restate the chapter content. Report only what a script cannot see:
 - curriculum: scope versus the official objectives and scope notes; nothing out of programme presented as required.
 - accuracy: definitions, properties, worked examples, illustrations.
-- exercises: solve a sample yourself (at least one per level) before reading the key; ambiguity, missing equivalent answers, hints that give the answer away, unrealistic data, level calibration.
+{{#pc}}- physics accuracy: units and conversions, significant figures, realistic orders of magnitude, circuit diagrams consistent with the statement (series / parallel, meter placement), safety rules (report under accuracy).
+{{/pc}}- exercises: solve a sample yourself (at least one per level) before reading the key; ambiguity, missing equivalent answers, hints that give the answer away, unrealistic data, level calibration.
 - games: correctness of items and pedagogical value.
 - technical: code-level risks the validator cannot detect (e.g. a generator branch that can produce a misleading statement).
 - language: French spelling and grammar, consistent "tu", terminology of the French programme.
