@@ -60,3 +60,22 @@ describe("non-régression pct3 : diagnostics de même valeur retirés (paires ex
     });
   }
 });
+
+describe("Pythagore : position de l'angle droit (C3) et accords (C4)", () => {
+  const ids = ["py3-01", "py3-02", "py3-05", "py3-06", "py3-07", "py3-09", "py3-10", "py3-12", "py3-17", "py3-18"];
+  for (const id of ids) {
+    it(`${id} : l'angle droit occupe au moins deux positions du nom du triangle`, () => {
+      const e = math3ePythagore.exercises.find((x) => x.id === id)!;
+      const g = exerciseGenerator(math3ePythagore, e);
+      const pos = new Set<number>();
+      for (let k = 0; k < 300; k++) {
+        const m = /\$([A-Z]{3})\$ (?:est )?rectangle en \$([A-Z])\$/.exec(g.generate(createRng(`p${k}`), 1).statement);
+        if (m) pos.add(m[1].indexOf(m[2]));
+      }
+      expect(pos.size, `${id} : positions ${[...pos].join(",")}`).toBeGreaterThanOrEqual(2);
+    });
+  }
+  it("« hypoténuse » est féminin dans les questions", () => {
+    expect(JSON.stringify(math3ePythagore)).not.toMatch(/Quel est (l'|son )hypoténuse/);
+  });
+});

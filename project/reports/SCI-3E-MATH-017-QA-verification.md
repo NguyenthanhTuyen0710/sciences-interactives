@@ -35,3 +35,17 @@ Constats de la relecture IA **non confirmés** : « dégénérescence » de py3-
 
 ## 3. Lot de corrections proposé (à approuver, aucune appliquée)
 C3 (majeur), puis C1, C2, C4, C6, C7, C8 (mineurs, éditions locales), C5 en option (un exercice N5 réécrit). Après correction : `validate-chapter`, test de non-régression sur la position de l'angle droit (≥ 2 positions par générateur sur 500 graines), relecture humaine ; pas de nouvelle relecture IA nécessaire pour ces éditions.
+
+## 4. Lot appliqué (2026-11-15, approuvé : C1–C8, C3 en priorité ; aucun exercice ajouté)
+| # | Modification | Contrôle |
+|---|---|---|
+| C3 | `rightTriangle()` : sommet de l'angle droit tiré parmi les trois, nom du triangle dans l'ordre des lettres ; appliqué à py3-01, 02, 05, 06, 07, 09, 10, 12, 17, 18 ; indices rendus indépendants des lettres (py3-06, 09). | 500 graines : angle droit au 1er sommet 1 733 / 6 003 (avant 5 003 / 6 003), 2e 2 146, 3e 2 124 ; test : ≥ 2 positions par générateur. |
+| C1 | « Contraposée (prolongement) » dans la leçon, « Exemple 5 (prolongement) », raisonnement de py3-20 étiqueté. | relecture |
+| C2 | Source `bo-2019-22-pdf` ajoutée (sha256 et date de l'enregistrement du collecteur). | `validate-chapter` : 0/4 source en attente. |
+| C4 | « Quelle est son hypoténuse ? » (mini-quiz), « Quelle est l'hypoténuse ? » (py3-18). | test d'accord |
+| C5 | py3-18 réécrit sans étapes : deux réponses finales (clôture, gazon), côté manquant non entier, arrondi au dixième, diagnostics hypoténuse/côté. | 500 tirages validés |
+| C6 | py3-20 : « écart » remplacé par $FG^2$ et $EF^2 + EG^2$ (diagnostics longueur / somme des longueurs). | validé |
+| C7 | 5 items « 1 si oui, 0 si non » remplacés par le calcul du carré ou de la somme des carrés, conclusion dans l'explication. | validé |
+| C8 | py3-12 : « Calcule la valeur exacte de … » (sans « un décimal »). | validé |
+
+Chapitre après correction : sha256 `ee3bc04b5c7fac11…` ; `validate-chapter` 8 004 tirages, 0 problème ; 484 tests. Le chapitre reste `draft`, 20 exercices (complément après la taxonomie G3).

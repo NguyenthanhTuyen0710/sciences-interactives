@@ -21,6 +21,15 @@ function triple(rng: Rng, n = 4, ks: number[] = [1, 2, 3]): [number, number, num
   return rng.next() < 0.5 ? [a * k, b * k, c * k] : [b * k, a * k, c * k];
 }
 const NAMES: [string, string, string][] = [["A", "B", "C"], ["E", "F", "G"], ["K", "L", "M"], ["R", "S", "T"]];
+/**
+ * Triangle rectangle : nom N écrit dans l'ordre des lettres, sommet de l'angle droit A tiré parmi les trois
+ * (B, C : les deux autres, hypoténuse [BC]). Évite que l'angle droit soit toujours au premier sommet du nom.
+ */
+function rightTriangle(rng: Rng, letters: [string, string, string] = rng.pick(NAMES)) {
+  const r = rng.int(0, 2);
+  const [B, C] = letters.filter((_, i) => i !== r);
+  return { A: letters[r], B, C, N: letters.join("") };
+}
 
 const num = (value: number, mistakes: Mistake[] = [], prompt?: string, suffix?: string): ChapterPart => ({
   prompt,
@@ -88,9 +97,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "py3-01", title: "Repérer l'hypoténuse", niveau: 1, objectives: ["M3-AUTO-03"], time: 60,
     vary: (rng) => {
-      const [A, B, C] = rng.pick(NAMES);
+      const { A, B, C, N } = rightTriangle(rng);
       return {
-        statement: `Le triangle $${A}${B}${C}$ est rectangle en $${A}$. Quel côté est son hypoténuse ?`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$. Quel côté est son hypoténuse ?`,
         parts: [shuffledQcm(rng, [`$[${B}${C}]$`, `$[${A}${B}]$`, `$[${A}${C}]$`, "On ne peut pas le savoir"], 0, {
           1: `$[${A}${B}]$ touche l'angle droit : c'est un côté de l'angle droit, pas l'hypoténuse.`,
           2: `$[${A}${C}]$ touche l'angle droit : c'est un côté de l'angle droit, pas l'hypoténuse.`,
@@ -105,9 +114,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "py3-02", title: "Écrire la bonne égalité", niveau: 1, objectives: ["M3-AUTO-03", "M4-EG-03"], time: 90,
     vary: (rng) => {
-      const [A, B, C] = rng.pick(NAMES);
+      const { A, B, C, N } = rightTriangle(rng);
       return {
-        statement: `Le triangle $${A}${B}${C}$ est rectangle en $${A}$. Quelle égalité donne le théorème de Pythagore ?`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$. Quelle égalité donne le théorème de Pythagore ?`,
         parts: [shuffledQcm(rng, [
           `$${B}${C}^2 = ${A}${B}^2 + ${A}${C}^2$`,
           `$${A}${B}^2 = ${B}${C}^2 + ${A}${C}^2$`,
@@ -116,7 +125,7 @@ const EXERCISES: ChapterExercise[] = [
         ], 0, {
           1: `Ici $[${A}${B}]$ n'est pas l'hypoténuse : le carré de l'hypoténuse est seul d'un côté de l'égalité.`,
           2: "Tu as additionné les longueurs : ce sont les **carrés** des longueurs qu'on additionne.",
-          3: "Il manque les carrés dans la somme : $AB$ et $AC$ doivent être élevés au carré.",
+          3: `Il manque les carrés dans la somme : $${A}${B}$ et $${A}${C}$ doivent être élevés au carré.`,
         })],
         solution: [`L'hypoténuse est $[${B}${C}]$ (en face de l'angle droit en $${A}$).`, `Le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés : $${B}${C}^2 = ${A}${B}^2 + ${A}${C}^2$.`],
       };
@@ -169,14 +178,14 @@ const EXERCISES: ChapterExercise[] = [
     id: "py3-05", title: "Calculer l'hypoténuse", niveau: 2, objectives: ["M4-EG-03"], time: 90,
     vary: (rng) => {
       const [a, b, c] = triple(rng);
-      const [A, B, C] = rng.pick(NAMES);
+      const { A, B, C, N } = rightTriangle(rng);
       return {
-        statement: `Le triangle $${A}${B}${C}$ est rectangle en $${A}$, avec $${A}${B} = ${a}$ cm et $${A}${C} = ${b}$ cm. Calcule $${B}${C}$.`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$, avec $${A}${B} = ${a}$ cm et $${A}${C} = ${b}$ cm. Calcule $${B}${C}$.`,
         parts: [num(c, [
           { match: String(a + b), feedback: "Tu as additionné les longueurs : il faut additionner les **carrés** des longueurs." },
           { match: String(a * a + b * b), feedback: `Tu as calculé $${B}${C}^2$ : il reste à prendre la racine carrée.` },
         ], undefined, "cm")],
-        solution: [`$${A}${B}${C}$ est rectangle en $${A}$ : d'après le théorème de Pythagore, $${B}${C}^2 = ${A}${B}^2 + ${A}${C}^2$.`, `$${B}${C}^2 = ${a}^2 + ${b}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, `$${B}${C}$ est positif, donc $${B}${C} = \\sqrt{${a * a + b * b}} = ${c}$ cm.`],
+        solution: [`$${N}$ est rectangle en $${A}$ : d'après le théorème de Pythagore, $${B}${C}^2 = ${A}${B}^2 + ${A}${C}^2$.`, `$${B}${C}^2 = ${a}^2 + ${b}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, `$${B}${C}$ est positif, donc $${B}${C} = \\sqrt{${a * a + b * b}} = ${c}$ cm.`],
       };
     },
     reasoning: "On additionne les carrés des deux côtés de l'angle droit, puis on prend la racine carrée.",
@@ -186,9 +195,9 @@ const EXERCISES: ChapterExercise[] = [
     id: "py3-06", title: "Calculer un côté de l'angle droit", niveau: 2, objectives: ["M4-EG-03"], time: 120,
     vary: (rng) => {
       const [a, b, c] = triple(rng);
-      const [A, B, C] = rng.pick(NAMES);
+      const { A, B, C, N } = rightTriangle(rng);
       return {
-        statement: `Le triangle $${A}${B}${C}$ est rectangle en $${A}$, avec $${B}${C} = ${c}$ cm et $${A}${B} = ${a}$ cm. Calcule $${A}${C}$.`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$, avec $${B}${C} = ${c}$ cm et $${A}${B} = ${a}$ cm. Calcule $${A}${C}$.`,
         parts: [num(b, [
           { match: String(c * c - a * a), feedback: `Tu as calculé $${A}${C}^2$ : il reste à prendre la racine carrée.` },
           { match: String(c * c + a * a), feedback: `Ici l'inconnue est un côté de l'angle droit : $${B}${C}$ est l'hypoténuse, on **soustrait** les carrés.` },
@@ -198,21 +207,23 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Quand l'inconnue est un côté de l'angle droit, on soustrait le carré du côté connu au carré de l'hypoténuse.",
-    hints: ["Identifie d'abord l'hypoténuse.", "Isole le carré de l'inconnue : $AC^2 = BC^2 - AB^2$."],
+    hints: ["Identifie d'abord l'hypoténuse.", "Isole le carré de l'inconnue : carré de l'hypoténuse moins carré du côté connu."],
   }),
   ex({
     id: "py3-07", title: "Compléter les étapes du calcul", niveau: 2, objectives: ["M4-EG-03"], time: 120,
     vary: (rng) => {
       const [a, b, c] = triple(rng);
+      const { A, B, C, N } = rightTriangle(rng, ["A", "B", "C"]);
+      const [AB, AC, BC] = [A + B, A + C, B + C];
       return {
-        statement: `Le triangle $ABC$ est rectangle en $A$, avec $AB = ${a}$ cm et $AC = ${b}$ cm. Complète le tableau pour calculer $BC$.`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$, avec $${AB} = ${a}$ cm et $${AC} = ${b}$ cm. Complète le tableau pour calculer $${BC}$.`,
         parts: [{ interaction: { kind: "tableau", headers: ["Calcul", "Résultat"], rows: [
-          { label: "$AB^2$", cells: [{ answer: { value: a * a } }] },
-          { label: "$AC^2$", cells: [{ answer: { value: b * b } }] },
-          { label: "$BC^2 = AB^2 + AC^2$", cells: [{ answer: { value: a * a + b * b } }] },
-          { label: "$BC$ (en cm)", cells: [{ answer: { value: c } }] },
+          { label: `$${AB}^2$`, cells: [{ answer: { value: a * a } }] },
+          { label: `$${AC}^2$`, cells: [{ answer: { value: b * b } }] },
+          { label: `$${BC}^2 = ${AB}^2 + ${AC}^2$`, cells: [{ answer: { value: a * a + b * b } }] },
+          { label: `$${BC}$ (en cm)`, cells: [{ answer: { value: c } }] },
         ] } }],
-        solution: [`$AB^2 = ${a}^2 = ${a * a}$ et $AC^2 = ${b}^2 = ${b * b}$.`, `$BC^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, `$BC = \\sqrt{${a * a + b * b}} = ${c}$ cm.`],
+        solution: [`$${AB}^2 = ${a}^2 = ${a * a}$ et $${AC}^2 = ${b}^2 = ${b * b}$.`, `$${BC}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, `$${BC} = \\sqrt{${a * a + b * b}} = ${c}$ cm.`],
       };
     },
     reasoning: "Décomposer le calcul en étapes évite d'oublier la racine carrée finale.",
@@ -233,29 +244,31 @@ const EXERCISES: ChapterExercise[] = [
       let a = 0, b = 0, s = 0;
       do { a = rng.int(2, 9); b = rng.int(2, 9); s = a * a + b * b; } while (isSq(s) || Math.abs((Math.sqrt(s) * 10) % 1 - 0.5) < 0.05);
       const v = Math.round(Math.sqrt(s) * 10) / 10;
+      const { A, B, C, N } = rightTriangle(rng, ["A", "B", "C"]);
+      const [AB, AC, BC] = [A + B, A + C, B + C];
       return {
-        statement: `Le triangle $ABC$ est rectangle en $A$, avec $AB = ${a}$ cm et $AC = ${b}$ cm. Calcule $BC$ et donne l'arrondi au dixième.`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$, avec $${AB} = ${a}$ cm et $${AC} = ${b}$ cm. Calcule $${BC}$ et donne l'arrondi au dixième.`,
         parts: [{
           interaction: { kind: "numerique", suffix: "cm", answer: { value: v, tol: 0.001, decimals: 1, roundingLabel: "au dixième" } },
           mistakes: [
             { match: String(a + b), feedback: "Tu as additionné les longueurs : il faut additionner les **carrés**." },
-            { match: String(s), feedback: "Tu as donné $BC^2$ : il reste à prendre la racine carrée." },
+            { match: String(s), feedback: `Tu as donné $${BC}^2$ : il reste à prendre la racine carrée.` },
           ].filter((m) => Number(m.match) !== v),
         }],
-        solution: [`$ABC$ est rectangle en $A$ : $BC^2 = AB^2 + AC^2 = ${a}^2 + ${b}^2 = ${s}$.`, `$BC = \\sqrt{${s}}$, valeur exacte non décimale.`, `À la calculatrice, $BC \\approx ${T(v)}$ cm (arrondi au dixième).`],
+        solution: [`$${N}$ est rectangle en $${A}$ : $${BC}^2 = ${AB}^2 + ${AC}^2 = ${a}^2 + ${b}^2 = ${s}$.`, `$${BC} = \\sqrt{${s}}$, valeur exacte non décimale.`, `À la calculatrice, $${BC} \\approx ${T(v)}$ cm (arrondi au dixième).`],
       };
     },
     reasoning: "Quand le résultat n'est pas un carré parfait, on garde $\\sqrt{\\ }$ pour la valeur exacte et on arrondit seulement à la fin.",
-    hints: ["Calcule $BC^2$ d'abord.", "Utilise la touche racine carrée de la calculatrice.", "Arrondis seulement le résultat final."],
+    hints: ["Calcule d'abord le carré de l'hypoténuse.", "Utilise la touche racine carrée de la calculatrice.", "Arrondis seulement le résultat final."],
   }),
   ex({
     id: "py3-10", title: "La valeur exacte de l'hypoténuse", niveau: 3, objectives: ["M4-EG-03"], time: 120,
     vary: (rng) => {
       let a = 0, b = 0, s = 0;
       do { a = rng.int(2, 9); b = rng.int(2, 9); s = a * a + b * b; } while (isSq(s) || a >= b);
-      const [E, F, G] = rng.pick(NAMES);
+      const { A: E, B: F, C: G, N } = rightTriangle(rng);
       return {
-        statement: `Le triangle $${E}${F}${G}$ est rectangle en $${E}$, avec $${E}${F} = ${a}$ cm et $${E}${G} = ${b}$ cm. Quelle est la valeur **exacte** de $${F}${G}$ ?`,
+        statement: `Le triangle $${N}$ est rectangle en $${E}$, avec $${E}${F} = ${a}$ cm et $${E}${G} = ${b}$ cm. Quelle est la valeur **exacte** de $${F}${G}$ ?`,
         parts: [shuffledQcm(rng, [`$\\sqrt{${s}}$ cm`, `$\\sqrt{${b * b - a * a}}$ cm`, `$${a + b}$ cm`, `$${s}$ cm`], 0, {
           1: `Tu as soustrait : mais $[${F}${G}]$ est l'hypoténuse, on additionne les carrés.`,
           2: "Tu as additionné les longueurs au lieu de leurs carrés.",
@@ -294,16 +307,18 @@ const EXERCISES: ChapterExercise[] = [
       const m = rng.pick([2, 3, 4, 5]);
       const sw = rng.next() < 0.5;
       const x = (sw ? b : a) * m, y = (sw ? a : b) * m, h = c * m;
+      const { A, B, C, N } = rightTriangle(rng, ["A", "B", "C"]);
+      const [AB, AC, BC] = [A + B, A + C, B + C];
       return {
-        statement: `Le triangle $ABC$ est rectangle en $A$, avec $AB = ${T(x / 10)}$ m et $AC = ${T(y / 10)}$ m. Calcule $BC$ (valeur exacte, un décimal).`,
+        statement: `Le triangle $${N}$ est rectangle en $${A}$, avec $${AB} = ${T(x / 10)}$ m et $${AC} = ${T(y / 10)}$ m. Calcule la valeur exacte de $${BC}$.`,
         parts: [{
           interaction: { kind: "numerique", suffix: "m", answer: { value: h / 10, tol: 1e-9 } },
           mistakes: [
             { match: String((x + y) / 10), feedback: "Tu as additionné les longueurs : il faut additionner les **carrés**." },
-            { match: String(Math.round(((x * x + y * y) / 100) * 100) / 100), feedback: "Tu as donné $BC^2$ : il reste à prendre la racine carrée." },
+            { match: String(Math.round(((x * x + y * y) / 100) * 100) / 100), feedback: `Tu as donné $${BC}^2$ : il reste à prendre la racine carrée.` },
           ].filter((d) => Number(d.match) !== h / 10), // BC = 1 ⇒ BC² = BC : diagnostic retiré
         }],
-        solution: [`$BC^2 = ${T(x / 10)}^2 + ${T(y / 10)}^2 = ${T((x * x) / 100)} + ${T((y * y) / 100)} = ${T((x * x + y * y) / 100)}$.`, `$BC = \\sqrt{${T((x * x + y * y) / 100)}} = ${T(h / 10)}$ m.`],
+        solution: [`$${BC}^2 = ${T(x / 10)}^2 + ${T(y / 10)}^2 = ${T((x * x) / 100)} + ${T((y * y) / 100)} = ${T((x * x + y * y) / 100)}$.`, `$${BC} = \\sqrt{${T((x * x + y * y) / 100)}} = ${T(h / 10)}$ m.`],
       };
     },
     reasoning: "Les décimaux se traitent comme les entiers : on élève au carré, on additionne, on prend la racine.",
@@ -397,21 +412,23 @@ const EXERCISES: ChapterExercise[] = [
       const [a, b, c] = triple(rng);
       const rect = rng.next() < 0.5;
       const d = rect ? c : c + 1;
+      const { A, B, C, N } = rightTriangle(rng, ["A", "B", "C"]);
+      const [AB, AC, BC] = [A + B, A + C, B + C];
       return {
-        statement: `Pour vérifier qu'un cadre est d'équerre, un artisan mesure un triangle $ABC$ : $AB = ${a}$ cm, $AC = ${b}$ cm et $BC = ${d}$ cm. Il veut savoir si $ABC$ est rectangle en $A$.`,
+        statement: `Pour vérifier qu'un cadre est d'équerre, un artisan mesure un triangle $${N}$ : $${AB} = ${a}$ cm, $${AC} = ${b}$ cm et $${BC} = ${d}$ cm. Il veut savoir si $${N}$ est rectangle en $${A}$.`,
         parts: [
-          num(d * d, [{ match: String(d), feedback: "Tu as donné la longueur : on demande son **carré**." }], "1. Calcule $BC^2$ (le plus grand côté est $[BC]$).", "cm²"),
-          num(a * a + b * b, [{ match: String(a + b), feedback: "Il faut additionner les carrés, pas les longueurs." }], "2. Calcule $AB^2 + AC^2$.", "cm²"),
+          num(d * d, [{ match: String(d), feedback: "Tu as donné la longueur : on demande son **carré**." }], `1. Calcule $${BC}^2$ (le plus grand côté est $[${BC}]$).`, "cm²"),
+          num(a * a + b * b, [{ match: String(a + b), feedback: "Il faut additionner les carrés, pas les longueurs." }], `2. Calcule $${AB}^2 + ${AC}^2$.`, "cm²"),
           shuffledQcm(rng, [
-            "$ABC$ est rectangle en $A$, d'après la réciproque du théorème de Pythagore.",
-            "$ABC$ n'est pas rectangle en $A$ : les deux résultats sont différents (contraposée du théorème de Pythagore).",
-            "$ABC$ est rectangle en $A$ car l'angle a l'air droit sur le dessin.",
+            `$${N}$ est rectangle en $${A}$, d'après la réciproque du théorème de Pythagore.`,
+            `$${N}$ n'est pas rectangle en $${A}$ : les deux résultats sont différents (contraposée du théorème de Pythagore).`,
+            `$${N}$ est rectangle en $${A}$ car l'angle a l'air droit sur le dessin.`,
           ], rect ? 0 : 1, {
             [rect ? 1 : 0]: rect ? "Les deux nombres sont égaux : la réciproque s'applique." : "Les deux nombres sont différents : la réciproque ne s'applique pas.",
             2: "Une impression visuelle ou une mesure ne prouve rien : il faut comparer les carrés.",
           }, "3. Quelle conclusion est correcte ?"),
         ],
-        solution: [`1. $BC^2 = ${d}^2 = ${d * d}$.`, `2. $AB^2 + AC^2 = ${a}^2 + ${b}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, rect ? `3. $BC^2 = AB^2 + AC^2$ : d'après la réciproque du théorème de Pythagore, $ABC$ est rectangle en $A$.` : `3. $BC^2 \\neq AB^2 + AC^2$ ($${d * d} \\neq ${a * a + b * b}$) : si $ABC$ était rectangle en $A$, le théorème de Pythagore donnerait l'égalité. Donc $ABC$ n'est pas rectangle en $A$.`],
+        solution: [`1. $${BC}^2 = ${d}^2 = ${d * d}$.`, `2. $${AB}^2 + ${AC}^2 = ${a}^2 + ${b}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, rect ? `3. $${BC}^2 = ${AB}^2 + ${AC}^2$ : d'après la réciproque du théorème de Pythagore, $${N}$ est rectangle en $${A}$.` : `3. $${BC}^2 \\neq ${AB}^2 + ${AC}^2$ ($${d * d} \\neq ${a * a + b * b}$) : si $${N}$ était rectangle en $${A}$, le théorème de Pythagore donnerait l'égalité. Donc $${N}$ n'est pas rectangle en $${A}$.`],
       };
     },
     reasoning: "Rédaction attendue : isoler le plus grand côté, calculer les deux quantités séparément, les comparer, puis citer la réciproque (ou la contraposée) et conclure.",
@@ -420,19 +437,32 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "py3-18", title: "Type Brevet — Clôturer et semer un jardin", niveau: 5, objectives: ["M4-EG-03"], time: 300,
     vary: (rng) => {
-      const [a, b, c] = triple(rng);
+      // Sans étapes intermédiaires ; côté manquant non entier : valeur exacte gardée jusqu'au bout, arrondi final.
+      const r1 = (x: number) => Math.round(x * 10) / 10;
+      const nearHalf = (x: number) => Math.abs(((x * 10) % 1) - 0.5) < 0.05;
+      let a = 0, c = 0, ac = 0;
+      do { a = rng.int(3, 9); c = rng.int(a + 2, a + 8); ac = Math.sqrt(c * c - a * a); } while (Number.isInteger(ac) || nearHalf(a + c + ac) || nearHalf((a * ac) / 2));
+      const p = r1(a + c + ac), s = r1((a * ac) / 2), d2 = c * c - a * a;
+      const { A, B, C, N } = rightTriangle(rng, ["A", "B", "C"]);
+      const [AB, AC, BC] = [A + B, A + C, B + C];
+      const far = (v: number) => (m: Mistake) => Math.abs(Number(m.match) - v) > 0.05;
+      const round1 = { tol: 0.001, decimals: 1, roundingLabel: "au dixième" };
       return {
-        statement: `Un jardin a la forme d'un triangle $ABC$ rectangle en $A$, avec $AB = ${a}$ m et $BC = ${c}$ m. On veut poser une clôture sur tout le pourtour et semer du gazon sur toute la surface.`,
-        parts: [etapes([
-          { prompt: "Longueur $AC$", value: b, suffix: "m" },
-          { prompt: "Longueur de clôture (périmètre)", value: a + b + c, suffix: "m" },
-          { prompt: "Surface de gazon (aire)", value: (a * b) / 2, suffix: "m²" },
-        ])],
-        solution: [`$ABC$ est rectangle en $A$ : $AC^2 = BC^2 - AB^2 = ${c * c} - ${a * a} = ${b * b}$, donc $AC = ${b}$ m.`, `Périmètre : $${a} + ${b} + ${c} = ${a + b + c}$ m.`, `Aire : $\\dfrac{AB \\times AC}{2} = \\dfrac{${a} \\times ${b}}{2} = ${(a * b) / 2}$ m².`],
+        statement: `Un jardin a la forme d'un triangle $${N}$ rectangle en $${A}$, avec $${AB} = ${a}$ m et $${BC} = ${c}$ m. On veut poser une clôture sur tout le pourtour et semer du gazon sur toute la surface. Calcule la longueur de clôture et la surface de gazon (arrondis au dixième).`,
+        parts: [
+          { prompt: "Longueur de clôture (périmètre)", interaction: { kind: "numerique", suffix: "m", answer: { value: p, ...round1 } }, mistakes: [
+            { match: String(r1(a + c + Math.sqrt(a * a + c * c))), feedback: `$[${BC}]$ est l'hypoténuse : le côté manquant s'obtient en **soustrayant** les carrés.` },
+            { match: String(a + c), feedback: "Le pourtour comprend les trois côtés : calcule d'abord le côté manquant." },
+          ].filter(far(p)) },
+          { prompt: "Surface de gazon (aire)", interaction: { kind: "numerique", suffix: "m²", answer: { value: s, ...round1 } }, mistakes: [
+            { match: String((a * c) / 2), feedback: `L'aire utilise les deux côtés de l'angle droit ; $[${BC}]$ est l'hypoténuse.` },
+          ].filter(far(s)) },
+        ],
+        solution: [`$${N}$ est rectangle en $${A}$ : $${AC}^2 = ${BC}^2 - ${AB}^2 = ${c * c} - ${a * a} = ${d2}$, donc $${AC} = \\sqrt{${d2}}$ m (valeur exacte).`, `Clôture : $${a} + ${c} + \\sqrt{${d2}} \\approx ${T(p)}$ m.`, `Gazon : $\\dfrac{${AB} \\times ${AC}}{2} = \\dfrac{${a}\\sqrt{${d2}}}{2} \\approx ${T(s)}$ m².`],
       };
     },
-    reasoning: "Le calcul de la longueur manquante est la première étape : périmètre et aire en dépendent.",
-    hints: ["Quel est l'hypoténuse ?", "Calcule d'abord $AC$.", "Aire d'un triangle rectangle : produit des côtés de l'angle droit ÷ 2."],
+    reasoning: "Le calcul de la longueur manquante est la première étape : périmètre et aire en dépendent. On garde la valeur exacte et on n'arrondit qu'à la fin.",
+    hints: ["Quelle est l'hypoténuse ?", "Calcule d'abord le côté manquant, en valeur exacte.", "Aire d'un triangle rectangle : produit des côtés de l'angle droit ÷ 2."],
   }),
   ex({
     id: "py3-19", title: "Type Brevet — Deux triangles pour un atelier", niveau: 5, objectives: ["M4-EG-03", "M4-EG-04"], time: 360,
@@ -453,13 +483,14 @@ const EXERCISES: ChapterExercise[] = [
   }),
   ex({
     id: "py3-20", title: "Type Brevet — Démontrer qu'un triangle n'est pas rectangle", niveau: 5, objectives: ["M4-EG-04"], time: 300,
-    statement: "Le triangle $EFG$ a pour côtés $EF = 9$ cm, $EG = 12$ cm et $FG = 16$ cm. Un élève affirme : « $EFG$ est rectangle en $E$ ». Remets dans l'ordre la démonstration qui le contredit, puis calcule l'écart entre les deux nombres comparés.",
+    statement: "Le triangle $EFG$ a pour côtés $EF = 9$ cm, $EG = 12$ cm et $FG = 16$ cm. Un élève affirme : « $EFG$ est rectangle en $E$ ». Remets dans l'ordre la démonstration qui le contredit, puis donne les deux nombres comparés.",
     parts: [
       { interaction: { kind: "ordonner", items: brevItems, answer: BREV_STEPS.map((s) => brevItems.indexOf(s)), hint: "Première étape en haut" } },
-      num(31, [{ match: "225", feedback: "Tu as donné $EF^2 + EG^2$ : on demande l'écart $FG^2 - (EF^2 + EG^2)$." }], "Écart $FG^2 - (EF^2 + EG^2)$ (en cm²).", "cm²"),
+      num(256, [{ match: "16", feedback: "Tu as donné la longueur : on demande son **carré**." }], "$FG^2$ (en cm²)", "cm²"),
+      num(225, [{ match: "21", feedback: "Il faut additionner les carrés, pas les longueurs." }], "$EF^2 + EG^2$ (en cm²)", "cm²"),
     ],
-    solution: [...BREV_STEPS, "$256 - 225 = 31$ : les deux nombres sont différents, l'élève a tort. Une mesure sur la figure n'aurait rien prouvé ; la comparaison des carrés exacts, si."],
-    reasoning: "Pour prouver qu'un triangle n'est pas rectangle, on montre que l'égalité de Pythagore est fausse : le théorème, appliqué à un triangle rectangle, la donnerait.",
+    solution: [...BREV_STEPS, "$256 \\neq 225$ : les deux nombres sont différents, l'élève a tort. Une mesure sur la figure n'aurait rien prouvé ; la comparaison des carrés exacts, si."],
+    reasoning: "Prolongement (raisonnement par l'absurde, cycle 4) : pour prouver qu'un triangle n'est pas rectangle, on montre que l'égalité de Pythagore est fausse ; le théorème, appliqué à un triangle rectangle, la donnerait.",
     hints: ["Commence par repérer le plus grand côté.", "Calcule séparément $FG^2$ et $EF^2 + EG^2$.", "Conclus sur le lien entre l'inégalité et l'angle droit."],
   }),
 ];
@@ -486,6 +517,7 @@ export const math3ePythagore: ChapterContent = {
     { id: "c4-programme-2020-eduscol-pdf", title: "Programme du cycle 4 en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf", kind: "official", verification: "verified", sha256: "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9", accessedAt: "2026-11-07T14:49:44.189Z" },
     { id: "c4-attendus-4e-2019-pdf", title: "Mathématiques 4e — attendus de fin d'année (2019), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf", kind: "official", note: "notions de 4e consolidées en 3e (p. 10)", verification: "verified", sha256: "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966", accessedAt: "2026-11-07T14:49:57.494Z" },
     { id: "c4-attendus-3e-2019-pdf", title: "Mathématiques 3e — attendus de fin d'année (2019), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf", kind: "official", note: "cadre de la consolidation en 3e", verification: "verified", sha256: "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a", accessedAt: "2026-11-07T14:50:10.048Z" },
+    { id: "bo-2019-22-pdf", title: "Bulletin officiel n° 22 du 29 mai 2019 — repères annuels de progression et attendus de fin d'année (note de service n° 2019-072, NOR MENE1913283N), annexe 26 : mathématiques cycle 4", url: "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf", kind: "official", note: "repères annuels de progression du cycle 4 (géométrie plane en 4e)", verification: "verified", sha256: "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065", accessedAt: "2026-11-07T15:03:14.705Z" },
   ],
   lesson: {
     introduction: "Un menuisier veut vérifier qu'un cadre de porte est bien d'équerre, un déménageur se demande si son échelle de $5$ m atteindra une fenêtre : dans les deux cas, on a un triangle et des longueurs, et on veut savoir si un angle est droit ou calculer une longueur manquante.\nLe **théorème de Pythagore** relie les trois longueurs d'un triangle rectangle, et sa **réciproque** permet de prouver qu'un triangle est rectangle à partir de ses seules longueurs. Ces notions, vues en 4e, reviennent très souvent en 3e (notamment au Brevet) : l'objectif est de bien les consolider et d'avoir en tête l'image de la configuration.",
@@ -493,7 +525,7 @@ export const math3ePythagore: ChapterContent = {
       { term: "Hypoténuse", text: "Dans un triangle rectangle, l'**hypoténuse** est le côté opposé à l'angle droit. C'est le plus long côté du triangle. Les deux autres côtés sont les **côtés de l'angle droit**." },
       { term: "Théorème de Pythagore", text: "Si le triangle $ABC$ est rectangle en $A$, alors $BC^2 = AB^2 + AC^2$.\nAutrement dit : le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés." },
       { term: "Réciproque du théorème de Pythagore", text: "Si, dans un triangle $ABC$, on a $BC^2 = AB^2 + AC^2$, alors $ABC$ est rectangle en $A$.\nOn l'utilise pour **démontrer** qu'un triangle est rectangle à partir des longueurs de ses côtés." },
-      { term: "Contraposée", text: "Si, dans un triangle $ABC$, $BC^2 \\neq AB^2 + AC^2$, alors $ABC$ n'est **pas** rectangle en $A$. En effet, s'il l'était, le théorème de Pythagore donnerait l'égalité." },
+      { term: "Contraposée (prolongement)", text: "Si, dans un triangle $ABC$, $BC^2 \\neq AB^2 + AC^2$, alors $ABC$ n'est **pas** rectangle en $A$. En effet, s'il l'était, le théorème de Pythagore donnerait l'égalité. Ce raisonnement (par l'absurde, travaillé au cycle 4) prolonge le programme, qui demande de démontrer qu'un triangle **est** rectangle." },
       { term: "Valeur exacte, valeur approchée", text: "$\\sqrt{13}$ est une valeur **exacte** ; $3{,}6$ est une valeur **approchée** (arrondi au dixième). Quand on demande une valeur exacte, on garde la racine ; quand on demande un arrondi, on l'effectue **à la fin** du calcul." },
       { term: "Image mentale de la configuration", text: "On construit un carré sur chacun des trois côtés d'un triangle rectangle : l'aire du grand carré (sur l'hypoténuse) est la somme des aires des deux petits carrés. Exemple : $3^2 + 4^2 = 9 + 16 = 25 = 5^2$." },
     ],
@@ -513,7 +545,7 @@ export const math3ePythagore: ChapterContent = {
       { title: "Exemple 2 — Calculer un côté de l'angle droit", statement: "$EFG$ est rectangle en $E$ avec $FG = 17$ cm et $EF = 8$ cm. Calculer $EG$.", steps: ["$EFG$ est rectangle en $E$ : $FG^2 = EF^2 + EG^2$, donc $EG^2 = FG^2 - EF^2$.", "$EG^2 = 17^2 - 8^2 = 289 - 64 = 225$.", "$EG = \\sqrt{225} = 15$."], answer: "$EG = 15$ cm" },
       { title: "Exemple 3 — Valeur approchée", statement: "$ABC$ est rectangle en $A$ avec $AB = 3$ cm et $AC = 5$ cm. Donner $BC$ arrondi au dixième.", steps: ["$BC^2 = 3^2 + 5^2 = 9 + 25 = 34$.", "$BC = \\sqrt{34}$ (valeur exacte).", "À la calculatrice, $\\sqrt{34} \\approx 5{,}83$, soit $5{,}8$ au dixième."], answer: "$BC \\approx 5{,}8$ cm" },
       { title: "Exemple 4 — Démontrer qu'un triangle est rectangle", statement: "$ABC$ a pour côtés $AB = 20$ cm, $AC = 21$ cm et $BC = 29$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[BC]$ : $BC^2 = 29^2 = 841$.", "$AB^2 + AC^2 = 20^2 + 21^2 = 400 + 441 = 841$.", "Les deux résultats sont égaux : d'après la réciproque du théorème de Pythagore, $ABC$ est rectangle en $A$."], answer: "$ABC$ est rectangle en $A$." },
-      { title: "Exemple 5 — Démontrer qu'il ne l'est pas", statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
+      { title: "Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas",statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
     ],
     illustrations: [
       { svg: squaresSvg("9", "16", "25", "Triangle rectangle de côtés 3, 4 et 5 avec un carré sur chaque côté, d'aires 9, 16 et 25"), alt: "Triangle rectangle de côtés 3, 4 et 5 avec un carré construit sur chaque côté, d'aires 9, 16 et 25.", caption: "$9 + 16 = 25$ : l'aire du grand carré est la somme des deux autres." },
@@ -543,7 +575,7 @@ export const math3ePythagore: ChapterContent = {
       skills: ["Reconnaître l'hypoténuse.", "Calculer une longueur manquante (exacte ou arrondie).", "Démontrer qu'un triangle est rectangle ou ne l'est pas.", "Modéliser une situation par un triangle rectangle."],
     },
     miniQuiz: [
-      { question: "$ABC$ est rectangle en $B$. Quel est son hypoténuse ?", options: ["$[AB]$", "$[BC]$", "$[AC]$"], answer: 2, explanation: "L'hypoténuse est opposée à l'angle droit, donc au sommet $B$ : c'est $[AC]$." },
+      { question: "$ABC$ est rectangle en $B$. Quelle est son hypoténuse ?", options: ["$[AB]$", "$[BC]$", "$[AC]$"], answer: 2, explanation: "L'hypoténuse est opposée à l'angle droit, donc au sommet $B$ : c'est $[AC]$." },
       { question: "$ABC$ est rectangle en $A$ avec $AB = 6$ et $AC = 8$. Alors $BC$ vaut…", options: ["$14$", "$10$", "$100$", "$2$"], answer: 1, explanation: "$BC^2 = 36 + 64 = 100$, donc $BC = 10$." },
       { question: "Un triangle a pour côtés $5$, $6$ et $8$. Est-il rectangle ?", options: ["Oui, car $5 + 6 > 8$", "Oui, car $5^2 + 6^2 = 8^2$", "Non, car $5^2 + 6^2 \\neq 8^2$"], answer: 2, explanation: "$5^2 + 6^2 = 61$ et $8^2 = 64$ : les résultats sont différents." },
       { question: "$EFG$ est rectangle en $E$ avec $FG = 13$ et $EF = 5$. Alors $EG$ vaut…", options: ["$18$", "$12$", "$194$", "$8$"], answer: 1, explanation: "$EG^2 = 13^2 - 5^2 = 169 - 25 = 144$, donc $EG = 12$." },
@@ -582,13 +614,13 @@ export const math3ePythagore: ChapterContent = {
           ] },
           { label: "Réciproque et triplets", items: [
             { q: "Carré du plus grand côté d'un triangle de côtés $5$, $12$ et $13$", answer: "169", explanation: "$13^2 = 169$." },
-            { q: "Triangle $9$ ; $12$ ; $15$ rectangle ? (1 si oui, 0 si non)", answer: "1", explanation: "$81 + 144 = 225 = 15^2$." },
-            { q: "Triangle $4$ ; $5$ ; $7$ rectangle ? (1 si oui, 0 si non)", answer: "0", explanation: "$16 + 25 = 41 \\neq 49$." },
-            { q: "Triangle $20$ ; $21$ ; $29$ rectangle ? (1 si oui, 0 si non)", answer: "1", explanation: "$400 + 441 = 841 = 29^2$." },
-            { q: "Triangle $8$ ; $10$ ; $12$ rectangle ? (1 si oui, 0 si non)", answer: "0", explanation: "$64 + 100 = 164 \\neq 144$." },
+            { q: "Triangle $9$ ; $12$ ; $15$ : $9^2 + 12^2 =$", answer: "225", explanation: "$81 + 144 = 225 = 15^2$ : le triangle est rectangle (réciproque)." },
+            { q: "Triangle $4$ ; $5$ ; $7$ : $4^2 + 5^2 =$", answer: "41", explanation: "$16 + 25 = 41 \\neq 7^2 = 49$ : le triangle n'est pas rectangle." },
+            { q: "Triangle $20$ ; $21$ ; $29$ : $29^2 =$", answer: "841", explanation: "$29^2 = 841 = 400 + 441$ : le triangle est rectangle." },
+            { q: "Triangle $8$ ; $10$ ; $12$ : $8^2 + 10^2 =$", answer: "164", explanation: "$64 + 100 = 164 \\neq 12^2 = 144$ : le triangle n'est pas rectangle." },
             { q: "Complète le triplet : $3$ ; $4$ ; ?", answer: "5", explanation: "$9 + 16 = 25$." },
             { q: "Si $6^2 + x^2 = 10^2$ avec $x > 0$, alors $x =$", answer: "8", explanation: "$x^2 = 100 - 36 = 64$." },
-            { q: "Triangle $7$ ; $24$ ; $25$ rectangle ? (1 si oui, 0 si non)", answer: "1", explanation: "$49 + 576 = 625 = 25^2$." },
+            { q: "Triangle $7$ ; $24$ ; $25$ : $7^2 + 24^2 =$", answer: "625", explanation: "$49 + 576 = 625 = 25^2$ : le triangle est rectangle." },
           ] },
         ],
       },
