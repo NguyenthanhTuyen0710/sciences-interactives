@@ -1,4 +1,4 @@
-<!-- Relecture produite par claude-sonnet-5-5 via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->
+<!-- Relecture QA produite par claude-sonnet-5-5 via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->
 # Relecture QA (API) — math-3e-pythagore
 
 **Verdict : NEEDS_REVIEW**
@@ -8,25 +8,23 @@
 | curriculum | NEEDS_REVIEW |
 | accuracy | NEEDS_REVIEW |
 | exercises | NEEDS_REVIEW |
-| games | NEEDS_REVIEW |
+| games | PASS |
 | technical | NEEDS_REVIEW |
 | language | NEEDS_REVIEW |
 
 ## Constats
-1. **MAJEUR** · exercises · `py3-20` — La partie 2 demande « l'écart » 256 − 225 = 31, une notion artificielle qui n'est pas un attendu du Brevet. Le niveau 5 se réduit à un exercice de rédaction mécanique.
-   - Correction proposée : Remplacer l'écart par une question de conclusion (QCM) ou une autre longueur à calculer.
-2. **MAJEUR** · accuracy · `py3-15` — L'énoncé donne H(x1 ; y0) et affirme que AHB est rectangle en H. Si dx ou dy est nul, le triangle est dégénéré ; ce n'est pas le cas ici, mais la figure manque et le repère n'est pas tracé. Le niveau 4 repose sur une construction imposée.
-   - Correction proposée : Ajouter une figure SVG du repère, ou demander à l'élève d'identifier lui-même le triangle rectangle.
-3. **MAJEUR** · exercises · `py3-12` — La valeur affichée dans l'énoncé se réduit à un décimal avec « un décimal » en consigne, ce qui indique la forme de la réponse. Si x/10 est entier (ex. 1,5 ou 2), la forme attendue est ambiguë ; mistakes[match] peut aussi devenir un nombre mal formé (arrondi à 2 décimales).
-   - Correction proposée : Retirer « un décimal » de la consigne et vérifier les diagnostics pour chaque triplet.
-4. **MINEUR** · curriculum — Le chapitre est présenté comme consolidation de 4e, mais le seul objectif de 3e est M3-AUTO-03. Les exercices niveau 5 reposent sur des notions de 4e, ce qui est acceptable mais doit être signalé comme révision aux élèves.
-   - Correction proposée : Ajouter une phrase dans l'introduction indiquant que les notions sont vues en 4e et reprises en 3e.
-5. **MINEUR** · games · `py3-jeu-flash` — Les items « rectangle ? (1 si oui, 0 si non) » imposent un codage artificiel et peu pédagogique.
-   - Correction proposée : Remplacer par des calculs de carrés ou de racines, ou par un mini-QCM.
-6. **MINEUR** · language · `py3-18` — Indice « Quel est l'hypoténuse ? » : « hypoténuse » est féminin (dans le mini-quiz aussi : « son hypoténuse » est correct, mais « Quel est son hypoténuse ? » est faux).
-   - Correction proposée : Écrire « Quelle est l'hypoténuse ? » et « Quelle est son hypoténuse ? ».
-7. **MINEUR** · technical · `py3-09` — Le diagnostic « a+b » est filtré par Number(match) !== v, alors que a+b ne peut pas égaler v. Le test de proximité à .5 n'évite pas tous les cas d'arrondi ambigus.
-   - Correction proposée : Contrôler l'arrondi avec une marge plus large ou fixer une liste de couples valides.
+1. **MAJEUR** · curriculum · `py3-20` — Exercice de niveau 5 « Type Brevet » entièrement consacré à la contraposée (PY-EXT-01, approfondissement), alors que le niveau 5 sert d'évaluation finale du chapitre. La contraposée est évaluée comme exigible, alors que seul le prolongement est validé. Confirme le constat du screening.
+   - Correction proposée : Retitrer « Prolongement — … » et sortir l'exercice du niveau 5 Brevet, ou le remplacer par un exercice sur la réciproque.
+2. **MAJEUR** · curriculum · `py3-17` — La bonne réponse de la question 3 est la contraposée (« n'est pas rectangle ») dans la moitié des tirages, sans mention de prolongement ; elle est donc attendue comme exigible. Confirme le constat du screening.
+   - Correction proposée : Ne faire varier que le cas rectangle, ou signaler « (prolongement) » dans l'énoncé quand la contraposée est attendue.
+3. **MAJEUR** · curriculum — La source bo-2019-22-pdf figure dans sources avec verification « verified » alors qu'elle n'est pas dans officialSources ; la note de périmètre interdit de citer une autre source comme vérifiée. Confirme le constat du screening.
+   - Correction proposée : Retirer l'entrée, ou la passer en non vérifiée avec accord explicite ; SRC_4E la cite aussi, à corriger en conséquence.
+4. **MINEUR** · accuracy · `py3-03` — La solution de l'item 1 (« il faut que le triangle soit rectangle (ou que l'égalité soit vérifiée, pour la réciproque) ») mélange théorème et réciproque. Confirme le constat du screening.
+   - Correction proposée : Reformuler : « Faux : le théorème ne s'applique qu'à un triangle rectangle ; la réciproque part de l'égalité. »
+5. **MINEUR** · exercises · `py3-18` — Le périmètre et l'aire sont arrondis puis comparés avec tol 0,001 : un élève qui arrondit ses calculs intermédiaires (par exemple AC≈7,5) peut obtenir une réponse différente de la clé.
+   - Correction proposée : Préciser dans l'énoncé « sans arrondir avant la fin », ou élargir la tolérance.
+6. **MINEUR** · language — Espace manquante après la virgule dans le titre de workedExamples « Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas »,statement. Confirme le constat du screening ; sans effet sur l'affichage.
+   - Correction proposée : Ajouter l'espace après la virgule.
 
 <details><summary>JSON validé</summary>
 
@@ -48,7 +46,7 @@
   },
   {
    "criterion": "games",
-   "verdict": "NEEDS_REVIEW"
+   "verdict": "PASS"
   },
   {
    "criterion": "technical",
@@ -61,53 +59,46 @@
  ],
  "findings": [
   {
-   "criterion": "exercises",
+   "criterion": "curriculum",
    "severity": "MAJEUR",
    "exerciseId": "py3-20",
-   "issue": "La partie 2 demande « l'écart » 256 − 225 = 31, une notion artificielle qui n'est pas un attendu du Brevet. Le niveau 5 se réduit à un exercice de rédaction mécanique.",
-   "fix": "Remplacer l'écart par une question de conclusion (QCM) ou une autre longueur à calculer."
-  },
-  {
-   "criterion": "accuracy",
-   "severity": "MAJEUR",
-   "exerciseId": "py3-15",
-   "issue": "L'énoncé donne H(x1 ; y0) et affirme que AHB est rectangle en H. Si dx ou dy est nul, le triangle est dégénéré ; ce n'est pas le cas ici, mais la figure manque et le repère n'est pas tracé. Le niveau 4 repose sur une construction imposée.",
-   "fix": "Ajouter une figure SVG du repère, ou demander à l'élève d'identifier lui-même le triangle rectangle."
-  },
-  {
-   "criterion": "exercises",
-   "severity": "MAJEUR",
-   "exerciseId": "py3-12",
-   "issue": "La valeur affichée dans l'énoncé se réduit à un décimal avec « un décimal » en consigne, ce qui indique la forme de la réponse. Si x/10 est entier (ex. 1,5 ou 2), la forme attendue est ambiguë ; mistakes[match] peut aussi devenir un nombre mal formé (arrondi à 2 décimales).",
-   "fix": "Retirer « un décimal » de la consigne et vérifier les diagnostics pour chaque triplet."
+   "issue": "Exercice de niveau 5 « Type Brevet » entièrement consacré à la contraposée (PY-EXT-01, approfondissement), alors que le niveau 5 sert d'évaluation finale du chapitre. La contraposée est évaluée comme exigible, alors que seul le prolongement est validé. Confirme le constat du screening.",
+   "fix": "Retitrer « Prolongement — … » et sortir l'exercice du niveau 5 Brevet, ou le remplacer par un exercice sur la réciproque."
   },
   {
    "criterion": "curriculum",
-   "severity": "MINEUR",
-   "exerciseId": "",
-   "issue": "Le chapitre est présenté comme consolidation de 4e, mais le seul objectif de 3e est M3-AUTO-03. Les exercices niveau 5 reposent sur des notions de 4e, ce qui est acceptable mais doit être signalé comme révision aux élèves.",
-   "fix": "Ajouter une phrase dans l'introduction indiquant que les notions sont vues en 4e et reprises en 3e."
+   "severity": "MAJEUR",
+   "exerciseId": "py3-17",
+   "issue": "La bonne réponse de la question 3 est la contraposée (« n'est pas rectangle ») dans la moitié des tirages, sans mention de prolongement ; elle est donc attendue comme exigible. Confirme le constat du screening.",
+   "fix": "Ne faire varier que le cas rectangle, ou signaler « (prolongement) » dans l'énoncé quand la contraposée est attendue."
   },
   {
-   "criterion": "games",
+   "criterion": "curriculum",
+   "severity": "MAJEUR",
+   "exerciseId": "",
+   "issue": "La source bo-2019-22-pdf figure dans sources avec verification « verified » alors qu'elle n'est pas dans officialSources ; la note de périmètre interdit de citer une autre source comme vérifiée. Confirme le constat du screening.",
+   "fix": "Retirer l'entrée, ou la passer en non vérifiée avec accord explicite ; SRC_4E la cite aussi, à corriger en conséquence."
+  },
+  {
+   "criterion": "accuracy",
    "severity": "MINEUR",
-   "exerciseId": "py3-jeu-flash",
-   "issue": "Les items « rectangle ? (1 si oui, 0 si non) » imposent un codage artificiel et peu pédagogique.",
-   "fix": "Remplacer par des calculs de carrés ou de racines, ou par un mini-QCM."
+   "exerciseId": "py3-03",
+   "issue": "La solution de l'item 1 (« il faut que le triangle soit rectangle (ou que l'égalité soit vérifiée, pour la réciproque) ») mélange théorème et réciproque. Confirme le constat du screening.",
+   "fix": "Reformuler : « Faux : le théorème ne s'applique qu'à un triangle rectangle ; la réciproque part de l'égalité. »"
+  },
+  {
+   "criterion": "exercises",
+   "severity": "MINEUR",
+   "exerciseId": "py3-18",
+   "issue": "Le périmètre et l'aire sont arrondis puis comparés avec tol 0,001 : un élève qui arrondit ses calculs intermédiaires (par exemple AC≈7,5) peut obtenir une réponse différente de la clé.",
+   "fix": "Préciser dans l'énoncé « sans arrondir avant la fin », ou élargir la tolérance."
   },
   {
    "criterion": "language",
    "severity": "MINEUR",
-   "exerciseId": "py3-18",
-   "issue": "Indice « Quel est l'hypoténuse ? » : « hypoténuse » est féminin (dans le mini-quiz aussi : « son hypoténuse » est correct, mais « Quel est son hypoténuse ? » est faux).",
-   "fix": "Écrire « Quelle est l'hypoténuse ? » et « Quelle est son hypoténuse ? »."
-  },
-  {
-   "criterion": "technical",
-   "severity": "MINEUR",
-   "exerciseId": "py3-09",
-   "issue": "Le diagnostic « a+b » est filtré par Number(match) !== v, alors que a+b ne peut pas égaler v. Le test de proximité à .5 n'évite pas tous les cas d'arrondi ambigus.",
-   "fix": "Contrôler l'arrondi avec une marge plus large ou fixer une liste de couples valides."
+   "exerciseId": "",
+   "issue": "Espace manquante après la virgule dans le titre de workedExamples « Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas »,statement. Confirme le constat du screening ; sans effet sur l'affichage.",
+   "fix": "Ajouter l'espace après la virgule."
   }
  ]
 }
