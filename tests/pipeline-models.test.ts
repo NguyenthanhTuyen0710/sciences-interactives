@@ -5,9 +5,27 @@ import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, 
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { spentByModel, type LedgerEntry } from "../pipeline/ledger";
 
 const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Prices;
+
+/**
+ * Dry-run de pipeline/run.ts sur une racine de données temporaire (PIPELINE_ROOT) : seules les données d'entrée sont
+ * copiées (prompts, fiches, tarifs, inventaires, schéma, types, arborescence, chapitre d'exemple) ; aucun dossier,
+ * chapitre produit, état, rapport ni registre du dépôt n'est vu. `files` ajoute des fichiers au fixture.
+ */
+function dryRun(args: string[], files: Record<string, string> = {}) {
+  const root = mkdtempSync(join(tmpdir(), "pipeline-fixture-"));
+  try {
+    for (const p of ["pipeline/prompts", "pipeline/chapters", "pipeline/prices.json", "pipeline/budget.json", "research/curriculum", "src/lib/chapters/schema.ts", "src/lib/engine/types.ts", "src/lib/content/curriculum.ts", "src/lib/chapters/data/math-3e-arithmetique.ts"]) cpSync(p, join(root, p), { recursive: true });
+    for (const [p, text] of Object.entries(files)) { mkdirSync(dirname(join(root, p)), { recursive: true }); writeFileSync(join(root, p), text); }
+    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", ...args], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "", PIPELINE_ROOT: root } });
+    return { status: r.status, out: r.stdout + r.stderr };
+  } finally { rmSync(root, { recursive: true, force: true }); }
+}
 
 describe("tarifs (page officielle du 2026-11-15)", () => {
   it("trois modèles 5.5, remise batch de 50 % cohérente avec les prix batch publiés", () => {
@@ -98,9 +116,8 @@ describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
     for (const s of Object.values(SUBJECTS)) expect(existsSync(s.inventory)).toBe(true);
   });
   it("dry-run de la fiche pc-4e-electricite : sans appel, inventaire PC, objectifs du chapitre", () => {
-    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "pc-4e-electricite", "--level", "4e", "--subject", "physique-chimie", "--batch"], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
-    const out = r.stdout + r.stderr;
-    expect(r.status, out).toBe(0);
+    const { status, out } = dryRun(["pc-4e-electricite", "--level", "4e", "--subject", "physique-chimie", "--batch"]);
+    expect(status, out).toBe(0);
     expect(out).toContain("contrôle des données : OK (4e, physique-chimie, p4-electricite, SCI-4E-PC-007)");
     expect(out).toContain("mode dry-run");
     expect(out).not.toMatch(/soumis|coût réel/);
@@ -120,15 +137,26 @@ describe("empreinte du dossier : modèle imposé pour la comparaison du pilote",
   });
   it("dry-run : --dossier-model sonnet change l'empreinte du dossier, pas celle du chapitre", () => {
     const hashes = (extra: string[]) => {
-      const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "pc-4e-electricite", "--batch", ...extra], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
-      expect(r.status, r.stdout + r.stderr).toBe(0);
-      return Object.fromEntries([...(r.stdout).matchAll(/estimation (\w+) \(batch\).*?empreinte ([0-9a-f]{16})/g)].map((m) => [m[1], m[2]]));
+      const { status, out } = dryRun(["pc-4e-electricite", "--batch", ...extra]);
+      expect(status, out).toBe(0);
+      return Object.fromEntries([...out.matchAll(/estimation (\w+) \(batch\).*?empreinte ([0-9a-f]{16})/g)].map((m) => [m[1], m[2]]));
     };
     const d = hashes([]), s = hashes(["--dossier-model", "sonnet"]);
     expect(d.dossier).toMatch(/^[0-9a-f]{16}$/);
     expect(s.dossier).not.toBe(d.dossier);
     expect(s.chapter).toBe(d.chapter);
   }, 60_000);
+  it("dossier déjà présent : conservé, empreinte et modèle tracés ; même empreinte que l'estimation", () => {
+    const est = dryRun(["pc-4e-electricite", "--batch"]).out.match(/estimation dossier \(batch\).*?empreinte ([0-9a-f]{16})/)![1];
+    const { status, out } = dryRun(["pc-4e-electricite", "--batch"], { "research/dossiers/pc-4e-electricite.md": "# Dossier de test\n" });
+    expect(status, out).toBe(0);
+    expect(out).toMatch(new RegExp(`dossier : research/dossiers/pc-4e-electricite\\.md existe déjà, conservé \\(modèle claude-haiku-5-5, empreinte ${est}\\)`));
+  }, 60_000);
+  it("PIPELINE_ROOT refusé hors dry-run", () => {
+    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "pc-4e-electricite", "--submit"], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "", PIPELINE_ROOT: tmpdir() } });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/réservé au dry-run/);
+  });
 });
 
 describe("prompts du collège : empreintes inchangées par l'étape B (blocs lycée)", () => {
@@ -149,13 +177,11 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
     }
   });
   it("dry-run de la fiche 1re : parcours contrôlé, palier Opus pour le chapitre (démonstration exigible)", () => {
-    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "math-1re-spe-second-degre", "--level", "1re", "--parcours", "specialite", "--batch"], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
-    const out = r.stdout + r.stderr;
-    expect(r.status, out).toBe(0);
+    const { status, out } = dryRun(["math-1re-spe-second-degre", "--level", "1re", "--parcours", "specialite", "--batch"]);
+    expect(status, out).toBe(0);
     expect(out).toContain("contrôle des données : OK (1re, mathematiques, m1-second-degre, SCI-1RE-MATH-001)");
     expect(out).toContain(`chapter=${MODELS.opus}`);
-    const bad = spawnSync("npx", ["tsx", "pipeline/run.ts", "math-1re-spe-second-degre", "--parcours", "tronc-commun"], { encoding: "utf8" });
-    expect(bad.status).not.toBe(0);
+    expect(dryRun(["math-1re-spe-second-degre", "--parcours", "tronc-commun"]).status).not.toBe(0);
   }, 60_000);
 });
 

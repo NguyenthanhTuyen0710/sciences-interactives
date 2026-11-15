@@ -26,7 +26,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// PIPELINE_ROOT : racine de données de remplacement (tests sur un répertoire temporaire) ; refusée hors dry-run.
+const ROOT = process.env.PIPELINE_ROOT ?? join(dirname(fileURLToPath(import.meta.url)), "..");
 const P = (f: string) => join(ROOT, f);
 const read = (f: string) => readFileSync(P(f), "utf8");
 const readJson = <T>(f: string): T => JSON.parse(read(f));
@@ -97,6 +98,7 @@ if (!chapterId && flag("--next")) {
 }
 const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
 const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
+if (process.env.PIPELINE_ROOT && LIVE) { console.error("ARRÊT : PIPELINE_ROOT est réservé au dry-run (tests)."); process.exit(2); }
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
 
 function fail(msg: string, code = 2): never { console.error(`ARRÊT : ${msg}`); process.exit(code); }
@@ -470,7 +472,7 @@ async function main() {
     + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
   if (!LIVE) costPlan(dossierUser, chapterUserFor(dossierText()));
   if (wanted("dossier") && !done("dossier", hDossier)) {
-    if (existsSync(P(DOSSIER_FILE)) && !FORCE) { console.log(`dossier : ${DOSSIER_FILE} existe déjà, conservé.`); markDone("dossier", hDossier, "fichier existant"); }
+    if (existsSync(P(DOSSIER_FILE)) && !FORCE) { console.log(`dossier : ${DOSSIER_FILE} existe déjà, conservé (modèle ${DOSSIER_MODEL}, empreinte ${hDossier}).`); markDone("dossier", hDossier, "fichier existant"); }
     else {
       console.log("dossier :");
       const t = await call("dossier", dossierUser, hDossier, DOSSIER_MODEL);
