@@ -105,6 +105,8 @@ async function matrix() {
   const { pathToFileURL } = await import("node:url");
   const { readLedger, ops } = await import("../pipeline/ledger");
   const registered = new Set(ALL_CHAPTERS.map((c) => c.id));
+  const specs = readdirSync(P("pipeline/chapters")).filter((f) => f.endsWith(".json")).sort()
+    .map((f) => JSON.parse(readFileSync(P(`pipeline/chapters/${f}`), "utf8")) as { id: string; officialChapterIds: string[] });
   type Loaded = { c: (typeof ALL_CHAPTERS)[number]; file: string; sha256: string };
   const loaded: Loaded[] = [];
   for (const f of readdirSync(P("src/lib/chapters/data")).filter((x) => x.endsWith(".ts")).sort()) {
@@ -138,7 +140,8 @@ async function matrix() {
     return {
       subject: s.subject, grade: g.grade, domain: d.id, chapterId: ch.id, title: ch.title, state,
       objectives: { total: ch.objectives.length, verified: ch.objectives.filter((o) => o.verified).length },
-      pipelineSpec: c ? existsSync(P(`pipeline/chapters/${c.id}.json`)) : existsSync(P(`pipeline/chapters/${ch.id}.json`)),
+      // Fiche du pipeline (pipeline/chapters/<id>.json) qui produit ce chapitre d'inventaire, ou null.
+      pipelineSpec: specs.find((sp) => sp.id === c?.id || sp.id === ch.id || sp.officialChapterIds.includes(ch.id))?.id ?? null,
       content: c && hit ? {
         id: c.id, taskId: c.taskId, file: hit.file, sha256: hit.sha256, registered: registered.has(c.id), publication: c.publicationStatus,
         exercises: c.exercises.length, perLevel: [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length),

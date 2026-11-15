@@ -84,7 +84,7 @@
     "total": 7,
     "verified": 7
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -101,7 +101,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -118,7 +118,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -135,7 +135,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -152,7 +152,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -169,7 +169,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -186,7 +186,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -203,7 +203,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -220,7 +220,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -237,7 +237,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -254,7 +254,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -271,7 +271,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -288,7 +288,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -305,7 +305,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -322,7 +322,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -339,7 +339,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -356,7 +356,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -373,7 +373,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -390,7 +390,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -407,7 +407,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -424,7 +424,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -441,7 +441,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -458,7 +458,7 @@
     "total": 7,
     "verified": 7
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -475,7 +475,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -492,7 +492,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-5e-nombres-relatifs",
     "taskId": "SCI-5E-MATH-001",
@@ -539,7 +539,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-5e-nombres-relatifs",
     "taskId": "SCI-5E-MATH-001",
@@ -585,7 +585,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -602,7 +602,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -619,7 +619,7 @@
     "total": 6,
     "verified": 6
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -636,7 +636,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -653,7 +653,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-5e-nombres-relatifs",
     "taskId": "SCI-5E-MATH-001",
@@ -697,7 +697,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -714,7 +714,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -731,7 +731,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -748,7 +748,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -765,7 +765,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -782,7 +782,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -799,7 +799,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -816,7 +816,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -833,7 +833,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -850,7 +850,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -867,7 +867,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -884,7 +884,7 @@
     "total": 6,
     "verified": 6
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -901,7 +901,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -918,7 +918,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -935,7 +935,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -952,7 +952,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -969,7 +969,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-3e-arithmetique",
     "taskId": "SCI-3E-MATH-001",
@@ -1010,7 +1010,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1027,7 +1027,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1044,7 +1044,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1061,7 +1061,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1078,7 +1078,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-3e-pourcentages-evolution",
     "taskId": "SCI-3E-MATH-009",
@@ -1122,7 +1122,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1139,7 +1139,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1156,7 +1156,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1173,7 +1173,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1190,7 +1190,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": true,
+   "pipelineSpec": "math-3e-pythagore",
    "content": {
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
@@ -1238,7 +1238,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1255,7 +1255,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1272,7 +1272,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1289,7 +1289,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1306,7 +1306,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1323,7 +1323,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1340,7 +1340,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-3e-arithmetique",
     "taskId": "SCI-3E-MATH-001",
@@ -1381,7 +1381,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-3e-puissances-calculs",
     "taskId": "SCI-3E-MATH-002",
@@ -1429,7 +1429,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": true,
+   "pipelineSpec": "math-3e-calcul-litteral",
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1446,7 +1446,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1463,7 +1463,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1480,7 +1480,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1497,7 +1497,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1514,7 +1514,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1531,7 +1531,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": {
     "id": "math-3e-pourcentages-evolution",
     "taskId": "SCI-3E-MATH-009",
@@ -1572,7 +1572,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1589,7 +1589,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1606,7 +1606,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1623,7 +1623,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1640,7 +1640,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1657,7 +1657,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1674,7 +1674,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": true,
+   "pipelineSpec": "math-3e-pythagore",
    "content": {
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
@@ -1724,7 +1724,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1741,7 +1741,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1758,7 +1758,7 @@
     "total": 8,
     "verified": 8
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1775,7 +1775,7 @@
     "total": 5,
     "verified": 5
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1792,7 +1792,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1809,7 +1809,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1826,7 +1826,7 @@
     "total": 6,
     "verified": 6
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1843,7 +1843,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1860,7 +1860,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1877,7 +1877,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1894,7 +1894,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1911,7 +1911,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1928,7 +1928,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1945,7 +1945,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1962,7 +1962,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1979,7 +1979,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -1996,7 +1996,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2013,7 +2013,7 @@
     "total": 3,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2030,7 +2030,7 @@
     "total": 3,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2047,7 +2047,7 @@
     "total": 7,
     "verified": 6
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2064,7 +2064,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2081,7 +2081,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2098,7 +2098,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2115,7 +2115,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2132,7 +2132,7 @@
     "total": 4,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2149,7 +2149,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2166,7 +2166,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2183,7 +2183,7 @@
     "total": 4,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2200,7 +2200,7 @@
     "total": 2,
     "verified": 0
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2217,7 +2217,7 @@
     "total": 3,
     "verified": 2
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2234,7 +2234,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2251,7 +2251,7 @@
     "total": 1,
     "verified": 1
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2268,7 +2268,7 @@
     "total": 4,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2285,7 +2285,7 @@
     "total": 2,
     "verified": 0
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2302,7 +2302,7 @@
     "total": 4,
     "verified": 4
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"
@@ -2319,7 +2319,7 @@
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": false,
+   "pipelineSpec": null,
    "content": null,
    "missing": [
     "chapitre complet"

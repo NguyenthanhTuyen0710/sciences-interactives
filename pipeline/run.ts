@@ -50,15 +50,52 @@ interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixR
 
 const args = process.argv.slice(2);
 const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject"];
-const chapterId = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTS.includes(args[i - 1]));
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
+
+// ───────── Rapport du run (pipeline-output/summary.{md,json}, repris dans le résumé du job GitHub) ─────────
+const RUN = {
+  chapter: "" as string, mode: "", newCostUsd: 0, tokens: { input: 0, cacheWrite: 0, cacheRead: 0, output: 0, thinking: 0 },
+  qa: [] as { check: string; ok: boolean; detail: string }[], needsHuman: [] as string[], missing: [] as string[], notes: [] as string[],
+};
+function writeSummary(code: number) {
+  try {
+    const passed = RUN.qa.filter((q) => q.ok).length;
+    const md = [`### Pipeline \`${RUN.chapter || "—"}\` — ${RUN.mode} (code ${code})`, "",
+      `- Dépense de ce run : $${RUN.newCostUsd.toFixed(3)} · cumul registre : ${LEDGER_TOTAL()}`,
+      `- Tokens : entrée ${RUN.tokens.input}, cache écrit ${RUN.tokens.cacheWrite}, cache lu ${RUN.tokens.cacheRead}, sortie ${RUN.tokens.output} (dont réflexion ${RUN.tokens.thinking})`,
+      `- QA : ${RUN.qa.length ? `${passed}/${RUN.qa.length} contrôle(s) réussi(s) (${Math.round((100 * passed) / RUN.qa.length)} %)` : "aucun contrôle dans ce run"}${RUN.qa.map((q) => `\n  - ${q.ok ? "✔" : "✘"} ${q.check} : ${q.detail}`).join("")}`,
+      `- needs-human : ${RUN.needsHuman.length}${RUN.needsHuman.map((n) => `\n  - ${n}`).join("")}`,
+      `- Manques (matrice de couverture) : ${RUN.missing.length ? RUN.missing.slice(0, 10).join(" ; ") : "aucun relevé"}`,
+      ...RUN.notes.map((n) => `- ${n}`)].join("\n");
+    write("pipeline-output/summary.md", md + "\n");
+    write("pipeline-output/summary.json", JSON.stringify({ ...RUN, exitCode: code, qaPassRate: RUN.qa.length ? passed / RUN.qa.length : null }, null, 1) + "\n");
+  } catch { /* le rapport ne doit jamais masquer le code de sortie */ }
+}
+let LEDGER_TOTAL = () => "inconnu";
+process.on("exit", writeSummary);
+
+// ───────── Chapitre : argument explicite, ou --next (premier chapitre à produire selon la matrice de couverture) ─────────
+interface MatrixRow { subject: string; grade: string; chapterId: string; state: string; pipelineSpec: string | null; missing: string[]; content: { id: string; sha256: string; qaPassed: boolean } | null }
+const MATRIX_FILE = "research/curriculum/coverage-matrix.json";
+const matrixRows = (): MatrixRow[] => (existsSync(P(MATRIX_FILE)) ? readJson<{ chapters: MatrixRow[] }>(MATRIX_FILE).chapters : []);
+function nextFromMatrix(): string | undefined {
+  const level = opt("--level"), subject = opt("--subject");
+  return matrixRows().find((r) => r.pipelineSpec && !r.content && (!level || r.grade === level) && (!subject || r.subject === subject))?.pipelineSpec ?? undefined;
+}
+let chapterId = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTS.includes(args[i - 1]));
+if (!chapterId && flag("--next")) {
+  chapterId = nextFromMatrix();
+  RUN.mode = "next";
+  if (!chapterId) { console.log(`--next : aucun chapitre à produire dans ${MATRIX_FILE} (fiche pipeline présente et contenu absent) pour ${opt("--level") ?? "tout niveau"} / ${opt("--subject") ?? "toute matière"}.`); process.exit(0); }
+  console.log(`--next : chapitre retenu d'après la matrice de couverture : ${chapterId}`);
+}
 const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
 const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
 
 function fail(msg: string, code = 2): never { console.error(`ARRÊT : ${msg}`); process.exit(code); }
-if (!chapterId) fail("Usage : npx tsx pipeline/run.ts <chapitre> [--live] [--step s] [--force] [--batch] [--submit | --collect <batchId>] [--exercises N] [--level g --subject s]");
+if (!chapterId) fail("Usage : npx tsx pipeline/run.ts <chapitre | --next> [--live] [--step s] [--force] [--batch] [--submit | --collect <batchId>] [--exercises N] [--level g --subject s]");
 if (!/^[a-z0-9-]+$/.test(chapterId!)) fail(`identifiant de chapitre invalide : ${chapterId}`);
 if (!existsSync(P(`pipeline/chapters/${chapterId}.json`))) fail(`chapitre ${chapterId} absent du catalogue du pipeline (pipeline/chapters/)`);
 if ([SUBMIT, !!COLLECT, RECONCILE].filter(Boolean).length > 1) fail("--submit, --collect et --reconcile sont exclusifs");
@@ -96,6 +133,8 @@ checkInputs();
 const LEDGER = P("pipeline/.store/ledger.jsonl");
 const ledger = () => readLedger(LEDGER);
 const spent = () => spentUsd(ledger());
+LEDGER_TOTAL = () => `$${spent().toFixed(3)} / $${TRIAL_CAP_USD}`;
+RUN.chapter = spec.id;
 const readiness = () => ({ ledgerSynced: process.env.PIPELINE_LEDGER_SYNCED === "1", creditVerified: budget.creditVerified, limitUsd: budget.limitUsd });
 const usd = (n: number, perM: number) => (n * perM) / 1e6;
 const money = (x: number) => `$${x.toFixed(3)}`;
@@ -219,6 +258,9 @@ function logCost(step: Step, usage: Anthropic.Usage, batch: boolean, ref: { opId
   const detail = `entrée ${usage.input_tokens}, cache écrit ${usage.cache_creation_input_tokens ?? 0}, cache lu ${usage.cache_read_input_tokens ?? 0}, sortie ${usage.output_tokens}${thinking != null ? ` dont réflexion ${thinking}` : ""}`;
   if (op?.state === "settled") { console.log(`  coût déjà enregistré pour ${op.id} (${money(op.usd ?? 0)}) : non compté deux fois (${detail})`); return; }
   appendLedger(LEDGER, { type: "actual", id: op?.id ?? `externe-${ref.batchId}`, at: new Date().toISOString(), usd: Number(cost.toFixed(5)), batchId: ref.batchId });
+  RUN.newCostUsd += cost;
+  const tk = RUN.tokens;
+  tk.input += usage.input_tokens; tk.cacheWrite += usage.cache_creation_input_tokens ?? 0; tk.cacheRead += usage.cache_read_input_tokens ?? 0; tk.output += usage.output_tokens; tk.thinking += thinking ?? 0;
   console.log(`  coût réel ${money(cost)} (${detail}) — total ${money(spent())}`);
 }
 
@@ -239,6 +281,7 @@ function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchI
   const saved = `pipeline-output/unusable/${spec.id}-${step}-${stop}.md`;
   write(saved, `<!-- TRUNCATED – không phải báo cáo QA hợp lệ / résultat inutilisable, pas un rapport QA valide. Étape ${step}, stop_reason ${stop}, ${problem}. Opération ${op?.id ?? "?"}${ref.batchId ? `, batch ${ref.batchId}` : ""}. -->\n\n` + text + "\n");
   note(false, { note: problem, saved });
+  RUN.needsHuman.push(`${step} : ${problem} (texte dans ${saved})`);
   console.error(`ARRÊT : étape ${step} : ${problem} ; texte reçu (${text.length} caractères) sauvegardé dans ${saved}, issue inscrite au registre.`);
   process.exit(7);
 }
@@ -282,7 +325,7 @@ type OutStep = Exclude<Step, "fix">;
 const OUT: Record<OutStep, { file: string; save: (t: string) => void }> = {
   dossier: { file: DOSSIER_FILE, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
   chapter: { file: CHAPTER_FILE, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
-  review: { file: REPORT_FILE, save: (t) => { const r = parseReview(t); if (!r.ok) fail(`relecture hors schéma : ${r.errors.join(" ; ")}`, 7); write(REPORT_FILE, reviewMarkdown(r.review, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->\n# Relecture QA (API) — ${spec.id}`)); } },
+  review: { file: REPORT_FILE, save: (t) => { const r = parseReview(t); if (!r.ok) fail(`relecture hors schéma : ${r.errors.join(" ; ")}`, 7); RUN.qa.push({ check: "relecture IA (schéma, 6 critères)", ok: r.review.verdict === "PASS", detail: `${r.review.verdict}, ${r.review.findings.length} constat(s)` });write(REPORT_FILE, reviewMarkdown(r.review, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->\n# Relecture QA (API) — ${spec.id}`)); } },
 };
 
 /** Mode collect : lit le résultat d'un batch déjà soumis ; aucune nouvelle requête payante. */
@@ -300,7 +343,11 @@ async function collect(batchId: string) {
     logCost(step as Step, r.result.message.usage, true, { batchId });
     out.save(finish(step as Step, r.result.message, { batchId }));
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
-    if (step === "chapter") { const v = validate(); console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`); }
+    if (step === "chapter") {
+      const v = validate(); qaValidation(v);
+      console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
+      if (!v.ok) RUN.needsHuman.push("chapitre collecté hors validation : correction ciblée (fix) à lancer");
+    }
   }
 }
 
@@ -330,7 +377,11 @@ async function reconcile() {
 }
 
 const hashOf = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 16);
-const done = (step: Step, hash: string) => !FORCE && state.steps[step]?.status === "done" && state.steps[step]!.hash === hash;
+// Étape faite : état local (pipeline/state) ou, à défaut, registre partagé (data-store) — opération soldée de même
+// empreinte et résultat utilisable. Le registre survit aux runs GitHub, l'état local non : il assure la reprise (M1).
+const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && o.reserve.inputHash === hash && o.state === "settled" && o.outcome?.usable !== false);
+const done = (step: Step, hash: string) => !FORCE && ((state.steps[step]?.status === "done" && state.steps[step]!.hash === hash) || doneInLedger(step, hash));
+function qaValidation(v: { ok: boolean; summary: string }) { RUN.qa.push({ check: "validate-chapter + tsc", ok: v.ok, detail: v.summary }); }
 const wanted = (step: Step) => !ONLY || ONLY === step;
 const markDone = (step: Step, hash: string, note?: string) => { state.steps[step] = { status: "done", hash, at: new Date().toISOString(), note }; saveState(); };
 
@@ -341,8 +392,15 @@ async function main() {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
   }
+  RUN.mode = `${RUN.mode ? RUN.mode + " → " : ""}${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit" : LIVE ? "réel" : "dry-run"}`;
+  const rows = matrixRows().filter((r) => r.pipelineSpec === spec.id || r.content?.id === spec.id);
+  RUN.missing = [...new Set(rows.flatMap((r) => r.missing))];
   if (COLLECT) return collect(COLLECT);
   if (RECONCILE) return reconcile();
+  // Rien à refaire : chapitre validé (six revues QA « pass ») dont le fichier n'a pas changé depuis la matrice.
+  const current = existsSync(P(CHAPTER_FILE)) ? createHash("sha256").update(read(CHAPTER_FILE)).digest("hex") : null;
+  const passed = rows.find((r) => r.content?.qaPassed && r.content.sha256 === current);
+  if (passed && !FORCE) { RUN.notes.push(`déjà validé (QA pass, sha256 ${current!.slice(0, 16)} inchangé) : aucune étape relancée`); console.log(`${spec.id} : déjà validé, empreinte inchangée — rien à faire (--force pour forcer).`); return; }
   const OBJ = objectives();
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
@@ -376,6 +434,7 @@ async function main() {
 
   // 3. Validation par script, puis corrections ciblées (≤ 2 tours, éditions minimales).
   let v = validate();
+  qaValidation(v);
   console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
   // Un fichier préexistant (approuvé ou relu par un humain) n'est jamais modifié par l'IA.
   const generatedHere = state.steps.chapter?.note !== "fichier existant";
@@ -391,7 +450,10 @@ async function main() {
     v = validate();
     console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
   }
-  if (!v.ok) { console.error("ARRÊT : le chapitre ne passe pas la validation automatique ; correction humaine nécessaire."); process.exit(6); }
+  if (!v.ok) {
+    RUN.needsHuman.push(generatedHere ? `validation en échec après ${state.fixRounds}/${MAX_FIX_ROUNDS} tour(s) de correction` : "validation en échec sur un fichier existant (jamais modifié par l'IA)");
+    console.error("ARRÊT : le chapitre ne passe pas la validation automatique ; correction humaine nécessaire (needs-human)."); process.exit(6);
+  }
 
   // 4. Relecture pédagogique et linguistique (une seule).
   const reviewUser = fill(read("pipeline/prompts/review.md"), { VALIDATOR: v.summary, SPEC, FILE: read(CHAPTER_FILE) });
