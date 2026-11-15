@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-15 09:51 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-15 10:33 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -66,5 +66,6 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 | SCI-5E-MATH-009 | chapter | Repérage sur une droite et dans le plan | PUBLISHED | Couvert par SCI-5E-MATH-001 (publié) |
 | SCI-INFRA-003 | infra | Instruire l'erreur d'hydratation intermittente de /admin/exercices/nouveau (e2e) | TODO | Reproduire, puis attendre l'hydratation dans scripts/e2e.ts ou corriger la page |
 | SCI-INFRA-004 | infra | Décision : tutoiement ou vouvoiement de l'interface existante | BLOCKED | Appliquer la décision au lecteur d'exercices et au moteur de correction |
+| SCI-3E-MATH-017 | chapter | Théorème de Pythagore et réciproque | QA_PENDING | Relecture humaine de la PR (revues QA), puis décision de publication |
 
-Total : 124 tâches — TODO 115 · RESEARCHED 3 · INTEGRATED 1 · PUBLISHED 4 · BLOCKED 1. Les tâches de chapitre au statut TODO ne sont pas listées individuellement.
+Total : 125 tâches — TODO 115 · RESEARCHED 3 · QA_PENDING 1 · INTEGRATED 1 · PUBLISHED 4 · BLOCKED 1. Les tâches de chapitre au statut TODO ne sont pas listées individuellement.
