@@ -251,7 +251,7 @@ jobs:
     needs: [setup, pipeline]
     if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
@@ -276,7 +276,7 @@ jobs:
           name: lessons-${{ needs.pipeline.outputs.chapter }}-collect-${{ github.run_id }}
           path: ${{ runner.temp }}/out
 
-      - name: Copier, contrôler, inscrire
+      - name: Copier et inscrire
         id: apply
         env:
           CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
@@ -287,15 +287,44 @@ jobs:
             if [ -f "$OUT/$f" ]; then mkdir -p "$(dirname "$f")"; cp "$OUT/$f" "$f"; copied=$((copied+1)); fi
           done
           for f in "$OUT"/project/reports/*-QA-api.md; do [ -f "$f" ] && cp "$f" project/reports/ && copied=$((copied+1)); done
-          if [ -f "src/lib/chapters/data/$CHAPTER.ts" ]; then
-            npx tsx scripts/validate-chapter.ts "src/lib/chapters/data/$CHAPTER.ts"
-            npm run dashboard -- register "$CHAPTER"
-          else
-            npm run dashboard
-          fi
-          npx tsc --noEmit
+          if [ -f "src/lib/chapters/data/$CHAPTER.ts" ]; then npm run dashboard -- register "$CHAPTER"; else npm run dashboard; fi
           if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
           echo "Fichiers copiés depuis l'artefact : $copied"
+
+      # Les PR ouvertes avec GITHUB_TOKEN ne déclenchent pas « PR Checks » : les mêmes contrôles sont exécutés ici, sur
+      # l'état exact de la PR. Un seul contrôle rouge → aucune PR. Le tableau est repris dans la description de la PR.
+      - name: Contrôles de la PR (ChapterSchema, validate-chapter, tsc, tests, lint, build)
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
+        run: |
+          table="$RUNNER_TEMP/checks.md"; failed=0
+          printf '| Contrôle | Résultat | Durée |\n|---|---|---|\n' > "$table"
+          row() { echo "| $1 | $2 | $3 s |" >> "$table"; }
+          check() { local name="$1"; shift; local t0=$SECONDS
+            if "$@" > "$RUNNER_TEMP/check.log" 2>&1; then row "$name" "✔" $((SECONDS - t0))
+            else row "$name" "✘ (voir le journal du job)" $((SECONDS - t0)); failed=1; echo "::group::$name (échec)"; tail -n 80 "$RUNNER_TEMP/check.log"; echo "::endgroup::"; fi; }
+          file="src/lib/chapters/data/$CHAPTER.ts"
+          if [ -f "$file" ]; then
+            t0=$SECONDS
+            npx tsx scripts/validate-chapter.ts "$file" --json > "$RUNNER_TEMP/validate.json" 2> "$RUNNER_TEMP/validate.err" || true
+            res=$(node -e '
+              const fs = require("fs"); let r;
+              try { r = JSON.parse(fs.readFileSync(process.argv[1], "utf8").trim().split("\n").pop()); } catch { console.log("✘ chargement impossible|✘ chargement impossible"); process.exit(); }
+              const schema = r.issues.filter((i) => i.where.startsWith("schema:")).length;
+              console.log(`${schema ? "✘ " + schema + " écart(s)" : "✔"}|${r.summary.ok ? "✔ " + r.summary.instances + " tirages" : "✘ " + r.summary.issues + " problème(s)"}`);
+            ' "$RUNNER_TEMP/validate.json")
+            row "ChapterSchema" "${res%%|*}" $((SECONDS - t0)); row "validate-chapter" "${res##*|}" $((SECONDS - t0))
+            case "$res" in *✘*) failed=1; cat "$RUNNER_TEMP/validate.err" | tail -n 40 ;; esac
+          else
+            row "ChapterSchema" "sans objet (aucun fichier de chapitre)" 0; row "validate-chapter" "sans objet" 0
+          fi
+          check "tsc" npx tsc --noEmit
+          check "tests (vitest)" npm test
+          check "lint (ESLint)" npm run lint
+          check "build (Next.js)" npm run build
+          cat "$table" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$failed" = 1 ]; then echo "::error::au moins un contrôle est rouge : aucune PR n'est ouverte"; exit 1; fi
 
       - name: Ouvrir la Pull Request
         if: steps.apply.outputs.changed == 'true'
@@ -309,7 +338,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
-          git add -A src/lib/chapters research/dossiers project/reports project/ledger.json project/dashboard.md research/curriculum/coverage-matrix.json research/curriculum/coverage-matrix.md
+          git add -A src/lib/chapters research/dossiers project/reports project/ledger.json project/dashboard.md research/curriculum/coverage-matrix.json research/curriculum/coverage-matrix.md research/curriculum/master-curriculum.json
           git commit -m "Pipeline : $CHAPTER (run ${{ github.run_id }}) — à relire avant publication"
           git push -u origin "$branch"
           {
@@ -317,7 +346,13 @@ jobs:
             echo ""
             cat "$OUT/pipeline-output/summary.md" 2>/dev/null || true
             echo ""
-            echo "Contrôles passés dans le job : ChapterSchema, validate-chapter, tsc. Matrice de couverture et project/ledger.json régénérés ; registre des dépenses : data-store (hors Git)."
+            echo "### Contrôles exécutés dans le job (état exact de cette PR)"
+            echo ""
+            echo "Run : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (les PR ouvertes par github-actions[bot] ne déclenchent pas « PR Checks »)."
+            echo ""
+            cat "$RUNNER_TEMP/checks.md"
+            echo ""
+            echo "Matrice de couverture et project/ledger.json régénérés ; registre des dépenses : data-store (hors Git)."
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base "$BASE" --head "$branch" --title "Pipeline : $CHAPTER (run ${{ github.run_id }})" --body-file "$RUNNER_TEMP/pr-body.md"
 
