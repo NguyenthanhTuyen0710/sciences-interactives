@@ -27,7 +27,10 @@ Constat préalable : **les programmes 2019 de 2nde et de 1re sont remplacés à 
 
 **Proposition : 1re spécialité « Équations, fonctions polynômes du second degré ».** Raisons : chapitre borné, évalué à l'épreuve anticipée dès la session 2028, comporte une démonstration exigible (cas d'usage du palier Opus), et consolide la 2nde (fonction carré, identités remarquables). Inventaire G1 relevé pour ce seul chapitre (`math-1re-spe-second-degre`, M1S-SD-01…06, dont SD-06 en approfondissement), statut « proposé », `verified: false` : lecture manuelle du BO, **hors collecteur** (à enregistrer par le collecteur après approbation G1 du document).
 
-Non vérifié : liste des automatismes évaluables de l'épreuve anticipée pour la session 2028 (texte de 2025 lu en résumé seulement).
+**Décision du porteur de projet (2026-11-15) : 1re spécialité « Second degré », sous condition de périmètre d'examen. Vérification faite — condition remplie :**
+- NS MENE2622640N (BO spécial n° 4 du 17-9-2026, **p. 44**, texte entier de la note sur cette page) : « Cette épreuve comprend trois sujets différents, chacun correspondant à un programme de mathématiques de première […]. Le candidat compose sur le sujet correspondant au programme qu'il a préparé : — enseignement de spécialité de mathématiques de la voie générale ; […] ». Objectif : « vérifier la maîtrise des compétences fondamentales attendues dans les programmes de mathématiques de première du lycée, ainsi que des automatismes ». La note abroge celle du 10-6-2025 (MENE2515469N).
+- Le second degré fait partie du programme de spécialité de 1re (BO n° 14, MENE2602917A, p. 359-360), et sa liste d'automatismes contient « Déterminer le signe d'une expression du premier degré, d'une expression factorisée du second degré » (**p. 359**) : le chapitre relève donc des deux parties de l'épreuve (automatismes 6 pts, exercices 14 pts).
+- Limite : la note ne fixe pas les chapitres tirés à chaque session ; « liée à l'examen » signifie « dans le programme évalué », non « présent à chaque sujet ». La partie « Examen » ci-dessus reste exacte.
 
 ## 3. M3 — prise en charge de la physique-chimie par le pipeline (proposition, non codée)
 Principe : extension par paramètre de matière, sans nouveau fichier de configuration ni nouveau pipeline.
