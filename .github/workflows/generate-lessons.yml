@@ -228,6 +228,81 @@ jobs:
             src/lib/chapters/data/${{ steps.run.outputs.chapter || 'aucun' }}.ts
             project/reports/*-QA-api.md
 
+  # Publication par Pull Request (jamais de commit direct sur la branche par défaut) : après un collect réussi, les
+  # fichiers produits (chapitre TS, dossier, relecture) sont copiés, contrôlés (ChapterSchema, validate-chapter, tsc),
+  # le chapitre est inscrit au registre (brouillon invisible tant qu'il n'est pas « published »), la matrice de
+  # couverture et project/ledger.json sont régénérés, puis une PR est ouverte pour relecture humaine.
+  # Prérequis côté dépôt : Settings → Actions → « Allow GitHub Actions to create and approve pull requests ».
+  publish-pr:
+    needs: [setup, pipeline]
+    if: needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Récupérer les sorties du run
+        uses: actions/download-artifact@v4
+        with:
+          name: lessons-${{ needs.pipeline.outputs.chapter }}-collect-${{ github.run_id }}
+          path: ${{ runner.temp }}/out
+
+      - name: Copier, contrôler, inscrire
+        id: apply
+        env:
+          CHAPTER: ${{ needs.pipeline.outputs.chapter }}
+          OUT: ${{ runner.temp }}/out
+        run: |
+          copied=0
+          for f in "src/lib/chapters/data/$CHAPTER.ts" "research/dossiers/$CHAPTER.md"; do
+            if [ -f "$OUT/$f" ]; then mkdir -p "$(dirname "$f")"; cp "$OUT/$f" "$f"; copied=$((copied+1)); fi
+          done
+          for f in "$OUT"/project/reports/*-QA-api.md; do [ -f "$f" ] && cp "$f" project/reports/ && copied=$((copied+1)); done
+          if [ -f "src/lib/chapters/data/$CHAPTER.ts" ]; then
+            npx tsx scripts/validate-chapter.ts "src/lib/chapters/data/$CHAPTER.ts"
+            npm run dashboard -- register "$CHAPTER"
+          else
+            npm run dashboard
+          fi
+          npx tsc --noEmit
+          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          echo "Fichiers copiés depuis l'artefact : $copied"
+
+      - name: Ouvrir la Pull Request
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHAPTER: ${{ needs.pipeline.outputs.chapter }}
+          OUT: ${{ runner.temp }}/out
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          branch="pipeline/$CHAPTER-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A src/lib/chapters research/dossiers project/reports project/ledger.json project/dashboard.md research/curriculum/coverage-matrix.json research/curriculum/coverage-matrix.md
+          git commit -m "Pipeline : $CHAPTER (run ${{ github.run_id }}) — à relire avant publication"
+          git push -u origin "$branch"
+          {
+            echo "Sorties du pipeline pour \`$CHAPTER\` (run ${{ github.run_id }}). **Relecture humaine obligatoire** ; le chapitre reste \`draft\` (invisible) tant que \`publicationStatus\` n'est pas \`published\`."
+            echo ""
+            cat "$OUT/pipeline-output/summary.md" 2>/dev/null || true
+            echo ""
+            echo "Contrôles passés dans le job : ChapterSchema, validate-chapter, tsc. Matrice de couverture et project/ledger.json régénérés ; registre des dépenses : data-store (hors Git)."
+          } > "$RUNNER_TEMP/pr-body.md"
+          gh pr create --base "$BASE" --head "$branch" --title "Pipeline : $CHAPTER (run ${{ github.run_id }})" --body-file "$RUNNER_TEMP/pr-body.md"
+
   ledger-push:
     needs: [setup, ledger-pull, pipeline]
     if: always() && needs.setup.outputs.api == 'true' && needs.ledger-pull.result == 'success'

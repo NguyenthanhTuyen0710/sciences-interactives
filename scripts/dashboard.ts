@@ -175,6 +175,49 @@ async function matrix() {
   console.log(`coverage-matrix.json et bloc généré de coverage-matrix.md écrits (${rows.length} chapitres d'inventaire).`);
 }
 
-if (process.argv[2] === "sync") sync();
-render();
-matrix().catch((e: unknown) => { console.error(e); process.exit(1); });
+// ───────── Inscription d'un chapitre produit par le pipeline (job « publish-pr » de generate-lessons.yml) ─────────
+//   npm run dashboard -- register <id>
+// Contrôle ChapterSchema (obligatoire), inscription dans src/lib/chapters/index.ts (un brouillon reste invisible :
+// isVisible exige « published »), tâche de project/ledger.json mise à jour, puis tableau de bord et matrice régénérés.
+async function register(id: string) {
+  const { pathToFileURL } = await import("node:url");
+  const { ChapterSchema } = await import("../src/lib/chapters/schema");
+  const file = `src/lib/chapters/data/${id}.ts`;
+  if (!/^[a-z0-9-]+$/.test(id) || !existsSync(P(file))) throw new Error(`chapitre introuvable : ${file}`);
+  const mod = (await import(pathToFileURL(P(file)).href)) as Record<string, unknown>;
+  const entry = Object.entries(mod).find(([, v]) => v && typeof v === "object" && "lesson" in (v as object) && "exercises" in (v as object));
+  if (!entry) throw new Error(`aucun chapitre exporté dans ${file}`);
+  const [exportName, c] = entry as [string, (typeof ALL_CHAPTERS)[number]];
+  const parsed = ChapterSchema.safeParse(c);
+  if (!parsed.success) throw new Error(`ChapterSchema refuse ${id} : ${JSON.stringify(parsed.error.issues.slice(0, 5))}`);
+  if (c.id !== id) throw new Error(`le fichier ${file} déclare l'id ${c.id}`);
+
+  const INDEX = "src/lib/chapters/index.ts";
+  let src = readFileSync(P(INDEX), "utf8");
+  const importLine = `import { ${exportName} } from "./data/${id}";`;
+  if (!src.includes(importLine)) {
+    const imports = [...src.matchAll(/^import \{ \w+ \} from "\.\/data\/[a-z0-9-]+";$/gm)];
+    const last = imports[imports.length - 1];
+    if (!last) throw new Error(`${INDEX} : aucune importation de chapitre repérée`);
+    src = src.slice(0, last.index! + last[0].length) + "\n" + importLine + src.slice(last.index! + last[0].length);
+  }
+  const arr = /export const ALL_CHAPTERS: ChapterContent\[\] = \[([^\]]*)\];/.exec(src);
+  if (!arr) throw new Error(`${INDEX} : tableau ALL_CHAPTERS introuvable`);
+  if (!arr[1].split(",").map((s) => s.trim()).includes(exportName)) src = src.replace(arr[0], `export const ALL_CHAPTERS: ChapterContent[] = [${arr[1].trim()}, ${exportName}];`);
+  writeFileSync(P(INDEX), src);
+
+  const state: State = c.publicationStatus === "published" ? "PUBLISHED" : REVIEW_KEYS.every((k) => c.reviewStatus[k] === "pass") ? "APPROVED" : "QA_PENDING";
+  const task = ledger.tasks.find((t) => t.id === c.taskId);
+  const next = state === "QA_PENDING" ? "Relecture humaine de la PR (revues QA), puis décision de publication" : undefined;
+  if (task) Object.assign(task, { state, chapterId: task.chapterId ?? id, ...(next ? { next } : {}) });
+  else ledger.tasks.push({ id: c.taskId, kind: "chapter", title: c.title, state, grade: c.grade, subject: c.subject, chapterId: id, ...(next ? { next } : {}) } as Task);
+  save();
+  console.log(`${id} inscrit (${exportName}, ${c.publicationStatus}) ; tâche ${c.taskId} → ${state}.`);
+}
+
+(async () => {
+  if (process.argv[2] === "sync") sync();
+  if (process.argv[2] === "register") await register(process.argv[3] ?? "");
+  render();
+  await matrix();
+})().catch((e: unknown) => { console.error(`ARRÊT : ${(e as Error).message ?? e}`); process.exit(1); });
