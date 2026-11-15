@@ -47,9 +47,9 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 
 | Chapitre d'inventaire | État | Objectifs (vérifiés) | Contenu | Exercices / jeux | QA | Coût API | Manques |
 |---|---|---|---|---|---|---|---|
-| math-5e-nombres-relatifs | published | 5 (5) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-NC-10 non repris dans le chapitre ; objectif M5-NC-11 non repris dans le chapitre ; objectif M5-NC-12 non repris dans le chapitre |
-| math-5e-relatifs-addition-soustraction | published | 4 (4) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-NC-15 non repris dans le chapitre ; objectif M5-NC-16 non repris dans le chapitre ; objectif M5-NC-17 non repris dans le chapitre |
-| math-5e-reperage | published | 2 (2) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-EG-01 non repris dans le chapitre ; objectif M5-EG-02 non repris dans le chapitre |
+| math-5e-nombres-relatifs | published | 5 (5) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | — |
+| math-5e-relatifs-addition-soustraction | published | 4 (4) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | — |
+| math-5e-reperage | published | 2 (2) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | — |
 | math-4e-nombres-premiers | published | 4 (4) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
 | math-4e-proportionnalite | published | 4 (4) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | objectif M4-OGDF-07 non repris dans le chapitre ; objectif M4-OGDF-09 non repris dans le chapitre |
 | math-4e-pythagore | draft | 2 (2) | `math-3e-pythagore` (hors registre) | 20 / 3 | en attente | 0.69214 | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |

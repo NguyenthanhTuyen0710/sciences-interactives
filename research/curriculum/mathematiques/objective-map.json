@@ -1,0 +1,18 @@
+{
+  "note": "Correspondance objectif d'inventaire (curriculum-math.json) → objectifs du chapitre complet, quand le chapitre emploie ses propres identifiants. Lue par scripts/dashboard.ts (matrice de couverture). Établie le 2026-11-15 par comparaison des textes ; un objectif d'inventaire n'est compté couvert que si toutes ses cibles existent dans le chapitre.",
+  "chapters": {
+    "math-5e-nombres-relatifs": {
+      "M5-NC-10": ["M5-REL-01", "M5-REL-02", "M5-REL-03"],
+      "M5-NC-11": ["M5-REL-04"],
+      "M5-NC-12": ["M5-REL-05"],
+      "M5-NC-13": ["M5-REL-06"],
+      "M5-NC-14": ["M5-REL-08"],
+      "M5-NC-15": ["M5-REL-09", "M5-REL-10"],
+      "M5-NC-16": ["M5-REL-11"],
+      "M5-NC-17": ["M5-REL-12", "M5-REL-13"],
+      "M5-NC-18": ["M5-REL-14", "M5-REL-15"],
+      "M5-EG-01": ["M5-REL-06"],
+      "M5-EG-02": ["M5-REL-07"]
+    }
+  }
+}

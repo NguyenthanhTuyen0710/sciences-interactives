@@ -520,13 +520,7 @@
     "qaPassed": true,
     "apiCostUsd": null
    },
-   "missing": [
-    "objectif M5-NC-10 non repris dans le chapitre",
-    "objectif M5-NC-11 non repris dans le chapitre",
-    "objectif M5-NC-12 non repris dans le chapitre",
-    "objectif M5-NC-13 non repris dans le chapitre",
-    "objectif M5-NC-14 non repris dans le chapitre"
-   ]
+   "missing": []
   },
   {
    "subject": "mathematiques",
@@ -567,12 +561,7 @@
     "qaPassed": true,
     "apiCostUsd": null
    },
-   "missing": [
-    "objectif M5-NC-15 non repris dans le chapitre",
-    "objectif M5-NC-16 non repris dans le chapitre",
-    "objectif M5-NC-17 non repris dans le chapitre",
-    "objectif M5-NC-18 non repris dans le chapitre"
-   ]
+   "missing": []
   },
   {
    "subject": "mathematiques",
@@ -681,10 +670,7 @@
     "qaPassed": true,
     "apiCostUsd": null
    },
-   "missing": [
-    "objectif M5-EG-01 non repris dans le chapitre",
-    "objectif M5-EG-02 non repris dans le chapitre"
-   ]
+   "missing": []
   },
   {
    "subject": "mathematiques",

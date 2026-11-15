@@ -105,6 +105,7 @@ async function matrix() {
   const { pathToFileURL } = await import("node:url");
   const { readLedger, ops } = await import("../pipeline/ledger");
   const registered = new Set(ALL_CHAPTERS.map((c) => c.id));
+  const objectiveMap = (subject: string) => readJson<{ chapters: Record<string, Record<string, string[]>> }>(`research/curriculum/${subject}/objective-map.json`)?.chapters ?? {};
   const specs = readdirSync(P("pipeline/chapters")).filter((f) => f.endsWith(".json")).sort()
     .map((f) => JSON.parse(readFileSync(P(`pipeline/chapters/${f}`), "utf8")) as { id: string; officialChapterIds: string[] });
   type Loaded = { c: (typeof ALL_CHAPTERS)[number]; file: string; sha256: string };
@@ -133,8 +134,12 @@ async function matrix() {
     else {
       const issues = doneIssues(c);
       missing.push(...issues);
-      const covered = new Set(c.officialObjectives.map((o) => o.id));
-      for (const o of ch.objectives) if (!covered.has(o.id)) missing.push(`objectif ${o.id} non repris dans le chapitre`);
+      // Objectif d'inventaire couvert : même identifiant dans le chapitre, ou correspondance déclarée
+      // (research/curriculum/<matière>/objective-map.json) dont toutes les cibles existent dans le chapitre.
+      const own = new Set(c.officialObjectives.map((o) => o.id));
+      const map = objectiveMap(s.subject)[c.id] ?? {};
+      const covered = (id: string) => own.has(id) || (map[id]?.length > 0 && map[id].every((t) => own.has(t)));
+      for (const o of ch.objectives) if (!covered(o.id)) missing.push(`objectif ${o.id} non repris dans le chapitre`);
     }
     const state: MatrixState = c?.publicationStatus === "published" ? "published" : qaPassed ? "qa-passed" : c ? "draft" : existsSync(P(dossier)) ? "researched" : "todo";
     return {

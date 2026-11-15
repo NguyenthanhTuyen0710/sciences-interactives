@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
@@ -113,3 +113,19 @@ describe("logique des jeux", () => {
 });
 
 for (const c of ALL_CHAPTERS) describeChapter(c);
+
+describe("correspondance d'objectifs inventaire → chapitre (research/curriculum/*/objective-map.json)", () => {
+  for (const subject of ["mathematiques", "physique-chimie"]) {
+    const file = `research/curriculum/${subject}/objective-map.json`;
+    if (!existsSync(file)) continue;
+    const map = JSON.parse(readFileSync(file, "utf8")).chapters as Record<string, Record<string, string[]>>;
+    for (const [chapterId, entries] of Object.entries(map)) {
+      it(`${chapterId} : toutes les cibles existent dans le chapitre`, () => {
+        const c = ALL_CHAPTERS.find((x) => x.id === chapterId);
+        expect(c, `chapitre ${chapterId} non inscrit`).toBeDefined();
+        const own = new Set(c!.officialObjectives.map((o) => o.id));
+        for (const [inv, targets] of Object.entries(entries)) for (const t of targets) expect(own.has(t), `${inv} → ${t}`).toBe(true);
+      });
+    }
+  }
+});
