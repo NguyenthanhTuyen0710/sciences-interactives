@@ -158,12 +158,19 @@ function applyEdits(file: string, edits: { old: string; new: string }[]): { text
 // ───────── Appel API (toujours après contrôle du budget) ─────────
 let client: Anthropic | null = null;
 let systemCached = false;
-const params = (step: Step, user: string): Anthropic.MessageCreateParamsNonStreaming => ({
+/**
+ * Cache conditionnel (M14, option A) : le préfixe n'est marqué que pour un appel synchrone, suivi dans le même run
+ * d'autres appels au même préfixe (dossier → chapitre → fix). Un batch d'une seule requête est suivi d'une relecture
+ * humaine (heures) : l'écriture en cache (2 × le prix d'entrée en TTL 1 h) ne serait jamais relue. Mesuré au run #12 :
+ * 50 420 tokens écrits sans lecture, 0,050 $ perdus. La relecture (output_config.format) invalide de toute façon le cache.
+ */
+const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review";
+const params = (step: Step, user: string, batch: boolean): Anthropic.MessageCreateParamsNonStreaming => ({
   model: MODEL,
   max_tokens: MAX_TOKENS[step],
   // Relecture : JSON imposé par structured outputs (pris en charge par les Message Batches), revérifié par parseReview.
   output_config: step === "review" ? { effort: EFFORT[step], format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: EFFORT[step] },
-  system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral", ttl: "1h" } }],
+  system: [{ type: "text", text: SYSTEM, ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
   messages: [{ role: "user", content: user }],
 });
 
@@ -175,8 +182,9 @@ async function estimate(step: Step, user: string, batch: boolean) {
     sysTok = c.input_tokens; userTok = t.input_tokens - c.input_tokens; exact = true;
   }
   const m = batch ? prices.batchMultiplier : 1;
-  // Pire cas : préfixe système écrit en cache (pas lu), sortie au maximum.
-  const upper = m * (usd(sysTok, systemCached ? price.cacheRead : price.cacheWrite1h) + usd(userTok, price.input) + usd(MAX_TOKENS[step], price.output));
+  // Pire cas : préfixe écrit en cache s'il est marqué (lu s'il l'a déjà été dans ce run), sinon prix d'entrée ; sortie au maximum.
+  const sysPrice = !cacheSystem(step, batch) ? price.input : systemCached ? price.cacheRead : price.cacheWrite1h;
+  const upper = m * (usd(sysTok, sysPrice) + usd(userTok, price.input) + usd(MAX_TOKENS[step], price.output));
   return { sysTok, userTok, upper, exact };
 }
 
@@ -188,7 +196,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string) {
   }
   const e = await estimate(step, user, batch);
   console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, empreinte ${hash}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
-  const pr = params(step, user);
+  const pr = params(step, user, batch);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
@@ -256,14 +264,14 @@ async function call(step: Step, user: string, hash: string): Promise<string | nu
   // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
   const unknown = (err: unknown): never => { appendLedger(LEDGER, { type: "unknown", id: opId, at: new Date().toISOString(), error: String((err as Error).message ?? err).slice(0, 300) }); throw err; };
   if (batch) {
-    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user) }] }, { maxRetries: 0 }).catch(unknown);
+    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user, true) }] }, { maxRetries: 0 }).catch(unknown);
     appendLedger(LEDGER, { type: "submitted", id: opId, at: new Date().toISOString(), batchId: b.id });
     state.steps[step] = { status: "batch-pending", hash, batchId: b.id, at: new Date().toISOString() };
     saveState();
     console.log(`  batch ${step} soumis : ${b.id} (récupérer avec --collect ${b.id}, ou relancer la même commande en local).`);
     return null;
   }
-  const msg = await client.messages.stream(params(step, user), { maxRetries: 0 }).finalMessage().catch(unknown);
+  const msg = await client.messages.stream(params(step, user, false), { maxRetries: 0 }).finalMessage().catch(unknown);
   systemCached = true;
   logCost(step, msg.usage, false, { opId });
   return finish(step, msg, { opId });
@@ -401,9 +409,10 @@ async function main() {
 function estimateRest() {
   const fileTok = 32000, m = BATCH ? prices.batchMultiplier : 1;
   const sys = Math.ceil(SYSTEM.length / CHARS_PER_TOKEN);
-  const fix = usd(sys, price.cacheRead) + usd(fileTok + 3000, price.input) + usd(MAX_TOKENS.fix, price.output);
-  const review = m * (usd(sys, price.cacheRead) + usd(fileTok + 2000, price.input) + usd(MAX_TOKENS.review, price.output));
-  console.log(`  estimation fix : ≤ ${MAX_FIX_ROUNDS} × ${money(fix)} ; review : ${money(review)} (cache système supposé lu ; pire cas sans cache : +${money(m * usd(sys, price.cacheWrite1h - price.cacheRead))} par appel)`);
+  // fix : synchrone, préfixe en cache (1er tour : écriture, 2e : lecture) ; review : jamais en cache (cacheSystem).
+  const fix = usd(sys, price.cacheWrite1h) + usd(fileTok + 3000, price.input) + usd(MAX_TOKENS.fix, price.output);
+  const review = m * (usd(sys + fileTok + 2000, price.input) + usd(MAX_TOKENS.review, price.output));
+  console.log(`  estimation fix : ≤ ${MAX_FIX_ROUNDS} × ${money(fix)} (pire cas : écriture du cache à chaque tour) ; review : ${money(review)} (préfixe non mis en cache)`);
 }
 
 main().catch((e: unknown) => {
