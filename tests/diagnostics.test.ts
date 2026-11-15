@@ -101,3 +101,29 @@ describe("taxonomie G3 Pythagore (research/curriculum/mathematiques/taxonomy/mat
     expect([...mapped].filter((i) => !ids.has(i as string))).toEqual([]);
   });
 });
+
+describe("taxonomie Pythagore verrouillée (Việc 2, 2026-11-15)", () => {
+  const tax = JSON.parse(readFileSync("research/curriculum/mathematiques/taxonomy/math-3e-pythagore.json", "utf8"));
+  // Sérialisation canonique identique à json.dumps(sort_keys=True, ensure_ascii=False) de Python.
+  const canon = (v: unknown): string => Array.isArray(v) ? `[${v.map(canon).join(", ")}]`
+    : v && typeof v === "object" ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}: ${canon((v as Record<string, unknown>)[k])}`).join(", ")}}`
+    : JSON.stringify(v);
+  it("empreinte de verrouillage inchangée (seul le champ « brevet » peut évoluer)", async () => {
+    const { createHash } = await import("node:crypto");
+    const d = JSON.parse(JSON.stringify(tax));
+    for (const t of d.types) delete t.brevet;
+    delete d.lockHash; delete d.coverage;
+    expect(tax.status).toBe("verrouillé");
+    expect(tax.lockedAt).toBeTruthy();
+    expect(createHash("sha256").update(canon(d)).digest("hex")).toBe(tax.lockHash);
+  });
+  it("ajustements approuvés présents", () => {
+    const byId = Object.fromEntries(tax.types.map((t: { id: string }) => [t.id, t]));
+    expect(byId["PY-T11"].competences).toEqual(["Calculer"]);
+    expect(byId["PY-T11"].difficulty).toEqual([1, 2]);
+    expect(byId["PY-T09"].transversal).toBe(true);
+    expect(byId["PY-T09"].countsTowardCompleteness).toBe(false);
+    for (const id of ["PY-T08", "PY-T10"]) expect(byId[id].requiredVariants.length, id).toBe(2);
+    expect(tax.redactionCriterionRequiredFor).toEqual(["PY-T06", "PY-T07", "PY-T10"]);
+  });
+});
