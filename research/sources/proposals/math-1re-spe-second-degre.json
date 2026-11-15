@@ -1,6 +1,6 @@
 {
   "chapter": "math-1re-spe-second-degre",
-  "status": "approuvé par le porteur de projet le 2026-11-15 (G2, tableau du rapport PILOT-chapitres-PC-lycee.md) ; appliqué par `run.ts apply` (attach_evidence → verified: true)",
+  "status": "approuvé par Nguyễn Thanh Tuyền (porteur de projet) le 2026-11-15 (G2, tableau du rapport PILOT-chapitres-PC-lycee.md) ; appliqué par `run.ts apply` (attach_evidence → verified: true)",
   "note": "Citations copiées du texte extrait (pdftotext) du BO n° 14 du 2-4-2026 enregistré par le collecteur (seed bo-2026-14-pdf) ; « 𝑥𝑛 » = xⁿ (exposant perdu à l'extraction). SD-03, SD-04 et SD-06 alignés mot pour mot sur le BO avant approbation. Page = numéro de page du PDF.",
   "changes": [
     {
@@ -14,7 +14,7 @@
         "matchType": "a — texte de l'objectif = citation du BO (mot pour mot)",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     },
     {
@@ -28,7 +28,7 @@
         "matchType": "a — texte de l'objectif = citation du BO (mot pour mot)",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     },
     {
@@ -42,7 +42,7 @@
         "matchType": "a — texte de l'objectif = citation du BO (mot pour mot)",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     },
     {
@@ -56,7 +56,7 @@
         "matchType": "a — texte de l'objectif = citation du BO (mot pour mot)",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     },
     {
@@ -70,7 +70,7 @@
         "matchType": "b — objectif reformulé (« Démontrer … ») ; la citation est l'intitulé « Démonstration » du BO",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     },
     {
@@ -84,7 +84,7 @@
         "matchType": "b — mêmes mots que le BO, ponctuation de liste adaptée (tirets → points-virgules) ; exposants perdus à l'extraction",
         "reason": "approbation du porteur de projet (2026-11-15) : correspondance objectif ↔ citation du BO n° 14, p. 360 (tableau G2 du rapport PILOT-chapitres-PC-lycee.md)"
       },
-      "approvedBy": "porteur de projet",
+      "approvedBy": "Nguyễn Thanh Tuyền",
       "approvedAt": "2026-11-15"
     }
   ]
