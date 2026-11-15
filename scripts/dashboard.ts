@@ -92,5 +92,86 @@ function render() {
   console.log("project/dashboard.md régénéré.");
 }
 
+// ───────── Matrice de couverture lisible par machine (source de décision du pipeline, roadmap § 7) ─────────
+// research/curriculum/coverage-matrix.json + bloc généré de coverage-matrix.md. Contenu : tous les fichiers de
+// src/lib/chapters/data (y compris les brouillons hors registre) ; coût API : registre pipeline/.store/ledger.jsonl
+// s'il est présent localement (il vit dans le stockage « data-store », hors Git), sinon null.
+export const MATRIX_STATES = ["todo", "researched", "draft", "qa-passed", "published"] as const;
+type MatrixState = (typeof MATRIX_STATES)[number];
+
+async function matrix() {
+  const { readdirSync } = await import("node:fs");
+  const { createHash } = await import("node:crypto");
+  const { pathToFileURL } = await import("node:url");
+  const { readLedger, ops } = await import("../pipeline/ledger");
+  const registered = new Set(ALL_CHAPTERS.map((c) => c.id));
+  type Loaded = { c: (typeof ALL_CHAPTERS)[number]; file: string; sha256: string };
+  const loaded: Loaded[] = [];
+  for (const f of readdirSync(P("src/lib/chapters/data")).filter((x) => x.endsWith(".ts")).sort()) {
+    const file = `src/lib/chapters/data/${f}`;
+    const mod = (await import(pathToFileURL(P(file)).href)) as Record<string, unknown>;
+    const c = Object.values(mod).find((v) => v && typeof v === "object" && "lesson" in (v as object) && "exercises" in (v as object)) as Loaded["c"] | undefined;
+    if (c) loaded.push({ c, file, sha256: createHash("sha256").update(readFileSync(P(file))).digest("hex") });
+  }
+  const ledgerFile = P("pipeline/.store/ledger.jsonl");
+  const costs = existsSync(ledgerFile) ? ops(readLedger(ledgerFile)) : null;
+  // null : registre absent, ou chapitre jamais passé par l'API (produit dans Claude Code).
+  const costOf = (id: string) => {
+    const mine = costs?.filter((o) => o.reserve?.chapter === id && o.state === "settled") ?? [];
+    return mine.length ? Number(mine.reduce((s, o) => s + (o.usd ?? 0), 0).toFixed(5)) : null;
+  };
+
+  const rows = curricula().flatMap((s) => s.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters.map((ch) => {
+    const hit = loaded.find((l) => l.c.id === ch.id || (l.c.curriculumChapterIds ?? []).includes(ch.id));
+    const c = hit?.c;
+    const qaPassed = !!c && REVIEW_KEYS.every((k) => c.reviewStatus[k] === "pass");
+    const dossier = c ? `research/dossiers/${c.id}.md` : `research/dossiers/${ch.id}.md`;
+    const missing: string[] = [];
+    if (!c) missing.push("chapitre complet");
+    else {
+      const issues = doneIssues(c);
+      missing.push(...issues);
+      const covered = new Set(c.officialObjectives.map((o) => o.id));
+      for (const o of ch.objectives) if (!covered.has(o.id)) missing.push(`objectif ${o.id} non repris dans le chapitre`);
+    }
+    const state: MatrixState = c?.publicationStatus === "published" ? "published" : qaPassed ? "qa-passed" : c ? "draft" : existsSync(P(dossier)) ? "researched" : "todo";
+    return {
+      subject: s.subject, grade: g.grade, domain: d.id, chapterId: ch.id, title: ch.title, state,
+      objectives: { total: ch.objectives.length, verified: ch.objectives.filter((o) => o.verified).length },
+      pipelineSpec: c ? existsSync(P(`pipeline/chapters/${c.id}.json`)) : existsSync(P(`pipeline/chapters/${ch.id}.json`)),
+      content: c && hit ? {
+        id: c.id, taskId: c.taskId, file: hit.file, sha256: hit.sha256, registered: registered.has(c.id), publication: c.publicationStatus,
+        exercises: c.exercises.length, perLevel: [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length),
+        games: c.games.length, review: c.reviewStatus, qaPassed, apiCostUsd: costOf(c.id),
+      } : null,
+      missing,
+    };
+  }))));
+  const summary = Object.values(rows.reduce<Record<string, { subject: string; grade: string; chapters: number; byState: Record<string, number> }>>((acc, r) => {
+    const k = `${r.subject}/${r.grade}`;
+    acc[k] ??= { subject: r.subject, grade: r.grade, chapters: 0, byState: {} };
+    acc[k].chapters++; acc[k].byState[r.state] = (acc[k].byState[r.state] ?? 0) + 1;
+    return acc;
+  }, {}));
+  writeFileSync(P("research/curriculum/coverage-matrix.json"), JSON.stringify({
+    note: "Généré par `npm run dashboard` — ne pas modifier à la main. États : " + MATRIX_STATES.join(" → ") + ". apiCostUsd null = registre des dépenses absent localement (data-store).",
+    costsAvailable: !!costs, summary, chapters: rows,
+  }, null, 1) + "\n");
+
+  const md = P("research/curriculum/coverage-matrix.md");
+  const BEGIN = "<!-- BEGIN GENERATED: npm run dashboard -->", END = "<!-- END GENERATED -->";
+  const block = [BEGIN, "## Matrice générée (chapitres de l'inventaire)", "",
+    "| Matière | Niveau | Chapitres | " + MATRIX_STATES.join(" | ") + " |", "|---|---|---|" + MATRIX_STATES.map(() => "---").join("|") + "|",
+    ...summary.map((s) => `| ${s.subject} | ${s.grade} | ${s.chapters} | ${MATRIX_STATES.map((st) => s.byState[st] ?? 0).join(" | ")} |`), "",
+    "| Chapitre d'inventaire | État | Objectifs (vérifiés) | Contenu | Exercices / jeux | QA | Coût API | Manques |", "|---|---|---|---|---|---|---|---|",
+    ...rows.filter((r) => r.state !== "todo").map((r) => `| ${r.chapterId} | ${r.state} | ${r.objectives.total} (${r.objectives.verified}) | ${r.content ? `\`${r.content.id}\`${r.content.registered ? "" : " (hors registre)"}` : "—"} | ${r.content ? `${r.content.exercises} / ${r.content.games}` : "—"} | ${r.content ? (r.content.qaPassed ? "pass" : "en attente") : "—"} | ${r.content?.apiCostUsd ?? "—"} | ${r.missing.slice(0, 3).join(" ; ") || "—"} |`),
+    "", `Chapitres d'inventaire au statut \`todo\` : ${rows.filter((r) => r.state === "todo").length} (détail dans \`coverage-matrix.json\`).`, END].join("\n");
+  const prev = readFileSync(md, "utf8");
+  const next = prev.includes(BEGIN) ? prev.slice(0, prev.indexOf(BEGIN)) + block + prev.slice(prev.indexOf(END) + END.length) : prev.trimEnd() + "\n\n" + block + "\n";
+  writeFileSync(md, next);
+  console.log(`coverage-matrix.json et bloc généré de coverage-matrix.md écrits (${rows.length} chapitres d'inventaire).`);
+}
+
 if (process.argv[2] === "sync") sync();
 render();
+matrix().catch((e: unknown) => { console.error(e); process.exit(1); });

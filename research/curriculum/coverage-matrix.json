@@ -1,0 +1,2329 @@
+{
+ "note": "Généré par `npm run dashboard` — ne pas modifier à la main. États : todo → researched → draft → qa-passed → published. apiCostUsd null = registre des dépenses absent localement (data-store).",
+ "costsAvailable": true,
+ "summary": [
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "chapters": 22,
+   "byState": {
+    "todo": 22
+   }
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "chapters": 21,
+   "byState": {
+    "todo": 18,
+    "published": 3
+   }
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "chapters": 21,
+   "byState": {
+    "todo": 18,
+    "published": 2,
+    "draft": 1
+   }
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "chapters": 16,
+   "byState": {
+    "published": 2,
+    "draft": 2,
+    "todo": 12
+   }
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "chapters": 8,
+   "byState": {
+    "todo": 8
+   }
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "chapters": 9,
+   "byState": {
+    "todo": 9
+   }
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "chapters": 9,
+   "byState": {
+    "todo": 9
+   }
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "chapters": 10,
+   "byState": {
+    "todo": 10
+   }
+  }
+ ],
+ "chapters": [
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-numeration-decimaux",
+   "title": "Nombres entiers et décimaux : numération, repérage, comparaison",
+   "state": "todo",
+   "objectives": {
+    "total": 7,
+    "verified": 7
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-operations-decimaux",
+   "title": "Addition, soustraction et multiplication des nombres décimaux",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-division",
+   "title": "Division euclidienne et division décimale",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-fraction-quotient",
+   "title": "La fraction comme quotient",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-fractions-calculs",
+   "title": "Comparer et calculer avec des fractions",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-pourcentages",
+   "title": "Pourcentages",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "NC",
+   "chapterId": "math-6e-pensee-algebrique",
+   "title": "Pensée algébrique : nombres inconnus et motifs évolutifs",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "GM",
+   "chapterId": "math-6e-longueurs-perimetres",
+   "title": "Longueurs et périmètres, périmètre du disque",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "GM",
+   "chapterId": "math-6e-aires",
+   "title": "Aires : unités, conversions, carré et rectangle",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "GM",
+   "chapterId": "math-6e-volumes",
+   "title": "Volumes : le centimètre cube",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "GM",
+   "chapterId": "math-6e-durees",
+   "title": "Horaires et durées",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-distances-cercles",
+   "title": "Distances, milieu, cercle et disque",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-mediatrice",
+   "title": "Médiatrice d'un segment",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-angles",
+   "title": "Angles et bissectrice",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-triangles",
+   "title": "Triangles : construction, angles, cercle circonscrit",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-symetrie-axiale",
+   "title": "Symétrie axiale",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "EG",
+   "chapterId": "math-6e-vision-espace",
+   "title": "Vision dans l'espace : solides et assemblages de cubes",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "OGD",
+   "chapterId": "math-6e-donnees",
+   "title": "Organiser et exploiter des données",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "OGD",
+   "chapterId": "math-6e-probabilites",
+   "title": "Premières probabilités",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "PROP",
+   "chapterId": "math-6e-proportionnalite",
+   "title": "Proportionnalité entre grandeurs",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "INFO",
+   "chapterId": "math-6e-pensee-informatique",
+   "title": "Instructions et séquences (programmation par blocs)",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "6e",
+   "domain": "AUTO",
+   "chapterId": "math-6e-automatismes",
+   "title": "Automatismes et calcul mental de 6e",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-operations-priorites",
+   "title": "Enchaînement d'opérations et priorités",
+   "state": "todo",
+   "objectives": {
+    "total": 7,
+    "verified": 7
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-multiples-diviseurs",
+   "title": "Multiples, diviseurs et critères de divisibilité",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-nombres-relatifs",
+   "title": "Nombres relatifs : définition, repérage, comparaison",
+   "state": "published",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-5e-nombres-relatifs",
+    "taskId": "SCI-5E-MATH-001",
+    "file": "src/lib/chapters/data/math-5e-nombres-relatifs.ts",
+    "sha256": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
+    "registered": true,
+    "publication": "published",
+    "exercises": 36,
+    "perLevel": [
+     7,
+     8,
+     8,
+     7,
+     6
+    ],
+    "games": 4,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": [
+    "objectif M5-NC-10 non repris dans le chapitre",
+    "objectif M5-NC-11 non repris dans le chapitre",
+    "objectif M5-NC-12 non repris dans le chapitre",
+    "objectif M5-NC-13 non repris dans le chapitre",
+    "objectif M5-NC-14 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-relatifs-addition-soustraction",
+   "title": "Addition et soustraction des nombres relatifs",
+   "state": "published",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-5e-nombres-relatifs",
+    "taskId": "SCI-5E-MATH-001",
+    "file": "src/lib/chapters/data/math-5e-nombres-relatifs.ts",
+    "sha256": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
+    "registered": true,
+    "publication": "published",
+    "exercises": 36,
+    "perLevel": [
+     7,
+     8,
+     8,
+     7,
+     6
+    ],
+    "games": 4,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": [
+    "objectif M5-NC-15 non repris dans le chapitre",
+    "objectif M5-NC-16 non repris dans le chapitre",
+    "objectif M5-NC-17 non repris dans le chapitre",
+    "objectif M5-NC-18 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-fractions",
+   "title": "Fractions : comparaison, addition, soustraction",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-puissances",
+   "title": "Puissances : carrés et cubes",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-expressions-litterales",
+   "title": "Expressions littérales et distributivité",
+   "state": "todo",
+   "objectives": {
+    "total": 6,
+    "verified": 6
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "NC",
+   "chapterId": "math-5e-equations",
+   "title": "Premières équations",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-reperage",
+   "title": "Repérage sur une droite et dans le plan",
+   "state": "published",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-5e-nombres-relatifs",
+    "taskId": "SCI-5E-MATH-001",
+    "file": "src/lib/chapters/data/math-5e-nombres-relatifs.ts",
+    "sha256": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
+    "registered": true,
+    "publication": "published",
+    "exercises": 36,
+    "perLevel": [
+     7,
+     8,
+     8,
+     7,
+     6
+    ],
+    "games": 4,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": [
+    "objectif M5-EG-01 non repris dans le chapitre",
+    "objectif M5-EG-02 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-solides-representations",
+   "title": "Représenter l'espace : perspective cavalière et patrons",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-aires-volumes",
+   "title": "Aire du disque et volumes (prisme, cylindre)",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-symetrie-centrale",
+   "title": "Symétrie centrale (demi-tour)",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-angles-parallelisme",
+   "title": "Angles et parallélisme",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-triangles",
+   "title": "Triangles : somme des angles, constructions, droites remarquables",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "EG",
+   "chapterId": "math-5e-parallelogrammes",
+   "title": "Parallélogrammes et parallélogrammes particuliers",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "OGD",
+   "chapterId": "math-5e-statistiques",
+   "title": "Statistiques : effectifs, fréquences, représentations, moyenne",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "OGD",
+   "chapterId": "math-5e-probabilites",
+   "title": "Probabilités : vocabulaire, équiprobabilité, fréquences",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "PF",
+   "chapterId": "math-5e-proportionnalite-pourcentages",
+   "title": "Proportionnalité, proportions et pourcentages",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "PF",
+   "chapterId": "math-5e-dependance-grandeurs",
+   "title": "Grandeurs dépendantes : tableaux, graphiques, formules",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "PI",
+   "chapterId": "math-5e-pensee-informatique",
+   "title": "Programmation par blocs : instructions, formules, boucle simple",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "5e",
+   "domain": "AUTO",
+   "chapterId": "math-5e-automatismes",
+   "title": "Automatismes et calcul mental de 5e",
+   "state": "todo",
+   "objectives": {
+    "total": 6,
+    "verified": 6
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-relatifs-multiplication-division",
+   "title": "Multiplication et division des nombres relatifs",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-fractions-operations",
+   "title": "Nombres rationnels : multiplication, division, inverse",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-puissances",
+   "title": "Puissances et notation scientifique",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-racine-carree",
+   "title": "Carrés parfaits et racine carrée",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-nombres-premiers",
+   "title": "Divisibilité et nombres premiers",
+   "state": "published",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-3e-arithmetique",
+    "taskId": "SCI-3E-MATH-001",
+    "file": "src/lib/chapters/data/math-3e-arithmetique.ts",
+    "sha256": "d0cf16f9d03ddd26128e8063073984b7065803cab1c4b2ebbdc22d91cbca985c",
+    "registered": true,
+    "publication": "published",
+    "exercises": 36,
+    "perLevel": [
+     7,
+     8,
+     8,
+     7,
+     6
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": []
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-calcul-litteral",
+   "title": "Calcul littéral : distributivité simple, réduction",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "NC",
+   "chapterId": "math-4e-equations",
+   "title": "Équations du premier degré",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "OGDF",
+   "chapterId": "math-4e-statistiques",
+   "title": "Statistiques : médiane, diagrammes circulaires",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "OGDF",
+   "chapterId": "math-4e-probabilites",
+   "title": "Probabilités : calculs, évènements contraires",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "OGDF",
+   "chapterId": "math-4e-proportionnalite",
+   "title": "Proportionnalité : quatrième proportionnelle, graphiques, ratio",
+   "state": "published",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-3e-pourcentages-evolution",
+    "taskId": "SCI-3E-MATH-009",
+    "file": "src/lib/chapters/data/math-3e-pourcentages-evolution.ts",
+    "sha256": "006db69983018ecf2ff05232d80325760722bc4f75309180312835c296a1643b",
+    "registered": true,
+    "publication": "published",
+    "exercises": 33,
+    "perLevel": [
+     6,
+     7,
+     8,
+     6,
+     6
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": [
+    "objectif M4-OGDF-07 non repris dans le chapitre",
+    "objectif M4-OGDF-09 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "OGDF",
+   "chapterId": "math-4e-fonctions-dependance",
+   "title": "Dépendance entre grandeurs : formules et graphiques",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "GM",
+   "chapterId": "math-4e-volumes-grandeurs-composees",
+   "title": "Volumes de la pyramide et du cône ; grandeurs composées",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "GM",
+   "chapterId": "math-4e-agrandissement-reduction",
+   "title": "Agrandissement et réduction",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-reperage-espace",
+   "title": "Repérage dans un pavé, pyramide et cône",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-pythagore",
+   "title": "Théorème de Pythagore et réciproque",
+   "state": "draft",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": true,
+   "content": {
+    "id": "math-3e-pythagore",
+    "taskId": "SCI-3E-MATH-017",
+    "file": "src/lib/chapters/data/math-3e-pythagore.ts",
+    "sha256": "47570879eca9749947e4ddabd1cbb6d07cb3b1b2982a3e70fa90f7abc734a88e",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 20,
+    "perLevel": [
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": 0.69214
+   },
+   "missing": [
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-thales",
+   "title": "Théorème de Thalès (triangles emboîtés)",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-cosinus",
+   "title": "Cosinus d'un angle aigu",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-triangles-egaux",
+   "title": "Cas d'égalité des triangles",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "EG",
+   "chapterId": "math-4e-translation",
+   "title": "Translations",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "AP",
+   "chapterId": "math-4e-programmation",
+   "title": "Programmation : conditions, boucles, évènements, variables",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "4e",
+   "domain": "AUTO",
+   "chapterId": "math-4e-automatismes",
+   "title": "Automatismes et calcul mental de 4e",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "NC",
+   "chapterId": "math-3e-arithmetique",
+   "title": "Arithmétique : fractions irréductibles et problèmes",
+   "state": "published",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-3e-arithmetique",
+    "taskId": "SCI-3E-MATH-001",
+    "file": "src/lib/chapters/data/math-3e-arithmetique.ts",
+    "sha256": "d0cf16f9d03ddd26128e8063073984b7065803cab1c4b2ebbdc22d91cbca985c",
+    "registered": true,
+    "publication": "published",
+    "exercises": 36,
+    "perLevel": [
+     7,
+     8,
+     8,
+     7,
+     6
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": []
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "NC",
+   "chapterId": "math-3e-puissances-calculs",
+   "title": "Puissances, notation scientifique et racines carrées en problèmes",
+   "state": "draft",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-3e-puissances-calculs",
+    "taskId": "SCI-3E-MATH-002",
+    "file": "src/lib/chapters/data/math-3e-puissances-calculs.ts",
+    "sha256": "7239a34eb246c59efd5d4486ebdaba4e2167ca918f464c3dc39cd2fcf569adec",
+    "registered": true,
+    "publication": "draft",
+    "exercises": 35,
+    "perLevel": [
+     7,
+     7,
+     8,
+     7,
+     6
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
+   "missing": [
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "NC",
+   "chapterId": "math-3e-calcul-litteral",
+   "title": "Calcul littéral : double distributivité, identités",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": true,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "NC",
+   "chapterId": "math-3e-equations",
+   "title": "Équations produits et équations x² = a",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "OGDF",
+   "chapterId": "math-3e-statistiques",
+   "title": "Statistiques : histogrammes, étendue",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "OGDF",
+   "chapterId": "math-3e-probabilites",
+   "title": "Probabilités : fréquences, simulation, deux épreuves",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "OGDF",
+   "chapterId": "math-3e-notion-fonction",
+   "title": "Notion de fonction : image, antécédent, représentations",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "OGDF",
+   "chapterId": "math-3e-fonctions-affines",
+   "title": "Fonctions linéaires et affines",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "OGDF",
+   "chapterId": "math-3e-pourcentages-evolution",
+   "title": "Pourcentages d'évolution et coefficient multiplicateur",
+   "state": "published",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": {
+    "id": "math-3e-pourcentages-evolution",
+    "taskId": "SCI-3E-MATH-009",
+    "file": "src/lib/chapters/data/math-3e-pourcentages-evolution.ts",
+    "sha256": "006db69983018ecf2ff05232d80325760722bc4f75309180312835c296a1643b",
+    "registered": true,
+    "publication": "published",
+    "exercises": 33,
+    "perLevel": [
+     6,
+     7,
+     8,
+     6,
+     6
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pass",
+     "accuracy": "pass",
+     "exercises": "pass",
+     "games": "pass",
+     "technical": "pass",
+     "language": "pass"
+    },
+    "qaPassed": true,
+    "apiCostUsd": null
+   },
+   "missing": []
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "GM",
+   "chapterId": "math-3e-volumes-grandeurs",
+   "title": "Boule, volumes composés, grandeurs composées",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "EG",
+   "chapterId": "math-3e-sphere-sections",
+   "title": "Sphère, repérage terrestre et sections de solides",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "EG",
+   "chapterId": "math-3e-thales-semblables",
+   "title": "Thalès (configuration papillon) et triangles semblables",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "EG",
+   "chapterId": "math-3e-trigonometrie",
+   "title": "Trigonométrie : cosinus, sinus, tangente",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "EG",
+   "chapterId": "math-3e-rotations-homotheties",
+   "title": "Rotations et homothéties",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "AP",
+   "chapterId": "math-3e-programmation",
+   "title": "Programmation : boucles conditionnelles, scripts parallèles, blocs personnalisés",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "3e",
+   "domain": "AUTO",
+   "chapterId": "math-3e-automatismes",
+   "title": "Automatismes et calcul mental de 3e",
+   "state": "draft",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": true,
+   "content": {
+    "id": "math-3e-pythagore",
+    "taskId": "SCI-3E-MATH-017",
+    "file": "src/lib/chapters/data/math-3e-pythagore.ts",
+    "sha256": "47570879eca9749947e4ddabd1cbb6d07cb3b1b2982a3e70fa90f7abc734a88e",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 20,
+    "perLevel": [
+     4,
+     4,
+     4,
+     4,
+     4
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": 0.69214
+   },
+   "missing": [
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending",
+    "objectif M3-AUTO-01 non repris dans le chapitre",
+    "objectif M3-AUTO-02 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-proprietes-matiere",
+   "title": "États et propriétés de la matière",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-masse-volume",
+   "title": "Masse et volume",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-melanges-transformations",
+   "title": "Mélanges et premières transformations chimiques",
+   "state": "todo",
+   "objectives": {
+    "total": 8,
+    "verified": 8
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-mouvements",
+   "title": "Mouvements et vitesse",
+   "state": "todo",
+   "objectives": {
+    "total": 5,
+    "verified": 5
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-energie",
+   "title": "Ressources et conversions d'énergie",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-lumiere-terre",
+   "title": "Lumière, ombres, jour/nuit et saisons",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-electricite",
+   "title": "Circuits électriques à une boucle",
+   "state": "todo",
+   "objectives": {
+    "total": 6,
+    "verified": 6
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "6e",
+   "domain": "pc-c3-6e-mmei",
+   "chapterId": "pc-6e-signaux",
+   "title": "Signaux et transmission de l'information",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-m",
+   "chapterId": "pc-5e-etats-changements-etat",
+   "title": "États de la matière et changements d'état",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-m",
+   "chapterId": "pc-5e-melanges-corps-purs",
+   "title": "Mélanges, corps purs, miscibilité et solubilité",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-m",
+   "chapterId": "pc-5e-transformations-chimiques-intro",
+   "title": "Reconnaître une transformation chimique ; acidité et pH",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-m",
+   "chapterId": "pc-5e-systeme-solaire",
+   "title": "Le système solaire et les distances",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-i",
+   "chapterId": "pc-5e-caracteriser-mouvement",
+   "title": "Caractériser un mouvement",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-i",
+   "chapterId": "pc-5e-actions-mecaniques",
+   "title": "Actions de contact et actions à distance",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-e",
+   "chapterId": "pc-5e-sources-formes-energie",
+   "title": "Sources, formes, transferts et conversions d'énergie",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-e",
+   "chapterId": "pc-5e-circuits-electriques",
+   "title": "Circuits électriques : série et dérivation",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "5e",
+   "domain": "pc-c4-5-s",
+   "chapterId": "pc-5e-lumiere-propagation",
+   "title": "Sources de lumière et propagation rectiligne",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-m",
+   "chapterId": "pc-4e-air-gaz-tests",
+   "title": "L'air, la dissolution des gaz et les tests caractéristiques",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-m",
+   "chapterId": "pc-4e-masse-volumique",
+   "title": "La masse volumique",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-m",
+   "chapterId": "pc-4e-atomes-molecules-reactions",
+   "title": "Atomes, molécules et transformations chimiques",
+   "state": "todo",
+   "objectives": {
+    "total": 7,
+    "verified": 6
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-m",
+   "chapterId": "pc-4e-univers-distances",
+   "title": "Structure de l'Univers et grandes distances",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-i",
+   "chapterId": "pc-4e-vitesse",
+   "title": "Vitesse : direction, sens et valeur",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-i",
+   "chapterId": "pc-4e-poids-pesanteur",
+   "title": "Modéliser une action par une force ; le poids",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-e",
+   "chapterId": "pc-4e-lois-electricite",
+   "title": "Intensité, tension et lois des circuits",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-e",
+   "chapterId": "pc-4e-energie-chimique-bilan",
+   "title": "Énergie chimique, bilan énergétique et relation E = P × t",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "4e",
+   "domain": "pc-c4-4-s",
+   "chapterId": "pc-4e-son-vitesse-propagation",
+   "title": "Propagation du son et vitesse de la lumière",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-m",
+   "chapterId": "pc-3e-atome-noyau-ions",
+   "title": "Constitution de l'atome, noyau et ions",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-m",
+   "chapterId": "pc-3e-acides-bases-metaux",
+   "title": "Acides, bases, pH et réactions avec les métaux",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-m",
+   "chapterId": "pc-3e-chimie-climat-environnement",
+   "title": "Transformations chimiques, gaz à effet de serre et environnement",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 0
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-m",
+   "chapterId": "pc-3e-origine-matiere-univers",
+   "title": "Origine de la matière et évolution de l'Univers",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 2
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-i",
+   "chapterId": "pc-3e-forces-gravitation",
+   "title": "Interactions, forces et gravitation universelle",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-i",
+   "chapterId": "pc-3e-relativite-mouvement",
+   "title": "Relativité du mouvement",
+   "state": "todo",
+   "objectives": {
+    "total": 1,
+    "verified": 1
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-e",
+   "chapterId": "pc-3e-conservation-energie",
+   "title": "Formes d'énergie, conservation et énergie cinétique",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-e",
+   "chapterId": "pc-3e-rayonnement-effet-serre",
+   "title": "Transferts d'énergie par rayonnement",
+   "state": "todo",
+   "objectives": {
+    "total": 2,
+    "verified": 0
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-e",
+   "chapterId": "pc-3e-puissance-energie-electrique",
+   "title": "Loi d'Ohm, puissance et énergie électriques",
+   "state": "todo",
+   "objectives": {
+    "total": 4,
+    "verified": 4
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  },
+  {
+   "subject": "physique-chimie",
+   "grade": "3e",
+   "domain": "pc-c4-3-s",
+   "chapterId": "pc-3e-frequence-signaux-information",
+   "title": "Fréquence, signaux et information",
+   "state": "todo",
+   "objectives": {
+    "total": 3,
+    "verified": 3
+   },
+   "pipelineSpec": false,
+   "content": null,
+   "missing": [
+    "chapitre complet"
+   ]
+  }
+ ]
+}

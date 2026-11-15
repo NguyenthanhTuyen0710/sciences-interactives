@@ -30,3 +30,33 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 - `research/curriculum/mathematiques/manifest-3e.json` : 40 thèmes tous au statut `TODO`, alors que deux chapitres 3e sont publiés — statut du manifest à mettre à jour.
 - Physique-chimie 4e/3e : 4 et 7 objectifs non `verified` dans l'inventaire (lus uniquement sur une reproduction non institutionnelle).
 - Non couverts par cette matrice : enseignement scientifique (tronc commun 1re/Tle), voies technologique et professionnelle.
+
+<!-- BEGIN GENERATED: npm run dashboard -->
+## Matrice générée (chapitres de l'inventaire)
+
+| Matière | Niveau | Chapitres | todo | researched | draft | qa-passed | published |
+|---|---|---|---|---|---|---|---|
+| mathematiques | 6e | 22 | 22 | 0 | 0 | 0 | 0 |
+| mathematiques | 5e | 21 | 18 | 0 | 0 | 0 | 3 |
+| mathematiques | 4e | 21 | 18 | 0 | 1 | 0 | 2 |
+| mathematiques | 3e | 16 | 12 | 0 | 2 | 0 | 2 |
+| physique-chimie | 6e | 8 | 8 | 0 | 0 | 0 | 0 |
+| physique-chimie | 5e | 9 | 9 | 0 | 0 | 0 | 0 |
+| physique-chimie | 4e | 9 | 9 | 0 | 0 | 0 | 0 |
+| physique-chimie | 3e | 10 | 10 | 0 | 0 | 0 | 0 |
+
+| Chapitre d'inventaire | État | Objectifs (vérifiés) | Contenu | Exercices / jeux | QA | Coût API | Manques |
+|---|---|---|---|---|---|---|---|
+| math-5e-nombres-relatifs | published | 5 (5) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-NC-10 non repris dans le chapitre ; objectif M5-NC-11 non repris dans le chapitre ; objectif M5-NC-12 non repris dans le chapitre |
+| math-5e-relatifs-addition-soustraction | published | 4 (4) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-NC-15 non repris dans le chapitre ; objectif M5-NC-16 non repris dans le chapitre ; objectif M5-NC-17 non repris dans le chapitre |
+| math-5e-reperage | published | 2 (2) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | objectif M5-EG-01 non repris dans le chapitre ; objectif M5-EG-02 non repris dans le chapitre |
+| math-4e-nombres-premiers | published | 4 (4) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
+| math-4e-proportionnalite | published | 4 (4) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | objectif M4-OGDF-07 non repris dans le chapitre ; objectif M4-OGDF-09 non repris dans le chapitre |
+| math-4e-pythagore | draft | 2 (2) | `math-3e-pythagore` (hors registre) | 20 / 3 | en attente | 0.69214 | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
+| math-3e-arithmetique | published | 3 (3) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
+| math-3e-puissances-calculs | draft | 4 (4) | `math-3e-puissances-calculs` | 35 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
+| math-3e-pourcentages-evolution | published | 1 (1) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | — |
+| math-3e-automatismes | draft | 3 (3) | `math-3e-pythagore` (hors registre) | 20 / 3 | en attente | 0.69214 | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
+
+Chapitres d'inventaire au statut `todo` : 106 (détail dans `coverage-matrix.json`).
+<!-- END GENERATED -->
