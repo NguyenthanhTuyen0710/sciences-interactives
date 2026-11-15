@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-15T06:09:14.214Z",
+  "updatedAt": "2026-11-15T10:33:54.995Z",
   "tasks": [
     {
       "id": "SCI-INFRA-001",
@@ -1614,6 +1614,16 @@
         "SCI-INFRA-002"
       ],
       "next": "A2/A3 : dossier de recherche"
+    },
+    {
+      "id": "SCI-3E-MATH-017",
+      "kind": "chapter",
+      "title": "Théorème de Pythagore et réciproque",
+      "state": "QA_PENDING",
+      "grade": "3e",
+      "subject": "mathematiques",
+      "chapterId": "math-3e-pythagore",
+      "next": "Relecture humaine de la PR (revues QA), puis décision de publication"
     }
   ]
 }
