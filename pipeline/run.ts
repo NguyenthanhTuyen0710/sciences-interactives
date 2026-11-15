@@ -43,13 +43,13 @@ const MAX_FIX_ROUNDS = 2;
 const CHARS_PER_TOKEN = 2;
 type Step = keyof typeof MAX_TOKENS;
 
-interface Spec { id: string; taskId: string; grade: string; subject: string; objectiveIds?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
+interface Spec { id: string; taskId: string; grade: string; subject: string; objectiveIds?: string[]; parcours?: string; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
 interface Price { input: number; output: number; cacheWrite1h: number; cacheRead: number }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject"];
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours"];
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
 
@@ -118,6 +118,8 @@ function checkInputs() {
   if (spec.id !== chapterId) fail(`la fiche pipeline/chapters/${chapterId}.json déclare l'id ${spec.id}`);
   if (level && level !== spec.grade) fail(`niveau ${level} ≠ niveau du chapitre (${spec.grade})`);
   if (subject && subject !== spec.subject) fail(`matière ${subject} ≠ matière du chapitre (${spec.subject})`);
+  const parcours = opt("--parcours");
+  if (parcours && parcours !== (spec.parcours ?? "college")) fail(`parcours ${parcours} ≠ parcours du chapitre (${spec.parcours ?? "college"})`);
   if (spec.subject !== "mathematiques") fail("le pipeline ne produit que des chapitres de mathématiques (prompts et inventaire)");
   const manifestFile = `research/curriculum/${spec.subject}/manifest-${spec.grade}.json`;
   if (!existsSync(P(manifestFile))) fail(`aucun manifest pour ${spec.subject} ${spec.grade} (${manifestFile})`);

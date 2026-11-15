@@ -8,35 +8,44 @@
 # Les fichiers produits sont publiés comme artefact du run, jamais committés : relecture humaine obligatoire.
 # Droits : seuls les jobs ledger-pull et ledger-push (stockage « data-store ») ont contents: write ; le job qui
 # détient la clé API n'a que contents: read et reçoit le registre par artefact, vérifié par SHA256.
+#
+# Déclenchement automatique : après un run réussi de « Collect Sources » (workflow_run) → TOUJOURS dry-run sur le
+# prochain chapitre de la matrice de couverture (--next), sans clé API. pilot / production : lancement manuel seulement.
 name: Generate Lessons
 
 on:
+  workflow_run:
+    workflows: ["Collect Sources"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       mode:
-        description: "dry-run (estimation, sans API) | submit (Message Batches) | collect (résultat d'un batch) | reconcile"
+        description: "dry-run (sans API) | pilot (Message Batches, plafond d'essai) | production (fermé pendant l'essai) | collect (résultat d'un batch) | reconcile"
         type: choice
-        options: [dry-run, submit, collect, reconcile]
+        options: [dry-run, pilot, production, collect, reconcile]
         default: dry-run
-      level:
+      niveau:
         description: "Niveau (doit correspondre à la fiche du chapitre)"
         type: choice
-        options: [3e]
+        options: [3e, 4e, 5e, 6e]
         default: 3e
-      subject:
+      matiere:
         description: "Matière (doit correspondre à la fiche du chapitre)"
         type: choice
-        options: [mathematiques]
+        options: [mathematiques, physique-chimie]
         default: mathematiques
-      chapter:
-        description: "Identifiant de chapitre (fichier pipeline/chapters/<id>.json)"
-        type: choice
-        options: [math-3e-pythagore, math-3e-calcul-litteral]
-        default: math-3e-pythagore
+      parcours:
+        description: "Parcours (collège : « college » ; lycée : tronc commun, spécialité… quand l'inventaire existera)"
+        type: string
+        default: college
+      chapitre:
+        description: "Identifiant de chapitre (pipeline/chapters/<id>.json) ; vide = prochain chapitre de la matrice de couverture"
+        type: string
+        default: ""
       exercise_count:
         description: "Nombre d'exercices imposé (1-60) ; vide = règle normale (≥ 30)"
         type: string
-        default: "5"
+        default: ""
       batch_id:
         description: "Identifiant msgbatch_… (mode collect uniquement)"
         type: string
@@ -46,12 +55,34 @@ permissions:
   contents: read
 
 concurrency:
-  group: data-store # une seule exécution à la fois sur le registre partagé (avec collect-sources.yml)
+  group: data-store # une seule exécution à la fois sur le registre partagé (avec collect-sources.yml) : pas de run en double
   cancel-in-progress: false
 
 jobs:
+  # Paramètres normalisés pour les deux déclencheurs ; workflow_run ne peut produire qu'un dry-run.
+  setup:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      mode: ${{ steps.p.outputs.mode }}
+      api: ${{ steps.p.outputs.api }}
+    steps:
+      - id: p
+        env:
+          EVENT: ${{ github.event_name }}
+          MODE_IN: ${{ inputs.mode }}
+        run: |
+          mode="$MODE_IN"
+          if [ "$EVENT" = "workflow_run" ]; then mode="dry-run"; fi
+          if [ "$mode" = "production" ]; then echo "::error::mode production fermé pendant la phase d'essai (décision du porteur de projet requise)"; exit 1; fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          if [ "$mode" = "dry-run" ]; then echo "api=false" >> "$GITHUB_OUTPUT"; else echo "api=true" >> "$GITHUB_OUTPUT"; fi
+          echo "Déclencheur : $EVENT ; mode retenu : $mode"
+
   ledger-pull:
-    if: inputs.mode != 'dry-run'
+    needs: setup
+    if: needs.setup.outputs.api == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -71,14 +102,15 @@ jobs:
           if-no-files-found: error
 
   pipeline:
-    needs: ledger-pull
-    if: always() && (inputs.mode == 'dry-run' || needs.ledger-pull.result == 'success')
+    needs: [setup, ledger-pull]
+    if: always() && needs.setup.result == 'success' && (needs.setup.outputs.api == 'false' || needs.ledger-pull.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
     outputs:
       started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
+      chapter: ${{ steps.run.outputs.chapter }}
     steps:
       - uses: actions/checkout@v4
 
@@ -95,14 +127,14 @@ jobs:
         id: premark
 
       - name: Recevoir le registre
-        if: inputs.mode != 'dry-run'
+        if: needs.setup.outputs.api == 'true'
         uses: actions/download-artifact@v4
         with:
           name: ledger-in
           path: pipeline/.store
 
       - name: Vérifier le registre reçu
-        if: inputs.mode != 'dry-run'
+        if: needs.setup.outputs.api == 'true'
         run: |
           (cd pipeline/.store && sha256sum -c ledger.sha256)
           npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl
@@ -112,38 +144,51 @@ jobs:
         id: mark
         run: echo "started=true" >> "$GITHUB_OUTPUT"
 
-      - name: Pipeline (${{ inputs.mode }})
+      - name: Pipeline (${{ needs.setup.outputs.mode }})
+        id: run
         shell: bash
         env:
-          MODE: ${{ inputs.mode }}
-          LEVEL: ${{ inputs.level }}
-          SUBJECT: ${{ inputs.subject }}
-          CHAPTER: ${{ inputs.chapter }}
+          MODE: ${{ needs.setup.outputs.mode }}
+          LEVEL: ${{ inputs.niveau || '3e' }}
+          SUBJECT: ${{ inputs.matiere || 'mathematiques' }}
+          PARCOURS: ${{ inputs.parcours || 'college' }}
+          CHAPTER: ${{ inputs.chapitre }}
           EXERCISES: ${{ inputs.exercise_count }}
           BATCH_ID: ${{ inputs.batch_id }}
           # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
-          # et pipeline/run.ts ne l'affiche jamais.
-          ANTHROPIC_API_KEY: ${{ inputs.mode != 'dry-run' && secrets.ANTHROPIC_API_KEY || '' }}
+          # et pipeline/run.ts ne l'affiche jamais. workflow_run → dry-run → aucune clé.
+          ANTHROPIC_API_KEY: ${{ needs.setup.outputs.api == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
         run: |
-          args=("$CHAPTER" --level "$LEVEL" --subject "$SUBJECT")
+          if [ -n "$CHAPTER" ]; then args=("$CHAPTER"); else args=(--next); fi
+          args+=(--level "$LEVEL" --subject "$SUBJECT" --parcours "$PARCOURS")
           if [ -n "$EXERCISES" ]; then args+=(--exercises "$EXERCISES"); fi
           case "$MODE" in
             dry-run) args+=(--batch) ;;
-            submit)  args+=(--submit) ;;
+            pilot)   args+=(--submit) ;;
             collect)
               if [ -z "$BATCH_ID" ]; then echo "::error::batch_id est obligatoire en mode collect"; exit 2; fi
+              if [ -z "$CHAPTER" ]; then echo "::error::chapitre est obligatoire en mode collect"; exit 2; fi
               args+=(--collect "$BATCH_ID") ;;
-            reconcile) args+=(--reconcile) ;;
+            reconcile)
+              if [ -z "$CHAPTER" ]; then echo "::error::chapitre est obligatoire en mode reconcile"; exit 2; fi
+              args+=(--reconcile) ;;
+            *) echo "::error::mode inconnu : $MODE"; exit 2 ;;
           esac
           mkdir -p pipeline-output
+          set +e
           npx tsx pipeline/run.ts "${args[@]}" 2>&1 | tee pipeline-output/run.log
+          code=${PIPESTATUS[0]}
+          set -e
+          chapter=$(node -e 'try{process.stdout.write(require("./pipeline-output/summary.json").chapter||"")}catch{}')
+          echo "chapter=${chapter:-aucun}" >> "$GITHUB_OUTPUT"
+          exit "$code"
 
       - name: Cohérence du registre après exécution
-        if: always() && inputs.mode != 'dry-run'
+        if: always() && needs.setup.outputs.api == 'true'
         run: npx tsx pipeline/ledger.ts check pipeline/.store/ledger.jsonl --base pipeline/.store/ledger.base.jsonl
 
       - name: Transmettre le registre
-        if: always() && inputs.mode != 'dry-run'
+        if: always() && needs.setup.outputs.api == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ledger-out
@@ -157,30 +202,35 @@ jobs:
         shell: bash
         run: |
           {
-            echo "### Pipeline \`${{ inputs.chapter }}\` — mode \`${{ inputs.mode }}\`"
+            cat pipeline-output/summary.md 2>/dev/null || echo "### Pipeline — aucun rapport (arrêt avant le choix du chapitre)"
+            echo ""
+            echo "<details><summary>Journal complet</summary>"
+            echo ""
             echo '```'
             cat pipeline-output/run.log 2>/dev/null || echo "(pas de journal)"
             echo '```'
-            echo "Sorties dans l'artefact du run : brouillons non publiés, à relire avant tout commit."
+            echo "</details>"
+            echo ""
+            echo "Sorties dans l'artefact du run : brouillons non publiés ; publication uniquement par PR relue."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publier les sorties (artefact, sans commit)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lessons-${{ inputs.chapter }}-${{ inputs.mode }}-${{ github.run_id }}
+          name: lessons-${{ steps.run.outputs.chapter || 'aucun' }}-${{ needs.setup.outputs.mode }}-${{ github.run_id }}
           retention-days: 30
           if-no-files-found: warn
           path: |
             pipeline-output/
             pipeline/state/
-            research/dossiers/${{ inputs.chapter }}.md
-            src/lib/chapters/data/${{ inputs.chapter }}.ts
+            research/dossiers/${{ steps.run.outputs.chapter || 'aucun' }}.md
+            src/lib/chapters/data/${{ steps.run.outputs.chapter || 'aucun' }}.ts
             project/reports/*-QA-api.md
 
   ledger-push:
-    needs: [ledger-pull, pipeline]
-    if: always() && inputs.mode != 'dry-run' && needs.ledger-pull.result == 'success'
+    needs: [setup, ledger-pull, pipeline]
+    if: always() && needs.setup.outputs.api == 'true' && needs.ledger-pull.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

@@ -26,9 +26,14 @@ npx tsx pipeline/run.ts math-3e-calcul-litteral --live --step review --force   #
 ```
 
 ## GitHub Actions (`.github/workflows/generate-lessons.yml`)
-Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), jamais sur push. Entrées : `mode`, `level`, `subject`, `chapter` (fiches de `pipeline/chapters/`), `exercise_count`, `batch_id`.
-- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, manifest) et estimation ; la clé n'est pas transmise.
-- `submit` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
+Deux déclencheurs, jamais sur push :
+- **automatique** (`workflow_run`, après un run réussi de *Collect Sources*) : **toujours dry-run** sur le prochain chapitre de la matrice de couverture (`run.ts --next`), sans clé API ;
+- **manuel** (*Actions → Generate Lessons → Run workflow*) : `mode`, `niveau`, `matiere`, `parcours`, `chapitre` (fiche de `pipeline/chapters/` ; vide = `--next`), `exercise_count`, `batch_id`.
+
+Modes :
+- `dry-run` (défaut) : contrôle des données (fiche, niveau, matière, parcours, manifest) et estimation ; la clé n'est pas transmise.
+- `production` : fermé pendant la phase d'essai (le job `setup` refuse).
+- `pilot` : `run.ts --submit` soumet la prochaine étape par Message Batches et affiche le `msgbatch_…` ; refusé tant que `creditVerified` vaut `false` ou si le coût maximal dépasse `limitUsd`. Une étape synchrone (fix) n'est jamais envoyée dans ce mode.
 - `collect` : `run.ts --collect <batch_id>` récupère le résultat, journalise le coût réel et valide le chapitre ; aucune nouvelle requête.
 - Le registre des dépenses vit dans la release GitHub **brouillon** `data-store` (`.github/scripts/data-store.sh`), avec son SHA256 et la version précédente (`ledger.backup.jsonl`). Seuls les jobs `ledger-pull` / `ledger-push` ont `contents: write` ; le job qui détient la clé API n'a que `contents: read` et reçoit le registre par artefact. Tous les workflows qui touchent au stockage partagent le groupe de concurrence `data-store`.
 - Lecture : refusée (donc aucun envoi) si le brouillon est absent, publié, en double, ou si l'empreinte ne correspond pas ; jamais de recréation implicite. Écriture : refusée si le registre n'est pas cohérent (`npx tsx pipeline/ledger.ts check`), s'il ne prolonge pas la version lue (ajout seul) ou si la version distante a changé entre-temps.
@@ -37,7 +42,7 @@ Lancement manuel uniquement (*Actions → Generate Lessons → Run workflow*), j
 - Initialisation (une seule fois, après décision) : workflow `Data Store Init` (saisir CREER), ou `bash .github/scripts/data-store.sh init`. Test réel du mécanisme : workflow `Data Store Self-test` (release jetable).
 - Les sorties (dossier, chapitre `draft`, rapport, registre, journal) sont publiées en **artefact du run**, jamais committées.
 - `reconcile` : à lancer si un envoi a échoué avec une issue inconnue.
-- Chaîne type : submit (dossier) → collect → relecture + commit du dossier → submit (chapitre) → collect → relecture → commit du brouillon.
+- Chaîne type : pilot (dossier) → collect → relecture + commit du dossier → pilot (chapitre) → collect → relecture → commit du brouillon. Le résumé du job reprend `pipeline-output/summary.md` (dépense, tokens, QA, needs-human, manques).
 
 ## Reprise et non-régression
 - `state/<chapitre>.json` mémorise les étapes terminées (avec l'empreinte de leurs entrées) et les batchs en attente : une relance reprend là où le pipeline s'est arrêté.
