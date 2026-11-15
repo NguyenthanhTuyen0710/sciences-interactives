@@ -1,0 +1,138 @@
+{
+  "chapter": "math-3e-pythagore",
+  "taskId": "SCI-3E-MATH-017",
+  "status": "proposé",
+  "lockedAt": null,
+  "note": "Taxonomie G3 (roadmap § 4) : types d'exercices par compétence, non par quantité. Une variante n'est retenue que si elle change la structure ou une étape du raisonnement (jamais seulement les nombres). Rédigée le 2026-11-15 à partir de l'inventaire classé (8a), du dossier research/dossiers/math-3e-pythagore.md et des 20 exercices existants ; à valider puis verrouiller par le porteur de projet. Aucun exercice n'est généré à ce stade.",
+  "sources": [
+    "research/curriculum/mathematiques/curriculum-math.json (M3-AUTO-03, M4-EG-03, M4-EG-04, niveaux et compétences « proposés »)",
+    "pipeline/chapters/math-3e-pythagore.json (PY-EXT-01, approfondissement)",
+    "Programme cycle 4 (2020), Éduscol : compétences p. 129, raisonnement par l'absurde p. 127, images mentales p. 137",
+    "Attendus de fin d'année de 4e (2019), Éduscol, p. 10"
+  ],
+  "brevetNote": "Liens Brevet indicatifs : aucune annale officielle n'a encore été collectée (G2) ; à confirmer avant la banque Brevet (G5).",
+  "types": [
+    {
+      "id": "PY-T01", "title": "Repérer l'hypoténuse et écrire l'égalité de Pythagore",
+      "objectives": ["M3-AUTO-03", "M4-EG-03"], "competences": ["Représenter", "Raisonner"],
+      "prerequisites": ["triangle rectangle, angle droit (math-5e-triangles)"],
+      "difficulty": [1, 2],
+      "variants": ["angle droit à n'importe quel sommet du nom", "donnée par une figure codée (angle droit dessiné) plutôt que par l'énoncé", "triangle tourné ou retourné sur la figure", "inconnue côté de l'angle droit : écrire l'égalité isolant ce côté"],
+      "method": "Repérer le sommet de l'angle droit ; l'hypoténuse est le côté opposé ; son carré est seul d'un côté de l'égalité.",
+      "commonMistakes": ["prendre un côté de l'angle droit pour l'hypoténuse", "additionner les longueurs au lieu des carrés", "isoler le mauvais côté dans l'égalité"],
+      "brevet": "Question d'entrée d'un exercice de géométrie ; automatismes.",
+      "exercises": ["py3-01", "py3-02"]
+    },
+    {
+      "id": "PY-T02", "title": "Image mentale : les trois carrés construits sur les côtés",
+      "objectives": ["M3-AUTO-03"], "competences": ["Représenter", "Calculer"],
+      "prerequisites": ["aire d'un carré"],
+      "difficulty": [1, 2],
+      "variants": ["aires des deux petits carrés données → aire du grand", "aire du grand carré et d'un petit → aire de l'autre", "reconnaître sur une figure laquelle des trois aires est la somme des deux autres"],
+      "method": "L'aire du carré construit sur l'hypoténuse est la somme des aires des deux autres carrés.",
+      "commonMistakes": ["additionner les côtés au lieu des aires", "confondre aire et côté du carré"],
+      "brevet": "Automatismes (images mentales).",
+      "exercises": ["py3-04"]
+    },
+    {
+      "id": "PY-T03", "title": "Calculer l'hypoténuse",
+      "objectives": ["M4-EG-03"], "competences": ["Calculer"],
+      "prerequisites": ["carré et racine carrée (math-4e-racine-carree)"],
+      "difficulty": [2, 3],
+      "variants": ["résultat entier", "résultat en valeur exacte avec racine", "résultat arrondi (valeur approchée)", "longueurs décimales ou d'unités différentes à convertir"],
+      "method": "Écrire l'égalité, remplacer, additionner les carrés, prendre la racine carrée, conclure avec l'unité.",
+      "commonMistakes": ["somme des longueurs", "oubli de la racine (réponse = BC²)", "arrondi prématuré", "oubli ou erreur d'unité"],
+      "brevet": "Calcul de longueur dans un exercice de géométrie.",
+      "exercises": ["py3-05", "py3-07", "py3-09", "py3-12"]
+    },
+    {
+      "id": "PY-T04", "title": "Calculer un côté de l'angle droit",
+      "objectives": ["M4-EG-03"], "competences": ["Calculer", "Raisonner"],
+      "prerequisites": ["PY-T01"],
+      "difficulty": [2, 3],
+      "variants": ["résultat entier", "valeur exacte avec racine", "valeur approchée", "inconnue présentée comme une hauteur ou une distance (le côté n'est pas nommé comme tel)"],
+      "method": "Isoler le carré de l'inconnue : carré de l'hypoténuse moins carré du côté connu, puis racine carrée.",
+      "commonMistakes": ["additionner au lieu de soustraire", "soustraire les longueurs", "soustraction dans le mauvais ordre (résultat négatif)"],
+      "brevet": "Calcul de longueur, souvent une hauteur ou une distance au sol.",
+      "exercises": ["py3-06"]
+    },
+    {
+      "id": "PY-T05", "title": "Valeur exacte ou valeur approchée",
+      "objectives": ["M4-EG-03"], "competences": ["Calculer", "Communiquer"],
+      "prerequisites": ["PY-T03", "racine carrée non entière"],
+      "difficulty": [3],
+      "variants": ["choisir la valeur exacte parmi des propositions", "donner l'arrondi demandé (dixième, centième, unité)", "justifier qu'une valeur affichée par la calculatrice n'est qu'approchée"],
+      "method": "Garder √ pour la valeur exacte ; n'arrondir qu'à la fin et au rang demandé.",
+      "commonMistakes": ["arrondir en cours de calcul", "donner un décimal comme valeur exacte", "mauvais rang d'arrondi"],
+      "brevet": "Consigne « valeur exacte puis arrondi au … ».",
+      "exercises": ["py3-09", "py3-10", "py3-12"]
+    },
+    {
+      "id": "PY-T06", "title": "Démontrer qu'un triangle est rectangle (réciproque)",
+      "objectives": ["M4-EG-04"], "competences": ["Raisonner", "Calculer", "Communiquer"],
+      "prerequisites": ["PY-T01"],
+      "difficulty": [3, 4, 5],
+      "variants": ["plus grand côté donné en premier, au milieu ou en dernier", "longueurs décimales", "triangle extrait d'une figure composée", "conclusion à rédiger (et non choisie)"],
+      "method": "Repérer le plus grand côté ; calculer séparément son carré et la somme des carrés des deux autres ; comparer ; citer la réciproque ; conclure en nommant le sommet de l'angle droit.",
+      "commonMistakes": ["isoler un autre côté que le plus grand", "conclure d'après la figure ou une mesure", "citer le théorème au lieu de la réciproque", "oublier de nommer le sommet de l'angle droit"],
+      "brevet": "Question type « Le triangle … est-il rectangle ? Justifier. »",
+      "exercises": ["py3-03", "py3-11", "py3-17", "py3-19"]
+    },
+    {
+      "id": "PY-T07", "title": "Démontrer qu'un triangle n'est pas rectangle (approfondissement PY-EXT-01)",
+      "objectives": ["M4-EG-04"], "level": "approfondissement", "competences": ["Raisonner", "Communiquer"],
+      "prerequisites": ["PY-T06"],
+      "difficulty": [4, 5],
+      "variants": ["affirmation d'un élève à réfuter", "deux nombres très proches (piège de l'arrondi)", "rédaction à compléter ou à ordonner"],
+      "method": "Montrer que l'égalité de Pythagore est fausse ; si le triangle était rectangle, le théorème la donnerait (raisonnement par l'absurde).",
+      "commonMistakes": ["conclure « rectangle » sur des valeurs arrondies égales", "confondre théorème, réciproque et contraposée"],
+      "brevet": "Réfutation fréquente dans les exercices de géométrie (à confirmer sur annales).",
+      "exercises": ["py3-20"]
+    },
+    {
+      "id": "PY-T08", "title": "Modéliser une situation par un triangle rectangle",
+      "objectives": ["M4-EG-03"], "competences": ["Modéliser", "Chercher"],
+      "prerequisites": ["PY-T03", "PY-T04"],
+      "difficulty": [4, 5],
+      "variants": ["triangle rectangle visible (échelle, rampe)", "triangle caché à construire (diagonale d'un rectangle, hauteur d'un isocèle, distance dans un repère)", "inconnue hypoténuse ou côté de l'angle droit", "réponse attendue dans le contexte (comparaison à une contrainte, unité)"],
+      "method": "Faire un schéma, repérer l'angle droit et l'hypoténuse dans la situation, appliquer le théorème, revenir au contexte.",
+      "commonMistakes": ["mauvaise identification de l'angle droit dans la situation", "oubli de la moitié de la base (isocèle)", "réponse sans retour au contexte"],
+      "brevet": "Problème contextualisé (bâtiment, jardin, sport).",
+      "exercises": ["py3-13", "py3-14", "py3-15", "py3-16"]
+    },
+    {
+      "id": "PY-T09", "title": "Rédiger une démonstration",
+      "objectives": ["M4-EG-03", "M4-EG-04"], "competences": ["Communiquer", "Raisonner"],
+      "prerequisites": ["PY-T03", "PY-T06"],
+      "difficulty": [2, 3, 5],
+      "variants": ["remettre les étapes dans l'ordre", "compléter les justifications (théorème / réciproque / contraposée)", "repérer l'erreur dans une rédaction"],
+      "method": "Hypothèse (triangle rectangle en …), propriété citée, calcul, conclusion avec l'unité ou le sommet.",
+      "commonMistakes": ["propriété citée avant d'avoir vérifié son hypothèse", "conclusion sans unité ou sans sommet"],
+      "brevet": "Critère « justifier » du barème.",
+      "exercises": ["py3-08", "py3-20"]
+    },
+    {
+      "id": "PY-T10", "title": "Problème à plusieurs étapes (type Brevet)",
+      "objectives": ["M4-EG-03", "M4-EG-04"], "competences": ["Chercher", "Raisonner", "Calculer"],
+      "prerequisites": ["PY-T03", "PY-T04", "PY-T06"],
+      "difficulty": [5],
+      "variants": ["sans étapes intermédiaires (réponse finale seule)", "enchaînement réciproque puis calcul de longueur", "calcul puis réinvestissement (périmètre, aire, coût)", "données inutiles à écarter"],
+      "method": "Décomposer en sous-problèmes, identifier le triangle rectangle de chaque étape, garder les valeurs exactes jusqu'au bout.",
+      "commonMistakes": ["réutiliser une valeur arrondie", "appliquer le théorème à un triangle dont l'angle droit n'est pas établi"],
+      "brevet": "Exercice de géométrie de 5 à 8 points (à confirmer).",
+      "exercises": ["py3-17", "py3-18", "py3-19"]
+    }
+  ],
+  "coverage": {
+    "byType": {"PY-T01": 2, "PY-T02": 1, "PY-T03": 4, "PY-T04": 1, "PY-T05": 3, "PY-T06": 4, "PY-T07": 1, "PY-T08": 4, "PY-T09": 2, "PY-T10": 3},
+    "gaps": [
+      "PY-T04 : un seul exercice dédié (py3-06) ; variantes « valeur exacte » et « hauteur/distance » absentes en niveau 2-3",
+      "PY-T02 : une seule activité (py3-04) ; variante « reconnaître laquelle des trois aires est la somme » absente",
+      "PY-T01 : variante « figure codée » et « triangle tourné » absentes (toutes les questions passent par l'énoncé)",
+      "PY-T06 : plus grand côté jamais placé en premier dans l'énoncé ; aucune conclusion à rédiger librement",
+      "PY-T10 : pas de variante avec données inutiles",
+      "PY-T09 : pas de variante « repérer l'erreur dans une rédaction » sous forme d'exercice (seulement dans le jeu chasse-erreurs)"
+    ],
+    "towards30": "Les 10 exercices manquants (règle des 30) devront venir des lacunes ci-dessus, une variante structurelle par exercice ; aucune ne sera produite avant verrouillage de cette taxonomie."
+  }
+}

@@ -1,5 +1,6 @@
 // Règles de cohérence des diagnostics (src/lib/engine/diagnostics.ts) et non-régression py3-12 (Pythagore 3e).
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { diagnosticIssues, sameValue, specialValues } from "../src/lib/engine/diagnostics";
 import { createRng } from "../src/lib/engine/rng";
 import { perfect } from "../src/lib/engine/solve";
@@ -77,5 +78,26 @@ describe("Pythagore : position de l'angle droit (C3) et accords (C4)", () => {
   }
   it("« hypoténuse » est féminin dans les questions", () => {
     expect(JSON.stringify(math3ePythagore)).not.toMatch(/Quel est (l'|son )hypoténuse/);
+  });
+});
+
+describe("taxonomie G3 Pythagore (research/curriculum/mathematiques/taxonomy/math-3e-pythagore.json)", () => {
+  const tax = JSON.parse(readFileSync("research/curriculum/mathematiques/taxonomy/math-3e-pythagore.json", "utf8"));
+  const COMPETENCES = ["Chercher", "Modéliser", "Représenter", "Raisonner", "Calculer", "Communiquer"];
+  const ids = new Set(math3ePythagore.exercises.map((e) => e.id));
+  const objectives = new Set(math3ePythagore.officialObjectives.map((o) => o.id));
+  it("types complets, compétences officielles, objectifs du chapitre, variantes structurelles", () => {
+    for (const t of tax.types) {
+      expect(t.id).toMatch(/^PY-T\d{2}$/);
+      for (const c of t.competences) expect(COMPETENCES, t.id).toContain(c);
+      for (const o of t.objectives) expect(objectives.has(o), `${t.id} : ${o}`).toBe(true);
+      for (const k of ["method", "commonMistakes", "variants", "prerequisites", "difficulty"]) expect(t[k], `${t.id}.${k}`).toBeTruthy();
+      expect(t.variants.length, t.id).toBeGreaterThanOrEqual(2);
+    }
+  });
+  it("chaque exercice du chapitre relève d'au moins un type, et inversement", () => {
+    const mapped = new Set(tax.types.flatMap((t: { exercises: string[] }) => t.exercises));
+    expect([...ids].filter((i) => !mapped.has(i))).toEqual([]);
+    expect([...mapped].filter((i) => !ids.has(i as string))).toEqual([]);
   });
 });
