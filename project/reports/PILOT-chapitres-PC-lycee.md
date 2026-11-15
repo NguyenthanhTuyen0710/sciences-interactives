@@ -32,6 +32,17 @@ Constat préalable : **les programmes 2019 de 2nde et de 1re sont remplacés à 
 - Le second degré fait partie du programme de spécialité de 1re (BO n° 14, MENE2602917A, p. 359-360), et sa liste d'automatismes contient « Déterminer le signe d'une expression du premier degré, d'une expression factorisée du second degré » (**p. 359**) : le chapitre relève donc des deux parties de l'épreuve (automatismes 6 pts, exercices 14 pts).
 - Limite : la note ne fixe pas les chapitres tirés à chaque session ; « liée à l'examen » signifie « dans le programme évalué », non « présent à chaque sujet ». La partie « Examen » ci-dessus reste exacte.
 
+**Vérification par le collecteur (2026-11-15)** : seed `bo-2026-14-pdf` (G1 approuvé par le porteur de projet), HTTP 200, SHA256 `34875c42…` identique à la copie lue, statut `verified` ; rapprochement `run.ts match math-1re-spe-second-degre` (`research/sources/verification/math-1re-spe-second-degre.json`) ; toutes les capacités sont en **p. 360** :
+
+| Objectif | Collecteur | Texte du BO (p. 360) | Constat |
+|---|---|---|---|
+| SD-01 | verified (citation exacte) | « Étudier le signe d'une fonction polynôme du second degré donnée sous forme factorisée. » | conforme ; capacité attendue → exigible |
+| SD-02 | verified (citation exacte) | « Déterminer les fonctions polynômes du second degré s'annulant en deux nombres réels distincts. » | conforme ; exigible |
+| SD-03 | à relire (100 % des mots) | « Factoriser …, en diversifiant les stratégies : racine évidente, détection des racines par leur somme et leur produit, identité remarquable, application des formules générales. » | paraphrase fidèle ; exigible |
+| SD-04 | à relire (92 %) | « Choisir une forme adaptée (développée réduite, canonique, factorisée) d'une fonction polynôme du second degré dans le cadre de la résolution d'un problème (équation, inéquation, optimisation, variations). » | paraphrase fidèle (« d'une fonction polynôme du second degré » omis) ; exigible |
+| SD-05 | à relire (80 %) | « Démonstration — Résolution de l'équation du second degré. » | conforme ; démonstration exigible |
+| SD-06 | à relire (54 %) | « Approfondissements possibles : Factorisation d'un polynôme du troisième degré admettant une racine et résolution de l'équation associée. — Factorisation de xⁿ − 1 par x − 1, de xⁿ − aⁿ par x − a. — Déterminer deux nombres réels connaissant leur somme s et leur produit p comme racines de la fonction polynôme x ↦ x² − sx + p. » | **écart** : niveau conforme, mais 2 approfondissements sur 3 (factorisation de xⁿ − aⁿ omise) et « résolution de l'équation associée » omise ; non corrigé (décision attendue) |
+
 ## 3. M3 — prise en charge de la physique-chimie (étape A) et du lycée (étape B) : faites
 Principe : extension par paramètre de matière, sans nouveau fichier de configuration ni nouveau pipeline.
 
@@ -72,17 +83,21 @@ Dépense comptée : 0,692 $ ; plafond 10 $ ; **reste 9,308 $**. Dry-runs du 2026
 |---|---|---|---|---|---|---|
 | 1. Pythagore 3e — relecture | criblage Haiku 0,004 $ + juge Sonnet 0,071 $ | atteint | OK (empreintes inchangées) | 0,075 $ | 0,075 $ | ≈ 0,02 $ |
 | 2. PC 4e électricité | dossier Haiku 0,003 $ **et** Sonnet 0,050 $ ; chapitre Sonnet 0,386 $ ; criblage 0,004 $ ; juge 0,077 $ ; correction 2 × 0,167 $ au pire | atteint (9 objectifs validés) | OK | 0,520 $ | 0,854 $ | ≈ 0,33 $ |
-| 3. 1re spé Second degré | dossier Haiku 0,002 $ ; chapitre **Opus** 0,767 $ (démonstration exigible) ; criblage 0,004 $ ; juge 0,077 $ ; correction 2 × 0,167 $ au pire | **non atteint** : M1S-SD-01…06 « proposé » | OK (refus d'envoi réel tant que G1 manque) | 0,850 $ | 1,183 $ | ≈ 0,61 $ |
+| 3. 1re spé Second degré | dossier Haiku 0,002 $ ; chapitre **Opus** 0,767 $ (démonstration exigible) ; criblage 0,004 $ ; juge 0,077 $ ; correction 2 × 0,167 $ au pire | **non atteint** : M1S-SD-01…06 « proposé » ; collecteur : écart sur SD-06 (§ 2) | OK (refus d'envoi réel tant que G1 manque) | 0,850 $ | 1,183 $ | ≈ 0,61 $ |
 | **Total** | | | | **1,445 $** | **2,112 $** | **≈ 0,96 $** |
 
 Après le pilote, au pire : 0,692 + 2,112 = **2,804 $ / 10 $**.
 
-Ordre et points d'arrêt (un `pilot` puis un `collect` par étape ; relecture humaine entre chaque) :
+Ordre (décision du 2026-11-15) : lots 1 et 2 d'abord, sans attendre le lot 3 ; lot 3 dès que son Gate 1 est atteint. Aucun lot avant les chiffres 8c et « duyệt pilot ».
+
+Points d'arrêt (un `pilot` puis un `collect` par étape ; relecture humaine entre chaque) :
 1. Pythagore : criblage → juge → vérification humaine du rapport ; publication = décision séparée.
 2. PC : dossier (`dossier_model` = haiku) puis dossier (`dossier_model` = sonnet), mêmes entrées, empreintes distinctes ; comparaison humaine sur une grille commune ; commit du dossier retenu seul (le chapitre réel est refusé sans dossier committé) → chapitre → validate-chapter (unités, sigFigs) → correction(s) → criblage → juge.
 3. 1re : après validation G1 de M1S-SD-01…06 ; mêmes étapes, chapitre au palier Opus.
 
 Préalables restants : 8c (chiffres de la Console) et `creditVerified: true` ; Gate 1 du lot 3 ; droit de création de PR des Actions effectif (Việc 1).
+
+Après le pilote, **comparaison Opus / Sonnet de la démonstration** (M1S-SD-05) sur le même chapitre 1re : même requête, chapitre au palier Sonnet ; critères : rigueur et complétude de la démonstration, validate-chapter, relecture ; décide si le palier Opus est nécessaire pour l'ensemble des chapitres du lycée.
 
 Après le pilote (non mesuré pendant le pilote, décision du 2026-11-15) : **essai D** sur un seul chapitre : étape chapitre en effort `low`, comparée à l'effort `medium` (tokens de réflexion, validate-chapter, tours de correction, relecture) ; B (`kit.ts`) réexaminé ; budget de production proposé **par niveau** à partir des coûts réels du pilote.
 
