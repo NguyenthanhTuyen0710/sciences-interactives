@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
 import { describeChapter } from "./chapter-suite";
 import { createRng } from "../src/lib/engine/rng";
-import { adapt, calcFeedback, calcQuestion, flashAnswerTex, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type LineLevel } from "../src/lib/games/logic";
+import { adapt, calcFeedback, calcQuestion, erreursConfig, flashAnswerTex, flashConfig, flashFeedback, flashPick, lineFeedback, lineRound, parseRel, type CalcLevel, type ErrItem, type FlashLevel, type LineLevel } from "../src/lib/games/logic";
 
 describe("tutoiement de l'interface élève", () => {
   it("aucun « vous / votre / vos » ni impératif en -ez hors espace enseignant", () => {
@@ -190,5 +190,17 @@ describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master gén
     const src = [read("research/curriculum/mathematiques/curriculum-math.json"), read("research/curriculum/physique-chimie/curriculum-pc.json")];
     expect(master.subjects).toEqual(src);
     expect(master.generatedAt).toBe(src.map((s) => s.generatedAt).sort().pop());
+  });
+});
+
+describe("proposition C : constructeurs compacts des jeux = écriture développée", () => {
+  it("calcul-flash et chasse-erreurs de l'arithmétique 3e reconstruits à l'identique", () => {
+    const c = ALL_CHAPTERS.find((x) => x.id === "math-3e-arithmetique")!;
+    const flash = c.games.find((g) => g.template === "calcul-flash")!.config as { duration: number; practiceCount: number; levels: FlashLevel[] };
+    const rows = flash.levels.map((l) => [l.label, l.items.map((i) => [i.q, i.answer, i.explanation, ...(i.irreducible ? [true] : [])])] as [string, [string, string, string, boolean?][]]);
+    expect(flashConfig(rows, flash.duration, flash.practiceCount)).toEqual(flash);
+    const err = c.games.find((g) => g.template === "chasse-erreurs")!.config as { items: ErrItem[] };
+    const erows = err.items.map((i) => (i.correct ? [i.niveau, i.calc, i.explanation] : [i.niveau, i.calc, i.explanation, i.errors!, i.error!]) as Parameters<typeof erreursConfig>[0][number]);
+    expect(erreursConfig(erows)).toEqual(err);
   });
 });

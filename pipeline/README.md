@@ -29,6 +29,11 @@ Fable et Mythos sont refusés par le script. Toutes les étapes de production pa
 - `npm run dashboard` régénère à chaque exécution `master-curriculum.json` (fusion des `curriculum-*.json`, test d'égalité) et la matrice, désormais lue directement dans les inventaires.
 - Fiche pilote : `pipeline/chapters/math-1re-spe-second-degre.json` ; dry-run dans `pr-checks.yml`.
 
+## Sortie du chapitre allégée (propositions A et C, 2026-11-15)
+- **A** : le bloc `const META = {…}` (id, taskId, niveau, matière, parcours, arborescence, `curriculumChapterIds`, objectifs avec `required`, sources de la fiche, statuts) est construit par `metaBlock` (`pipeline/models.ts`) et inséré après les imports (`injectMeta`) à l'enregistrement du chapitre ; le modèle écrit `{ ...META, prerequisites, lesson, exercises, games }`. Mesuré sur Pythagore : −3,9 ko de sortie (≈ 1 850 tokens).
+- **C** : `flashConfig` et `erreursConfig` (`src/lib/games/logic.ts`) : lignes compactes, même forme à l'exécution (test sur l'arithmétique). Mesuré sur les 4 chapitres publiés : −0,7 à −1,7 ko par chapitre.
+- Seule l'empreinte de l'étape « chapitre » change (prompt `chapter.md`) ; dossier, correction, criblage et relecture inchangés ; un chapitre existant n'est jamais régénéré sans `--force`.
+
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.
 - `budget.json` : `limitUsd` (plafond cumulé de toute la phase) et `creditVerified`. Tant que `creditVerified` vaut `false`, le mode réel refuse de démarrer. Le porteur de projet le passe à `true` après avoir vérifié dans la Console Anthropic que :

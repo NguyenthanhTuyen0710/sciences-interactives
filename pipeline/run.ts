@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, metaBlock, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -365,7 +365,8 @@ function applyFix(t: string) {
 }
 const OUT: Record<Step, { file: string; replaces: boolean; save: (t: string, model: string) => void }> = {
   dossier: { file: DOSSIER_FILE, replaces: false, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
-  chapter: { file: CHAPTER_FILE, replaces: false, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
+  // Proposition A : le bloc META (identité, objectifs, sources, statuts) est inséré par le pipeline, pas écrit par le modèle.
+  chapter: { file: CHAPTER_FILE, replaces: false, save: (t) => write(CHAPTER_FILE, injectMeta(extractBlock(t, "ts"), metaBlock(spec, JSON.parse(objectives()))) + "\n") },
   fix: { file: CHAPTER_FILE, replaces: true, save: (t) => applyFix(t) },
   screen: { file: SCREEN_FILE, replaces: false, save: (t, model) => saveReport(SCREEN_FILE, "Criblage QA", t, model) },
   review: { file: REPORT_FILE, replaces: false, save: (t, model) => saveReport(REPORT_FILE, "Relecture QA", t, model) },

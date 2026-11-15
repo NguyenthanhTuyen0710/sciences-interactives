@@ -132,3 +132,54 @@ export function exerciseBlocks(src: string, prefix: string): { id: string; nivea
     return { id: s.id, niveau: Number(/niveau: (\d)/.exec(text)?.[1] ?? 0), text };
   });
 }
+
+// ───────── Métadonnées du chapitre injectées par le pipeline (proposition A) ─────────
+export interface MetaSpec {
+  id: string; taskId: string; grade: string; subject: string; parcours?: string; treeChapterId: string; title: string;
+  officialChapterIds?: string[]; consolidationChapterIds?: string[];
+  objectiveLevels?: Record<string, string>;
+  officialSources?: { seedId?: string | null; title: string; url: string; sha256?: string; accessedAt?: string; verification?: string }[];
+}
+export interface ObjectiveGroup { chapter: string; kind: string; objectives: { id: string; text: string; officialRef?: string; required?: boolean }[] }
+export const META_START = "// <pipeline:meta> générée par pipeline/run.ts depuis la fiche et l'inventaire — ne pas modifier à la main";
+export const META_END = "// </pipeline:meta>";
+
+/**
+ * Bloc `const META = {…}` : champs entièrement déterminés par la fiche et l'inventaire (identité, objectifs, sources,
+ * statuts). Le modèle ne les écrit plus et étale `...META`. `required: false` : objectif non exigé par l'inventaire ou
+ * marqué « approfondissement » dans la fiche.
+ */
+export function metaBlock(spec: MetaSpec, groups: ObjectiveGroup[]): string {
+  const objectives = groups.flatMap((g) => g.objectives.map((o) => ({
+    id: o.id, text: o.text,
+    source: `${o.officialRef ?? g.chapter}${g.kind === "consolidation" ? " (consolidation)" : ""}`,
+    ...(o.required === false || spec.objectiveLevels?.[o.id] === "approfondissement" ? { required: false } : {}),
+  })));
+  const sources = (spec.officialSources ?? []).map((s, i) => ({
+    id: s.seedId ?? `source-${i + 1}`, title: s.title, url: s.url, kind: "official",
+    verification: s.verification ?? "verified", ...(s.sha256 ? { sha256: s.sha256 } : {}), ...(s.accessedAt ? { accessedAt: s.accessedAt } : {}),
+  }));
+  // Chapitres d'inventaire couverts (matrice de couverture), si différents de l'id du chapitre.
+  const covered = [...(spec.officialChapterIds ?? []), ...(spec.consolidationChapterIds ?? [])];
+  const curriculumChapterIds = covered.length === 1 && covered[0] === spec.id ? [] : covered;
+  const meta = {
+    id: spec.id, taskId: spec.taskId, grade: spec.grade, subject: spec.subject, ...(spec.parcours && spec.parcours !== "college" ? { parcours: spec.parcours } : {}),
+    treeChapterId: spec.treeChapterId, ...(curriculumChapterIds.length ? { curriculumChapterIds } : {}), curriculumVersion: "2026-2027", title: spec.title,
+    officialObjectives: objectives, sources,
+    reviewStatus: { curriculum: "pending", accuracy: "pending", exercises: "pending", games: "pending", technical: "pending", language: "pending" },
+    publicationStatus: "draft",
+  };
+  return `${META_START}\nconst META = ${JSON.stringify(meta, null, 2)} satisfies Partial<import("../schema").ChapterContent>;\n${META_END}`;
+}
+
+/** Insère (ou remplace) le bloc META après la dernière instruction `import` du fichier produit. */
+export function injectMeta(file: string, block: string): string {
+  const start = file.indexOf(META_START);
+  if (start >= 0) {
+    const end = file.indexOf(META_END, start);
+    return file.slice(0, start) + block + file.slice(end + META_END.length);
+  }
+  const imports = [...file.matchAll(/^import\b[^;]*;[ \t]*$/gm)];
+  const at = imports.length ? imports[imports.length - 1].index! + imports[imports.length - 1][0].length : 0;
+  return `${file.slice(0, at)}\n\n${block}\n${file.slice(at)}`;
+}

@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, metaBlock, META_START, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -132,12 +132,13 @@ describe("empreinte du dossier : modèle imposé pour la comparaison du pilote",
 });
 
 describe("prompts du collège : empreintes inchangées par l'étape B (blocs lycée)", () => {
-  // sha256 (16) des prompts résolus pour le collège, relevés avant l'étape B. Une modification volontaire d'un prompt
+  // sha256 (16) des prompts résolus pour le collège, relevés avant l'étape B ; chapter.md modifié ensuite par A et C
+  // (empreinte de l'étape chapitre seule changée ; dossier, fix, criblage et relecture inchangés). Une modification volontaire d'un prompt
   // du collège met à jour cette table dans le même commit, avec sa justification.
   const COLLEGE_PROMPTS: Record<string, string> = {
-    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "e808dd9155a79a70",
+    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "54ec615f95f20d67", // modifié volontairement : propositions A et C (2026-11-15)
     "mathematiques/fix": "ecc7a2b99610772e", "mathematiques/review": "f84f4e7803af6a9c",
-    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "b77f4711d9edd48c",
+    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "0cce633843c2cc8b", // idem
     "physique-chimie/fix": "ecc7a2b99610772e", "physique-chimie/review": "216835bdc19e6453",
   };
   it("prompts résolus identiques", () => {
@@ -156,4 +157,46 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
     const bad = spawnSync("npx", ["tsx", "pipeline/run.ts", "math-1re-spe-second-degre", "--parcours", "tronc-commun"], { encoding: "utf8" });
     expect(bad.status).not.toBe(0);
   }, 60_000);
+});
+
+describe("proposition A : métadonnées injectées par le pipeline", () => {
+  const spec = JSON.parse(readFileSync("pipeline/chapters/math-3e-pythagore.json", "utf8"));
+  const groups = [
+    { chapter: "math-3e-automatismes", kind: "officiel 3e", objectives: [{ id: "M3-AUTO-03", text: "Images mentales.", officialRef: "BO 2020" }] },
+    { chapter: "math-4e-pythagore", kind: "consolidation", objectives: [{ id: "M4-EG-03", text: "Calculer une longueur.", officialRef: "Attendus 4e" }, { id: "X-APP", text: "Prolongement.", officialRef: "BO", required: false }] },
+  ];
+  const metaOf = (block: string) => JSON.parse(block.slice(block.indexOf("{"), block.lastIndexOf("} satisfies") + 1));
+  it("champs déterminés par la fiche : identité, objectifs (consolidation, required), sources vérifiées, statuts", () => {
+    const m = metaOf(metaBlock(spec, groups));
+    expect(m).toMatchObject({ id: "math-3e-pythagore", taskId: "SCI-3E-MATH-017", grade: "3e", publicationStatus: "draft", curriculumChapterIds: ["math-3e-automatismes", "math-4e-pythagore"] });
+    expect(m.parcours).toBeUndefined();
+    expect(m.officialObjectives.map((o: { source: string }) => o.source)).toEqual(["BO 2020", "Attendus 4e (consolidation)", "BO (consolidation)"]);
+    expect(m.officialObjectives[2].required).toBe(false);
+    expect(m.sources).toHaveLength(3);
+    expect(m.sources.every((x: { verification: string; sha256: string }) => x.verification === "verified" && x.sha256.length === 64)).toBe(true);
+    expect(Object.values(m.reviewStatus).every((v) => v === "pending")).toBe(true);
+  });
+  it("lycée : parcours, sources non vérifiées, approfondissement non exigé", () => {
+    const ly = JSON.parse(readFileSync("pipeline/chapters/math-1re-spe-second-degre.json", "utf8"));
+    const m = metaOf(metaBlock(ly, [{ chapter: ly.id, kind: "officiel 1re", objectives: [{ id: "M1S-SD-05", text: "Démontrer." }, { id: "M1S-SD-06", text: "Approfondissement." }] }]));
+    expect(m.parcours).toBe("specialite");
+    expect(m.curriculumChapterIds).toBeUndefined();
+    expect(m.sources.every((x: { verification: string }) => x.verification === "pending_verification")).toBe(true);
+    expect(m.officialObjectives.find((o: { id: string }) => o.id === "M1S-SD-06").required).toBe(false);
+  });
+  it("le chapitre Pythagore recomposé avec ...META reste conforme et complet", async () => {
+    const { ChapterSchema, doneIssues } = await import("../src/lib/chapters/schema");
+    const { math3ePythagore: c } = await import("../src/lib/chapters/data/math-3e-pythagore");
+    const m = metaOf(metaBlock(spec, groups.map((g, i) => (i ? { ...g, objectives: g.objectives.slice(0, 1).concat([{ id: "M4-EG-04", text: "Réciproque.", officialRef: "Attendus 4e" }]) } : g))));
+    const r = { ...c, ...m };
+    expect(ChapterSchema.safeParse(r).success).toBe(true);
+    expect(doneIssues(r).filter((x) => !x.startsWith("revue "))).toEqual(doneIssues(c).filter((x) => !x.startsWith("revue ")));
+  });
+  it("insertion après les imports, remplacement idempotent", () => {
+    const file = 'import type { A } from "../schema";\nimport { b } from "x";\n\nexport const z = { ...META };\n';
+    const once = injectMeta(file, metaBlock(spec, groups));
+    expect(once.indexOf(META_START)).toBeGreaterThan(once.indexOf('from "x";'));
+    expect(once.indexOf(META_START)).toBeLessThan(once.indexOf("export const z"));
+    expect(injectMeta(once, metaBlock(spec, groups))).toBe(once);
+  });
 });
