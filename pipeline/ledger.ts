@@ -11,16 +11,27 @@ import { pathToFileURL } from "node:url";
 export const TRIAL_CAP_USD = 10; // plafond de la phase d'essai, non modifiable par budget.json
 
 export type LedgerEntry =
-  | { type: "reserve"; id: string; at: string; chapter: string; step: string; inputHash: string; mode: "batch" | "sync"; maxUsd: number }
+  | { type: "reserve"; id: string; at: string; chapter: string; step: string; inputHash: string; mode: "batch" | "sync"; maxUsd: number; model?: string }
   | { type: "submitted"; id: string; at: string; batchId: string }
-  | { type: "actual"; id: string; at: string; usd: number; batchId?: string }
+  | { type: "actual"; id: string; at: string; usd: number; batchId?: string; model?: string; tokens?: { input: number; cacheWrite: number; cacheRead: number; output: number; thinking?: number } }
   | { type: "failed"; id: string; at: string; reason: string }
   | { type: "unknown"; id: string; at: string; error: string }
   // Issue d'une opération soldée : motif d'arrêt du modèle et utilisabilité du résultat (sans effet sur la dépense ni l'anti-doublon).
   | { type: "outcome"; id: string; at: string; stopReason: string; usable: boolean; note?: string; saved?: string };
 
 export type OpState = "reserved" | "submitted" | "settled" | "failed" | "unknown";
-export interface Op { id: string; reserve: Extract<LedgerEntry, { type: "reserve" }> | null; state: OpState; batchId?: string; usd?: number; outcome?: Extract<LedgerEntry, { type: "outcome" }> }
+export interface Op { id: string; reserve: Extract<LedgerEntry, { type: "reserve" }> | null; state: OpState; batchId?: string; usd?: number; outcome?: Extract<LedgerEntry, { type: "outcome" }>; actual?: Extract<LedgerEntry, { type: "actual" }> }
+
+/** Modèle d'une opération ; les entrées antérieures au 2026-11-15 (sans champ) étaient toutes faites avec Sonnet 5.5. */
+export const HISTORICAL_MODEL = "claude-sonnet-5-5";
+export const modelOf = (o: Op) => o.actual?.model ?? o.reserve?.model ?? HISTORICAL_MODEL;
+
+/** Dépense soldée par modèle (USD). */
+export function spentByModel(entries: LedgerEntry[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const o of ops(entries)) if (o.state === "settled") out[modelOf(o)] = (out[modelOf(o)] ?? 0) + (o.usd ?? 0);
+  return out;
+}
 
 export function readLedger(file: string): LedgerEntry[] {
   return existsSync(file) ? readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as LedgerEntry) : [];
@@ -33,7 +44,7 @@ export function ops(entries: LedgerEntry[]): Op[] {
     const op = m.get(e.id) ?? { id: e.id, reserve: null, state: "reserved" as OpState };
     if (e.type === "reserve") op.reserve = e;
     else if (e.type === "submitted") { op.state = "submitted"; op.batchId = e.batchId; }
-    else if (e.type === "actual") { op.state = "settled"; op.usd = e.usd; op.batchId ??= e.batchId; }
+    else if (e.type === "actual") { op.state = "settled"; op.usd = e.usd; op.batchId ??= e.batchId; op.actual = e; }
     else if (e.type === "failed") op.state = "failed";
     else if (e.type === "unknown") op.state = "unknown";
     else if (e.type === "outcome") op.outcome = e;
@@ -121,6 +132,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const all = ops(entries), spent = spentUsd(entries);
   console.log(`registre : ${entries.length} entrée(s), ${all.length} opération(s) ; dépense comptée ${spent.toFixed(3)} USD ; reste ${(TRIAL_CAP_USD - spent).toFixed(3)} / ${TRIAL_CAP_USD} USD`);
+  const byModel = spentByModel(entries);
+  if (Object.keys(byModel).length) console.log(`  par modèle : ${Object.entries(byModel).map(([m, v]) => `${m} ${v.toFixed(3)} USD`).join(" · ")}`);
   const open = all.filter((o) => o.state === "reserved" || o.state === "unknown" || o.state === "submitted");
   for (const o of open) console.log(`  ouverte : ${o.id} (${o.state}${o.batchId ? `, ${o.batchId}` : ""})`);
   for (const o of all.filter((x) => x.outcome && !x.outcome.usable)) console.log(`  payée sans résultat utilisable : ${o.id} (${o.outcome!.stopReason}${o.outcome!.note ? ` — ${o.outcome!.note}` : ""})`);

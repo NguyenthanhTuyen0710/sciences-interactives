@@ -1,27 +1,31 @@
 {
-  "source": "Tarifs publics Anthropic (USD par million de tokens), relevés le 2026-11-07 ; Sonnet 5.5 cacheRead corrigé le 2026-11-15 (0,05 × entrée = 0,10, https://platform.claude.com/docs/en/about-claude/pricing). À vérifier dans la Console avant chaque campagne.",
+  "source": "Tarifs officiels Anthropic (USD par million de tokens), https://platform.claude.com/docs/en/about-claude/pricing, relevés le 2026-11-15 (inchangés depuis le 2026-11-08 sauf correction cacheRead Sonnet 5.5). Lecture du cache Opus/Sonnet 5.5 : 0,05 × entrée ; Haiku 5.5 : 0,1 × entrée. Haiku 5.5 : tout le prompt (cache lu et écrit compris) au tarif « longPrompt » au-delà de 100 000 tokens. Batch : −50 % sur toutes les catégories (cumulable avec le cache). À vérifier dans la Console avant chaque campagne.",
   "batchMultiplier": 0.5,
   "models": {
-    "claude-sonnet-5-5": {
-      "input": 2.0,
-      "output": 10.0,
-      "cacheWrite5m": 2.5,
-      "cacheWrite1h": 4.0,
-      "cacheRead": 0.1
-    },
     "claude-haiku-5-5": {
       "input": 0.1,
       "output": 0.5,
       "cacheWrite5m": 0.125,
       "cacheWrite1h": 0.2,
-      "cacheRead": 0.01
+      "cacheRead": 0.01,
+      "longPrompt": { "thresholdTokens": 100000, "input": 0.5, "output": 2.5, "cacheWrite5m": 0.625, "cacheWrite1h": 1.0, "cacheRead": 0.05 },
+      "batch": { "input": 0.05, "output": 0.25, "longPrompt": { "input": 0.25, "output": 1.25 } }
+    },
+    "claude-sonnet-5-5": {
+      "input": 2.0,
+      "output": 10.0,
+      "cacheWrite5m": 2.5,
+      "cacheWrite1h": 4.0,
+      "cacheRead": 0.1,
+      "batch": { "input": 1.0, "output": 5.0 }
     },
     "claude-opus-5-5": {
       "input": 4.0,
       "output": 20.0,
       "cacheWrite5m": 5.0,
       "cacheWrite1h": 8.0,
-      "cacheRead": 0.2
+      "cacheRead": 0.2,
+      "batch": { "input": 2.0, "output": 10.0 }
     }
   }
 }

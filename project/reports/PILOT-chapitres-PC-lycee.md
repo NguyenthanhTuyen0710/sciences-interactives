@@ -40,3 +40,8 @@ Principe : extension par paramètre de matière, sans nouveau fichier de configu
 | `.github/workflows/pr-checks.yml` | dry-run PC à côté du dry-run Pythagore |
 
 Prérequis lycée (séparé de M3) : `src/lib/chapters/schema.ts` (GRADES, motifs `id` et `taskId` : 2nde, 1re, Tle, parcours), arborescence et routes du site, contrôle de cohérence de `run.ts` (manifest par niveau). À chiffrer après choix du chapitre lycée.
+
+## 4. Plan de l'étape 9 (pilote réel, non lancé — approbation séparée)
+- Pythagore : relecture (criblage Haiku + juge Sonnet), dépense maximale ≈ 0,126 $ (dry-run du 2026-11-15) ; remplace l'estimation de 0,145 $ (relecture Sonnet unique).
+- **Dossier : comparaison Haiku / Sonnet sur un même chapitre** (le chapitre PC retenu) : deux soumissions du dossier, `--dossier-model haiku` puis `--dossier-model sonnet`, mêmes entrées ; comparer le taux de réussite à la relecture humaine du dossier (sources, objectifs, erreurs typiques, progression), puis la validation du chapitre généré à partir de chacun, et le coût réel par modèle (registre). Le dossier retenu alimente seul la génération du chapitre.
+- Préalables : Gate 1 validé pour le chapitre choisi, M3 (PC) et, pour le lycée, extension du schéma des chapitres.

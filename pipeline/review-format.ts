@@ -75,6 +75,6 @@ export function reviewMarkdown(r: Review, header: string): string {
 export function outputProblem(step: string, stopReason: string | null, text: string): string | null {
   if (stopReason === "max_tokens") return "sortie tronquée (max_tokens atteint)";
   if (stopReason === "refusal") return "refus du modèle";
-  if (step === "review") { const r = parseReview(text); if (!r.ok) return `JSON hors schéma : ${r.errors.slice(0, 5).join(" ; ")}`; }
+  if (step === "review" || step === "screen") { const r = parseReview(text); if (!r.ok) return `JSON hors schéma : ${r.errors.slice(0, 5).join(" ; ")}`; }
   return null;
 }

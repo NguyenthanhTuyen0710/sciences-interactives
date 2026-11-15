@@ -18,7 +18,8 @@
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
-import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown } from "./review-format";
+import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, type ByModel, type PipelineStep, type Prices } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -32,24 +33,22 @@ const readJson = <T>(f: string): T => JSON.parse(read(f));
 const write = (f: string, s: string) => { mkdirSync(dirname(P(f)), { recursive: true }); writeFileSync(P(f), s); };
 
 // ───────── Configuration ─────────
-const MODEL = "claude-sonnet-5-5"; // production de contenu et relecture (Sonnet, décision du porteur de projet)
-// Effort par étape. Relecture en « low » (décision du 2026-11-08) : au run #9, 11 260 des 12 000 tokens de sortie
-// étaient de la réflexion. L'effort n'entre pas dans l'empreinte anti-doublon (inputHash = texte du prompt).
-const EFFORT = { dossier: "medium", chapter: "medium", fix: "medium", review: "low" } as const;
-const MAX_TOKENS = { dossier: 8000, chapter: 64000, fix: 16000, review: 12000 } as const;
+// Modèle, effort et max_tokens par étape : pipeline/models.ts (STEP_CONFIG, paliers du 2026-11-15). Relecture en effort
+// « low » (2026-11-08 : 11 260 des 12 000 tokens de sortie étaient de la réflexion au run #9). Ni le modèle ni l'effort
+// n'entrent dans l'empreinte anti-doublon (inputHash = texte du prompt).
 const MAX_FIX_ROUNDS = 2;
 // Estimation hors ligne (dry-run) ; remplacée par count_tokens en mode réel. Mesuré sur les runs #5 à #8 (Sonnet 5.5,
 // français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
 const CHARS_PER_TOKEN = 2;
-type Step = keyof typeof MAX_TOKENS;
+type Step = PipelineStep;
+const maxTokens = (step: Step) => STEP_CONFIG[step].maxTokens;
 
 interface Spec { id: string; taskId: string; grade: string; subject: string; objectiveIds?: string[]; parcours?: string; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
-interface Price { input: number; output: number; cacheWrite1h: number; cacheRead: number }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours"];
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model"];
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
 
@@ -57,6 +56,7 @@ const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undef
 const RUN = {
   chapter: "" as string, mode: "", newCostUsd: 0, tokens: { input: 0, cacheWrite: 0, cacheRead: 0, output: 0, thinking: 0 },
   qa: [] as { check: string; ok: boolean; detail: string }[], needsHuman: [] as string[], missing: [] as string[], notes: [] as string[],
+  byModel: {} as ByModel, plan: [] as string[],
 };
 function writeSummary(code: number) {
   try {
@@ -64,6 +64,8 @@ function writeSummary(code: number) {
     const md = [`### Pipeline \`${RUN.chapter || "—"}\` — ${RUN.mode} (code ${code})`, "",
       `- Dépense de ce run : $${RUN.newCostUsd.toFixed(3)} · cumul registre : ${LEDGER_TOTAL()}`,
       `- Tokens : entrée ${RUN.tokens.input}, cache écrit ${RUN.tokens.cacheWrite}, cache lu ${RUN.tokens.cacheRead}, sortie ${RUN.tokens.output} (dont réflexion ${RUN.tokens.thinking})`,
+      ...Object.entries(RUN.byModel).map(([m, u]) => `  - ${m} : $${u.usd.toFixed(3)} · entrée ${u.input}, cache écrit ${u.cacheWrite}, cache lu ${u.cacheRead}, sortie ${u.output} (réflexion ${u.thinking})`),
+      ...(RUN.plan.length ? ["", "Dépense maximale prévue par étape et par modèle (batch) :", "", ...RUN.plan] : []),
       `- QA : ${RUN.qa.length ? `${passed}/${RUN.qa.length} contrôle(s) réussi(s) (${Math.round((100 * passed) / RUN.qa.length)} %)` : "aucun contrôle dans ce run"}${RUN.qa.map((q) => `\n  - ${q.ok ? "✔" : "✘"} ${q.check} : ${q.detail}`).join("")}`,
       `- needs-human : ${RUN.needsHuman.length}${RUN.needsHuman.map((n) => `\n  - ${n}`).join("")}`,
       `- Manques (matrice de couverture) : ${RUN.missing.length ? RUN.missing.slice(0, 10).join(" ; ") : "aucun relevé"}`,
@@ -102,9 +104,15 @@ if ([SUBMIT, !!COLLECT, RECONCILE].filter(Boolean).length > 1) fail("--submit, -
 if (COLLECT !== undefined && !/^msgbatch_[A-Za-z0-9]+$/.test(COLLECT)) fail("identifiant de batch invalide (attendu : msgbatch_…)");
 if (EXERCISES !== undefined && !(Number.isInteger(EXERCISES) && EXERCISES >= 1 && EXERCISES <= 60)) fail("--exercises doit être un entier entre 1 et 60");
 const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
-const prices = readJson<{ batchMultiplier: number; models: Record<string, Price> }>("pipeline/prices.json");
+const prices = readJson<Prices>("pipeline/prices.json");
 const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline/budget.json");
-const price = prices.models[MODEL];
+// Dossier : modèle forcé pour la comparaison du pilote (--dossier-model haiku|sonnet) ; sinon STEP_CONFIG.
+const DOSSIER_MODEL = opt("--dossier-model") ? MODELS[opt("--dossier-model") as keyof typeof MODELS] : STEP_CONFIG.dossier.model;
+if (!DOSSIER_MODEL) fail("--dossier-model attend haiku, sonnet ou opus");
+for (const m of [...Object.values(STEP_CONFIG).map((c) => c.model), DOSSIER_MODEL]) {
+  if (FORBIDDEN_MODEL.test(m)) fail(`modèle exclu par décision du porteur de projet : ${m}`);
+  if (!prices.models[m]) fail(`tarif absent de pipeline/prices.json pour ${m}`);
+}
 const STATE_FILE = `pipeline/state/${spec.id}.json`;
 const state: State = existsSync(P(STATE_FILE)) ? readJson(STATE_FILE) : { chapter: spec.id, steps: {}, fixRounds: 0 };
 const saveState = () => write(STATE_FILE, JSON.stringify(state, null, 2) + "\n");
@@ -141,17 +149,18 @@ const readiness = () => ({ ledgerSynced: process.env.PIPELINE_LEDGER_SYNCED === 
 const usd = (n: number, perM: number) => (n * perM) / 1e6;
 const money = (x: number) => `$${x.toFixed(3)}`;
 
-function actualCost(u: Anthropic.Usage, batch: boolean): number {
-  const m = batch ? prices.batchMultiplier : 1;
-  const write = u.cache_creation_input_tokens ?? 0;
-  return m * (usd(u.input_tokens, price.input) + usd(write, price.cacheWrite1h) + usd(u.cache_read_input_tokens ?? 0, price.cacheRead) + usd(u.output_tokens, price.output));
-}
+const usageOf = (u: Anthropic.Usage) => ({ input: u.input_tokens, cacheWrite: u.cache_creation_input_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, output: u.output_tokens, thinking: u.output_tokens_details?.thinking_tokens ?? 0 });
+const actualCost = (u: Anthropic.Usage, batch: boolean, model: string) => costUsd(prices, model, usageOf(u), batch);
 
-// ───────── Prompts (préfixe système identique pour toutes les étapes → cache) ─────────
+// ───────── Prompts ─────────
 const fill = (tpl: string, v: Record<string, string>) => tpl.replace(/\{\{(\w+)\}\}/g, (_, k: string) => { if (!(k in v)) throw new Error(`variable de gabarit manquante : ${k}`); return v[k]; });
 const SYSTEM = fill(read("pipeline/prompts/system.md"), {
   SCHEMA: read("src/lib/chapters/schema.ts"), TYPES: read("src/lib/engine/types.ts"), EXAMPLE_PATH: spec.exampleChapter, EXAMPLE: read(spec.exampleChapter),
 });
+// Préfixe « light » (dossier, criblage) : mêmes règles, sans schéma, types ni chapitre d'exemple (entrée minimale).
+const OMITTED = "(non fourni pour cette étape : aucun code TypeScript n'est attendu)";
+const SYSTEM_LIGHT = fill(read("pipeline/prompts/system.md"), { SCHEMA: OMITTED, TYPES: OMITTED, EXAMPLE_PATH: "—", EXAMPLE: OMITTED });
+const systemFor = (step: Step) => (STEP_CONFIG[step].system === "light" ? SYSTEM_LIGHT : SYSTEM);
 
 function objectives(): string {
   const inv = readJson<{ grades: { domains: { chapters: { id: string; objectives: unknown[] }[] }[] }[] }>("research/curriculum/mathematiques/curriculum-math.json");
@@ -205,39 +214,46 @@ let systemCached = false;
  * humaine (heures) : l'écriture en cache (2 × le prix d'entrée en TTL 1 h) ne serait jamais relue. Mesuré au run #12 :
  * 50 420 tokens écrits sans lecture, 0,050 $ perdus. La relecture (output_config.format) invalide de toute façon le cache.
  */
-const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review";
-const params = (step: Step, user: string, batch: boolean): Anthropic.MessageCreateParamsNonStreaming => ({
-  model: MODEL,
-  max_tokens: MAX_TOKENS[step],
-  // Relecture : JSON imposé par structured outputs (pris en charge par les Message Batches), revérifié par parseReview.
-  output_config: step === "review" ? { effort: EFFORT[step], format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: EFFORT[step] },
-  system: [{ type: "text", text: SYSTEM, ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
+const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review" && step !== "screen";
+const params = (step: Step, user: string, batch: boolean, model: string): Anthropic.MessageCreateParamsNonStreaming => ({
+  model,
+  max_tokens: maxTokens(step),
+  // Relecture et criblage : JSON imposé par structured outputs (Message Batches compatibles), revérifié par parseReview.
+  output_config: step === "review" || step === "screen" ? { effort: STEP_CONFIG[step].effort, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: STEP_CONFIG[step].effort },
+  system: [{ type: "text", text: systemFor(step), ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
   messages: [{ role: "user", content: user }],
 });
 
-async function estimate(step: Step, user: string, batch: boolean) {
-  let sysTok = Math.ceil(SYSTEM.length / CHARS_PER_TOKEN), userTok = Math.ceil(user.length / CHARS_PER_TOKEN), exact = false;
+/** Coût maximal d'une requête (sortie au maximum) au tarif du modèle et de la longueur du prompt. */
+function upperCost(step: Step, model: string, sysTok: number, userTok: number, batch: boolean) {
+  const r = rateFor(prices.models[model], sysTok + userTok);
+  const m = batch ? prices.batchMultiplier : 1;
+  // Préfixe écrit en cache s'il est marqué (lu s'il l'a déjà été dans ce run), sinon prix d'entrée.
+  const sysPrice = !cacheSystem(step, batch) ? r.input : systemCached ? r.cacheRead : r.cacheWrite1h;
+  return { upper: m * (usd(sysTok, sysPrice) + usd(userTok, r.input) + usd(maxTokens(step), r.output)), long: r.long };
+}
+
+async function estimate(step: Step, user: string, batch: boolean, model: string) {
+  const sys = systemFor(step);
+  let sysTok = Math.ceil(sys.length / CHARS_PER_TOKEN), userTok = Math.ceil(user.length / CHARS_PER_TOKEN), exact = false;
   if (client) {
-    const c = await client.messages.countTokens({ model: MODEL, system: [{ type: "text", text: SYSTEM }], messages: [{ role: "user", content: "." }] });
-    const t = await client.messages.countTokens({ model: MODEL, system: [{ type: "text", text: SYSTEM }], messages: [{ role: "user", content: user }] });
+    const c = await client.messages.countTokens({ model, system: [{ type: "text", text: sys }], messages: [{ role: "user", content: "." }] });
+    const t = await client.messages.countTokens({ model, system: [{ type: "text", text: sys }], messages: [{ role: "user", content: user }] });
     sysTok = c.input_tokens; userTok = t.input_tokens - c.input_tokens; exact = true;
   }
-  const m = batch ? prices.batchMultiplier : 1;
-  // Pire cas : préfixe écrit en cache s'il est marqué (lu s'il l'a déjà été dans ce run), sinon prix d'entrée ; sortie au maximum.
-  const sysPrice = !cacheSystem(step, batch) ? price.input : systemCached ? price.cacheRead : price.cacheWrite1h;
-  const upper = m * (usd(sysTok, sysPrice) + usd(userTok, price.input) + usd(MAX_TOKENS[step], price.output));
-  return { sysTok, userTok, upper, exact };
+  return { sysTok, userTok, exact, ...upperCost(step, model, sysTok, userTok, batch), warning: longPromptWarning(prices, model, sysTok + userTok) };
 }
 
 /** Estime le coût maximal et applique TOUS les contrôles de dépense ; en dry-run, les affiche sans bloquer. */
-async function guard(step: Step, user: string, batch: boolean, hash: string) {
+async function guard(step: Step, user: string, batch: boolean, hash: string, model: string) {
   if (LIVE) { // conditions indépendantes du coût : vérifiées avant toute requête, même gratuite (count_tokens)
     const pre = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: 0 }, readiness());
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
-  const e = await estimate(step, user, batch);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${MAX_TOKENS[step]}, empreinte ${hash}, coût maximal ${money(e.upper)} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
-  const pr = params(step, user, batch);
+  const e = await estimate(step, user, batch, model);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokens(step)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  if (e.warning) { console.log(`  AVERTISSEMENT : ${e.warning}`); RUN.notes.push(e.warning); }
+  const pr = params(step, user, batch, model);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
@@ -246,23 +262,24 @@ async function guard(step: Step, user: string, batch: boolean, hash: string) {
 }
 
 /** Réserve le coût maximal dans le registre AVANT l'envoi ; renvoie l'identifiant de l'opération. */
-function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number): string {
+function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number, model: string): string {
   const id = `${spec.id}-${step}-${Date.now()}`;
-  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)) });
+  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)), model });
   return id;
 }
 
-/** Solde une opération par son coût réel (une seule fois par opération ou par batch). */
-function logCost(step: Step, usage: Anthropic.Usage, batch: boolean, ref: { opId?: string; batchId?: string }) {
-  const cost = actualCost(usage, batch);
+/** Solde une opération par son coût réel, au tarif du modèle réellement utilisé (une seule fois par opération). */
+function logCost(step: Step, msg: Anthropic.Message, batch: boolean, ref: { opId?: string; batchId?: string }) {
+  const usage = msg.usage, model = msg.model, u = usageOf(usage);
+  const cost = actualCost(usage, batch, model);
   const op = ops(ledger()).find((o) => (ref.opId && o.id === ref.opId) || (ref.batchId && o.batchId === ref.batchId));
-  const thinking = usage.output_tokens_details?.thinking_tokens;
-  const detail = `entrée ${usage.input_tokens}, cache écrit ${usage.cache_creation_input_tokens ?? 0}, cache lu ${usage.cache_read_input_tokens ?? 0}, sortie ${usage.output_tokens}${thinking != null ? ` dont réflexion ${thinking}` : ""}`;
+  const detail = `${model} : entrée ${u.input}, cache écrit ${u.cacheWrite}, cache lu ${u.cacheRead}, sortie ${u.output} dont réflexion ${u.thinking}`;
   if (op?.state === "settled") { console.log(`  coût déjà enregistré pour ${op.id} (${money(op.usd ?? 0)}) : non compté deux fois (${detail})`); return; }
-  appendLedger(LEDGER, { type: "actual", id: op?.id ?? `externe-${ref.batchId}`, at: new Date().toISOString(), usd: Number(cost.toFixed(5)), batchId: ref.batchId });
+  appendLedger(LEDGER, { type: "actual", id: op?.id ?? `externe-${ref.batchId}`, at: new Date().toISOString(), usd: Number(cost.toFixed(5)), batchId: ref.batchId, model, tokens: u });
   RUN.newCostUsd += cost;
   const tk = RUN.tokens;
-  tk.input += usage.input_tokens; tk.cacheWrite += usage.cache_creation_input_tokens ?? 0; tk.cacheRead += usage.cache_read_input_tokens ?? 0; tk.output += usage.output_tokens; tk.thinking += thinking ?? 0;
+  tk.input += u.input; tk.cacheWrite += u.cacheWrite; tk.cacheRead += u.cacheRead; tk.output += u.output; tk.thinking += u.thinking;
+  addUsage(RUN.byModel, model, u, cost);
   console.log(`  coût réel ${money(cost)} (${detail}) — total ${money(spent())}`);
 }
 
@@ -289,45 +306,59 @@ function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchI
 }
 
 /** Exécute une étape : renvoie le texte, ou null si un batch est en attente. */
-async function call(step: Step, user: string, hash: string): Promise<string | null> {
-  const batch = BATCH && step !== "fix";
+async function call(step: Step, user: string, hash: string, model: string): Promise<string | null> {
+  // Production : toutes les étapes, fix compris, passent par Message Batches (--submit) ; synchrone seulement avec --live sans --batch.
+  const batch = BATCH;
   const st = state.steps[step];
   if (LIVE && client && st?.status === "batch-pending" && st.batchId && st.hash === hash) {
     const b = await client.messages.batches.retrieve(st.batchId);
     if (b.processing_status !== "ended") { console.log(`  batch ${step} en cours (${b.request_counts.processing} en traitement) : relancer plus tard.`); return null; }
     for await (const r of await client.messages.batches.results(st.batchId)) {
       if (r.result.type !== "succeeded") throw new Error(`batch ${step} : ${r.result.type}`);
-      logCost(step, r.result.message.usage, true, { batchId: st.batchId });
+      logCost(step, r.result.message, true, { batchId: st.batchId });
       return finish(step, r.result.message, { batchId: st.batchId });
     }
     throw new Error(`batch ${step} : aucun résultat`);
   }
-  if (SUBMIT && !batch) { console.log(`  submit : l'étape ${step} exige un appel synchrone, non autorisé dans ce mode ; à traiter localement après relecture.`); return null; }
-  const e = await guard(step, user, batch, hash);
+  const e = await guard(step, user, batch, hash, model);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
-  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper);
+  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model);
   // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
   const unknown = (err: unknown): never => { appendLedger(LEDGER, { type: "unknown", id: opId, at: new Date().toISOString(), error: String((err as Error).message ?? err).slice(0, 300) }); throw err; };
   if (batch) {
-    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user, true) }] }, { maxRetries: 0 }).catch(unknown);
+    const b = await client.messages.batches.create({ requests: [{ custom_id: `${spec.id}-${step}`, params: params(step, user, true, model) }] }, { maxRetries: 0 }).catch(unknown);
     appendLedger(LEDGER, { type: "submitted", id: opId, at: new Date().toISOString(), batchId: b.id });
     state.steps[step] = { status: "batch-pending", hash, batchId: b.id, at: new Date().toISOString() };
     saveState();
     console.log(`  batch ${step} soumis : ${b.id} (récupérer avec --collect ${b.id}, ou relancer la même commande en local).`);
     return null;
   }
-  const msg = await client.messages.stream(params(step, user, false), { maxRetries: 0 }).finalMessage().catch(unknown);
+  const msg = await client.messages.stream(params(step, user, false, model), { maxRetries: 0 }).finalMessage().catch(unknown);
   systemCached = true;
-  logCost(step, msg.usage, false, { opId });
+  logCost(step, msg, false, { opId });
   return finish(step, msg, { opId });
 }
 
 // ───────── Écriture des sorties (jamais publiées : le chapitre reste « draft » et hors registre) ─────────
-type OutStep = Exclude<Step, "fix">;
-const OUT: Record<OutStep, { file: string; save: (t: string) => void }> = {
-  dossier: { file: DOSSIER_FILE, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
-  chapter: { file: CHAPTER_FILE, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
-  review: { file: REPORT_FILE, save: (t) => { const r = parseReview(t); if (!r.ok) fail(`relecture hors schéma : ${r.errors.join(" ; ")}`, 7); RUN.qa.push({ check: "relecture IA (schéma, 6 critères)", ok: r.review.verdict === "PASS", detail: `${r.review.verdict}, ${r.review.findings.length} constat(s)` });write(REPORT_FILE, reviewMarkdown(r.review, `<!-- Relecture produite par ${MODEL} via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->\n# Relecture QA (API) — ${spec.id}`)); } },
+const SCREEN_FILE = `project/reports/${spec.taskId}-screen-QA-api.md`;
+function saveReport(file: string, label: string, t: string, model: string) {
+  const r = parseReview(t);
+  if (!r.ok) fail(`${label} hors schéma : ${r.errors.join(" ; ")}`, 7);
+  RUN.qa.push({ check: `${label} [${model}] (schéma, 6 critères)`, ok: r.review.verdict === "PASS", detail: `${r.review.verdict}, ${r.review.findings.length} constat(s)` });
+  write(file, reviewMarkdown(r.review, `<!-- ${label} produite par ${model} via pipeline/run.ts (JSON validé par pipeline/review-format.ts) ; à confirmer par un humain. -->\n# ${label} (API) — ${spec.id}`));
+}
+/** Correction ciblée : remplacements exacts dans le fichier du chapitre, puis revalidation. */
+function applyFix(t: string) {
+  const { text, failed } = applyEdits(read(CHAPTER_FILE), JSON.parse(extractBlock(t, "json")));
+  write(CHAPTER_FILE, text);
+  if (failed.length) console.log(`  ${failed.length} remplacement(s) non appliqué(s) : ${failed.join(" | ")}`);
+}
+const OUT: Record<Step, { file: string; replaces: boolean; save: (t: string, model: string) => void }> = {
+  dossier: { file: DOSSIER_FILE, replaces: false, save: (t) => write(DOSSIER_FILE, t.trim() + "\n") },
+  chapter: { file: CHAPTER_FILE, replaces: false, save: (t) => write(CHAPTER_FILE, extractBlock(t, "ts") + "\n") },
+  fix: { file: CHAPTER_FILE, replaces: true, save: (t) => applyFix(t) },
+  screen: { file: SCREEN_FILE, replaces: false, save: (t, model) => saveReport(SCREEN_FILE, "Criblage QA", t, model) },
+  review: { file: REPORT_FILE, replaces: false, save: (t, model) => saveReport(REPORT_FILE, "Relecture QA", t, model) },
 };
 
 /** Mode collect : lit le résultat d'un batch déjà soumis ; aucune nouvelle requête payante. */
@@ -339,13 +370,13 @@ async function collect(batchId: string) {
   for await (const r of await client!.messages.batches.results(batchId)) {
     const step = r.custom_id.startsWith(`${spec.id}-`) ? r.custom_id.slice(spec.id.length + 1) : "";
     if (!(step in OUT)) fail(`le batch ${batchId} ne correspond pas au chapitre ${spec.id} (custom_id ${r.custom_id})`);
-    const out = OUT[step as OutStep];
+    const out = OUT[step as Step];
     if (r.result.type !== "succeeded") fail(`batch ${step} : ${r.result.type}`, 1);
-    if (existsSync(P(out.file)) && !FORCE) fail(`${out.file} existe déjà ; utiliser --force pour le remplacer`, 5);
-    logCost(step as Step, r.result.message.usage, true, { batchId });
-    out.save(finish(step as Step, r.result.message, { batchId }));
+    if (!out.replaces && existsSync(P(out.file)) && !FORCE) fail(`${out.file} existe déjà ; utiliser --force pour le remplacer`, 5);
+    logCost(step as Step, r.result.message, true, { batchId });
+    out.save(finish(step as Step, r.result.message, { batchId }), r.result.message.model);
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
-    if (step === "chapter") {
+    if (step === "chapter" || step === "fix") {
       const v = validate(); qaValidation(v);
       console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
       if (!v.ok) RUN.needsHuman.push("chapitre collecté hors validation : correction ciblée (fix) à lancer");
@@ -389,7 +420,7 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèle ${MODEL}, effort ${JSON.stringify(EFFORT)}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèles ${Object.entries(STEP_CONFIG).map(([s, c]) => `${s}=${s === "dossier" ? DOSSIER_MODEL : s === "fix" ? "haiku|sonnet" : c.model}/${c.effort}`).join(", ")}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
@@ -417,76 +448,160 @@ async function main() {
 
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
   const dossierUser = fill(read("pipeline/prompts/dossier.md"), { SPEC, OBJECTIVES: OBJ });
-  const hDossier = hashOf(SYSTEM, dossierUser);
+  const hDossier = hashOf(SYSTEM_LIGHT, dossierUser);
+  const dossierText = () => (existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " "));
+  const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
+    + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
+  if (!LIVE) costPlan(dossierUser, chapterUserFor(dossierText()));
   if (wanted("dossier") && !done("dossier", hDossier)) {
     if (existsSync(P(DOSSIER_FILE)) && !FORCE) { console.log(`dossier : ${DOSSIER_FILE} existe déjà, conservé.`); markDone("dossier", hDossier, "fichier existant"); }
     else {
       console.log("dossier :");
-      const t = await call("dossier", dossierUser, hDossier);
-      if (t !== null) { OUT.dossier.save(t); markDone("dossier", hDossier); }
+      const t = await call("dossier", dossierUser, hDossier, DOSSIER_MODEL);
+      if (t !== null) { OUT.dossier.save(t, DOSSIER_MODEL); markDone("dossier", hDossier); }
       else if (LIVE) return; // batch en attente
     }
   }
 
-  // 2. Chapitre complet.
-  const dossier = existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " ");
-  const chapterUser = fill(read("pipeline/prompts/chapter.md"), { ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
-    + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
+  // 2. Chapitre complet (une requête, D4).
+  const chapterUser = chapterUserFor(dossierText());
   const hChapter = hashOf(SYSTEM, chapterUser);
   if (wanted("chapter") && !done("chapter", hChapter)) {
     if (existsSync(P(CHAPTER_FILE)) && !FORCE) { console.log(`chapter : ${CHAPTER_FILE} existe déjà, conservé (--force pour le régénérer).`); markDone("chapter", hChapter, "fichier existant"); }
     else {
       console.log("chapter :");
-      const t = await call("chapter", chapterUser, hChapter);
-      if (t === null) { if (!LIVE) estimateRest(); return; }
-      OUT.chapter.save(t); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
+      const t = await call("chapter", chapterUser, hChapter, STEP_CONFIG.chapter.model);
+      if (t === null) return;
+      OUT.chapter.save(t, STEP_CONFIG.chapter.model); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
     }
   }
   if (!existsSync(P(CHAPTER_FILE))) return;
 
-  // 3. Validation par script, puis corrections ciblées (≤ 2 tours, éditions minimales).
+  // 3. Validation par script, puis corrections ciblées (≤ 2 tours ; tour 1 Haiku si tout est mineur, sinon et ensuite Sonnet).
   let v = validate();
   qaValidation(v);
   console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
-  // Un fichier préexistant (approuvé ou relu par un humain) n'est jamais modifié par l'IA.
-  const generatedHere = state.steps.chapter?.note !== "fichier existant";
-  while (!v.ok && generatedHere && wanted("fix") && state.fixRounds < MAX_FIX_ROUNDS) {
-    state.fixRounds++; saveState();
-    console.log(`fix (tour ${state.fixRounds}/${MAX_FIX_ROUNDS}) :`);
+  // L'IA ne corrige qu'un brouillon produit par le pipeline (registre ou run courant), jamais un fichier relu et publié.
+  const ledgerOps = ops(ledger()).filter((o) => o.reserve?.chapter === spec.id && o.state === "settled");
+  const pipelineGenerated = state.steps.chapter?.note !== "fichier existant" || ledgerOps.some((o) => o.reserve!.step === "chapter" && o.outcome?.usable !== false);
+  const generatedHere = pipelineGenerated && /publicationStatus: "draft"/.test(read(CHAPTER_FILE));
+  let rounds = Math.max(state.fixRounds, ledgerOps.filter((o) => o.reserve!.step === "fix").length);
+  while (!v.ok && generatedHere && wanted("fix") && rounds < MAX_FIX_ROUNDS) {
+    rounds++; state.fixRounds = rounds; saveState();
+    const model = fixModel(problemsOf(v.json), rounds);
+    console.log(`fix (tour ${rounds}/${MAX_FIX_ROUNDS}) [${model}${model === MODELS.haiku ? " : problèmes tous mineurs" : ""}] :`);
     const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE) });
-    const t = await call("fix", user, hashOf(user));
+    const t = await call("fix", user, hashOf(user), model);
     if (t === null) return;
-    const { text, failed } = applyEdits(read(CHAPTER_FILE), JSON.parse(extractBlock(t, "json")));
-    write(CHAPTER_FILE, text);
-    if (failed.length) console.log(`  ${failed.length} remplacement(s) non appliqué(s) : ${failed.join(" | ")}`);
-    v = validate();
+    applyFix(t);
+    v = validate(); qaValidation(v);
     console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
   }
   if (!v.ok) {
-    RUN.needsHuman.push(generatedHere ? `validation en échec après ${state.fixRounds}/${MAX_FIX_ROUNDS} tour(s) de correction` : "validation en échec sur un fichier existant (jamais modifié par l'IA)");
+    RUN.needsHuman.push(generatedHere ? `validation en échec après ${rounds}/${MAX_FIX_ROUNDS} tour(s) de correction` : "validation en échec sur un fichier existant (jamais modifié par l'IA)");
     console.error("ARRÊT : le chapitre ne passe pas la validation automatique ; correction humaine nécessaire (needs-human)."); process.exit(6);
   }
 
-  // 4. Relecture pédagogique et linguistique (une seule).
-  const reviewUser = fill(read("pipeline/prompts/review.md"), { VALIDATOR: v.summary, SPEC, FILE: read(CHAPTER_FILE) });
+  // 4. Juge, étape 1 : criblage Haiku sur tout le chapitre (langue, tutoiement, ton ; signale le reste).
+  const screenUser = fill(read("pipeline/prompts/review.md"), { FOCUS: SCREEN_FOCUS, VALIDATOR: v.summary, SPEC, FILE: read(CHAPTER_FILE) });
+  const hScreen = hashOf(screenUser);
+  if (wanted("screen") && !done("screen", hScreen)) {
+    console.log("screen :");
+    const t = await call("screen", screenUser, hScreen, STEP_CONFIG.screen.model);
+    if (t === null) { if (!LIVE) reviewDry(v.summary, null); return; }
+    OUT.screen.save(t, STEP_CONFIG.screen.model); markDone("screen", hScreen);
+  }
+
+  // 5. Juge, étape 2 : Sonnet sur les seuls exercices signalés et les niveaux 4-5.
+  const screen = screenResult();
+  if (!screen) {
+    if (doneInLedger("screen", hScreen)) { const n = `criblage soldé mais ${SCREEN_FILE} absent du dépôt : fusionner la PR de publication puis relancer`; RUN.needsHuman.push(n); console.log(n); }
+    return;
+  }
+  const reviewUser = reviewUserFor(v.summary, screen);
   const hReview = hashOf(reviewUser);
   if (wanted("review") && !done("review", hReview)) {
     console.log("review :");
-    const t = await call("review", reviewUser, hReview);
+    const t = await call("review", reviewUser, hReview, STEP_CONFIG.review.model);
     if (t === null) return;
-    OUT.review.save(t); markDone("review", hReview);
+    OUT.review.save(t, STEP_CONFIG.review.model); markDone("review", hReview);
   }
   console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(budget.limitUsd)}.`);
 }
 
-/** En dry-run, estime aussi les étapes suivantes (dont le texte dépend de sorties pas encore produites). */
-function estimateRest() {
-  const fileTok = 32000, m = BATCH ? prices.batchMultiplier : 1;
-  const sys = Math.ceil(SYSTEM.length / CHARS_PER_TOKEN);
-  // fix : synchrone, préfixe en cache (1er tour : écriture, 2e : lecture) ; review : jamais en cache (cacheSystem).
-  const fix = usd(sys, price.cacheWrite1h) + usd(fileTok + 3000, price.input) + usd(MAX_TOKENS.fix, price.output);
-  const review = m * (usd(sys + fileTok + 2000, price.input) + usd(MAX_TOKENS.review, price.output));
-  console.log(`  estimation fix : ≤ ${MAX_FIX_ROUNDS} × ${money(fix)} (pire cas : écriture du cache à chaque tour) ; review : ${money(review)} (préfixe non mis en cache)`);
+const SCREEN_FOCUS = "Screening pass (fast model). Check the whole chapter for French spelling and grammar, consistent « tu », tone and the terminology of the French programme (criterion « language »). For the five other criteria, do not try to be exhaustive: report as a finding, with its exerciseId, anything that looks wrong or doubtful so that a stronger model checks it; give such a criterion NEEDS_REVIEW if you report something under it, PASS otherwise.";
+
+/** Problèmes de validation (texte) à partir du JSON de validate(). */
+function problemsOf(json: string): string[] {
+  try {
+    const j = JSON.parse(json) as { validator?: { issues?: { problem: string }[] }; typescript?: string[] };
+    return [...(j.validator?.issues ?? []).map((i) => i.problem), ...(j.typescript ?? [])];
+  } catch { return ["validation illisible"]; }
+}
+
+/** Résultat du criblage enregistré (JSON validé joint au rapport Markdown), ou null. */
+function screenResult(): Review | null {
+  if (!existsSync(P(SCREEN_FILE))) return null;
+  const r = parseReview(extractBlock(read(SCREEN_FILE), "json"));
+  return r.ok ? r.review : null;
+}
+
+/** Entrée du juge approfondi : exercices signalés par le criblage (hors langue) et exercices de niveaux 4-5. */
+function reviewUserFor(validator: string, screen: Review | null): string {
+  const file = read(CHAPTER_FILE);
+  const flagged = new Set((screen?.findings ?? []).filter((f) => f.criterion !== "language" && f.exerciseId).map((f) => f.exerciseId));
+  const general = (screen?.findings ?? []).some((f) => f.criterion !== "language" && !f.exerciseId);
+  const blocks = exerciseBlocks(file, spec.exercisePrefix).filter((b) => b.niveau >= 4 || flagged.has(b.id));
+  const scope = general || blocks.length === 0 ? file
+    : `// Extrait : exercices ${blocks.map((b) => b.id).join(", ")} (signalés par le criblage ou de niveaux 4-5). Le reste du chapitre a été criblé.\n${blocks.map((b) => b.text).join("\n")}`;
+  const focus = "In-depth judge (strong model). The screening pass already checked language; its findings are listed below. Check the exercises given (those flagged by the screening pass and every level 4-5 exercise) on the five criteria other than language: confirm or reject each screening finding and report new defects. Copy the screening verdict for « language » and its language findings.\nScreening findings (JSON):\n"
+    + JSON.stringify(screen?.findings ?? [], null, 1);
+  return fill(read("pipeline/prompts/review.md"), { FOCUS: focus, VALIDATOR: validator, SPEC, FILE: scope });
+}
+
+/** Dry-run : estimation du juge approfondi quand le criblage n'est pas encore produit (exercices de niveaux 4-5). */
+async function reviewDry(validator: string, screen: Review | null) {
+  console.log("review (estimation, criblage non encore produit : niveaux 4-5 seulement) :");
+  const user = reviewUserFor(validator, screen);
+  await call("review", user, hashOf(user), STEP_CONFIG.review.model);
+}
+
+/**
+ * Dry-run : dépense maximale prévue par étape et par modèle, en batch (production), comparée à la même chaîne
+ * entièrement sur Sonnet. Estimation hors ligne (2 car./token) ; le criblage et la correction supposent le chapitre
+ * actuel (ou ~32 000 tokens s'il n'existe pas).
+ */
+function costPlan(dossierUser: string, chapterUser: string) {
+  const tok = (s: string) => Math.ceil(s.length / CHARS_PER_TOKEN);
+  const fileText = existsSync(P(CHAPTER_FILE)) ? read(CHAPTER_FILE) : "x".repeat(64000);
+  const fixUser = fill(read("pipeline/prompts/fix.md"), { ISSUES: "x".repeat(3000), ID: spec.id, FILE: fileText });
+  const screenUser = fill(read("pipeline/prompts/review.md"), { FOCUS: SCREEN_FOCUS, VALIDATOR: "{}", SPEC, FILE: fileText });
+  const reviewUser = existsSync(P(CHAPTER_FILE)) ? reviewUserFor("{}", screenResult()) : fill(read("pipeline/prompts/review.md"), { FOCUS: "", VALIDATOR: "{}", SPEC, FILE: "x".repeat(26000) });
+  const rows: [string, Step, string, string][] = [
+    ["dossier", "dossier", DOSSIER_MODEL, dossierUser],
+    ["chapitre", "chapter", STEP_CONFIG.chapter.model, chapterUser],
+    ["fix tour 1 (MINEUR)", "fix", MODELS.haiku, fixUser],
+    ["fix tour 1 (MAJEUR) ou tour 2", "fix", MODELS.sonnet, fixUser],
+    ["criblage (juge 1)", "screen", STEP_CONFIG.screen.model, screenUser],
+    ["juge approfondi (signalés + niveaux 4-5)", "review", STEP_CONFIG.review.model, reviewUser],
+  ];
+  let tiered = 0, sonnet = 0, tieredBest = 0;
+  const lines = ["| Étape | Modèle | Entrée (tokens) | Sortie max | Coût max | Tout Sonnet |", "|---|---|---|---|---|---|"];
+  for (const [label, step, model, user] of rows) {
+    const sysTok = tok(systemFor(step)), userTok = tok(user);
+    const a = upperCost(step, model, sysTok, userTok, true), b = upperCost(step, MODELS.sonnet, sysTok, userTok, true);
+    const warn = longPromptWarning(prices, model, sysTok + userTok);
+    lines.push(`| ${label} | ${model}${a.long ? " (tarif long)" : ""} | ${sysTok + userTok} | ${maxTokens(step)} | ${money(a.upper)} | ${money(b.upper)} |`);
+    if (warn) RUN.notes.push(warn);
+    const worst = label.startsWith("fix tour 1 (MINEUR)") ? 0 : label.startsWith("fix tour 1 (MAJEUR)") ? 2 : 1; // pire cas : 2 tours Sonnet
+    tiered += worst * a.upper; sonnet += worst * b.upper;
+    tieredBest += label.startsWith("fix") ? (label.includes("MINEUR") ? a.upper : 0) : a.upper;
+  }
+  lines.push(`| **Total, pire cas** (2 tours de fix Sonnet) | | | | **${money(tiered)}** | **${money(sonnet)}** |`);
+  lines.push(`| Total, sans échec de validation (aucun fix) | | | | ${money(tiered - 2 * upperCost("fix", MODELS.sonnet, tok(systemFor("fix")), tok(fixUser), true).upper)} | ${money(sonnet - 2 * upperCost("fix", MODELS.sonnet, tok(systemFor("fix")), tok(fixUser), true).upper)} |`);
+  lines.push(`| Total, un seul tour de fix mineur (Haiku) | | | | ${money(tieredBest)} | — |`);
+  RUN.plan = lines;
+  console.log(["Dépense maximale prévue (batch, estimation hors ligne) :", ...lines].join("\n"));
 }
 
 main().catch((e: unknown) => {

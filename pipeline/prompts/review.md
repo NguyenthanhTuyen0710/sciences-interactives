@@ -8,6 +8,9 @@ The deterministic validator has already passed (summary below): data contract, 5
 - technical: code-level risks the validator cannot detect (e.g. a generator branch that can produce a misleading statement).
 - language: French spelling and grammar, consistent "tu", terminology of the French programme.
 
+Role for this request:
+{{FOCUS}}
+
 Output rules (the answer has a hard length limit; the most important information must come first):
 1. `verdict`: PASS only if there is no BLOQUANT or MAJEUR finding; FAIL if at least one BLOQUANT; otherwise NEEDS_REVIEW.
 2. `criteria`: exactly one entry per criterion (curriculum, accuracy, exercises, games, technical, language).

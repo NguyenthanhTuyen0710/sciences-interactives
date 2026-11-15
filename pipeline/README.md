@@ -1,7 +1,21 @@
 # Pipeline de contenu par l'API Claude (phase pilote)
 
-Produit **un** chapitre à la fois : dossier → chapitre → validation par script → corrections ciblées (≤ 2 tours) → relecture.
-Phase pilote approuvée : un seul chapitre 3e (`math-3e-calcul-litteral`), plafond **10 USD** au total, modèle Sonnet 5.5.
+Produit **un** chapitre à la fois : dossier → chapitre → validation par script → corrections ciblées (≤ 2 tours) → criblage → relecture approfondie.
+Phase pilote : chapitre Pythagore 3e produit (0,692 $) ; pilote élargi (PC, lycée) soumis à approbation. Plafond **10 USD** au total.
+
+## Paliers de modèles (décision du 2026-11-15 ; `pipeline/models.ts`, tarifs `pipeline/prices.json`)
+| Tâche | Modèle |
+|---|---|
+| Extraction de sources, BO → inventaire, proposition de classement G1 | Haiku 5.5 |
+| Taxonomie G3 | Opus 5.5, effort high |
+| Dossier | Haiku 5.5 (`--dossier-model sonnet` pour la comparaison du pilote) |
+| Chapitre (une requête, D4) | Sonnet 5.5 |
+| Correction : tour 1 si tous les problèmes sont mineurs (vouvoiement, flottants, doublons, options équivalentes) | Haiku 5.5 |
+| Correction : problème majeur, ou tour 2 (escalade après un échec) | Sonnet 5.5 ; au-delà de 2 tours : needs-human |
+| Juge 1 : criblage du chapitre entier (langue, tutoiement, ton ; signale le reste) | Haiku 5.5, effort low |
+| Juge 2 : exercices signalés et niveaux 4-5 seulement | Sonnet 5.5, effort low |
+| Démonstrations lycée, sujets bac, juge d'examens (G5) | Opus 5.5 |
+Fable et Mythos sont refusés par le script. Toutes les étapes de production passent par Message Batches (`--submit`), correction comprise ; le cache n'est posé que sur un appel synchrone suivi d'autres appels au même préfixe. Le dry-run affiche la dépense maximale par étape et par modèle, comparée à la même chaîne entièrement sur Sonnet, et avertit quand une requête Haiku dépasse 100 000 tokens (tarif × 5, découpage proposé). Le registre (`reserve.model`, `actual.model`, `actual.tokens`) et le rapport de run ventilent coûts et tokens par modèle ; `ledger.ts check` affiche la dépense par modèle (entrées antérieures : Sonnet 5.5).
 
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.
