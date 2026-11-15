@@ -45,7 +45,24 @@ Principe : extension par paramètre de matière, sans nouveau fichier de configu
 | `tests/` | dry-run de la fiche PC ; contrôles d'unités |
 | `.github/workflows/pr-checks.yml` | dry-run PC à côté du dry-run Pythagore |
 
-Prérequis lycée (séparé de M3) : `src/lib/chapters/schema.ts` (GRADES, motifs `id` et `taskId` : 2nde, 1re, Tle, parcours), arborescence et routes du site, contrôle de cohérence de `run.ts` (manifest par niveau). À chiffrer après choix du chapitre lycée.
+**Étape A : faite** (2026-11-15) — `run.ts` (matière, inventaire, manifest), blocs `{{#pc}}` des 4 prompts (prompts de mathématiques inchangés octet pour octet), `unitIssues` dans `validate-chapter`, fiche `pc-4e-electricite.json`, tests, dry-run PC dans `pr-checks.yml`.
+
+### Étape B (lycée) — proposition détaillée, NON codée
+Constat : le moteur (`LevelId` de `src/lib/engine/types.ts`) et l'arborescence du site (`src/lib/content/curriculum.ts`, niveaux 2nde/1re/Tle, routes `[matiere]/[niveau]`) connaissent déjà le lycée ; seuls le contrat des chapitres complets, le pipeline et la matrice sont limités au collège.
+
+| Fichier | Modification | Pourquoi |
+|---|---|---|
+| `src/lib/chapters/schema.ts` | `GRADES` += `2nde`, `1re`, `Tle` ; motif `id` : `(math\|pc)-(6e\|5e\|4e\|3e\|2nde\|1re\|tle)-…` ; motif `taskId` : `SCI-(6E\|…\|3E\|2NDE\|1RE\|TLE\|DNB\|EAM)-(MATH\|PC)-NNN` ; champ facultatif `parcours` (`tronc-commun`, `specialite`, `maths-complementaires`, `maths-expertes`), exigé si `grade` est lycée | un chapitre 1re spé doit passer `ChapterSchema` ; distinguer spécialité et tronc commun |
+| `src/lib/chapters/schema.ts` (`doneIssues`) | niveau 5 : titre « Type Brevet — » au collège, « Type épreuve anticipée — » en 1re, « Type bac — » en Tle | évaluation finale propre au lycée |
+| `src/lib/content/curriculum.ts` | 1re : chapitre `m1-second-degre` « Second degré » (le chapitre `m1-fonctions` « Fonction exponentielle et second degré » devient « Fonction exponentielle »), conforme au découpage du programme 2026 | `treeChapterId` de la fiche lycée |
+| `pipeline/run.ts` | manifest exigé pour les mathématiques **du collège** seulement (aucun nouveau fichier manifest) ; parcours de la fiche contrôlé contre `track` de l'inventaire | pas de nouveau fichier de configuration |
+| `pipeline/prompts/system.md`, `chapter.md`, `review.md` | blocs `{{#lycee}}` (âge, notation lycée, démonstrations exigibles rédigées, épreuve anticipée sans calculatrice) — même mécanisme que `{{#pc}}`, clé déduite du niveau | prompts collège inchangés |
+| `pipeline/models.ts` | palier Opus pour l'étape chapitre **seulement si** la fiche marque une démonstration exigible (`MODEL_POLICY` le prévoit déjà) ; sinon Sonnet | coût (≈ +0,6 $ max par chapitre en Opus) |
+| `pipeline/chapters/math-1re-spe-second-degre.json` | fiche du chapitre (données) | pilote |
+| `scripts/dashboard.ts` / `master-curriculum.json` | `npm run dashboard -- sync` : **la matrice lit `master-curriculum.json`, non resynchronisé depuis les classements G1** (le chapitre 1re et les classements récents n'y figurent pas) ; ajoute aussi la tâche `SCI-1RE-MATH-001` au registre des tâches | matrice et `--next` à jour |
+| `tests/` | schéma (id/taskId/grade lycée, parcours), titre de niveau 5, dry-run de la fiche 1re | non-régression |
+
+Hors étape B : inventaire complet du lycée (autres chapitres), épreuves du bac, PC lycée.
 
 ## 4. Plan de l'étape 9 (pilote réel) — NON lancé, approbation séparée
 Dépense déjà comptée : 0,692 $ ; plafond 10 $ ; **reste 9,308 $**. Montants : dépense maximale des dry-runs du 2026-11-15 (batch, sortie au `max_tokens`, juge approfondi à préfixe court) ; « réaliste » : tokens réels de Pythagore (runs #5-#12) aux tarifs actuels.
