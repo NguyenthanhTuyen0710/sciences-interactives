@@ -21,7 +21,13 @@ Fable et Mythos sont refusés par le script. Toutes les étapes de production pa
 - `mathematiques` et `physique-chimie` (`SUBJECTS` dans `pipeline/models.ts`) : l'inventaire est lu selon la matière de la fiche (`curriculum-math.json` / `curriculum-pc.json`) ; le manifest de niveau est exigé en mathématiques, facultatif en physique-chimie (contrôle par l'inventaire et la matrice).
 - Prompts : blocs `{{#maths}}…{{/maths}}` et `{{#pc}}…{{/pc}}` gardés pour la seule matière du chapitre (unités SI, chiffres significatifs, schémas normalisés, sécurité, exactitude physique) ; les prompts de mathématiques sont identiques octet pour octet à ceux d'avant M3.
 - `validate-chapter` : pour un chapitre de physique-chimie, toute réponse numérique porte son unité (`suffix` ou `answer.unit`), `sigFigs` entier de 1 à 6, unité de base parmi les choix et convertible (`unitIssues`, `src/lib/engine/diagnostics.ts`).
-- Fiche pilote : `pipeline/chapters/pc-4e-electricite.json` ; dry-run dans `pr-checks.yml`. Lycée (étape B) : non pris en charge.
+- Fiche pilote : `pipeline/chapters/pc-4e-electricite.json` ; dry-run dans `pr-checks.yml`.
+
+## Lycée (M3, étape B)
+- `ChapterSchema` : niveaux 2nde, 1re, Tle ; motifs `id` (`math-1re-…`) et `taskId` (`SCI-1RE-MATH-…`) ; `parcours` obligatoire au lycée, interdit au collège ; `officialObjectives[].required: false` = objectif hors critère d'achèvement.
+- `run.ts` : manifest exigé pour les mathématiques du collège seulement ; parcours de la fiche contrôlé contre le `track` de l'inventaire ; blocs `{{#college}}` / `{{#lycee}}` des prompts (empreintes des prompts du collège inchangées, test) ; chapitre au palier **Opus** si la fiche lycée liste des `demonstrations` exigibles, Sonnet sinon.
+- `npm run dashboard` régénère à chaque exécution `master-curriculum.json` (fusion des `curriculum-*.json`, test d'égalité) et la matrice, désormais lue directement dans les inventaires.
+- Fiche pilote : `pipeline/chapters/math-1re-spe-second-degre.json` ; dry-run dans `pr-checks.yml`.
 
 ## Sécurité et budget
 - La clé est lue par le SDK dans `ANTHROPIC_API_KEY` (variable d'environnement ou secret de l'environnement). Si elle est mise dans `.env`, ce fichier est exclu par `.gitignore` (`.env*`). Le script n'affiche jamais la clé.

@@ -218,7 +218,9 @@ export const CURRICULUM: Record<Subject, Level[]> = {
           proprietes: ["$(k)' = 0$, $(x)' = 1$, $(x^n)' = nx^{n-1}$, $\\left(\\dfrac{1}{x}\\right)' = -\\dfrac{1}{x^2}$, $(\\sqrt{x})' = \\dfrac{1}{2\\sqrt{x}}$.", "$(u+v)' = u' + v'$, $(ku)' = ku'$, $(uv)' = u'v + uv'$."],
         }),
       ]),
-      ch("m1-fonctions", "Fonction exponentielle et second degré", LY_F),
+      // Programme de spécialité 2026 (BO n° 14, p. 355 et 359-360) : le second degré relève de la partie « Algèbre ».
+      ch("m1-second-degre", "Second degré", LY_AL),
+      ch("m1-fonctions", "Fonction exponentielle", LY_F),
       ch("m1-trigonometrie", "Trigonométrie", LY_G),
       ch("m1-probabilites", "Probabilités conditionnelles", LY_SP),
       ch("m1-geometrie", "Géométrie repérée, produit scalaire", LY_G),

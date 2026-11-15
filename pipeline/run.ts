@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, subjectSections, inputHash, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -43,7 +43,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 const maxTokens = (step: Step) => STEP_CONFIG[step].maxTokens;
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -109,7 +109,9 @@ const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline
 // Dossier : modèle forcé pour la comparaison du pilote (--dossier-model haiku|sonnet) ; sinon STEP_CONFIG.
 const DOSSIER_MODEL = opt("--dossier-model") ? MODELS[opt("--dossier-model") as keyof typeof MODELS] : STEP_CONFIG.dossier.model;
 if (!DOSSIER_MODEL) fail("--dossier-model attend haiku, sonnet ou opus");
-for (const m of [...Object.values(STEP_CONFIG).map((c) => c.model), DOSSIER_MODEL]) {
+// Chapitre : palier Opus seulement au lycée et si la fiche liste des démonstrations exigibles (MODEL_POLICY) ; sinon Sonnet.
+const CHAPTER_MODEL = isLycee(spec.grade) && spec.demonstrations?.length ? MODELS.opus : STEP_CONFIG.chapter.model;
+for (const m of [...Object.values(STEP_CONFIG).map((c) => c.model), DOSSIER_MODEL, CHAPTER_MODEL]) {
   if (FORBIDDEN_MODEL.test(m)) fail(`modèle exclu par décision du porteur de projet : ${m}`);
   if (!prices.models[m]) fail(`tarif absent de pipeline/prices.json pour ${m}`);
 }
@@ -133,8 +135,13 @@ function checkInputs() {
   if (existsSync(P(manifestFile))) {
     const themes = readJson<{ themes: { treeChapterId: string; taskId: string }[] }>(manifestFile).themes;
     if (!themes.some((t) => t.treeChapterId === spec.treeChapterId && t.taskId === spec.taskId)) fail(`${spec.treeChapterId} / ${spec.taskId} absent de ${manifestFile}`);
-  } else if (SUBJECTS[spec.subject].manifest) fail(`aucun manifest pour ${spec.subject} ${spec.grade} (${manifestFile})`);
+  } else if (SUBJECTS[spec.subject].manifest && !isLycee(spec.grade)) fail(`aucun manifest pour ${spec.subject} ${spec.grade} (${manifestFile})`);
   else console.log(`note : pas de manifest pour ${spec.subject} ${spec.grade} ; contrôle par l'inventaire et la matrice de couverture seulement.`);
+  if (isLycee(spec.grade)) {
+    const PARCOURS_LABEL: Record<string, string> = { "tronc-commun": "tronc commun", specialite: "spécialité", "maths-complementaires": "complémentaires", "maths-expertes": "expertes" };
+    const track = readJson<{ grades: { grade: string; track?: string }[] }>(SUBJECTS[spec.subject].inventory).grades.find((g) => g.grade === spec.grade)?.track ?? "";
+    if (!spec.parcours || !PARCOURS_LABEL[spec.parcours] || !track.includes(PARCOURS_LABEL[spec.parcours])) fail(`parcours ${spec.parcours ?? "absent"} incompatible avec l'inventaire ${spec.grade} (« ${track || "aucun"} »)`);
+  } else if (spec.parcours && spec.parcours !== "college") fail(`parcours ${spec.parcours} : réservé au lycée`);
   if (!read("src/lib/content/curriculum.ts").includes(`"${spec.treeChapterId}"`)) console.log(`avertissement : ${spec.treeChapterId} pas encore dans l'arborescence du site (src/lib/content/curriculum.ts) ; à ajouter lors de l'intégration.`);
   console.log(`contrôle des données : OK (${spec.grade}, ${spec.subject}, ${spec.treeChapterId}, ${spec.taskId}${EXERCISES ? `, ${EXERCISES} exercices imposés` : ""})`);
 }
@@ -155,8 +162,8 @@ const usageOf = (u: Anthropic.Usage) => ({ input: u.input_tokens, cacheWrite: u.
 const actualCost = (u: Anthropic.Usage, batch: boolean, model: string) => costUsd(prices, model, usageOf(u), batch);
 
 // ───────── Prompts ─────────
-// Blocs {{#maths}}…{{/maths}} / {{#pc}}…{{/pc}} résolus d'abord (matière de la fiche), puis les variables.
-const fill = (tpl: string, v: Record<string, string>) => subjectSections(tpl, spec.subject).replace(/\{\{(\w+)\}\}/g, (_, k: string) => { if (!(k in v)) throw new Error(`variable de gabarit manquante : ${k}`); return v[k]; });
+// Blocs {{#maths}} / {{#pc}} / {{#college}} / {{#lycee}} résolus d'abord (matière et niveau de la fiche), puis les variables.
+const fill = (tpl: string, v: Record<string, string>) => promptSections(tpl, sectionKeys(spec.subject, spec.grade)).replace(/\{\{(\w+)\}\}/g, (_, k: string) => { if (!(k in v)) throw new Error(`variable de gabarit manquante : ${k}`); return v[k]; });
 const SYSTEM = fill(read("pipeline/prompts/system.md"), {
   SCHEMA: read("src/lib/chapters/schema.ts"), TYPES: read("src/lib/engine/types.ts"), EXAMPLE_PATH: spec.exampleChapter, EXAMPLE: read(spec.exampleChapter),
 });
@@ -423,7 +430,7 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèles ${Object.entries(STEP_CONFIG).map(([s, c]) => `${s}=${s === "dossier" ? DOSSIER_MODEL : s === "fix" ? "haiku|sonnet" : c.model}/${c.effort}`).join(", ")}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèles ${Object.entries(STEP_CONFIG).map(([s, c]) => `${s}=${s === "dossier" ? DOSSIER_MODEL : s === "chapter" ? CHAPTER_MODEL : s === "fix" ? "haiku|sonnet" : c.model}/${c.effort}`).join(", ")}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
@@ -454,7 +461,7 @@ async function main() {
   // Modèle imposé (--dossier-model, comparaison) : ajouté à l'empreinte ; sinon empreinte inchangée.
   const hDossier = inputHash([SYSTEM_LIGHT, dossierUser], opt("--dossier-model") ? DOSSIER_MODEL : undefined);
   const dossierText = () => (existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " "));
-  const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { SUBJECT: spec.subject, ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
+  const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { SUBJECT: spec.subject, PARCOURS: spec.parcours ?? "", ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
     + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
   if (!LIVE) costPlan(dossierUser, chapterUserFor(dossierText()));
   if (wanted("dossier") && !done("dossier", hDossier)) {
@@ -475,9 +482,9 @@ async function main() {
     else {
       if (LIVE && !existsSync(P(DOSSIER_FILE))) fail(`chapter : ${DOSSIER_FILE} absent — committer le dossier relu (et retenu, en cas de comparaison) avant de générer le chapitre.`);
       console.log("chapter :");
-      const t = await call("chapter", chapterUser, hChapter, STEP_CONFIG.chapter.model);
+      const t = await call("chapter", chapterUser, hChapter, CHAPTER_MODEL);
       if (t === null) return;
-      OUT.chapter.save(t, STEP_CONFIG.chapter.model); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
+      OUT.chapter.save(t, CHAPTER_MODEL); markDone("chapter", hChapter); state.fixRounds = 0; saveState();
     }
   }
   if (!existsSync(P(CHAPTER_FILE))) return;
@@ -584,7 +591,7 @@ function costPlan(dossierUser: string, chapterUser: string) {
   const reviewUser = existsSync(P(CHAPTER_FILE)) ? reviewUserFor("{}", screenResult()) : fill(read("pipeline/prompts/review.md"), { FOCUS: "", VALIDATOR: "{}", SPEC, FILE: "x".repeat(26000) });
   const rows: [string, Step, string, string][] = [
     ["dossier", "dossier", DOSSIER_MODEL, dossierUser],
-    ["chapitre", "chapter", STEP_CONFIG.chapter.model, chapterUser],
+    ["chapitre", "chapter", CHAPTER_MODEL, chapterUser],
     ["fix tour 1 (MINEUR)", "fix", MODELS.haiku, fixUser],
     ["fix tour 1 (MAJEUR) ou tour 2", "fix", MODELS.sonnet, fixUser],
     ["criblage (juge 1)", "screen", STEP_CONFIG.screen.model, screenUser],

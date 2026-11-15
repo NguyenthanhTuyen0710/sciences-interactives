@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, subjectSections, SUBJECTS, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -79,15 +79,21 @@ describe("registre : dépense par modèle", () => {
 describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
   it("blocs {{#maths}} / {{#pc}} gardés pour la seule matière du chapitre ; clé inconnue refusée", () => {
     const t = "A{{#maths}}M{{/maths}}{{#pc}}P\n{{/pc}}B";
-    expect(subjectSections(t, "mathematiques")).toBe("AMB");
-    expect(subjectSections(t, "physique-chimie")).toBe("AP\nB");
-    expect(() => subjectSections("{{#svt}}x{{/svt}}", "mathematiques")).toThrow(/inconnu/);
+    expect(promptSections(t, sectionKeys("mathematiques", "3e"))).toBe("AMB");
+    expect(promptSections(t, sectionKeys("physique-chimie", "4e"))).toBe("AP\nB");
+    expect(() => promptSections("{{#svt}}x{{/svt}}", ["maths"])).toThrow(/inconnu/);
+    // imbrication de clés différentes : cycle dans la matière
+    const n = "{{#college}}C({{#maths}}m{{/maths}}{{#pc}}p{{/pc}}){{/college}}{{#lycee}}L{{/lycee}}";
+    expect(promptSections(n, sectionKeys("mathematiques", "3e"))).toBe("C(m)");
+    expect(promptSections(n, sectionKeys("physique-chimie", "5e"))).toBe("C(p)");
+    expect(promptSections(n, sectionKeys("mathematiques", "1re"))).toBe("L");
   });
   it("chaque prompt contient un bloc PC et aucune clé inconnue", () => {
     for (const f of ["system", "dossier", "chapter", "review"]) {
       const t = readFileSync(`pipeline/prompts/${f}.md`, "utf8");
       expect(t).toContain("{{#pc}}");
-      expect(subjectSections(t, "physique-chimie")).not.toMatch(/\{\{[#/]/);
+      expect(promptSections(t, sectionKeys("physique-chimie", "4e"))).not.toMatch(/\{\{[#/]/);
+      expect(promptSections(t, sectionKeys("mathematiques", "1re"))).not.toMatch(/\{\{[#/]/);
     }
     for (const s of Object.values(SUBJECTS)) expect(existsSync(s.inventory)).toBe(true);
   });
@@ -122,5 +128,32 @@ describe("empreinte du dossier : modèle imposé pour la comparaison du pilote",
     expect(d.dossier).toMatch(/^[0-9a-f]{16}$/);
     expect(s.dossier).not.toBe(d.dossier);
     expect(s.chapter).toBe(d.chapter);
+  }, 60_000);
+});
+
+describe("prompts du collège : empreintes inchangées par l'étape B (blocs lycée)", () => {
+  // sha256 (16) des prompts résolus pour le collège, relevés avant l'étape B. Une modification volontaire d'un prompt
+  // du collège met à jour cette table dans le même commit, avec sa justification.
+  const COLLEGE_PROMPTS: Record<string, string> = {
+    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "e808dd9155a79a70",
+    "mathematiques/fix": "ecc7a2b99610772e", "mathematiques/review": "f84f4e7803af6a9c",
+    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "b77f4711d9edd48c",
+    "physique-chimie/fix": "ecc7a2b99610772e", "physique-chimie/review": "216835bdc19e6453",
+  };
+  it("prompts résolus identiques", () => {
+    for (const [k, h] of Object.entries(COLLEGE_PROMPTS)) {
+      const [subj, f] = k.split("/") as ["mathematiques" | "physique-chimie", string];
+      const t = promptSections(readFileSync(`pipeline/prompts/${f}.md`, "utf8"), sectionKeys(subj, "3e"));
+      expect(createHash("sha256").update(t).digest("hex").slice(0, 16), k).toBe(h);
+    }
+  });
+  it("dry-run de la fiche 1re : parcours contrôlé, palier Opus pour le chapitre (démonstration exigible)", () => {
+    const r = spawnSync("npx", ["tsx", "pipeline/run.ts", "math-1re-spe-second-degre", "--level", "1re", "--parcours", "specialite", "--batch"], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "" } });
+    const out = r.stdout + r.stderr;
+    expect(r.status, out).toBe(0);
+    expect(out).toContain("contrôle des données : OK (1re, mathematiques, m1-second-degre, SCI-1RE-MATH-001)");
+    expect(out).toContain(`chapter=${MODELS.opus}`);
+    const bad = spawnSync("npx", ["tsx", "pipeline/run.ts", "math-1re-spe-second-degre", "--parcours", "tronc-commun"], { encoding: "utf8" });
+    expect(bad.status).not.toBe(0);
   }, 60_000);
 });

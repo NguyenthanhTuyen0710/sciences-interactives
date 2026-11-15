@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-15 05:50 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-15 06:11 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -12,6 +12,7 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 | mathematiques | 5e | Arrêté du 18 février 2026, BO n°10 du 5 mars 2026 | 21 | 80 (80) | 3 (14 %) | 3 (14 %) | 3 (14 %) | 3 (14 %) |
 | mathematiques | 4e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 21 | 56 (56) | 0 (0 %) | 2 (10 %) | 2 (10 %) | 2 (10 %) |
 | mathematiques | 3e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 16 | 44 (44) | 0 (0 %) | 3 (19 %) | 2 (13 %) | 2 (13 %) |
+| mathematiques | 1re | Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019) | 1 | 6 (0) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 6e | Arrêté du 15 juin 2023 (JO du 21/06/2023) modifiant l'arrêté du 9 novembre 2015 ; BO n°25 du 22 juin 2023 | 8 | 38 (38) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 5e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 24 (24) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 4e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 33 (29) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
@@ -66,4 +67,4 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 | SCI-INFRA-003 | infra | Instruire l'erreur d'hydratation intermittente de /admin/exercices/nouveau (e2e) | TODO | Reproduire, puis attendre l'hydratation dans scripts/e2e.ts ou corriger la page |
 | SCI-INFRA-004 | infra | Décision : tutoiement ou vouvoiement de l'interface existante | BLOCKED | Appliquer la décision au lecteur d'exercices et au moteur de correction |
 
-Total : 123 tâches — TODO 114 · RESEARCHED 3 · INTEGRATED 1 · PUBLISHED 4 · BLOCKED 1. Les tâches de chapitre au statut TODO ne sont pas listées individuellement.
+Total : 124 tâches — TODO 115 · RESEARCHED 3 · INTEGRATED 1 · PUBLISHED 4 · BLOCKED 1. Les tâches de chapitre au statut TODO ne sont pas listées individuellement.

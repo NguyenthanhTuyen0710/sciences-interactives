@@ -6,6 +6,8 @@ Chapter specification (JSON):
 Official objectives from the verified inventory (JSON):
 {{OBJECTIVES}}
 
-{{#pc}}Physique-chimie: in section 5 give the measurement protocols (instrument, placement in the circuit, unit, significant figures) and the laws written with symbols and units; in section 8 include the safety rules.
+{{#lycee}}Lycée: in section 4 list the demonstrations required by the programme and write their outline; in section 6 align level 5 with the exam of the grade (1re: épreuve anticipée, 2 h, no calculator).
+
+{{/lycee}}{{#pc}}Physique-chimie: in section 5 give the measurement protocols (instrument, placement in the circuit, unit, significant figures) and the laws written with symbols and units; in section 8 include the safety rules.
 
 {{/pc}}Return only the Markdown document.

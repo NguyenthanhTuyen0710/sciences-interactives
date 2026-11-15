@@ -102,13 +102,24 @@ export const SUBJECTS = {
 } as const;
 export type SubjectSlug = keyof typeof SUBJECTS;
 
-/** Garde `{{#maths}}…{{/maths}}` / `{{#pc}}…{{/pc}}` pour la matière donnée, retire les autres ; clé inconnue = erreur. */
-export function subjectSections(tpl: string, subject: SubjectSlug): string {
-  const keys = Object.values(SUBJECTS).map((s) => s.key as string);
-  return tpl.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k: string, body: string) => {
-    if (!keys.includes(k)) throw new Error(`bloc de matière inconnu dans un prompt : ${k}`);
-    return k === SUBJECTS[subject].key ? body : "";
-  });
+/** Clés de blocs des prompts : matière (`maths`, `pc`) et cycle (`college`, `lycee`). */
+export const SECTION_KEYS = ["maths", "pc", "college", "lycee"] as const;
+const LYCEE = ["2nde", "1re", "Tle"];
+export const isLycee = (grade: string) => LYCEE.includes(grade);
+/** Blocs actifs pour un chapitre : sa matière et son cycle. */
+export const sectionKeys = (subject: SubjectSlug, grade: string): string[] => [SUBJECTS[subject].key, isLycee(grade) ? "lycee" : "college"];
+
+/** Garde les blocs `{{#clé}}…{{/clé}}` actifs (imbrication de clés différentes permise), retire les autres ; clé inconnue = erreur. */
+export function promptSections(tpl: string, active: string[]): string {
+  let out = tpl, prev;
+  do {
+    prev = out;
+    out = out.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, k: string, body: string) => {
+      if (!(SECTION_KEYS as readonly string[]).includes(k)) throw new Error(`bloc inconnu dans un prompt : ${k}`);
+      return active.includes(k) ? body : "";
+    });
+  } while (out !== prev);
+  return out;
 }
 
 /** Exercices d'un fichier de chapitre : blocs de source par identifiant (préfixe donné) et niveau. */

@@ -27,7 +27,7 @@ on:
       niveau:
         description: "Niveau (doit correspondre à la fiche du chapitre)"
         type: choice
-        options: [3e, 4e, 5e, 6e]
+        options: [3e, 4e, 5e, 6e, 2nde, 1re, Tle]
         default: 3e
       matiere:
         description: "Matière (doit correspondre à la fiche du chapitre)"
@@ -35,7 +35,7 @@ on:
         options: [mathematiques, physique-chimie]
         default: mathematiques
       parcours:
-        description: "Parcours (collège : « college » ; lycée : tronc commun, spécialité… quand l'inventaire existera)"
+        description: "Parcours : « college » au collège ; lycée : tronc-commun | specialite | maths-complementaires | maths-expertes"
         type: string
         default: college
       chapitre:

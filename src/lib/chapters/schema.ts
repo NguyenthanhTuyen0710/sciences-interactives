@@ -3,7 +3,10 @@
 import { z } from "zod";
 import type { Figure, Interaction, Mistake, Rng } from "../engine/types";
 
-export const GRADES = ["6e", "5e", "4e", "3e"] as const;
+export const GRADES = ["6e", "5e", "4e", "3e", "2nde", "1re", "Tle"] as const;
+export const LYCEE_GRADES = ["2nde", "1re", "Tle"] as const;
+/** Parcours du lycée (voie générale) ; le collège n'en a pas. */
+export const PARCOURS = ["tronc-commun", "specialite", "maths-complementaires", "maths-expertes"] as const;
 export const SUBJECT_SLUGS = ["mathematiques", "physique-chimie"] as const;
 export const REVIEW_KEYS = ["curriculum", "accuracy", "exercises", "games", "technical", "language"] as const;
 export type ReviewKey = (typeof REVIEW_KEYS)[number];
@@ -97,15 +100,17 @@ export const GameSchema = z.object({
 export type ChapterGame = z.infer<typeof GameSchema>;
 
 export const ChapterSchema = z.object({
-  id: z.string().regex(/^(math|pc)-(6e|5e|4e|3e)-[a-z0-9-]+$/),
-  taskId: z.string().regex(/^SCI-(6E|5E|4E|3E|DNB)-(MATH|PC)-\d{3}$/),
+  id: z.string().regex(/^(math|pc)-(6e|5e|4e|3e|2nde|1re|tle)-[a-z0-9-]+$/),
+  taskId: z.string().regex(/^SCI-(6E|5E|4E|3E|2NDE|1RE|TLE|DNB)-(MATH|PC)-\d{3}$/),
   grade: z.enum(GRADES),
+  /** Lycée seulement (obligatoire) : parcours du programme. */
+  parcours: z.enum(PARCOURS).optional(),
   subject: z.enum(SUBJECT_SLUGS),
   /** Identifiant du chapitre dans l'arborescence du site (src/lib/content/curriculum.ts). */
   treeChapterId: z.string().min(1),
   curriculumVersion: z.string().regex(/^\d{4}-\d{4}$/),
   title: z.string().min(3),
-  officialObjectives: z.array(z.object({ id: z.string().min(1), text: z.string().min(5), source: z.string().min(1) })).min(1),
+  officialObjectives: z.array(z.object({ id: z.string().min(1), text: z.string().min(5), source: z.string().min(1), /** false : consolidation ou approfondissement non exigé, hors critère d'achèvement */ required: z.boolean().optional() })).min(1),
   prerequisites: z.array(z.object({ text: z.string().min(3), chapterId: z.string().optional() })).min(1),
   sources: z.array(SourceSchema).min(1),
   lesson: LessonSchema,
@@ -117,6 +122,11 @@ export const ChapterSchema = z.object({
   curriculumChapterIds: z.array(z.string()).optional(),
   /** Justification documentée si moins de 30 exercices. */
   exerciseCountJustification: z.string().optional(),
+}).superRefine((c, ctx) => {
+  const lycee = (LYCEE_GRADES as readonly string[]).includes(c.grade);
+  if (lycee && !c.parcours) ctx.addIssue({ code: "custom", path: ["parcours"], message: "parcours obligatoire au lycée" });
+  if (!lycee && c.parcours) ctx.addIssue({ code: "custom", path: ["parcours"], message: "pas de parcours au collège" });
+  if (c.id.split("-")[1] !== c.grade.toLowerCase()) ctx.addIssue({ code: "custom", path: ["id"], message: `niveau de l'id ≠ grade (${c.grade})` });
 });
 
 export type ChapterContent = Omit<z.infer<typeof ChapterSchema>, "exercises"> & { exercises: ChapterExercise[] };
@@ -128,7 +138,8 @@ export function doneIssues(c: ChapterContent): string[] {
   if (c.games.length < 3) issues.push(`${c.games.length} activités interactives (< 3)`);
   for (const lvl of [1, 2, 3, 4, 5]) if (!c.exercises.some((e) => e.niveau === lvl)) issues.push(`aucun exercice de niveau ${lvl}`);
   const objIds = new Set(c.officialObjectives.map((o) => o.id));
-  for (const o of objIds) {
+  // Objectifs non exigés (required: false) : utilisables par les exercices, hors critère d'achèvement.
+  for (const o of c.officialObjectives.filter((x) => x.required !== false).map((x) => x.id)) {
     if (!c.exercises.some((e) => e.objectives.includes(o))) issues.push(`objectif ${o} sans exercice`);
   }
   for (const e of c.exercises) for (const o of e.objectives) if (!objIds.has(o)) issues.push(`${e.id} : objectif inconnu ${o}`);

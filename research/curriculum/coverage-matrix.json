@@ -40,6 +40,14 @@
    }
   },
   {
+   "subject": "mathematiques",
+   "grade": "1re",
+   "chapters": 1,
+   "byState": {
+    "todo": 1
+   }
+  },
+  {
    "subject": "physique-chimie",
    "grade": "6e",
    "chapters": 8,
@@ -1697,6 +1705,23 @@
     "revue language : pending",
     "objectif M3-AUTO-01 non repris dans le chapitre",
     "objectif M3-AUTO-02 non repris dans le chapitre"
+   ]
+  },
+  {
+   "subject": "mathematiques",
+   "grade": "1re",
+   "domain": "M1S-ALG",
+   "chapterId": "math-1re-spe-second-degre",
+   "title": "Équations, fonctions polynômes du second degré",
+   "state": "todo",
+   "objectives": {
+    "total": 6,
+    "verified": 0
+   },
+   "pipelineSpec": "math-1re-spe-second-degre",
+   "content": null,
+   "missing": [
+    "chapitre complet"
    ]
   },
   {
