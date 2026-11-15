@@ -1716,7 +1716,7 @@
    "state": "todo",
    "objectives": {
     "total": 6,
-    "verified": 0
+    "verified": 6
    },
    "pipelineSpec": "math-1re-spe-second-degre",
    "content": null,
