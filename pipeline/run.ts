@@ -17,7 +17,7 @@
 // dépense déjà réalisée : si le total dépasse budget.limitUsd, le pipeline s'arrête sans appeler l'API.
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
-import { appendLedger, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
+import { appendLedger, effectiveLimitUsd, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
 import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
@@ -60,6 +60,8 @@ const RUN = {
   byModel: {} as ByModel, plan: [] as string[],
   /** Gate 1 du chapitre : null = non évalué dans ce run (collect, reconcile, arrêt avant). */
   gate1: null as null | { ok: boolean; missing: string[] },
+  /** Sorties utilisables écrites par ce run (« étape:fichier ») ; vide = rien à publier, publish-pr ne s'exécute pas. */
+  usableOutputs: [] as string[],
 };
 function writeSummary(code: number) {
   try {
@@ -158,7 +160,7 @@ checkInputs();
 const LEDGER = P("pipeline/.store/ledger.jsonl");
 const ledger = () => readLedger(LEDGER);
 const spent = () => spentUsd(ledger());
-LEDGER_TOTAL = () => `$${spent().toFixed(3)} / $${TRIAL_CAP_USD}`;
+LEDGER_TOTAL = () => `$${spent().toFixed(3)} / $${effectiveLimitUsd(budget.limitUsd)}`;
 RUN.chapter = spec.id;
 const readiness = () => ({ ledgerSynced: process.env.PIPELINE_LEDGER_SYNCED === "1", creditVerified: budget.creditVerified, limitUsd: budget.limitUsd });
 const usd = (n: number, perM: number) => (n * perM) / 1e6;
@@ -268,7 +270,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
   const e = await estimate(step, user, batch, model);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokensFor(step, model)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokensFor(step, model)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(effectiveLimitUsd(budget.limitUsd))}`);
   if (e.warning) { console.log(`  AVERTISSEMENT : ${e.warning}`); RUN.notes.push(e.warning); }
   const pr = params(step, user, batch, model);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
@@ -402,6 +404,7 @@ async function collect(batchId: string) {
     logCost(step as Step, r.result.message, true, { batchId });
     out.save(finish(step as Step, r.result.message, { batchId }), r.result.message.model);
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
+    RUN.usableOutputs.push(`${step}:${out.file}`);
     if (step === "chapter" || step === "fix") {
       const v = validate(); qaValidation(v);
       console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
@@ -557,7 +560,7 @@ async function main() {
     if (t === null) return;
     OUT.review.save(t, STEP_CONFIG.review.model); markDone("review", hReview);
   }
-  console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(budget.limitUsd)}.`);
+  console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(effectiveLimitUsd(budget.limitUsd))}.`);
 }
 
 const SCREEN_FOCUS = "Screening pass (fast model). Check the whole chapter for French spelling and grammar, consistent « tu », tone and the terminology of the French programme (criterion « language »). For the five other criteria, do not try to be exhaustive: report as a finding, with its exerciseId, anything that looks wrong or doubtful so that a stronger model checks it; give such a criterion NEEDS_REVIEW if you report something under it, PASS otherwise.";

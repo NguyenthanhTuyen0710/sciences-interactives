@@ -60,6 +60,9 @@ export const spentUsd = (entries: LedgerEntry[]) =>
 export interface SpendRequest { chapter: string; step: string; inputHash: string; maxUsd: number }
 export interface Readiness { ledgerSynced: boolean; creditVerified: boolean; limitUsd: number }
 
+/** Plafond réellement appliqué : budget.json → limitUsd, jamais au-delà du plafond d'essai. */
+export const effectiveLimitUsd = (limitUsd: number) => Math.min(limitUsd, TRIAL_CAP_USD);
+
 /** Toutes les conditions d'une dépense ; la liste vide signifie « autorisé ». */
 export function spendBlockers(entries: LedgerEntry[], req: SpendRequest, r: Readiness): string[] {
   const b: string[] = [];
@@ -71,7 +74,7 @@ export function spendBlockers(entries: LedgerEntry[], req: SpendRequest, r: Read
   if (open.length) b.push(`opération(s) à l'issue inconnue : ${open.map((o) => o.id).join(", ")} — lancer --reconcile (aucune nouvelle tentative automatique)`);
   const dup = all.find((o) => o.reserve && o.reserve.chapter === req.chapter && o.reserve.step === req.step && o.reserve.inputHash === req.inputHash && (o.state === "submitted" || o.state === "settled"));
   if (dup) b.push(`requête identique déjà ${dup.state === "submitted" ? `soumise (batch ${dup.batchId}, à récupérer avec --collect)` : "traitée"} : ${dup.id}`);
-  const spent = spentUsd(entries), limit = Math.min(r.limitUsd, TRIAL_CAP_USD);
+  const spent = spentUsd(entries), limit = effectiveLimitUsd(r.limitUsd);
   if (spent + req.maxUsd > limit) b.push(`plafond : ${spent.toFixed(3)} + ${req.maxUsd.toFixed(3)} > ${limit} USD`);
   return b;
 }
@@ -131,7 +134,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     if (!(existsSync(file) ? readFileSync(file, "utf8") : "").startsWith(before)) issues.push("le registre ne prolonge pas la version de base (modification ou suppression d'entrées)");
   }
   const all = ops(entries), spent = spentUsd(entries);
-  console.log(`registre : ${entries.length} entrée(s), ${all.length} opération(s) ; dépense comptée ${spent.toFixed(3)} USD ; reste ${(TRIAL_CAP_USD - spent).toFixed(3)} / ${TRIAL_CAP_USD} USD`);
+  // Plafond affiché = celui de pipeline/budget.json (exécuté depuis la racine du dépôt), borné par le plafond d'essai.
+  const budgetFile = "pipeline/budget.json";
+  const limit = effectiveLimitUsd(existsSync(budgetFile) ? (JSON.parse(readFileSync(budgetFile, "utf8")) as { limitUsd: number }).limitUsd : TRIAL_CAP_USD);
+  console.log(`registre : ${entries.length} entrée(s), ${all.length} opération(s) ; dépense comptée ${spent.toFixed(3)} USD ; reste ${(limit - spent).toFixed(3)} / ${limit} USD`);
   const byModel = spentByModel(entries);
   if (Object.keys(byModel).length) console.log(`  par modèle : ${Object.entries(byModel).map(([m, v]) => `${m} ${v.toFixed(3)} USD`).join(" · ")}`);
   const open = all.filter((o) => o.state === "reserved" || o.state === "unknown" || o.state === "submitted");

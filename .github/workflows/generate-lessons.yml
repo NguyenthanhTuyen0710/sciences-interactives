@@ -127,6 +127,7 @@ jobs:
     outputs:
       started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
       chapter: ${{ steps.run.outputs.chapter }}
+      usable: ${{ steps.run.outputs.usable }}
     steps:
       - uses: actions/checkout@v5
 
@@ -201,6 +202,9 @@ jobs:
           set -e
           chapter=$(node -e 'try{process.stdout.write(require("./pipeline-output/summary.json").chapter||"")}catch{}')
           echo "chapter=${chapter:-aucun}" >> "$GITHUB_OUTPUT"
+          # « true » seulement si ce run a écrit au moins une sortie utilisable (collect terminé, résultat non tronqué).
+          usable=$(node -e 'try{process.stdout.write((require("./pipeline-output/summary.json").usableOutputs||[]).length?"true":"false")}catch{process.stdout.write("false")}')
+          echo "usable=${usable}" >> "$GITHUB_OUTPUT"
           exit "$code"
 
       - name: Cohérence du registre après exécution
@@ -255,7 +259,8 @@ jobs:
   # Prérequis côté dépôt : Settings → Actions → « Allow GitHub Actions to create and approve pull requests ».
   publish-pr:
     needs: [setup, pipeline]
-    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
+    # collect : uniquement si le run a produit une sortie utilisable (pas de PR vide quand le batch n'est pas terminé, cf. PR #10, #12).
+    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun' && needs.pipeline.outputs.usable == 'true') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:

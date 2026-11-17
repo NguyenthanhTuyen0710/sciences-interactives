@@ -1,7 +1,7 @@
 // Sorties payées inutilisables (M16) : détection, format de relecture, annotation « outcome » du registre.
 import { describe, expect, it } from "vitest";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, SEVERITIES, VERDICTS } from "../pipeline/review-format";
-import { ledgerIssues, ops, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
+import { effectiveLimitUsd, ledgerIssues, ops, spendBlockers, spentUsd, TRIAL_CAP_USD, type LedgerEntry } from "../pipeline/ledger";
 import { REVIEW_KEYS } from "../src/lib/chapters/schema";
 
 const crit = (v = "PASS") => REVIEW_KEYS.map((criterion) => ({ criterion, verdict: v }));
@@ -9,6 +9,13 @@ const ok = { verdict: "NEEDS_REVIEW", criteria: crit(), findings: [
   { criterion: "exercises", severity: "MAJEUR", exerciseId: "py3-07", issue: "Énoncé ambigu.", fix: "Préciser l'unité." },
   { criterion: "language", severity: "MINEUR", exerciseId: "", issue: "Coquille.", fix: "Corriger." },
 ] };
+
+describe("plafond affiché = plafond appliqué", () => {
+  it("budget.json → limitUsd, borné par le plafond d'essai", () => {
+    expect(effectiveLimitUsd(2.892)).toBe(2.892);
+    expect(effectiveLimitUsd(50)).toBe(TRIAL_CAP_USD);
+  });
+});
 
 describe("sortie inutilisable : jamais traitée comme un rapport QA", () => {
   it("max_tokens et refus sont toujours inutilisables, même avec un JSON valide", () => {
