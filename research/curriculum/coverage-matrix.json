@@ -1,6 +1,6 @@
 {
  "note": "Généré par `npm run dashboard` — ne pas modifier à la main. États : todo → researched → draft → qa-passed → published. apiCostUsd null = registre des dépenses absent localement (data-store).",
- "costsAvailable": true,
+ "costsAvailable": false,
  "summary": [
   {
    "subject": "mathematiques",
@@ -44,7 +44,7 @@
    "grade": "1re",
    "chapters": 1,
    "byState": {
-    "todo": 1
+    "researched": 1
    }
   },
   {
@@ -1210,7 +1210,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
@@ -1694,7 +1694,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
@@ -1713,7 +1713,7 @@
    "domain": "M1S-ALG",
    "chapterId": "math-1re-spe-second-degre",
    "title": "Équations, fonctions polynômes du second degré",
-   "state": "todo",
+   "state": "researched",
    "objectives": {
     "total": 6,
     "verified": 6

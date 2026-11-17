@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-15 10:54 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-17 13:17 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
