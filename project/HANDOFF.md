@@ -1,14 +1,29 @@
 # Passation : reprendre le projet sans l'historique de conversation
 
-_Créé le 2026-11-17 (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
+_Créé le 2026-11-17, mis à jour au point d'arrêt du 2026-11-17 ~12:55 UTC (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
 _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons » (`.github/workflows/generate-lessons.yml`)._
 
 ## 1. État au 2026-11-17
 
 ### Pilote API (en cours)
 - **Pilote approuvé** le 2026-11-16 : plafond propre 2,20 $, **cumul maximal 2,892 $** (`pipeline/budget.json` de la branche de travail). Ne jamais relever le plafond. Vérifier le cumul avant chaque lot ; arrêter s'il serait dépassé.
-- **Cumul au registre (Data Store)** : 1,271 $ avant le lot 3. Pire cas restant du lot 3 : 1,511 $ (cumul ≤ 2,782 $).
-- Lot 1 (relecture Pythagore) : terminé. Lot 2 (chapitre PC 4e) : terminé. **Lot 3 (chapitre 1re, Opus) : en cours** ; dossier soumis au run #44.
+- **Cumul réel au registre (Data Store, entrées `actual`)** : **1,271 $**. Le résumé de run affiche 1,274 $ car il compte aussi la réservation ouverte du dossier lot 3 (0,00348 $).
+- Pire cas restant du lot 3 : 1,511 $ (cumul ≤ 2,782 $).
+- Lot 1 (relecture Pythagore) : terminé. Lot 2 (chapitre PC 4e) : terminé. **Lot 3 (chapitre 1re, Opus) : en cours.**
+
+### Point d'arrêt exact (2026-11-17, ~12:55 UTC)
+| Élément | Valeur |
+|---|---|
+| Lot / étape | lot 3, étape `dossier` (Haiku 5.5, `max_tokens` 12 000), état `batch-pending` |
+| Batch ouvert | `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`, soumis au run #44 (2026-11-17T12:48:28Z) |
+| Réservation | `math-1re-spe-second-degre-dossier-1794919708095`, empreinte `e11b997bbf17dcff`, maxUsd 0,00348 $ |
+| Collecte | run #45 (12:50 UTC) : « résultat pas encore disponible » ; aucun coût soldé. Non relancée (consigne : ne pas attendre). |
+
+**Étape suivante exacte** :
+1. Relancer `collect` (workflow « Generate Lessons », ref `claude/zealous-newton-dn96ub`, mode `collect`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, batch_id `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`). Une collecte ne crée aucune requête payante.
+2. Télécharger l'artefact, committer `research/dossiers/math-1re-spe-second-degre.md` sur la branche de travail (test, tsc, lint avant commit) ; noter le coût réel et les tokens de réflexion.
+3. Soumettre le chapitre Opus (mode `pilot`, mêmes entrées sans batch_id) : **déjà approuvé** (`max_tokens` 96 000, effort medium ; coût maximal estimé 1,094 $). Vérifier d'abord que cumul + 1,094 $ + marge du reste du lot ≤ 2,892 $.
+4. Puis : collect, contrôles compensatoires complets, correction si nécessaire, criblage (Haiku sans réflexion), juge (Sonnet).
 - Les runs sont lancés sur la ref `claude/zealous-newton-dn96ub` (seule branche portant le plafond 2,892 $).
 
 ### Chapitres
@@ -32,6 +47,7 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 |---|---|---|
 | `claude/zealous-newton-dn96ub` | branche de travail du pilote | y committer ; base de la PR de synthèse |
 | PR #8, #9 (`pipeline/math-3e-pythagore-*`) | ouvertes, PR du bot | **ne jamais fusionner** ; laisser ouvertes |
+| PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | ouverte, PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture : à décider par le porteur de projet. Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
 | `claude/busy-fermi-8y29au` | | **ne pas toucher** (ni fusion ni suppression) |
 | PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 |
 
@@ -54,12 +70,15 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | 2026-11-16 | Exception publish-pr, **étroite** : (i) tests dry-run `tests/pipeline-models.test.ts` l. 103/124/128 rouges car ils lisent l'état du dépôt (corrigé sur la branche, pas sur `main`) ; (ii) erreurs de contenu signalées identiquement par validate-chapter et traitées par un tour de correction. Après correction, publish-pr ne peut être rouge que par (i). Chaque application est journalisée (run, job, erreur verbatim). Toute autre erreur système : ARRÊT et rapport. |
 | 2026-11-16 | Après chaque génération ou correction : contrôles compensatoires complets sur la branche (ChapterSchema, validate-chapter avec tutoiement et unités, tsc, tests, lint, build). |
 | 2026-11-17 | Criblage Haiku sans réflexion (`thinking: disabled`) ; M17 minimal : un seul nouvel envoi, seulement si `usable: false`, motif obligatoire, empreinte `:retry=1`, toujours soumis au plafond. |
-| 2026-11-17 | Marge de sortie : chapitre Opus `max_tokens` 96 000 (effort medium), dossier 12 000. |
+| 2026-11-17 | Chapitre 1re Opus : `max_tokens` 96 000, effort medium ; **envoi du batch chapitre Opus approuvé**. |
+| 2026-11-17 | Dossier Haiku : `max_tokens` 12 000 pour tous les chapitres. |
+| 2026-11-17 | Rapport du pilote : proposer `max_tokens` 96 000 par défaut pour le chapitre Sonnet en production (proposition seulement, pas de changement de code pendant le pilote). |
+| 2026-11-17 | `project/HANDOFF.md` écrit tôt, mis à jour après le rapport du pilote. |
 
-Journal des exceptions (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
+Journal des exceptions publish-pr : (ii) non appliquée à ce jour ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
 ## 3. Travail en cours et suivant (par priorité)
-1. **Lot 3** : collecter le dossier (run #44), soumettre le chapitre Opus, collecter, contrôles compensatoires, correction si nécessaire, criblage, juge.
+1. **Lot 3** : voir « Étape suivante exacte » au § 1.
 2. **Rapport du pilote** (`project/reports/`) : coût réel par lot, étape et modèle contre l'estimation ; QA (taux de réussite, tours de correction, needs-human, constats du juge) ; comparaison des dossiers Haiku/Sonnet **par le contenu** ; couverture objectifs/taxonomie ; réestimation du projet par niveau avec plafond proposé ; sorties tronquées par la réflexion (2 fois : relecture Gate 0, criblage lot 2) et tokens de réflexion par étape/modèle ; configuration par défaut proposée pour la production (dont chapitre Sonnet 96 000) ; « erreurs récurrentes » ; charge G2 par niveau ; liste « avant production » (B kit.ts, test D effort low, comparaison démonstration Opus/Sonnet, une PR par chapitre en fin de chaîne, QA tier 2 contre la taxonomie verrouillée, corrections ciblées Pythagore).
 3. **PR de synthèse unique** : `budget.json` revenu à `limitUsd` 10 sur `main` avec historique du plafond du pilote à part ; affichage « reste … / 10 USD » corrigé ; correctifs de tests ; rapport du pilote ; `verificationMethod` « lecture-initiale » / « g2 » (P4-E-04 → `verified: false`, comptes séparés dans la matrice) ; porte G2 dans `run.ts` (refus en pilote/production, avertissement en dry-run) ; rapport du juge nommé par run ; ce fichier et `STATUS.md` à jour.
 4. **Arrêt** après la PR de synthèse : attendre la décision du budget de production.
