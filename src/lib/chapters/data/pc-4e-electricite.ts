@@ -106,7 +106,18 @@ const u = (x: number, unit: string) => `$${T(x)}\\ \\mathrm{${unit}}$`;
 const m1 = (x: number, unit: string) => `$${x.toFixed(1).replace(".", "{,}")}\\ \\mathrm{${unit}}$`;
 const m2 = (x: number, unit: string) => `$${x.toFixed(2).replace(".", "{,}")}\\ \\mathrm{${unit}}$`;
 
-const clean = (value: number, ms: Mistake[]) => ms.filter((m) => { const v = parseNumber(m.match)?.value; return v === undefined || !close(v, value); });
+const clean = (value: number, ms: Mistake[]) => {
+  const kept: Mistake[] = [];
+  const seen: number[] = [];
+  for (const m of ms) {
+    const v = parseNumber(m.match)?.value;
+    if (v === undefined) { kept.push(m); continue; }
+    if (close(v, value) || seen.some((s) => close(s, v))) continue;
+    seen.push(v);
+    kept.push(m);
+  }
+  return kept;
+};
 /** Réponse numérique avec son unité (suffix). */
 const num = (value: number, suffix: string, mistakes: Mistake[] = [], prompt?: string, extra: Partial<NumAnswer> = {}): ChapterPart => ({ prompt, interaction: { kind: "numerique", suffix, answer: { value, ...extra } }, mistakes: clean(value, mistakes) });
 /** Réponse numérique où l'élève choisit l'unité (A ou mA), valeur exprimée en ampères. */
