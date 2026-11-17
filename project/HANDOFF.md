@@ -42,13 +42,13 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 ### Branches et PR
 | Élément | État | Action |
 |---|---|---|
-| `claude/stoic-dirac-asjcs0` | **branche de travail actuelle** (depuis le 2026-11-17, = `d0d5234` + suite) | y committer ; base de la PR de synthèse |
+| `claude/stoic-dirac-asjcs0` | **branche de travail actuelle** ; PR #13 fusionnée (`38cf04e`), branche repartie de `main` le 2026-11-17 | y committer ; une nouvelle PR par lot |
 | `claude/zealous-newton-dn96ub` | ancienne branche de travail du pilote, arrêtée à `d0d5234` | laisser en l'état |
 | PR #8, #9 (`pipeline/math-3e-pythagore-*`) | **fermées sans fusion** (2026-11-17, motif en commentaire), PR du bot | **ne jamais fusionner** ; laisser ouvertes |
 | PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | **fermée sans fusion** (2026-11-17), PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture avec la PR de synthèse (décision du 2026-11-17). Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
 | `claude/busy-fermi-8y29au` | absente du dépôt distant (constat du 2026-11-17) | **ne pas toucher** (ni fusion ni suppression) |
 | PR #11 (`…-44088482503`, run #46, dossier) et #12 (`…-44090982433`, run #48, collecte sans résultat) | **fermées sans fusion** (2026-11-17), PR du bot (publish-pr) | même traitement que #10 |
-| PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 ; **à son ouverture, fermer #8 à #12 sans fusion, avec une note de motif** (décision du 2026-11-17) |
+| PR #13 (synthèse du pilote) | **fusionnée** le 2026-11-17 (`38cf04e`) | — |
 
 ## 2. Décisions en vigueur
 | Date | Décision |
@@ -81,13 +81,23 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | 2026-11-17 | Sortie tronquée conservée : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md` (jamais dans `src/`). |
 | 2026-11-17 | publish-pr seulement si la collecte a produit une sortie utilisable ; lié à la conception « une PR par chapitre » (à faire avant la production). |
 
-Journal des exceptions publish-pr : (ii) non appliquée à ce jour ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
+### Décisions du 17-11-2026 (après fusion de la PR #13, `38cf04e`)
+| Sujet | Décision |
+|---|---|
+| Plafond | `main` garde `limitUsd` **2,892 $**. Chaque relèvement = **une petite PR qui ne modifie que `pipeline/budget.json`**, approuvée par le porteur de projet. |
+| Première vague de production | **(A)** correction ciblée de Pythagore selon la taxonomie verrouillée (3 MAJEUR + 1 MINEUR du juge) ; **(B)** 4 nouveaux chapitres de 3e. Plafond de la vague : **6,40 $**, plus **0,30 $** à part pour l'essai H1. **Aucun plafond** pour les autres niveaux. |
+| Lycée | Pilote séparé, plus tard, après H1 et l'approbation de la conception en deux requêtes. |
+| D4 (lycée) | Modifiée pour le lycée : requête « cours + démonstrations » et requête « exercices + jeux » séparées (conception à approuver). Le collège garde D4. |
+| Exceptions publish-pr (i)/(ii) du 2026-11-16 | **Caduques**, sauf si elles sont reformulées. |
+| Préparatifs sans API | (a) porte G2 + `verificationMethod` ; (b) une PR par chapitre et rapport du juge nommé par run (**conception à approuver avant code**) ; (c) QA tier 2 déterministe contre la taxonomie verrouillée ; (d) garde-fou de troncature (`max_tokens` ≥ besoin estimé) ; (e) proposition H1 (**envoi après approbation**). |
+
+Journal des exceptions publish-pr (caduques depuis le 2026-11-17) : (ii) non appliquée ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
 ## 3. Travail en cours et suivant (par priorité)
 1. **Lot 3** : fermé (décision du 2026-11-17, option A) ; aucune correction, criblage ni juge du chapitre 1re.
 2. **Rapport du pilote** : **fait** — `project/reports/PILOT-rapport-final.md` (pièce : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md`).
-3. **PR de synthèse** : **ouverte, PR #13** (https://github.com/NguyenthanhTuyen0710/sciences-interactives/pull/13 ; base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées le 2026-11-17 sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
-4. **ARRÊT** : attendre les décisions du porteur de projet (budget de production par niveau, liste « avant production » du rapport § 8, fusion de la PR de synthèse).
+3. **PR de synthèse** : **fusionnée** (PR #13, commit de fusion `38cf04e`, 2026-11-17 ~14:09 UTC). Historique : (https://github.com/NguyenthanhTuyen0710/sciences-interactives/pull/13 ; base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées le 2026-11-17 sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
+4. **Préparatifs de la première vague** (décisions du 17-11-2026, sans API) : branche `claude/stoic-dirac-asjcs0` repartie de `main` (`38cf04e`) ; (a) porte G2, (c) QA tier 2, (d) garde-fou de troncature ; (b) et H1 en attente d'approbation ; G1 + G2 des objectifs des 4 chapitres et 4 taxonomies à faire valider.
 
 ## 4. Erreurs récurrentes et leçons
 - **La réflexion consomme toute la sortie** : relecture Gate 0 (11 260 tokens de réflexion, sortie tronquée), criblage lot 2 (7 999 / 8 000). Chapitre PC : 37 % de réflexion, 96,5 % de `max_tokens`. Opus 5.5 : réflexion ni désactivable ni plafonnable, seule la marge de `max_tokens` la contient.
