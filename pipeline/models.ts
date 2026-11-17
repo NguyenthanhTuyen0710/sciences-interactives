@@ -26,7 +26,8 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
  */
 /** thinking "disabled" : accepté par Claude Haiku 5.5 seulement aux efforts low/medium/high (400 sur Opus 5.5, Sonnet 5.5). */
 export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light"; thinking?: "disabled" }> = {
-  dossier: { model: MODELS.haiku, effort: "medium", maxTokens: 8000, system: "light" },
+  // 12 000 (pilote, décision du 2026-11-17) : le dossier PC Haiku a utilisé 6 657 / 8 000 tokens (83 %), dont 2 897 de réflexion.
+  dossier: { model: MODELS.haiku, effort: "medium", maxTokens: 12000, system: "light" },
   chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
   // Criblage sans réflexion (pilote, run 39 : 7 999 / 8 000 tokens de sortie en réflexion sur un chapitre de 45k tokens).
@@ -35,6 +36,18 @@ export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; 
   // tsc et validate-chapter (tier 1) ; la requête contient les extraits d'exercices à juger.
   review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "light" },
 };
+
+/**
+ * Chapitre lycée avec démonstrations (Opus) : la réflexion d'Opus 5.5 ne peut être ni désactivée ni plafonnée
+ * (budget_tokens refusé) ; seule la marge de max_tokens la contient. 96 000 (décision du 2026-11-17) : le chapitre PC
+ * Sonnet a utilisé 61 779 / 64 000 tokens, dont 23 147 de réflexion. Plafond de sortie d'Opus 5.5 : 128K.
+ */
+export const OPUS_CHAPTER_MAX_TOKENS = 96000;
+
+/** max_tokens d'une étape pour le modèle effectivement appelé. */
+export function maxTokensFor(step: PipelineStep, model: string): number {
+  return step === "chapter" && model === MODELS.opus ? OPUS_CHAPTER_MAX_TOKENS : STEP_CONFIG[step].maxTokens;
+}
 
 /** Politique complète, y compris les tâches hors de run.ts (référence pour les scripts et les agents). */
 export const MODEL_POLICY: { task: string; model: string; effort?: Effort; note?: string }[] = [

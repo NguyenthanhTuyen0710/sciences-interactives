@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -42,7 +42,7 @@ const MAX_FIX_ROUNDS = 2;
 // français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
 const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
-const maxTokens = (step: Step) => STEP_CONFIG[step].maxTokens;
+
 
 interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
@@ -233,7 +233,7 @@ let systemCached = false;
 const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review" && step !== "screen";
 const params = (step: Step, user: string, batch: boolean, model: string): Anthropic.MessageCreateParamsNonStreaming => ({
   model,
-  max_tokens: maxTokens(step),
+  max_tokens: maxTokensFor(step, model),
   ...(thinkingParam(step, model) ? { thinking: thinkingParam(step, model) } : {}),
   // Relecture et criblage : JSON imposé par structured outputs (Message Batches compatibles), revérifié par parseReview.
   output_config: step === "review" || step === "screen" ? { effort: STEP_CONFIG[step].effort, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: STEP_CONFIG[step].effort },
@@ -247,7 +247,7 @@ function upperCost(step: Step, model: string, sysTok: number, userTok: number, b
   const m = batch ? prices.batchMultiplier : 1;
   // Préfixe écrit en cache s'il est marqué (lu s'il l'a déjà été dans ce run), sinon prix d'entrée.
   const sysPrice = !cacheSystem(step, batch) ? r.input : systemCached ? r.cacheRead : r.cacheWrite1h;
-  return { upper: m * (usd(sysTok, sysPrice) + usd(userTok, r.input) + usd(maxTokens(step), r.output)), long: r.long };
+  return { upper: m * (usd(sysTok, sysPrice) + usd(userTok, r.input) + usd(maxTokensFor(step, model), r.output)), long: r.long };
 }
 
 async function estimate(step: Step, user: string, batch: boolean, model: string) {
@@ -268,7 +268,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
   const e = await estimate(step, user, batch, model);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokens(step)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokensFor(step, model)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
   if (e.warning) { console.log(`  AVERTISSEMENT : ${e.warning}`); RUN.notes.push(e.warning); }
   const pr = params(step, user, batch, model);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
@@ -622,7 +622,7 @@ function costPlan(dossierUser: string, chapterUser: string) {
     const sysTok = tok(systemFor(step)), userTok = tok(user);
     const a = upperCost(step, model, sysTok, userTok, true), b = upperCost(step, MODELS.sonnet, sysTok, userTok, true);
     const warn = longPromptWarning(prices, model, sysTok + userTok);
-    lines.push(`| ${label} | ${model}${a.long ? " (tarif long)" : ""} | ${sysTok + userTok} | ${maxTokens(step)} | ${money(a.upper)} | ${money(b.upper)} |`);
+    lines.push(`| ${label} | ${model}${a.long ? " (tarif long)" : ""} | ${sysTok + userTok} | ${maxTokensFor(step, model)} | ${money(a.upper)} | ${money(b.upper)} |`);
     if (warn) RUN.notes.push(warn);
     const worst = label.startsWith("fix tour 1 (MINEUR)") ? 0 : label.startsWith("fix tour 1 (MAJEUR)") ? 2 : 1; // pire cas : 2 tours Sonnet
     tiered += worst * a.upper; sonnet += worst * b.upper;

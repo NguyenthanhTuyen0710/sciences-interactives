@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, thinkingParam, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -286,6 +286,16 @@ describe("criblage sans réflexion (run 39 : sortie entièrement consommée par 
     for (const st of ["dossier", "chapter", "fix", "review"] as const) expect(thinkingParam(st, STEP_CONFIG[st].model)).toBeUndefined();
   });
   it("refusé hors Haiku (400 sur Opus 5.5 / Sonnet 5.5)", () => expect(() => thinkingParam("screen", MODELS.sonnet)).toThrow(/non accepté/));
+});
+
+describe("marge de sortie (décision du 2026-11-17)", () => {
+  it("chapitre Opus : 96 000 ; chapitre Sonnet inchangé ; dossier 12 000", () => {
+    expect(maxTokensFor("chapter", MODELS.opus)).toBe(OPUS_CHAPTER_MAX_TOKENS);
+    expect(OPUS_CHAPTER_MAX_TOKENS).toBe(96000);
+    expect(maxTokensFor("chapter", MODELS.sonnet)).toBe(64000);
+    expect(maxTokensFor("dossier", MODELS.haiku)).toBe(12000);
+    expect(maxTokensFor("fix", MODELS.opus)).toBe(STEP_CONFIG.fix.maxTokens);
+  });
 });
 
 describe("M17 minimal : nouvel envoi motivé, une seule fois, seulement sans résultat utilisable", () => {
