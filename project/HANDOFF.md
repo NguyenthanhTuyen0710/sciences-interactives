@@ -44,10 +44,10 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 |---|---|---|
 | `claude/stoic-dirac-asjcs0` | **branche de travail actuelle** (depuis le 2026-11-17, = `d0d5234` + suite) | y committer ; base de la PR de synthèse |
 | `claude/zealous-newton-dn96ub` | ancienne branche de travail du pilote, arrêtée à `d0d5234` | laisser en l'état |
-| PR #8, #9 (`pipeline/math-3e-pythagore-*`) | ouvertes, PR du bot | **ne jamais fusionner** ; laisser ouvertes |
-| PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | ouverte, PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture avec la PR de synthèse (décision du 2026-11-17). Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
+| PR #8, #9 (`pipeline/math-3e-pythagore-*`) | **fermées sans fusion** (2026-11-17, motif en commentaire), PR du bot | **ne jamais fusionner** ; laisser ouvertes |
+| PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | **fermée sans fusion** (2026-11-17), PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture avec la PR de synthèse (décision du 2026-11-17). Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
 | `claude/busy-fermi-8y29au` | absente du dépôt distant (constat du 2026-11-17) | **ne pas toucher** (ni fusion ni suppression) |
-| PR #11 (`…-44088482503`, run #46, dossier) et #12 (`…-44090982433`, run #48, collecte sans résultat) | ouvertes, PR du bot (publish-pr) | même traitement que #10 |
+| PR #11 (`…-44088482503`, run #46, dossier) et #12 (`…-44090982433`, run #48, collecte sans résultat) | **fermées sans fusion** (2026-11-17), PR du bot (publish-pr) | même traitement que #10 |
 | PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 ; **à son ouverture, fermer #8 à #12 sans fusion, avec une note de motif** (décision du 2026-11-17) |
 
 ## 2. Décisions en vigueur
@@ -86,7 +86,7 @@ Journal des exceptions publish-pr : (ii) non appliquée à ce jour ; (i) : run #
 ## 3. Travail en cours et suivant (par priorité)
 1. **Lot 3** : fermé (décision du 2026-11-17, option A) ; aucune correction, criblage ni juge du chapitre 1re.
 2. **Rapport du pilote** : **fait** — `project/reports/PILOT-rapport-final.md` (pièce : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md`).
-3. **PR de synthèse** : **ouverte** (base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
+3. **PR de synthèse** : **ouverte, PR #13** (https://github.com/NguyenthanhTuyen0710/sciences-interactives/pull/13 ; base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées le 2026-11-17 sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
 4. **ARRÊT** : attendre les décisions du porteur de projet (budget de production par niveau, liste « avant production » du rapport § 8, fusion de la PR de synthèse).
 
 ## 4. Erreurs récurrentes et leçons
