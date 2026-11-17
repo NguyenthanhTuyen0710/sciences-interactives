@@ -5,7 +5,7 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 
 ## 1. État au 2026-11-17
 
-### Pilote API (en cours)
+### Pilote API (terminé le 2026-11-17 ; rapport : `project/reports/PILOT-rapport-final.md`)
 - **Pilote approuvé** le 2026-11-16 : plafond propre 2,20 $, **cumul maximal 2,892 $** (`pipeline/budget.json` de la branche de travail). Ne jamais relever le plafond. Vérifier le cumul avant chaque lot ; arrêter s'il serait dépassé.
 - **Cumul réel au registre (Data Store, entrées `actual`)** : **2,359 $** (run #49 : 58 entrées, 15 opérations, aucune réservation ouverte ; Sonnet 1,259 $, Haiku 0,014 $, Opus 1,086 $). Reste sous le plafond : 0,533 $.
 - Lot 1 (relecture Pythagore) : terminé. Lot 2 (chapitre PC 4e) : terminé. **Lot 3 (chapitre 1re, Opus) : ARRÊTÉ** — chapitre tronqué, aucun nouvel envoi (décision du 2026-11-17).
@@ -20,7 +20,7 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | Relecture du dossier (Claude Code, 2026-11-17) | contenu mathématique correct (formules, démonstration en 5 étapes avec `2\|a\|`, signe, somme/produit, erreurs typiques) ; SD-06 avec les 3 approfondissements. Écarts hérités de la fiche, non corrigés (entrées du pilote figées) : la fiche déclare les 2 sources `seedId: null` / `pending_verification` alors que le collecteur a vérifié `bo-2026-14-pdf` ; le format 2 h / 6 + 14 pts est déjà vérifié (NS p. 44) mais le dossier le dit « à vérifier ». À traiter dans la PR de synthèse. |
 | PR du bot | publish-pr du run #46 ouvre une PR `pipeline/math-1re-spe-second-degre-44088482503` (même traitement que #8-#10 : ne pas fusionner, fermer avec la PR de synthèse). |
 
-**Étape suivante exacte** : aucune action API. Attendre la décision du porteur de projet sur le lot 3 (sortie Opus tronquée : la réflexion a pris 76 % de la sortie). Ensuite : rapport du pilote, PR de synthèse (fermer #8-#12 sans fusion, avec motif), arrêt.
+**Étape suivante exacte** : aucune action API. Lot 3 fermé (option A) ; rapport du pilote écrit ; PR de synthèse ouverte ; **arrêt** en attente des décisions (§ 3).
 - **Branche de travail actuelle : `claude/stoic-dirac-asjcs0`** (avance rapide sur `claude/zealous-newton-dn96ub` au commit `d0d5234`, 2026-11-17, décision du porteur de projet ; `budget.json` identique, `limitUsd` 2,892). Les runs sont lancés sur cette ref. `claude/zealous-newton-dn96ub` reste en l'état (historique du pilote jusqu'à `d0d5234`), on n'y committe plus.
 
 ### Chapitres
@@ -77,14 +77,17 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | 2026-11-17 | Lot 3 : si la sortie du chapitre Opus est tronquée (`max_tokens`) ou inutilisable → **ARRÊT et rapport, aucun nouvel envoi** (hors budget). Si utilisable : contrôles compensatoires complets puis suite du lot 3 (correction si nécessaire, criblage, juge) aux conditions déjà approuvées. |
 | 2026-11-17 | PR #8, #9, #10 : laissées ouvertes, jamais fusionnées ; fermées avec motif à l'ouverture de la PR de synthèse. |
 | 2026-11-17 | HANDOFF mis à jour après chaque envoi ou collecte de batch. |
+| 2026-11-17 | Lot 3 : option A — fermé, aucun nouvel envoi ; constat versé au rapport (réflexion Opus 76 %, ≈ 1,19 $ de sorties tronquées, conception lycée en deux requêtes modifiant D4 pour le lycée, hypothèse effort `low` non testée). |
+| 2026-11-17 | Sortie tronquée conservée : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md` (jamais dans `src/`). |
+| 2026-11-17 | publish-pr seulement si la collecte a produit une sortie utilisable ; lié à la conception « une PR par chapitre » (à faire avant la production). |
 
 Journal des exceptions publish-pr : (ii) non appliquée à ce jour ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
 ## 3. Travail en cours et suivant (par priorité)
-1. **Lot 3** : voir « Étape suivante exacte » au § 1.
-2. **Rapport du pilote** (`project/reports/`) : coût réel par lot, étape et modèle contre l'estimation ; QA (taux de réussite, tours de correction, needs-human, constats du juge) ; comparaison des dossiers Haiku/Sonnet **par le contenu** ; couverture objectifs/taxonomie ; réestimation du projet par niveau avec plafond proposé ; sorties tronquées par la réflexion (2 fois : relecture Gate 0, criblage lot 2) et tokens de réflexion par étape/modèle ; configuration par défaut proposée pour la production (dont chapitre Sonnet 96 000) ; « erreurs récurrentes » ; charge G2 par niveau ; liste « avant production » (B kit.ts, test D effort low, comparaison démonstration Opus/Sonnet, une PR par chapitre en fin de chaîne, QA tier 2 contre la taxonomie verrouillée, corrections ciblées Pythagore).
-3. **PR de synthèse unique** : `budget.json` revenu à `limitUsd` 10 sur `main` avec historique du plafond du pilote à part ; affichage « reste … / 10 USD » corrigé ; correctifs de tests ; rapport du pilote ; `verificationMethod` « lecture-initiale » / « g2 » (P4-E-04 → `verified: false`, comptes séparés dans la matrice) ; porte G2 dans `run.ts` (refus en pilote/production, avertissement en dry-run) ; rapport du juge nommé par run ; ce fichier et `STATUS.md` à jour.
-4. **Arrêt** après la PR de synthèse : attendre la décision du budget de production.
+1. **Lot 3** : fermé (décision du 2026-11-17, option A) ; aucune correction, criblage ni juge du chapitre 1re.
+2. **Rapport du pilote** : **fait** — `project/reports/PILOT-rapport-final.md` (pièce : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md`).
+3. **PR de synthèse** : **ouverte** (base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
+4. **ARRÊT** : attendre les décisions du porteur de projet (budget de production par niveau, liste « avant production » du rapport § 8, fusion de la PR de synthèse).
 
 ## 4. Erreurs récurrentes et leçons
 - **La réflexion consomme toute la sortie** : relecture Gate 0 (11 260 tokens de réflexion, sortie tronquée), criblage lot 2 (7 999 / 8 000). Chapitre PC : 37 % de réflexion, 96,5 % de `max_tokens`. Opus 5.5 : réflexion ni désactivable ni plafonnable, seule la marge de `max_tokens` la contient.

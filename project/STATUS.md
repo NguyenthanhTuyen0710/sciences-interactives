@@ -19,7 +19,7 @@ _Mis à jour à chaque fin de session. **Reprise sans historique : lire d'abord 
 - Prévoir une contre-vérification indépendante après correction : elle a trouvé 2 bloquants.
 
 ## Prochaines actions
-- **Pilote API (2026-11-16 → en cours)** : lots 1 et 2 terminés, lot 3 (1re, Opus) en cours ; cumul 1,271 $ / 2,892 $. Détail et ordre des travaux : `project/HANDOFF.md`.
+- **Pilote API (2026-11-16 → 2026-11-17, terminé)** : lots 1 et 2 terminés (NEEDS_REVIEW au juge), lot 3 (1re, Opus) fermé sur sortie tronquée ; cumul 2,359 $ / 2,892 $. Rapport : `project/reports/PILOT-rapport-final.md` ; état et décisions attendues : `project/HANDOFF.md`.
 0. **Feuille de route `project/roadmap.md`** (directive du 2026-11-08, gates 0→5). Gate 0 : chaîne Pythagore complète (dossier → chapitre → validation → relecture IA valide), 0,692 $ au total ; en attente d'approbation et de la décision de fusion dans `main`. Lot de corrections QA proposé (non appliqué) : `project/reports/SCI-3E-MATH-017-QA-verification.md`. Manques relevés : `project/reports/ROADMAP-G0-audit.md`.
 1. SCI-INFRA-003 : erreur d'hydratation intermittente de `/admin/exercices/nouveau` pendant l'e2e.
 2. Chapitre suivant de la file : 5e (nouveau programme, en vigueur cette année), en commençant par les chapitres liés aux relatifs (`math-5e-expressions-litterales`, `math-5e-equations`) puis par domaine.
