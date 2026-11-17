@@ -17,16 +17,17 @@
 // dépense déjà réalisée : si le total dépasse budget.limitUsd, le pipeline s'arrête sans appeler l'API.
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
-import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
+import { appendLedger, effectiveLimitUsd, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, metaBlock, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// PIPELINE_ROOT : racine de données de remplacement (tests sur un répertoire temporaire) ; refusée hors dry-run.
+const ROOT = process.env.PIPELINE_ROOT ?? join(dirname(fileURLToPath(import.meta.url)), "..");
 const P = (f: string) => join(ROOT, f);
 const read = (f: string) => readFileSync(P(f), "utf8");
 const readJson = <T>(f: string): T => JSON.parse(read(f));
@@ -41,14 +42,14 @@ const MAX_FIX_ROUNDS = 2;
 // français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
 const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
-const maxTokens = (step: Step) => STEP_CONFIG[step].maxTokens;
+
 
 interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model"];
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model", "--retry"];
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
 
@@ -59,6 +60,8 @@ const RUN = {
   byModel: {} as ByModel, plan: [] as string[],
   /** Gate 1 du chapitre : null = non évalué dans ce run (collect, reconcile, arrêt avant). */
   gate1: null as null | { ok: boolean; missing: string[] },
+  /** Sorties utilisables écrites par ce run (« étape:fichier ») ; vide = rien à publier, publish-pr ne s'exécute pas. */
+  usableOutputs: [] as string[],
 };
 function writeSummary(code: number) {
   try {
@@ -96,7 +99,9 @@ if (!chapterId && flag("--next")) {
   console.log(`--next : chapitre retenu d'après la matrice de couverture : ${chapterId}`);
 }
 const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
+const RETRY_REASON = opt("--retry");
 const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
+if (process.env.PIPELINE_ROOT && LIVE) { console.error("ARRÊT : PIPELINE_ROOT est réservé au dry-run (tests)."); process.exit(2); }
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
 
 function fail(msg: string, code = 2): never { console.error(`ARRÊT : ${msg}`); process.exit(code); }
@@ -155,7 +160,7 @@ checkInputs();
 const LEDGER = P("pipeline/.store/ledger.jsonl");
 const ledger = () => readLedger(LEDGER);
 const spent = () => spentUsd(ledger());
-LEDGER_TOTAL = () => `$${spent().toFixed(3)} / $${TRIAL_CAP_USD}`;
+LEDGER_TOTAL = () => `$${spent().toFixed(3)} / $${effectiveLimitUsd(budget.limitUsd)}`;
 RUN.chapter = spec.id;
 const readiness = () => ({ ledgerSynced: process.env.PIPELINE_LEDGER_SYNCED === "1", creditVerified: budget.creditVerified, limitUsd: budget.limitUsd });
 const usd = (n: number, perM: number) => (n * perM) / 1e6;
@@ -230,7 +235,8 @@ let systemCached = false;
 const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review" && step !== "screen";
 const params = (step: Step, user: string, batch: boolean, model: string): Anthropic.MessageCreateParamsNonStreaming => ({
   model,
-  max_tokens: maxTokens(step),
+  max_tokens: maxTokensFor(step, model),
+  ...(thinkingParam(step, model) ? { thinking: thinkingParam(step, model) } : {}),
   // Relecture et criblage : JSON imposé par structured outputs (Message Batches compatibles), revérifié par parseReview.
   output_config: step === "review" || step === "screen" ? { effort: STEP_CONFIG[step].effort, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: STEP_CONFIG[step].effort },
   system: [{ type: "text", text: systemFor(step), ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
@@ -243,7 +249,7 @@ function upperCost(step: Step, model: string, sysTok: number, userTok: number, b
   const m = batch ? prices.batchMultiplier : 1;
   // Préfixe écrit en cache s'il est marqué (lu s'il l'a déjà été dans ce run), sinon prix d'entrée.
   const sysPrice = !cacheSystem(step, batch) ? r.input : systemCached ? r.cacheRead : r.cacheWrite1h;
-  return { upper: m * (usd(sysTok, sysPrice) + usd(userTok, r.input) + usd(maxTokens(step), r.output)), long: r.long };
+  return { upper: m * (usd(sysTok, sysPrice) + usd(userTok, r.input) + usd(maxTokensFor(step, model), r.output)), long: r.long };
 }
 
 async function estimate(step: Step, user: string, batch: boolean, model: string) {
@@ -264,7 +270,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   }
   const e = await estimate(step, user, batch, model);
-  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokens(step)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(Math.min(budget.limitUsd, TRIAL_CAP_USD))}`);
+  console.log(`  estimation ${step}${batch ? " (batch)" : ""} [${model}] : système ${e.sysTok} + requête ${e.userTok} tokens${e.exact ? " (count_tokens)" : ` (approx. ${CHARS_PER_TOKEN} car./token)`}, sortie ≤ ${maxTokensFor(step, model)}, empreinte ${hash}, coût maximal ${money(e.upper)}${e.long ? " (tarif long)" : ""} ; déjà compté ${money(spent())} / plafond ${money(effectiveLimitUsd(budget.limitUsd))}`);
   if (e.warning) { console.log(`  AVERTISSEMENT : ${e.warning}`); RUN.notes.push(e.warning); }
   const pr = params(step, user, batch, model);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
@@ -275,9 +281,9 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
 }
 
 /** Réserve le coût maximal dans le registre AVANT l'envoi ; renvoie l'identifiant de l'opération. */
-function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number, model: string): string {
+function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number, model: string, retry?: { retryOf: string; retryReason: string }): string {
   const id = `${spec.id}-${step}-${Date.now()}`;
-  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)), model });
+  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)), model, ...(retry ?? {}) });
   return id;
 }
 
@@ -320,6 +326,14 @@ function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchI
 
 /** Exécute une étape : renvoie le texte, ou null si un batch est en attente. */
 async function call(step: Step, user: string, hash: string, model: string): Promise<string | null> {
+  // M17 minimal : --retry "motif" renvoie une fois une étape payée sans résultat utilisable (empreinte suffixée).
+  let retry: { retryOf: string; retryReason: string } | undefined;
+  if (RETRY_REASON !== undefined) {
+    const r = retryPlan(ledger(), spec.id, step, hash, RETRY_REASON);
+    if ("error" in r) fail(`--retry : ${r.error}`);
+    console.log(`  nouvel envoi motivé de ${r.retryOf} (« ${RETRY_REASON} »), empreinte ${r.hash}`);
+    hash = r.hash; retry = { retryOf: r.retryOf, retryReason: RETRY_REASON };
+  }
   // Production : toutes les étapes, fix compris, passent par Message Batches (--submit) ; synchrone seulement avec --live sans --batch.
   const batch = BATCH;
   const st = state.steps[step];
@@ -335,7 +349,7 @@ async function call(step: Step, user: string, hash: string, model: string): Prom
   }
   const e = await guard(step, user, batch, hash, model);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
-  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model);
+  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model, retry);
   // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
   const unknown = (err: unknown): never => { appendLedger(LEDGER, { type: "unknown", id: opId, at: new Date().toISOString(), error: String((err as Error).message ?? err).slice(0, 300) }); throw err; };
   if (batch) {
@@ -390,6 +404,7 @@ async function collect(batchId: string) {
     logCost(step as Step, r.result.message, true, { batchId });
     out.save(finish(step as Step, r.result.message, { batchId }), r.result.message.model);
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
+    RUN.usableOutputs.push(`${step}:${out.file}`);
     if (step === "chapter" || step === "fix") {
       const v = validate(); qaValidation(v);
       console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
@@ -426,8 +441,9 @@ async function reconcile() {
 const hashOf = (...parts: string[]) => inputHash(parts);
 // Étape faite : état local (pipeline/state) ou, à défaut, registre partagé (data-store) — opération soldée de même
 // empreinte et résultat utilisable. Le registre survit aux runs GitHub, l'état local non : il assure la reprise (M1).
-const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && o.reserve.inputHash === hash && o.state === "settled" && o.outcome?.usable !== false);
-const done = (step: Step, hash: string) => !FORCE && ((state.steps[step]?.status === "done" && state.steps[step]!.hash === hash) || doneInLedger(step, hash));
+// Étape faite : opération soldée utilisable, d'origine ou par nouvel envoi motivé (empreinte + RETRY_SUFFIX).
+const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && (o.reserve.inputHash === hash || o.reserve.inputHash === hash + RETRY_SUFFIX) && o.state === "settled" && o.outcome?.usable !== false);
+const done = (step: Step, hash: string) => !FORCE && ((state.steps[step]?.status === "done" && [hash, hash + RETRY_SUFFIX].includes(state.steps[step]!.hash)) || doneInLedger(step, hash));
 function qaValidation(v: { ok: boolean; summary: string }) { RUN.qa.push({ check: "validate-chapter + tsc", ok: v.ok, detail: v.summary }); }
 const wanted = (step: Step) => !ONLY || ONLY === step;
 const markDone = (step: Step, hash: string, note?: string) => { state.steps[step] = { status: "done", hash, at: new Date().toISOString(), note }; saveState(); };
@@ -470,7 +486,7 @@ async function main() {
     + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
   if (!LIVE) costPlan(dossierUser, chapterUserFor(dossierText()));
   if (wanted("dossier") && !done("dossier", hDossier)) {
-    if (existsSync(P(DOSSIER_FILE)) && !FORCE) { console.log(`dossier : ${DOSSIER_FILE} existe déjà, conservé.`); markDone("dossier", hDossier, "fichier existant"); }
+    if (existsSync(P(DOSSIER_FILE)) && !FORCE) { console.log(`dossier : ${DOSSIER_FILE} existe déjà, conservé (modèle ${DOSSIER_MODEL}, empreinte ${hDossier}).`); markDone("dossier", hDossier, "fichier existant"); }
     else {
       console.log("dossier :");
       const t = await call("dossier", dossierUser, hDossier, DOSSIER_MODEL);
@@ -501,7 +517,8 @@ async function main() {
   // L'IA ne corrige qu'un brouillon produit par le pipeline (registre ou run courant), jamais un fichier relu et publié.
   const ledgerOps = ops(ledger()).filter((o) => o.reserve?.chapter === spec.id && o.state === "settled");
   const pipelineGenerated = state.steps.chapter?.note !== "fichier existant" || ledgerOps.some((o) => o.reserve!.step === "chapter" && o.outcome?.usable !== false);
-  const generatedHere = pipelineGenerated && /publicationStatus: "draft"/.test(read(CHAPTER_FILE));
+  // Brouillon du pipeline : bloc META inséré par le pipeline (draft) ; un brouillon écrit à la main n'est jamais corrigé ici.
+  const generatedHere = pipelineGenerated && isPipelineDraft(read(CHAPTER_FILE));
   let rounds = Math.max(state.fixRounds, ledgerOps.filter((o) => o.reserve!.step === "fix").length);
   while (!v.ok && generatedHere && wanted("fix") && rounds < MAX_FIX_ROUNDS) {
     rounds++; state.fixRounds = rounds; saveState();
@@ -543,7 +560,7 @@ async function main() {
     if (t === null) return;
     OUT.review.save(t, STEP_CONFIG.review.model); markDone("review", hReview);
   }
-  console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(budget.limitUsd)}.`);
+  console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(effectiveLimitUsd(budget.limitUsd))}.`);
 }
 
 const SCREEN_FOCUS = "Screening pass (fast model). Check the whole chapter for French spelling and grammar, consistent « tu », tone and the terminology of the French programme (criterion « language »). For the five other criteria, do not try to be exhaustive: report as a finding, with its exerciseId, anything that looks wrong or doubtful so that a stronger model checks it; give such a criterion NEEDS_REVIEW if you report something under it, PASS otherwise.";
@@ -608,7 +625,7 @@ function costPlan(dossierUser: string, chapterUser: string) {
     const sysTok = tok(systemFor(step)), userTok = tok(user);
     const a = upperCost(step, model, sysTok, userTok, true), b = upperCost(step, MODELS.sonnet, sysTok, userTok, true);
     const warn = longPromptWarning(prices, model, sysTok + userTok);
-    lines.push(`| ${label} | ${model}${a.long ? " (tarif long)" : ""} | ${sysTok + userTok} | ${maxTokens(step)} | ${money(a.upper)} | ${money(b.upper)} |`);
+    lines.push(`| ${label} | ${model}${a.long ? " (tarif long)" : ""} | ${sysTok + userTok} | ${maxTokensFor(step, model)} | ${money(a.upper)} | ${money(b.upper)} |`);
     if (warn) RUN.notes.push(warn);
     const worst = label.startsWith("fix tour 1 (MINEUR)") ? 0 : label.startsWith("fix tour 1 (MAJEUR)") ? 2 : 1; // pire cas : 2 tours Sonnet
     tiered += worst * a.upper; sonnet += worst * b.upper;

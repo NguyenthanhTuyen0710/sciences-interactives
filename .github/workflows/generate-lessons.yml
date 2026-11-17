@@ -59,6 +59,10 @@ on:
         description: "Refaire une étape déjà faite ou un fichier existant (--force) ; à n'utiliser que sur décision"
         type: boolean
         default: false
+      retry_reason:
+        description: "Nouvel envoi motivé (M17) d'une étape payée sans résultat utilisable : motif obligatoire ; une seule fois"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -123,6 +127,7 @@ jobs:
     outputs:
       started: ${{ steps.mark.outputs.started || steps.premark.outputs.started }}
       chapter: ${{ steps.run.outputs.chapter }}
+      usable: ${{ steps.run.outputs.usable }}
     steps:
       - uses: actions/checkout@v5
 
@@ -167,6 +172,7 @@ jobs:
           BATCH_ID: ${{ inputs.batch_id }}
           DOSSIER_MODEL: ${{ inputs.dossier_model || 'defaut' }}
           FORCE: ${{ inputs.force && 'true' || 'false' }}
+          RETRY_REASON: ${{ inputs.retry_reason }}
           # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
           # et pipeline/run.ts ne l'affiche jamais. workflow_run → dry-run → aucune clé.
           ANTHROPIC_API_KEY: ${{ needs.setup.outputs.api == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
@@ -176,6 +182,7 @@ jobs:
           if [ -n "$EXERCISES" ]; then args+=(--exercises "$EXERCISES"); fi
           if [ "$DOSSIER_MODEL" != "defaut" ]; then args+=(--dossier-model "$DOSSIER_MODEL"); fi
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          if [ -n "$RETRY_REASON" ]; then args+=(--retry "$RETRY_REASON"); fi
           case "$MODE" in
             dry-run) args+=(--batch) ;;
             pilot)   args+=(--submit) ;;
@@ -195,6 +202,9 @@ jobs:
           set -e
           chapter=$(node -e 'try{process.stdout.write(require("./pipeline-output/summary.json").chapter||"")}catch{}')
           echo "chapter=${chapter:-aucun}" >> "$GITHUB_OUTPUT"
+          # « true » seulement si ce run a écrit au moins une sortie utilisable (collect terminé, résultat non tronqué).
+          usable=$(node -e 'try{process.stdout.write((require("./pipeline-output/summary.json").usableOutputs||[]).length?"true":"false")}catch{process.stdout.write("false")}')
+          echo "usable=${usable}" >> "$GITHUB_OUTPUT"
           exit "$code"
 
       - name: Cohérence du registre après exécution
@@ -249,7 +259,8 @@ jobs:
   # Prérequis côté dépôt : Settings → Actions → « Allow GitHub Actions to create and approve pull requests ».
   publish-pr:
     needs: [setup, pipeline]
-    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
+    # collect : uniquement si le run a produit une sortie utilisable (pas de PR vide quand le batch n'est pas terminé, cf. PR #10, #12).
+    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun' && needs.pipeline.outputs.usable == 'true') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
