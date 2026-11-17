@@ -20,11 +20,11 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | Collecte | run #45 (12:50 UTC) : « résultat pas encore disponible » ; aucun coût soldé. Non relancée (consigne : ne pas attendre). |
 
 **Étape suivante exacte** :
-1. Relancer `collect` (workflow « Generate Lessons », ref `claude/zealous-newton-dn96ub`, mode `collect`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, batch_id `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`). Une collecte ne crée aucune requête payante.
+1. Relancer `collect` (workflow « Generate Lessons », ref `claude/stoic-dirac-asjcs0`, mode `collect`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, batch_id `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`). Une collecte ne crée aucune requête payante.
 2. Télécharger l'artefact, committer `research/dossiers/math-1re-spe-second-degre.md` sur la branche de travail (test, tsc, lint avant commit) ; noter le coût réel et les tokens de réflexion.
 3. Soumettre le chapitre Opus (mode `pilot`, mêmes entrées sans batch_id) : **déjà approuvé** (`max_tokens` 96 000, effort medium ; coût maximal estimé 1,094 $). Vérifier d'abord que cumul + 1,094 $ + marge du reste du lot ≤ 2,892 $.
 4. Puis : collect, contrôles compensatoires complets, correction si nécessaire, criblage (Haiku sans réflexion), juge (Sonnet).
-- Les runs sont lancés sur la ref `claude/zealous-newton-dn96ub` (seule branche portant le plafond 2,892 $).
+- **Branche de travail actuelle : `claude/stoic-dirac-asjcs0`** (avance rapide sur `claude/zealous-newton-dn96ub` au commit `d0d5234`, 2026-11-17, décision du porteur de projet ; `budget.json` identique, `limitUsd` 2,892). Les runs sont lancés sur cette ref. `claude/zealous-newton-dn96ub` reste en l'état (historique du pilote jusqu'à `d0d5234`), on n'y committe plus.
 
 ### Chapitres
 | Chapitre | Statut | Remarque |
@@ -45,11 +45,12 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 ### Branches et PR
 | Élément | État | Action |
 |---|---|---|
-| `claude/zealous-newton-dn96ub` | branche de travail du pilote | y committer ; base de la PR de synthèse |
+| `claude/stoic-dirac-asjcs0` | **branche de travail actuelle** (depuis le 2026-11-17, = `d0d5234` + suite) | y committer ; base de la PR de synthèse |
+| `claude/zealous-newton-dn96ub` | ancienne branche de travail du pilote, arrêtée à `d0d5234` | laisser en l'état |
 | PR #8, #9 (`pipeline/math-3e-pythagore-*`) | ouvertes, PR du bot | **ne jamais fusionner** ; laisser ouvertes |
 | PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | ouverte, PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture : à décider par le porteur de projet. Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
-| `claude/busy-fermi-8y29au` | | **ne pas toucher** (ni fusion ni suppression) |
-| PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 |
+| `claude/busy-fermi-8y29au` | absente du dépôt distant (constat du 2026-11-17) | **ne pas toucher** (ni fusion ni suppression) |
+| PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 ; **à son ouverture, fermer #8, #9, #10 sans fusion, avec une note de motif** (décision du 2026-11-17) |
 
 ## 2. Décisions en vigueur
 | Date | Décision |
@@ -74,6 +75,10 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | 2026-11-17 | Dossier Haiku : `max_tokens` 12 000 pour tous les chapitres. |
 | 2026-11-17 | Rapport du pilote : proposer `max_tokens` 96 000 par défaut pour le chapitre Sonnet en production (proposition seulement, pas de changement de code pendant le pilote). |
 | 2026-11-17 | `project/HANDOFF.md` écrit tôt, mis à jour après le rapport du pilote. |
+| 2026-11-17 | Branche de travail : `claude/stoic-dirac-asjcs0` (avance rapide sur `d0d5234`) ; `claude/zealous-newton-dn96ub` laissée en l'état. |
+| 2026-11-17 | Lot 3 : si la sortie du chapitre Opus est tronquée (`max_tokens`) ou inutilisable → **ARRÊT et rapport, aucun nouvel envoi** (hors budget). Si utilisable : contrôles compensatoires complets puis suite du lot 3 (correction si nécessaire, criblage, juge) aux conditions déjà approuvées. |
+| 2026-11-17 | PR #8, #9, #10 : laissées ouvertes, jamais fusionnées ; fermées avec motif à l'ouverture de la PR de synthèse. |
+| 2026-11-17 | HANDOFF mis à jour après chaque envoi ou collecte de batch. |
 
 Journal des exceptions publish-pr : (ii) non appliquée à ce jour ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
