@@ -1,6 +1,6 @@
 {
  "note": "Généré par `npm run dashboard` — ne pas modifier à la main. États : todo → researched → draft → qa-passed → published. apiCostUsd null = registre des dépenses absent localement (data-store).",
- "costsAvailable": true,
+ "costsAvailable": false,
  "summary": [
   {
    "subject": "mathematiques",
@@ -1210,7 +1210,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
@@ -1694,7 +1694,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
