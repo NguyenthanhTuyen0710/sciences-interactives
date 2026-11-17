@@ -1,29 +1,28 @@
 # Passation : reprendre le projet sans l'historique de conversation
 
-_Créé le 2026-11-17, mis à jour au point d'arrêt du 2026-11-17 ~12:55 UTC (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
+_Créé le 2026-11-17, mis à jour au point d'arrêt du 2026-11-17 ~13:05 UTC (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
 _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons » (`.github/workflows/generate-lessons.yml`)._
 
 ## 1. État au 2026-11-17
 
 ### Pilote API (en cours)
 - **Pilote approuvé** le 2026-11-16 : plafond propre 2,20 $, **cumul maximal 2,892 $** (`pipeline/budget.json` de la branche de travail). Ne jamais relever le plafond. Vérifier le cumul avant chaque lot ; arrêter s'il serait dépassé.
-- **Cumul réel au registre (Data Store, entrées `actual`)** : **1,271 $**. Le résumé de run affiche 1,274 $ car il compte aussi la réservation ouverte du dossier lot 3 (0,00348 $).
-- Pire cas restant du lot 3 : 1,511 $ (cumul ≤ 2,782 $).
+- **Cumul réel au registre (Data Store, entrées `actual`)** : **1,272 $** (run #46 : 54 entrées, 14 opérations, aucune réservation ouverte ; Sonnet 1,259 $, Haiku 0,014 $).
+- Pire cas restant du lot 3 : 1,508 $ (chapitre Opus 1,094 $ + criblage 0,004 $ + juge 0,077 $ + 2 corrections × 0,167 $) → cumul ≤ 2,780 $ ≤ 2,892 $.
 - Lot 1 (relecture Pythagore) : terminé. Lot 2 (chapitre PC 4e) : terminé. **Lot 3 (chapitre 1re, Opus) : en cours.**
 
-### Point d'arrêt exact (2026-11-17, ~12:55 UTC)
+### Point d'arrêt exact (2026-11-17, ~13:05 UTC)
 | Élément | Valeur |
 |---|---|
-| Lot / étape | lot 3, étape `dossier` (Haiku 5.5, `max_tokens` 12 000), état `batch-pending` |
-| Batch ouvert | `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`, soumis au run #44 (2026-11-17T12:48:28Z) |
-| Réservation | `math-1re-spe-second-degre-dossier-1794919708095`, empreinte `e11b997bbf17dcff`, maxUsd 0,00348 $ |
-| Collecte | run #45 (12:50 UTC) : « résultat pas encore disponible » ; aucun coût soldé. Non relancée (consigne : ne pas attendre). |
+| Lot / étape | lot 3, étape `dossier` **soldée** ; prochaine étape `chapter` (Opus 5.5, `max_tokens` 96 000, effort medium) |
+| Dossier | batch `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz` (run #44) collecté au run #46 (ref `claude/stoic-dirac-asjcs0`, 13:01 UTC) : `ended`, 1 réussi. **Coût réel 0,002 $** (estimation max 0,00348 $) ; entrée 9 563, sortie 5 901 / 12 000 dont réflexion 2 130 (36 %). Committé sans modification : `research/dossiers/math-1re-spe-second-degre.md` (sha256 `fc9e2e95…`). |
+| Relecture du dossier (Claude Code, 2026-11-17) | contenu mathématique correct (formules, démonstration en 5 étapes avec `2\|a\|`, signe, somme/produit, erreurs typiques) ; SD-06 avec les 3 approfondissements. Écarts hérités de la fiche, non corrigés (entrées du pilote figées) : la fiche déclare les 2 sources `seedId: null` / `pending_verification` alors que le collecteur a vérifié `bo-2026-14-pdf` ; le format 2 h / 6 + 14 pts est déjà vérifié (NS p. 44) mais le dossier le dit « à vérifier ». À traiter dans la PR de synthèse. |
+| PR du bot | publish-pr du run #46 ouvre une PR `pipeline/math-1re-spe-second-degre-44088482503` (même traitement que #8-#10 : ne pas fusionner, fermer avec la PR de synthèse). |
 
 **Étape suivante exacte** :
-1. Relancer `collect` (workflow « Generate Lessons », ref `claude/stoic-dirac-asjcs0`, mode `collect`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, batch_id `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz`). Une collecte ne crée aucune requête payante.
-2. Télécharger l'artefact, committer `research/dossiers/math-1re-spe-second-degre.md` sur la branche de travail (test, tsc, lint avant commit) ; noter le coût réel et les tokens de réflexion.
-3. Soumettre le chapitre Opus (mode `pilot`, mêmes entrées sans batch_id) : **déjà approuvé** (`max_tokens` 96 000, effort medium ; coût maximal estimé 1,094 $). Vérifier d'abord que cumul + 1,094 $ + marge du reste du lot ≤ 2,892 $.
-4. Puis : collect, contrôles compensatoires complets, correction si nécessaire, criblage (Haiku sans réflexion), juge (Sonnet).
+1. Soumettre le chapitre Opus (mode `pilot`, ref `claude/stoic-dirac-asjcs0`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, sans batch_id) : **déjà approuvé** (coût maximal estimé 1,094 $ ; cumul + pire cas restant ≤ 2,780 $).
+2. Collect. **Sortie tronquée (`max_tokens`) ou inutilisable → ARRÊT et rapport, aucun nouvel envoi.**
+3. Si utilisable : contrôles compensatoires complets (ChapterSchema, validate-chapter, tsc, lint, tests, build), correction si nécessaire, criblage (Haiku sans réflexion), juge (Sonnet).
 - **Branche de travail actuelle : `claude/stoic-dirac-asjcs0`** (avance rapide sur `claude/zealous-newton-dn96ub` au commit `d0d5234`, 2026-11-17, décision du porteur de projet ; `budget.json` identique, `limitUsd` 2,892). Les runs sont lancés sur cette ref. `claude/zealous-newton-dn96ub` reste en l'état (historique du pilote jusqu'à `d0d5234`), on n'y committe plus.
 
 ### Chapitres
@@ -48,7 +47,7 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | `claude/stoic-dirac-asjcs0` | **branche de travail actuelle** (depuis le 2026-11-17, = `d0d5234` + suite) | y committer ; base de la PR de synthèse |
 | `claude/zealous-newton-dn96ub` | ancienne branche de travail du pilote, arrêtée à `d0d5234` | laisser en l'état |
 | PR #8, #9 (`pipeline/math-3e-pythagore-*`) | ouvertes, PR du bot | **ne jamais fusionner** ; laisser ouvertes |
-| PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | ouverte, PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture : à décider par le porteur de projet. Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
+| PR #10 (`pipeline/math-1re-spe-second-degre-44086852652`) | ouverte, PR du bot, ouverte par publish-pr du run #45 alors que la collecte n'a rien rapporté | **ne pas fusionner** ; ne contient ni dossier ni chapitre (rapports QA déjà sur la branche, dashboard, matrice avec coûts `null`). Fermeture avec la PR de synthèse (décision du 2026-11-17). Défaut à corriger : publish-pr ne doit pas s'exécuter quand une collecte n'a produit aucun fichier. |
 | `claude/busy-fermi-8y29au` | absente du dépôt distant (constat du 2026-11-17) | **ne pas toucher** (ni fusion ni suppression) |
 | PR de synthèse du pilote | à ouvrir après le rapport | contenu au § 3 ; **à son ouverture, fermer #8, #9, #10 sans fusion, avec une note de motif** (décision du 2026-11-17) |
 
