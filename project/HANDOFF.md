@@ -1,6 +1,6 @@
 # Passation : reprendre le projet sans l'historique de conversation
 
-_Créé le 2026-11-17, mis à jour au point d'arrêt du 2026-11-17 ~13:05 UTC (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
+_Créé le 2026-11-17, mis à jour au point d'arrêt du 2026-11-17 ~13:08 UTC (autorisation du porteur de projet du même jour). À tenir à jour à chaque point d'arrêt. Aucun secret ni clé API dans ce fichier._
 _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons » (`.github/workflows/generate-lessons.yml`)._
 
 ## 1. État au 2026-11-17
@@ -11,17 +11,19 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 - Pire cas restant du lot 3 : 1,508 $ (chapitre Opus 1,094 $ + criblage 0,004 $ + juge 0,077 $ + 2 corrections × 0,167 $) → cumul ≤ 2,780 $ ≤ 2,892 $.
 - Lot 1 (relecture Pythagore) : terminé. Lot 2 (chapitre PC 4e) : terminé. **Lot 3 (chapitre 1re, Opus) : en cours.**
 
-### Point d'arrêt exact (2026-11-17, ~13:05 UTC)
+### Point d'arrêt exact (2026-11-17, ~13:08 UTC)
 | Élément | Valeur |
 |---|---|
-| Lot / étape | lot 3, étape `dossier` **soldée** ; prochaine étape `chapter` (Opus 5.5, `max_tokens` 96 000, effort medium) |
+| Lot / étape | lot 3, étape `chapter` (Opus 5.5, `max_tokens` 96 000, effort medium), état `batch-pending` |
+| Batch ouvert | `msgbatch_01JcPJdoquTQWk8Sk7Rd5d8C`, soumis au run #47 (2026-11-17T13:05Z, ref `claude/stoic-dirac-asjcs0`, commit `51d3769`) |
+| Réservation | `math-1re-spe-second-degre-chapter-1794920701043` ; registre après envoi : 56 entrées, 15 opérations, dépense comptée 2,359 $ (= 1,272 $ réel + réservation ≈ 1,087 $) |
 | Dossier | batch `msgbatch_01HsGPMA5ZzLkSeTv6778Gnz` (run #44) collecté au run #46 (ref `claude/stoic-dirac-asjcs0`, 13:01 UTC) : `ended`, 1 réussi. **Coût réel 0,002 $** (estimation max 0,00348 $) ; entrée 9 563, sortie 5 901 / 12 000 dont réflexion 2 130 (36 %). Committé sans modification : `research/dossiers/math-1re-spe-second-degre.md` (sha256 `fc9e2e95…`). |
 | Relecture du dossier (Claude Code, 2026-11-17) | contenu mathématique correct (formules, démonstration en 5 étapes avec `2\|a\|`, signe, somme/produit, erreurs typiques) ; SD-06 avec les 3 approfondissements. Écarts hérités de la fiche, non corrigés (entrées du pilote figées) : la fiche déclare les 2 sources `seedId: null` / `pending_verification` alors que le collecteur a vérifié `bo-2026-14-pdf` ; le format 2 h / 6 + 14 pts est déjà vérifié (NS p. 44) mais le dossier le dit « à vérifier ». À traiter dans la PR de synthèse. |
 | PR du bot | publish-pr du run #46 ouvre une PR `pipeline/math-1re-spe-second-degre-44088482503` (même traitement que #8-#10 : ne pas fusionner, fermer avec la PR de synthèse). |
 
 **Étape suivante exacte** :
-1. Soumettre le chapitre Opus (mode `pilot`, ref `claude/stoic-dirac-asjcs0`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, sans batch_id) : **déjà approuvé** (coût maximal estimé 1,094 $ ; cumul + pire cas restant ≤ 2,780 $).
-2. Collect. **Sortie tronquée (`max_tokens`) ou inutilisable → ARRÊT et rapport, aucun nouvel envoi.**
+1. `collect` (ref `claude/stoic-dirac-asjcs0`, mode `collect`, niveau `1re`, matière `mathematiques`, parcours `specialite`, chapitre `math-1re-spe-second-degre`, batch_id `msgbatch_01JcPJdoquTQWk8Sk7Rd5d8C`). Gratuit. Si « pas encore disponible », relancer plus tard.
+2. **Sortie tronquée (`max_tokens`) ou inutilisable → ARRÊT et rapport, aucun nouvel envoi.**
 3. Si utilisable : contrôles compensatoires complets (ChapterSchema, validate-chapter, tsc, lint, tests, build), correction si nécessaire, criblage (Haiku sans réflexion), juge (Sonnet).
 - **Branche de travail actuelle : `claude/stoic-dirac-asjcs0`** (avance rapide sur `claude/zealous-newton-dn96ub` au commit `d0d5234`, 2026-11-17, décision du porteur de projet ; `budget.json` identique, `limitUsd` 2,892). Les runs sont lancés sur cette ref. `claude/zealous-newton-dn96ub` reste en l'état (historique du pilote jusqu'à `d0d5234`), on n'y committe plus.
 
