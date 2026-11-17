@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, metaBlock, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -503,7 +503,8 @@ async function main() {
   // L'IA ne corrige qu'un brouillon produit par le pipeline (registre ou run courant), jamais un fichier relu et publié.
   const ledgerOps = ops(ledger()).filter((o) => o.reserve?.chapter === spec.id && o.state === "settled");
   const pipelineGenerated = state.steps.chapter?.note !== "fichier existant" || ledgerOps.some((o) => o.reserve!.step === "chapter" && o.outcome?.usable !== false);
-  const generatedHere = pipelineGenerated && /publicationStatus: "draft"/.test(read(CHAPTER_FILE));
+  // Brouillon du pipeline : bloc META inséré par le pipeline (draft) ; un brouillon écrit à la main n'est jamais corrigé ici.
+  const generatedHere = pipelineGenerated && isPipelineDraft(read(CHAPTER_FILE));
   let rounds = Math.max(state.fixRounds, ledgerOps.filter((o) => o.reserve!.step === "fix").length);
   while (!v.ok && generatedHere && wanted("fix") && rounds < MAX_FIX_ROUNDS) {
     rounds++; state.fixRounds = rounds; saveState();

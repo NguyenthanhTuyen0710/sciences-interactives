@@ -183,3 +183,15 @@ export function injectMeta(file: string, block: string): string {
   const at = imports.length ? imports[imports.length - 1].index! + imports[imports.length - 1][0].length : 0;
   return `${file.slice(0, at)}\n\n${block}\n${file.slice(at)}`;
 }
+
+/**
+ * Brouillon produit par le pipeline : le fichier contient le bloc META inséré par injectMeta (marqueurs de début et
+ * de fin), et ce bloc déclare `publicationStatus: "draft"`. Un chapitre écrit à la main (sans META) ou publié n'est
+ * jamais modifié par la correction automatique, même s'il est en brouillon. À combiner avec le registre (étape
+ * « chapter » soldée pour ce chapitre).
+ */
+export function isPipelineDraft(file: string): boolean {
+  const start = file.indexOf(META_START), end = file.indexOf(META_END, start);
+  if (start < 0 || end < 0) return false;
+  return /"publicationStatus":\s*"draft"/.test(file.slice(start, end));
+}

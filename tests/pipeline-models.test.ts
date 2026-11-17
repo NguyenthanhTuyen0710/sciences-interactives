@@ -1,11 +1,11 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, metaBlock, META_START, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spentByModel, type LedgerEntry } from "../pipeline/ledger";
@@ -17,10 +17,15 @@ const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Price
  * copiées (prompts, fiches, tarifs, inventaires, schéma, types, arborescence, chapitre d'exemple) ; aucun dossier,
  * chapitre produit, état, rapport ni registre du dépôt n'est vu. `files` ajoute des fichiers au fixture.
  */
-function dryRun(args: string[], files: Record<string, string> = {}) {
+function dryRun(args: string[], files: Record<string, string> = {}, withCode = false) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-fixture-"));
   try {
     for (const p of ["pipeline/prompts", "pipeline/chapters", "pipeline/prices.json", "pipeline/budget.json", "research/curriculum", "src/lib/chapters/schema.ts", "src/lib/engine/types.ts", "src/lib/content/curriculum.ts", "src/lib/chapters/data/math-3e-arithmetique.ts"]) cpSync(p, join(root, p), { recursive: true });
+    // withCode : validate-chapter et tsc s'exécutent dans le fixture (code source, sans les chapitres produits du dépôt).
+    if (withCode) {
+      for (const p of ["src", "scripts", "package.json", "tsconfig.json", "research/sources/records"]) cpSync(p, join(root, p), { recursive: true, filter: (x) => !/src\/lib\/chapters\/data\/(pc-4e-electricite|math-3e-pythagore|math-3e-puissances-calculs)\.ts$/.test(x) });
+      symlinkSync(join(process.cwd(), "node_modules"), join(root, "node_modules"));
+    }
     for (const [p, text] of Object.entries(files)) { mkdirSync(dirname(join(root, p)), { recursive: true }); writeFileSync(join(root, p), text); }
     const r = spawnSync("npx", ["tsx", "pipeline/run.ts", ...args], { encoding: "utf8", env: { ...process.env, ANTHROPIC_API_KEY: "", PIPELINE_ROOT: root } });
     return { status: r.status, out: r.stdout + r.stderr };
@@ -225,4 +230,52 @@ describe("proposition A : métadonnées injectées par le pipeline", () => {
     expect(once.indexOf(META_START)).toBeLessThan(once.indexOf("export const z"));
     expect(injectMeta(once, metaBlock(spec, groups))).toBe(once);
   });
+});
+
+describe("correction automatique : seulement un brouillon produit par le pipeline (bloc META)", () => {
+  const spec = JSON.parse(readFileSync("pipeline/chapters/pc-4e-electricite.json", "utf8"));
+  const meta = metaBlock(spec, [{ chapter: "pc-4e-lois-electricite", kind: "officiel 4e", objectives: [{ id: "P4-E-01", text: "Protocole." }] }]);
+  const withMeta = injectMeta('import type { ChapterContent } from "../schema";\nexport const x: ChapterContent = { ...META } as never;\n', meta);
+  it("chapitre avec META draft : corrigeable", () => expect(isPipelineDraft(withMeta)).toBe(true));
+  it("chapitre avec META publié : non corrigeable", () => expect(isPipelineDraft(withMeta.replace('"publicationStatus": "draft"', '"publicationStatus": "published"'))).toBe(false));
+  it("brouillons écrits à la main (sans META) : jamais corrigés, même en draft", () => {
+    for (const id of ["math-3e-puissances-calculs", "math-3e-pythagore"]) {
+      const src = readFileSync(`src/lib/chapters/data/${id}.ts`, "utf8");
+      expect(src).toMatch(/publicationStatus: "draft"/);
+      expect(isPipelineDraft(src), id).toBe(false);
+    }
+  });
+  it("« draft » hors du bloc META ignoré", () => expect(isPipelineDraft('const a = { "publicationStatus": "draft" };')).toBe(false));
+  it("chapitre PC du pilote (produit par le pipeline) : corrigeable", () => expect(isPipelineDraft(readFileSync("src/lib/chapters/data/pc-4e-electricite.ts", "utf8"))).toBe(true));
+});
+
+describe("correction automatique : chemin complet en dry-run (fixture)", () => {
+  const ledgerChapter = [
+    { type: "reserve", id: "c1", at: "2026-11-17T00:00:00Z", chapter: "pc-4e-electricite", step: "chapter", inputHash: "x", mode: "batch", maxUsd: 0.4, model: "claude-sonnet-5-5" },
+    { type: "submitted", id: "c1", at: "2026-11-17T00:00:01Z", batchId: "msgbatch_test" },
+    { type: "actual", id: "c1", at: "2026-11-17T00:10:00Z", usd: 0.37, model: "claude-sonnet-5-5" },
+  ].map((e) => JSON.stringify(e)).join("\n") + "\n";
+  it("chapitre du pipeline (META) en échec de validation : tour de correction 1 prévu (Sonnet, problème majeur)", () => {
+    const { status, out } = dryRun(["pc-4e-electricite", "--batch"], {
+      "research/dossiers/pc-4e-electricite.md": "# Dossier\n",
+      "src/lib/chapters/data/pc-4e-electricite.ts": readFileSync("src/lib/chapters/data/pc-4e-electricite.ts", "utf8"),
+      "pipeline/.store/ledger.jsonl": ledgerChapter,
+    }, true);
+    expect(out).toMatch(/validation : échecs/);
+    expect(out).toMatch(/fix \(tour 1\/2\) \[claude-sonnet-5-5\]/);
+    expect(out).not.toMatch(/jamais modifié par l'IA/);
+    expect(status, out).toBe(0);
+  }, 180_000);
+  it("brouillon écrit à la main (sans META) en échec : aucune correction, needs-human", () => {
+    const src = readFileSync("src/lib/chapters/data/pc-4e-electricite.ts", "utf8");
+    const a = src.indexOf(META_START), b = src.indexOf("// </pipeline:meta>");
+    const manual = src.slice(0, a) + src.slice(a, b).replace(/^\/\/ <pipeline:meta>.*$/m, "// métadonnées écrites à la main") + src.slice(b).replace("// </pipeline:meta>", "");
+    const { status, out } = dryRun(["pc-4e-electricite", "--batch"], {
+      "research/dossiers/pc-4e-electricite.md": "# Dossier\n",
+      "src/lib/chapters/data/pc-4e-electricite.ts": manual,
+      "pipeline/.store/ledger.jsonl": ledgerChapter,
+    }, true);
+    expect(out).not.toMatch(/fix \(tour/);
+    expect(status, out).toBe(6);
+  }, 180_000);
 });
