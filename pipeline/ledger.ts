@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 export const TRIAL_CAP_USD = 10; // plafond de la phase d'essai, non modifiable par budget.json
 
 export type LedgerEntry =
-  | { type: "reserve"; id: string; at: string; chapter: string; step: string; inputHash: string; mode: "batch" | "sync"; maxUsd: number; model?: string }
+  | { type: "reserve"; id: string; at: string; chapter: string; step: string; inputHash: string; mode: "batch" | "sync"; maxUsd: number; model?: string; retryOf?: string; retryReason?: string }
   | { type: "submitted"; id: string; at: string; batchId: string }
   | { type: "actual"; id: string; at: string; usd: number; batchId?: string; model?: string; tokens?: { input: number; cacheWrite: number; cacheRead: number; output: number; thinking?: number } }
   | { type: "failed"; id: string; at: string; reason: string }
@@ -140,4 +140,22 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   for (const i of issues) console.error(`  ✗ ${i}`);
   console.log(issues.length ? `INCOHÉRENT (${issues.length})` : "cohérent");
   process.exit(issues.length ? 1 : 0);
+}
+
+/** Suffixe d'empreinte du nouvel envoi motivé (M17, version minimale). */
+export const RETRY_SUFFIX = ":retry=1";
+/**
+ * Nouvel envoi motivé d'une étape payée sans résultat utilisable (M17 minimal) : au plus UNE fois, seulement si
+ * l'opération d'origine est soldée avec `outcome.usable: false`, motif obligatoire. L'empreinte reçoit le suffixe
+ * RETRY_SUFFIX (l'anti-doublon reste actif) ; le plafond s'applique comme à tout envoi (spendBlockers).
+ */
+export function retryPlan(entries: LedgerEntry[], chapter: string, step: string, inputHash: string, reason: string | undefined): { hash: string; retryOf: string } | { error: string } {
+  if (!reason?.trim()) return { error: "motif du nouvel envoi obligatoire (--retry \"motif\")" };
+  const all = ops(entries);
+  const same = (o: Op, h: string) => o.reserve?.chapter === chapter && o.reserve.step === step && o.reserve.inputHash === h;
+  const orig = all.find((o) => same(o, inputHash) && o.state === "settled");
+  if (!orig) return { error: `aucune opération soldée ${chapter}/${step} (empreinte ${inputHash}) à renvoyer` };
+  if (orig.outcome?.usable !== false) return { error: `${orig.id} a un résultat utilisable : aucun nouvel envoi` };
+  if (all.some((o) => same(o, inputHash + RETRY_SUFFIX))) return { error: `nouvel envoi de ${orig.id} déjà fait (au plus un)` };
+  return { hash: inputHash + RETRY_SUFFIX, retryOf: orig.id };
 }

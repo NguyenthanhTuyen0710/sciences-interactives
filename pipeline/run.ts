@@ -17,9 +17,9 @@
 // dépense déjà réalisée : si le total dépasse budget.limitUsd, le pipeline s'arrête sans appeler l'API.
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
-import { appendLedger, ops, readLedger, reconcileBatch, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
+import { appendLedger, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd, TRIAL_CAP_USD } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -49,7 +49,7 @@ interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: 
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model"];
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model", "--retry"];
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
 
@@ -97,6 +97,7 @@ if (!chapterId && flag("--next")) {
   console.log(`--next : chapitre retenu d'après la matrice de couverture : ${chapterId}`);
 }
 const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
+const RETRY_REASON = opt("--retry");
 const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
 if (process.env.PIPELINE_ROOT && LIVE) { console.error("ARRÊT : PIPELINE_ROOT est réservé au dry-run (tests)."); process.exit(2); }
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
@@ -233,6 +234,7 @@ const cacheSystem = (step: Step, batch: boolean) => !batch && step !== "review" 
 const params = (step: Step, user: string, batch: boolean, model: string): Anthropic.MessageCreateParamsNonStreaming => ({
   model,
   max_tokens: maxTokens(step),
+  ...(thinkingParam(step, model) ? { thinking: thinkingParam(step, model) } : {}),
   // Relecture et criblage : JSON imposé par structured outputs (Message Batches compatibles), revérifié par parseReview.
   output_config: step === "review" || step === "screen" ? { effort: STEP_CONFIG[step].effort, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: STEP_CONFIG[step].effort },
   system: [{ type: "text", text: systemFor(step), ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
@@ -277,9 +279,9 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
 }
 
 /** Réserve le coût maximal dans le registre AVANT l'envoi ; renvoie l'identifiant de l'opération. */
-function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number, model: string): string {
+function reserve(step: Step, hash: string, mode: "batch" | "sync", maxUsd: number, model: string, retry?: { retryOf: string; retryReason: string }): string {
   const id = `${spec.id}-${step}-${Date.now()}`;
-  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)), model });
+  appendLedger(LEDGER, { type: "reserve", id, at: new Date().toISOString(), chapter: spec.id, step, inputHash: hash, mode, maxUsd: Number(maxUsd.toFixed(5)), model, ...(retry ?? {}) });
   return id;
 }
 
@@ -322,6 +324,14 @@ function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchI
 
 /** Exécute une étape : renvoie le texte, ou null si un batch est en attente. */
 async function call(step: Step, user: string, hash: string, model: string): Promise<string | null> {
+  // M17 minimal : --retry "motif" renvoie une fois une étape payée sans résultat utilisable (empreinte suffixée).
+  let retry: { retryOf: string; retryReason: string } | undefined;
+  if (RETRY_REASON !== undefined) {
+    const r = retryPlan(ledger(), spec.id, step, hash, RETRY_REASON);
+    if ("error" in r) fail(`--retry : ${r.error}`);
+    console.log(`  nouvel envoi motivé de ${r.retryOf} (« ${RETRY_REASON} »), empreinte ${r.hash}`);
+    hash = r.hash; retry = { retryOf: r.retryOf, retryReason: RETRY_REASON };
+  }
   // Production : toutes les étapes, fix compris, passent par Message Batches (--submit) ; synchrone seulement avec --live sans --batch.
   const batch = BATCH;
   const st = state.steps[step];
@@ -337,7 +347,7 @@ async function call(step: Step, user: string, hash: string, model: string): Prom
   }
   const e = await guard(step, user, batch, hash, model);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
-  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model);
+  const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model, retry);
   // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
   const unknown = (err: unknown): never => { appendLedger(LEDGER, { type: "unknown", id: opId, at: new Date().toISOString(), error: String((err as Error).message ?? err).slice(0, 300) }); throw err; };
   if (batch) {
@@ -428,8 +438,9 @@ async function reconcile() {
 const hashOf = (...parts: string[]) => inputHash(parts);
 // Étape faite : état local (pipeline/state) ou, à défaut, registre partagé (data-store) — opération soldée de même
 // empreinte et résultat utilisable. Le registre survit aux runs GitHub, l'état local non : il assure la reprise (M1).
-const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && o.reserve.inputHash === hash && o.state === "settled" && o.outcome?.usable !== false);
-const done = (step: Step, hash: string) => !FORCE && ((state.steps[step]?.status === "done" && state.steps[step]!.hash === hash) || doneInLedger(step, hash));
+// Étape faite : opération soldée utilisable, d'origine ou par nouvel envoi motivé (empreinte + RETRY_SUFFIX).
+const doneInLedger = (step: Step, hash: string) => ops(ledger()).some((o) => o.reserve?.chapter === spec.id && o.reserve.step === step && (o.reserve.inputHash === hash || o.reserve.inputHash === hash + RETRY_SUFFIX) && o.state === "settled" && o.outcome?.usable !== false);
+const done = (step: Step, hash: string) => !FORCE && ((state.steps[step]?.status === "done" && [hash, hash + RETRY_SUFFIX].includes(state.steps[step]!.hash)) || doneInLedger(step, hash));
 function qaValidation(v: { ok: boolean; summary: string }) { RUN.qa.push({ check: "validate-chapter + tsc", ok: v.ok, detail: v.summary }); }
 const wanted = (step: Step) => !ONLY || ONLY === step;
 const markDone = (step: Step, hash: string, note?: string) => { state.steps[step] = { status: "done", hash, at: new Date().toISOString(), note }; saveState(); };

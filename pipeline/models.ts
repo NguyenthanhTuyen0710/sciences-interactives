@@ -24,11 +24,13 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
  * étapes qui n'écrivent pas de code (dossier, criblage, juge approfondi) ; « full » : préfixe complet (chapitre, fix).
  * fix : modèle choisi par fixModel() ; review : juge approfondi limité aux constats signalés et aux niveaux 4-5.
  */
-export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light" }> = {
+/** thinking "disabled" : accepté par Claude Haiku 5.5 seulement aux efforts low/medium/high (400 sur Opus 5.5, Sonnet 5.5). */
+export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light"; thinking?: "disabled" }> = {
   dossier: { model: MODELS.haiku, effort: "medium", maxTokens: 8000, system: "light" },
   chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
-  screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light" },
+  // Criblage sans réflexion (pilote, run 39 : 7 999 / 8 000 tokens de sortie en réflexion sur un chapitre de 45k tokens).
+  screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light", thinking: "disabled" },
   // Juge approfondi : préfixe « light » (décision du 2026-11-15) : les erreurs de type sont déjà prises par ChapterSchema,
   // tsc et validate-chapter (tier 1) ; la requête contient les extraits d'exercices à juger.
   review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "light" },
@@ -194,4 +196,12 @@ export function isPipelineDraft(file: string): boolean {
   const start = file.indexOf(META_START), end = file.indexOf(META_END, start);
   if (start < 0 || end < 0) return false;
   return /"publicationStatus":\s*"draft"/.test(file.slice(start, end));
+}
+
+/** Paramètre `thinking` d'une étape : « disabled » seulement pour Haiku 5.5 à effort ≤ high ; sinon adaptatif par défaut. */
+export function thinkingParam(step: PipelineStep, model: string): { type: "disabled" } | undefined {
+  const c = STEP_CONFIG[step];
+  if (c.thinking !== "disabled") return undefined;
+  if (model !== MODELS.haiku || !["low", "medium", "high"].includes(c.effort)) throw new Error(`thinking désactivé non accepté pour ${model} / effort ${c.effort} (étape ${step})`);
+  return { type: "disabled" };
 }

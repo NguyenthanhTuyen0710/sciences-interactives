@@ -1,14 +1,14 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, thinkingParam, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { spentByModel, type LedgerEntry } from "../pipeline/ledger";
+import { retryPlan, RETRY_SUFFIX, spentByModel, type LedgerEntry } from "../pipeline/ledger";
 
 const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Prices;
 
@@ -278,4 +278,33 @@ describe("correction automatique : chemin complet en dry-run (fixture)", () => {
     expect(out).not.toMatch(/fix \(tour/);
     expect(status, out).toBe(6);
   }, 180_000);
+});
+
+describe("criblage sans réflexion (run 39 : sortie entièrement consommée par la réflexion)", () => {
+  it("criblage Haiku : thinking disabled ; autres étapes : adaptatif par défaut", () => {
+    expect(thinkingParam("screen", MODELS.haiku)).toEqual({ type: "disabled" });
+    for (const st of ["dossier", "chapter", "fix", "review"] as const) expect(thinkingParam(st, STEP_CONFIG[st].model)).toBeUndefined();
+  });
+  it("refusé hors Haiku (400 sur Opus 5.5 / Sonnet 5.5)", () => expect(() => thinkingParam("screen", MODELS.sonnet)).toThrow(/non accepté/));
+});
+
+describe("M17 minimal : nouvel envoi motivé, une seule fois, seulement sans résultat utilisable", () => {
+  const base: LedgerEntry[] = [
+    { type: "reserve", id: "s1", at: "t", chapter: "c", step: "screen", inputHash: "h", mode: "batch", maxUsd: 0.004, model: MODELS.haiku },
+    { type: "submitted", id: "s1", at: "t", batchId: "b1" },
+    { type: "actual", id: "s1", at: "t", usd: 0.004 },
+  ];
+  const unusable: LedgerEntry[] = [...base, { type: "outcome", id: "s1", at: "t", stopReason: "max_tokens", usable: false }];
+  it("accepté : empreinte suffixée, rattaché à l'opération d'origine", () => {
+    expect(retryPlan(unusable, "c", "screen", "h", "réflexion a consommé max_tokens")).toEqual({ hash: "h" + RETRY_SUFFIX, retryOf: "s1" });
+  });
+  it("refusé : second nouvel envoi", () => {
+    const after: LedgerEntry[] = [...unusable, { type: "reserve", id: "s2", at: "t", chapter: "c", step: "screen", inputHash: "h" + RETRY_SUFFIX, mode: "batch", maxUsd: 0.004, retryOf: "s1", retryReason: "x" }];
+    expect(retryPlan(after, "c", "screen", "h", "encore")).toMatchObject({ error: expect.stringMatching(/déjà fait/) });
+  });
+  it("refusé : résultat utilisable, opération absente, motif vide", () => {
+    expect(retryPlan(base, "c", "screen", "h", "motif")).toMatchObject({ error: expect.stringMatching(/utilisable/) });
+    expect(retryPlan(unusable, "c", "review", "h", "motif")).toMatchObject({ error: expect.stringMatching(/aucune opération/) });
+    expect(retryPlan(unusable, "c", "screen", "h", "  ")).toMatchObject({ error: expect.stringMatching(/obligatoire/) });
+  });
 });
