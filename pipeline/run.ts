@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, effectiveLimitUsd, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -44,7 +44,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string> }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -275,6 +275,8 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
   const pr = params(step, user, batch, model);
   console.log(`  requête : ${JSON.stringify({ model: pr.model, max_tokens: pr.max_tokens, output_config: { effort: pr.output_config?.effort, format: pr.output_config?.format ? `json_schema (sha256 ${createHash("sha256").update(JSON.stringify(pr.output_config.format.schema)).digest("hex").slice(0, 16)})` : undefined }, system_cache_control: (pr.system as Anthropic.TextBlockParam[])[0].cache_control, thinking: pr.thinking ?? "par défaut (adaptatif)", messages: `${pr.messages.length} message(s), ${user.length} car.` })}`);
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
+  const trunc = truncationRisk(step, model);
+  if (trunc) { blockers.push(trunc); RUN.notes.push(trunc); }
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
   if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   return e;
@@ -472,6 +474,15 @@ async function main() {
   RUN.gate1 = { ok: unclassified.length === 0, missing: unclassified };
   if (unclassified.length) {
     const msg = `Gate 1 non atteint : objectif(s) sans classement validé (niveau, notions, compétences) : ${unclassified.join(", ")}`;
+    if (LIVE) fail(`${msg} — aucun envoi.`, 8);
+    console.log(`avertissement : ${msg} (un envoi réel serait refusé).`);
+    RUN.notes.push(msg);
+  }
+  // Porte G2 (décision du 2026-11-17) : tout objectif obligatoire du chapitre doit être vérifié par G2
+  // (citation verbatim + approbation humaine) ; « lecture-initiale » ne suffit pas pour générer.
+  const notG2 = g2Missing((JSON.parse(OBJ) as { objectives: InventoryObjective[] }[]).flatMap((g) => g.objectives), spec.grade, spec.objectiveLevels);
+  if (notG2.length) {
+    const msg = `porte G2 : objectif(s) obligatoire(s) sans vérification G2 (méthode « lecture-initiale ») : ${notG2.join(", ")}`;
     if (LIVE) fail(`${msg} — aucun envoi.`, 8);
     console.log(`avertissement : ${msg} (un envoi réel serait refusé).`);
     RUN.notes.push(msg);
