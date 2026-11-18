@@ -270,3 +270,22 @@ describe("tutoiement : tous les textes élève contrôlés par validate-chapter"
   ];
   for (const [name, run, where] of instanceCases) it(`signalé dans un tirage : ${name}`, () => expect(run()).toEqual([where]));
 });
+
+describe("QA tier 2 : chapitre ↔ taxonomie verrouillée (validate-chapter)", () => {
+  it("Pythagore : écarts connus détectés (entrée de la correction ciblée A)", async () => {
+    const { spawnSync } = await import("node:child_process");
+    const r = spawnSync("npx", ["tsx", "scripts/validate-chapter.ts", "math-3e-pythagore", "--json", "--seeds", "3"], { encoding: "utf8" });
+    const out = JSON.parse(r.stdout.trim().split("\n").pop() ?? "{}") as { summary: { taxonomy: string }; issues: { where: string; problem: string }[] };
+    expect(out.summary.taxonomy).toBe("verrouillé");
+    const tier2 = out.issues.map((i) => `${i.where} | ${i.problem}`);
+    expect(tier2).toContain("py3-03 | niveau 1 hors de la difficulté du type PY-T06 (3, 4, 5)");
+    expect(tier2).toContain("taxonomie:PY-T11 | type obligatoire sans exercice");
+    expect(tier2).toContain("py3-20 | exercice d'approfondissement présenté en évaluation finale (titre « Type … — »)");
+  }, 120_000);
+  it("chapitre sans taxonomie : QA tier 2 non évaluée, pas d'échec", async () => {
+    const { spawnSync } = await import("node:child_process");
+    const r = spawnSync("npx", ["tsx", "scripts/validate-chapter.ts", "math-5e-nombres-relatifs", "--json", "--seeds", "3"], { encoding: "utf8" });
+    const out = JSON.parse(r.stdout.trim().split("\n").pop() ?? "{}") as { summary: { taxonomy: string; ok: boolean } };
+    expect(out.summary).toMatchObject({ taxonomy: "absente", ok: true });
+  }, 120_000);
+});

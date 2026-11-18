@@ -28,7 +28,8 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
 export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light"; thinking?: "disabled" }> = {
   // 12 000 (pilote, décision du 2026-11-17) : le dossier PC Haiku a utilisé 6 657 / 8 000 tokens (83 %), dont 2 897 de réflexion.
   dossier: { model: MODELS.haiku, effort: "medium", maxTokens: 12000, system: "light" },
-  chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
+  // 96 000 (décision du 2026-11-18) : besoin estimé 67 453 (chapitre PC : 38 632 visibles, 37 % de réflexion).
+  chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 96000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
   // Criblage sans réflexion (pilote, run 39 : 7 999 / 8 000 tokens de sortie en réflexion sur un chapitre de 45k tokens).
   screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light", thinking: "disabled" },
@@ -217,4 +218,52 @@ export function thinkingParam(step: PipelineStep, model: string): { type: "disab
   if (c.thinking !== "disabled") return undefined;
   if (model !== MODELS.haiku || !["low", "medium", "high"].includes(c.effort)) throw new Error(`thinking désactivé non accepté pour ${model} / effort ${c.effort} (étape ${step})`);
   return { type: "disabled" };
+}
+
+// ───────── G2 : méthode de vérification des objectifs (décision du 2026-11-17) ─────────
+/** « g2 » : preuve attachée par `attach_evidence` (citation + approbation humaine datée) ; sinon « lecture-initiale ». */
+export type VerificationMethod = "g2" | "lecture-initiale";
+export interface InventoryObjective { id: string; level?: Record<string, string>; required?: boolean; evidence?: { quote?: string; approvedBy?: string; approvedAt?: string } }
+export const verificationMethod = (o: InventoryObjective): VerificationMethod =>
+  (o.evidence?.quote && o.evidence.approvedBy && o.evidence.approvedAt ? "g2" : "lecture-initiale");
+/**
+ * Objectifs obligatoires du chapitre : `required` ≠ false et niveau « exigible » (fiche `objectiveLevels`, sinon inventaire
+ * pour le niveau). Niveau inconnu (objectif non classé, Gate 1 non atteint) : traité comme obligatoire, par prudence.
+ */
+export function requiredObjectives(objs: InventoryObjective[], grade: string, levels: Record<string, string> = {}): InventoryObjective[] {
+  return objs.filter((o) => {
+    const level = levels[o.id] ?? o.level?.[grade];
+    return o.required !== false && (level === undefined || level === "exigible");
+  });
+}
+/** Porte G2 : objectifs obligatoires dont la vérification n'est pas « g2 ». */
+export const g2Missing = (objs: InventoryObjective[], grade: string, levels?: Record<string, string>) =>
+  requiredObjectives(objs, grade, levels).filter((o) => verificationMethod(o) !== "g2").map((o) => o.id);
+
+// ───────── Garde-fou de troncature (décision du 2026-11-17) ─────────
+/**
+ * Sortie visible attendue et part de réflexion observée (pilote, registre du Data Store) par étape et modèle.
+ * Besoin estimé = visible / (1 − réflexion) × marge ; un `max_tokens` inférieur conduit à une sortie tronquée payée.
+ * chapitre Sonnet : PC 4e, 61 779 sorties dont 23 147 de réflexion → 38 632 visibles, 37 % ;
+ * chapitre Opus : 73 359 / 96 000 de réflexion (76 %), chapitre complet estimé à 43 000 visibles (SCI-1RE-SD-chapter-TRUNCATED) ;
+ * dossier Haiku : 3 771 visibles, 44 % au pire (PC) ; dossier Sonnet : 4 190, 0 % ;
+ * criblage Haiku sans réflexion : 1 898 ; juge Sonnet effort low : 2 000, 0 %. Correction : pas de mesure suffisante (non contrôlée).
+ */
+export const OBSERVED_OUTPUT: Partial<Record<PipelineStep, Partial<Record<string, { visible: number; thinking: number }>>>> = {
+  dossier: { [MODELS.haiku]: { visible: 3771, thinking: 0.44 }, [MODELS.sonnet]: { visible: 4190, thinking: 0 } },
+  chapter: { [MODELS.sonnet]: { visible: 38632, thinking: 0.37 }, [MODELS.opus]: { visible: 43000, thinking: 0.76 } },
+  screen: { [MODELS.haiku]: { visible: 1898, thinking: 0 } },
+  review: { [MODELS.sonnet]: { visible: 2000, thinking: 0 } },
+};
+export const TRUNCATION_MARGIN = 1.1;
+/** Besoin estimé de `max_tokens` (null = aucune mesure pour ce couple étape/modèle). */
+export function requiredMaxTokens(step: PipelineStep, model: string): number | null {
+  const o = OBSERVED_OUTPUT[step]?.[model];
+  return o ? Math.ceil((o.visible / (1 - o.thinking)) * TRUNCATION_MARGIN) : null;
+}
+/** Motif de refus si `max_tokens` est inférieur au besoin estimé ; null sinon. */
+export function truncationRisk(step: PipelineStep, model: string, maxTokens = maxTokensFor(step, model)): string | null {
+  const need = requiredMaxTokens(step, model);
+  if (need === null || maxTokens >= need) return null;
+  return `garde-fou de troncature : ${step} [${model}] max_tokens ${maxTokens} < besoin estimé ${need} (sortie visible observée ÷ (1 − part de réflexion) × ${TRUNCATION_MARGIN})${need > 128000 ? " ; au-delà du maximum de sortie de l'API (128 000) : découper la requête" : ""}`;
 }

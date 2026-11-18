@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, g2Missing, verificationMethod, requiredMaxTokens, truncationRisk, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -31,6 +31,53 @@ function dryRun(args: string[], files: Record<string, string> = {}, withCode = f
     return { status: r.status, out: r.stdout + r.stderr };
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
+
+describe("porte G2 (décision du 2026-11-17)", () => {
+  const ev = { quote: "citation verbatim du BO", approvedBy: "porteur", approvedAt: "2026-11-17" };
+  const objs = [
+    { id: "A", level: { "3e": "exigible" }, evidence: ev },
+    { id: "B", level: { "3e": "exigible" } },
+    { id: "C", level: { "3e": "consolidation" } },
+    { id: "D", level: { "3e": "exigible" }, required: false },
+    { id: "E", level: { "3e": "exigible" }, evidence: { quote: "sans approbation" } },
+  ];
+  it("méthode : g2 seulement avec citation et approbation datée", () => {
+    expect(verificationMethod(objs[0])).toBe("g2");
+    expect(verificationMethod(objs[1])).toBe("lecture-initiale");
+    expect(verificationMethod(objs[4])).toBe("lecture-initiale");
+  });
+  it("objectifs obligatoires sans G2 : exigibles, required ≠ false ; consolidation exclue", () => {
+    expect(g2Missing(objs, "3e")).toEqual(["B", "E"]);
+  });
+  it("le niveau de la fiche prime sur l'inventaire ; niveau inconnu = obligatoire", () => {
+    expect(g2Missing(objs, "3e", { B: "consolidation" })).toEqual(["E"]);
+    expect(g2Missing([{ id: "F" }], "3e")).toEqual(["F"]);
+  });
+  it("Pythagore : objectifs obligatoires déjà vérifiés par G2 ; P4-E-04 non vérifié", () => {
+    const inv = JSON.parse(readFileSync("research/curriculum/mathematiques/curriculum-math.json", "utf8")) as { grades: { domains: { chapters: { objectives: { id: string }[] }[] }[] }[] };
+    const all = inv.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
+    const py = JSON.parse(readFileSync("pipeline/chapters/math-3e-pythagore.json", "utf8")) as { objectiveLevels: Record<string, string> };
+    expect(g2Missing(all.filter((o) => o.id in py.objectiveLevels), "3e", py.objectiveLevels)).toEqual([]);
+    const pc = JSON.parse(readFileSync("research/curriculum/physique-chimie/curriculum-pc.json", "utf8")) as typeof inv;
+    const p404 = pc.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives))).find((o) => o.id === "P4-E-04") as { verified: boolean };
+    expect(p404.verified).toBe(false);
+  });
+});
+
+describe("garde-fou de troncature (décision du 2026-11-17)", () => {
+  it("chapitre Sonnet : 64 000 refusé, 96 000 accepté", () => {
+    expect(requiredMaxTokens("chapter", MODELS.sonnet)).toBe(Math.ceil((38632 / 0.63) * 1.1));
+    expect(truncationRisk("chapter", MODELS.sonnet, 64000)).toMatch(/max_tokens 64000 < besoin estimé/);
+    expect(truncationRisk("chapter", MODELS.sonnet, 96000)).toBeNull();
+  });
+  it("chapitre Opus : besoin au-delà de 128 000 → toujours refusé", () => {
+    expect(truncationRisk("chapter", MODELS.opus, 128000)).toMatch(/maximum de sortie de l'API/);
+  });
+  it("dossier, criblage, juge : configuration actuelle suffisante ; étape sans mesure non contrôlée", () => {
+    for (const [step, model] of [["dossier", MODELS.haiku], ["screen", MODELS.haiku], ["review", MODELS.sonnet]] as const) expect(truncationRisk(step, model)).toBeNull();
+    expect(requiredMaxTokens("fix", MODELS.sonnet)).toBeNull();
+  });
+});
 
 describe("tarifs (page officielle du 2026-11-15)", () => {
   it("trois modèles 5.5, remise batch de 50 % cohérente avec les prix batch publiés", () => {
@@ -289,10 +336,11 @@ describe("criblage sans réflexion (run 39 : sortie entièrement consommée par 
 });
 
 describe("marge de sortie (décision du 2026-11-17)", () => {
-  it("chapitre Opus : 96 000 ; chapitre Sonnet inchangé ; dossier 12 000", () => {
+  it("chapitre Opus : 96 000 ; chapitre Sonnet 96 000 (décision du 2026-11-18) ; dossier 12 000", () => {
     expect(maxTokensFor("chapter", MODELS.opus)).toBe(OPUS_CHAPTER_MAX_TOKENS);
     expect(OPUS_CHAPTER_MAX_TOKENS).toBe(96000);
-    expect(maxTokensFor("chapter", MODELS.sonnet)).toBe(64000);
+    expect(maxTokensFor("chapter", MODELS.sonnet)).toBe(96000);
+    expect(truncationRisk("chapter", MODELS.sonnet)).toBeNull();
     expect(maxTokensFor("dossier", MODELS.haiku)).toBe(12000);
     expect(maxTokensFor("fix", MODELS.opus)).toBe(STEP_CONFIG.fix.maxTokens);
   });

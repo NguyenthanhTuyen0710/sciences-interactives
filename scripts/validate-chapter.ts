@@ -48,6 +48,43 @@ const dup = (a: string[]) => a.find((x, i) => a.indexOf(x) !== i);
 // Valeur d'attribut SVG contenant « < » : signe d'un gabarit tronqué.
 const BROKEN_SVG = /="[^"]*</;
 const RECORDS = fileURLToPath(new URL("../research/sources/records", import.meta.url));
+const CURRICULUM = fileURLToPath(new URL("../research/curriculum", import.meta.url));
+
+interface TaxonomyType { id: string; difficulty: number[]; exercises?: string[]; level?: string; countsTowardCompleteness?: boolean; transversal?: boolean }
+interface Taxonomy { status: string; types: TaxonomyType[] }
+/** Titre d'évaluation finale (niveau 5) : « Type Brevet — », « Type épreuve anticipée — », « Type bac — ». */
+const FINAL_TITLE = /^Type (Brevet|épreuve anticipée|bac) —/;
+
+/**
+ * QA tier 2 : chaque exercice relève d'au moins un type ; chaque rattachement respecte la difficulté du type ;
+ * chaque type obligatoire (ni approfondissement, ni transversal, compté dans la complétude) a au moins un exercice ;
+ * un exercice d'approfondissement n'est ni rattaché à un type obligatoire ni présenté en évaluation finale.
+ */
+function taxonomyIssues(c: ChapterContent, tax: Taxonomy): Issue[] {
+  const out: Issue[] = [];
+  if (tax.status !== "verrouillé") out.push({ where: "taxonomie", problem: `taxonomie non verrouillée (statut « ${tax.status} »)` });
+  const byId = new Map(c.exercises.map((e) => [e.id, e]));
+  const required = (t: TaxonomyType) => t.level !== "approfondissement" && !t.transversal && t.countsTowardCompleteness !== false;
+  const typesOf = new Map<string, TaxonomyType[]>();
+  for (const t of tax.types) {
+    for (const id of t.exercises ?? []) {
+      const e = byId.get(id);
+      if (!e) { out.push({ where: `taxonomie:${t.id}`, problem: `exercice ${id} absent du chapitre` }); continue; }
+      typesOf.set(id, [...(typesOf.get(id) ?? []), t]);
+      if (!t.difficulty.includes(e.niveau)) out.push({ where: e.id, problem: `niveau ${e.niveau} hors de la difficulté du type ${t.id} (${t.difficulty.join(", ")})` });
+    }
+    if (required(t) && !(t.exercises ?? []).some((id) => byId.has(id))) out.push({ where: `taxonomie:${t.id}`, problem: "type obligatoire sans exercice" });
+  }
+  for (const e of c.exercises) {
+    const ts = typesOf.get(e.id) ?? [];
+    if (!ts.length) { out.push({ where: e.id, problem: "exercice rattaché à aucun type de la taxonomie" }); continue; }
+    if (!ts.some((t) => t.level === "approfondissement")) continue;
+    const req = ts.filter(required).map((t) => t.id);
+    if (req.length) out.push({ where: e.id, problem: `exercice d'approfondissement rattaché à un type obligatoire (${req.join(", ")})` });
+    if (FINAL_TITLE.test(e.title)) out.push({ where: e.id, problem: "exercice d'approfondissement présenté en évaluation finale (titre « Type … — »)" });
+  }
+  return out;
+}
 
 async function main() {
   if (!target) { console.error("Usage : npx tsx scripts/validate-chapter.ts <id|fichier.ts> [--seeds N] [--json]"); process.exit(2); }
@@ -132,11 +169,16 @@ async function main() {
     if (gm.template === "memory") { const d = dup((cfg.pairs as [string, string][]).flat()); if (d) add(gm.id, `carte en double : ${d}`); }
   }
 
+  // 5. QA tier 2 (déterministe) : chapitre ↔ taxonomie verrouillée, si elle existe.
+  const taxFile = join(CURRICULUM, c.subject, "taxonomy", `${c.id}.json`);
+  const taxonomy = existsSync(taxFile) ? (JSON.parse(readFileSync(taxFile, "utf8")) as Taxonomy) : null;
+  if (taxonomy) for (const t of taxonomyIssues(c, taxonomy)) add(t.where, t.problem);
+
   const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
-  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, issues: issues.length, ok: issues.length === 0 };
+  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, taxonomy: taxonomy ? taxonomy.status : "absente", issues: issues.length, ok: issues.length === 0 };
   if (asJson) console.log(JSON.stringify({ summary, issues, special }));
   else {
-    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification`);
+    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification, taxonomie : ${summary.taxonomy}${taxonomy ? "" : " (QA tier 2 non évaluée)"}`);
     const cov = Object.entries(special).map(([id, v]) => `${id} ${Object.entries(v).map(([k, n]) => `${k}×${n}`).join(" ")}`);
     if (cov.length) console.log(`  cas limites rencontrés (réponses numériques) : ${cov.join(" · ")}`);
     for (const i of issues) console.log(`  ✘ ${i.where} : ${i.problem}${i.example ? ` (graine ${i.example})` : ""}`);
