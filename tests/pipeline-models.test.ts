@@ -251,7 +251,7 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
   it("prompts résolus identiques", () => {
     for (const [k, h] of Object.entries(COLLEGE_PROMPTS)) {
       const [subj, f] = k.split("/") as ["mathematiques" | "physique-chimie", string];
-      const t = promptSections(readFileSync(`pipeline/prompts/${f}.md`, "utf8"), sectionKeys(subj, "3e")).replace("{{TAXONOMY}}", "");
+      const t = promptSections(readFileSync(`pipeline/prompts/${f}.md`, "utf8"), sectionKeys(subj, "3e")).replace("{{TAXONOMY}}", "").replace("{{FINDINGS}}", "");
       expect(createHash("sha256").update(t).digest("hex").slice(0, 16), k).toBe(h);
     }
   });
@@ -277,7 +277,7 @@ describe("proposition A : métadonnées injectées par le pipeline", () => {
     expect(m.parcours).toBeUndefined();
     expect(m.officialObjectives.map((o: { source: string }) => o.source)).toEqual(["BO 2020", "Attendus 4e (consolidation)", "BO (consolidation)"]);
     expect(m.officialObjectives[2].required).toBe(false);
-    expect(m.sources).toHaveLength(3);
+    expect(m.sources).toHaveLength(4); // BO n° 22 ajouté aux officialSources (C2 du 2026-11-15, décision du 2026-11-18)
     expect(m.sources.every((x: { verification: string; sha256: string }) => x.verification === "verified" && x.sha256.length === 64)).toBe(true);
     expect(Object.values(m.reviewStatus).every((v) => v === "pending")).toBe(true);
   });
@@ -313,7 +313,7 @@ describe("correction automatique : seulement un brouillon produit par le pipelin
   it("chapitre avec META draft : corrigeable", () => expect(isPipelineDraft(withMeta)).toBe(true));
   it("chapitre avec META publié : non corrigeable", () => expect(isPipelineDraft(withMeta.replace('"publicationStatus": "draft"', '"publicationStatus": "published"'))).toBe(false));
   it("brouillons écrits à la main (sans META) : jamais corrigés, même en draft", () => {
-    for (const id of ["math-3e-puissances-calculs", "math-3e-pythagore"]) {
+    for (const id of ["math-3e-puissances-calculs"]) { // Pythagore : META injecté le 2026-11-18 (test ci-dessous)
       const src = readFileSync(`src/lib/chapters/data/${id}.ts`, "utf8");
       expect(src).toMatch(/publicationStatus: "draft"/);
       expect(isPipelineDraft(src), id).toBe(false);
@@ -321,6 +321,12 @@ describe("correction automatique : seulement un brouillon produit par le pipelin
   });
   it("« draft » hors du bloc META ignoré", () => expect(isPipelineDraft('const a = { "publicationStatus": "draft" };')).toBe(false));
   it("chapitre PC du pilote (produit par le pipeline) : corrigeable", () => expect(isPipelineDraft(readFileSync("src/lib/chapters/data/pc-4e-electricite.ts", "utf8"))).toBe(true));
+  it("Pythagore (décision du 2026-11-18) : META injecté → corrigeable ; provenance notée, BO 22 dans les sources du META", () => {
+    const f = readFileSync("src/lib/chapters/data/math-3e-pythagore.ts", "utf8");
+    expect(isPipelineDraft(f)).toBe(true);
+    expect(f).toContain("corrigé à la main\n// (commit 49ad9ce, lot QA C1–C8)");
+    expect(f.slice(f.indexOf(META_START))).toContain('"id": "bo-2019-22-pdf"');
+  });
 });
 
 describe("correction automatique : chemin complet en dry-run (fixture)", () => {
@@ -416,7 +422,7 @@ describe("calcul littéral : dossier approuvé (décision du 2026-11-18)", () =>
   it("prompt du chapitre modifié : un chapitre existant n'est pas régénéré sans --force", () => {
     // Taxonomie verrouillée → {{TAXONOMY}} non vide → nouvelle empreinte de l'étape chapitre ; le fichier existant est gardé
     // (la suite du dry-run s'arrête à la validation, faute de code source dans ce fixture : hors sujet ici).
-    const { out } = dryRun(["math-3e-pythagore", "--batch"], { "src/lib/chapters/data/math-3e-pythagore.ts": readFileSync("src/lib/chapters/data/math-3e-pythagore.ts", "utf8") });
+    const { out } = dryRun(["math-3e-pythagore", "--batch"], { "src/lib/chapters/data/math-3e-pythagore.ts": readFileSync("src/lib/chapters/data/math-3e-pythagore.ts", "utf8"), "project/reports/SCI-3E-MATH-017-QA-api-run28.md": readFileSync("project/reports/SCI-3E-MATH-017-QA-api-run28.md", "utf8") });
     expect(out).toContain("chapter : src/lib/chapters/data/math-3e-pythagore.ts existe déjà, conservé (--force pour le régénérer).");
   }, 60_000);
 });

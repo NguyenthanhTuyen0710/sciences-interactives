@@ -154,7 +154,7 @@ describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master gén
     "math-3e-arithmetique": "d0cf16f9d03ddd26128e8063073984b7065803cab1c4b2ebbdc22d91cbca985c",
     "math-3e-pourcentages-evolution": "006db69983018ecf2ff05232d80325760722bc4f75309180312835c296a1643b",
     "math-3e-puissances-calculs": "7239a34eb246c59efd5d4486ebdaba4e2167ca918f464c3dc39cd2fcf569adec",
-    "math-3e-pythagore": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
+    "math-3e-pythagore": "328d5b1a6fcde8c77c650c1862b57d02e1462ead2cd87189591536142262394c", // META injecté (décision du 2026-11-18, correction A)
     "math-5e-nombres-relatifs": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
   };
   it("chapitres du collège : mêmes identifiants, mêmes empreintes de fichier, toujours conformes au schéma", async () => {
