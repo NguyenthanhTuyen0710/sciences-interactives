@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
-import { ChapterSchema, doneIssues, type ChapterContent } from "../src/lib/chapters/schema";
+import { ChapterSchema, doneIssues, type ChapterContent, type ChapterExercise } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise } from "../src/lib/engine/check";
 import { chapterTexts, diagnosticIssues, instanceTexts, specialValues, unitIssues, vouvoiementIssues } from "../src/lib/engine/diagnostics";
@@ -16,7 +16,7 @@ import { gcd, parseNumber } from "../src/lib/engine/numbers";
 import { flashFeedback, type FlashLevel } from "../src/lib/games/logic";
 import type { Interaction } from "../src/lib/engine/types";
 
-interface Issue { where: string; problem: string; example?: string }
+export interface Issue { where: string; problem: string; example?: string }
 
 const args = process.argv.slice(2);
 const target = args.find((a) => !a.startsWith("--"));
@@ -50,8 +50,8 @@ const BROKEN_SVG = /="[^"]*</;
 const RECORDS = fileURLToPath(new URL("../research/sources/records", import.meta.url));
 const CURRICULUM = fileURLToPath(new URL("../research/curriculum", import.meta.url));
 
-interface TaxonomyType { id: string; difficulty: number[]; exercises?: string[]; level?: string; countsTowardCompleteness?: boolean; transversal?: boolean }
-interface Taxonomy { status: string; types: TaxonomyType[] }
+export interface TaxonomyType { id: string; difficulty: number[]; exercises?: string[]; level?: string; countsTowardCompleteness?: boolean; transversal?: boolean }
+export interface Taxonomy { status: string; types: TaxonomyType[] }
 /** Titre d'évaluation finale (niveau 5) : « Type Brevet — », « Type épreuve anticipée — », « Type bac — ». */
 const FINAL_TITLE = /^Type (Brevet|épreuve anticipée|bac) —/;
 
@@ -59,25 +59,44 @@ const FINAL_TITLE = /^Type (Brevet|épreuve anticipée|bac) —/;
  * QA tier 2 : chaque exercice relève d'au moins un type ; chaque rattachement respecte la difficulté du type ;
  * chaque type obligatoire (ni approfondissement, ni transversal, compté dans la complétude) a au moins un exercice ;
  * un exercice d'approfondissement n'est ni rattaché à un type obligatoire ni présenté en évaluation finale.
+ * Rattachement : listes `exercises` de la taxonomie (Pythagore) et/ou champ `taxonomyTypes` de l'exercice. Taxonomie
+ * verrouillée dont toutes les listes `exercises` sont vides (chapitre généré après verrouillage) : `taxonomyTypes`
+ * est obligatoire pour chaque exercice (décision du 2026-11-18).
  */
-function taxonomyIssues(c: ChapterContent, tax: Taxonomy): Issue[] {
+export function taxonomyIssues(c: ChapterContent, tax: Taxonomy): Issue[] {
   const out: Issue[] = [];
   if (tax.status !== "verrouillé") out.push({ where: "taxonomie", problem: `taxonomie non verrouillée (statut « ${tax.status} »)` });
   const byId = new Map(c.exercises.map((e) => [e.id, e]));
+  const typeById = new Map(tax.types.map((t) => [t.id, t]));
   const required = (t: TaxonomyType) => t.level !== "approfondissement" && !t.transversal && t.countsTowardCompleteness !== false;
+  const fieldRequired = tax.status === "verrouillé" && tax.types.every((t) => !(t.exercises ?? []).length);
   const typesOf = new Map<string, TaxonomyType[]>();
+  const link = (e: ChapterExercise, t: TaxonomyType) => {
+    if ((typesOf.get(e.id) ?? []).includes(t)) return;
+    typesOf.set(e.id, [...(typesOf.get(e.id) ?? []), t]);
+    if (!t.difficulty.includes(e.niveau)) out.push({ where: e.id, problem: `niveau ${e.niveau} hors de la difficulté du type ${t.id} (${t.difficulty.join(", ")})` });
+  };
   for (const t of tax.types) {
     for (const id of t.exercises ?? []) {
       const e = byId.get(id);
-      if (!e) { out.push({ where: `taxonomie:${t.id}`, problem: `exercice ${id} absent du chapitre` }); continue; }
-      typesOf.set(id, [...(typesOf.get(id) ?? []), t]);
-      if (!t.difficulty.includes(e.niveau)) out.push({ where: e.id, problem: `niveau ${e.niveau} hors de la difficulté du type ${t.id} (${t.difficulty.join(", ")})` });
+      if (!e) out.push({ where: `taxonomie:${t.id}`, problem: `exercice ${id} absent du chapitre` });
+      else link(e, t);
     }
-    if (required(t) && !(t.exercises ?? []).some((id) => byId.has(id))) out.push({ where: `taxonomie:${t.id}`, problem: "type obligatoire sans exercice" });
+  }
+  for (const e of c.exercises) {
+    if (fieldRequired && !e.taxonomyTypes?.length) out.push({ where: e.id, problem: "taxonomyTypes manquant (taxonomie verrouillée sans liste d'exercices)" });
+    for (const id of e.taxonomyTypes ?? []) {
+      const t = typeById.get(id);
+      if (!t) out.push({ where: e.id, problem: `type inconnu dans taxonomyTypes : ${id}` });
+      else link(e, t);
+    }
+  }
+  for (const t of tax.types.filter(required)) {
+    if (![...typesOf.values()].some((ts) => ts.includes(t))) out.push({ where: `taxonomie:${t.id}`, problem: "type obligatoire sans exercice" });
   }
   for (const e of c.exercises) {
     const ts = typesOf.get(e.id) ?? [];
-    if (!ts.length) { out.push({ where: e.id, problem: "exercice rattaché à aucun type de la taxonomie" }); continue; }
+    if (!ts.length) { if (!fieldRequired) out.push({ where: e.id, problem: "exercice rattaché à aucun type de la taxonomie" }); continue; }
     if (!ts.some((t) => t.level === "approfondissement")) continue;
     const req = ts.filter(required).map((t) => t.id);
     if (req.length) out.push({ where: e.id, problem: `exercice d'approfondissement rattaché à un type obligatoire (${req.join(", ")})` });
@@ -186,4 +205,5 @@ async function main() {
   }
   process.exit(summary.ok ? 0 : 1);
 }
-main();
+// Exécution seulement en ligne de commande (les tests importent taxonomyIssues).
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main();

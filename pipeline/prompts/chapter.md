@@ -15,5 +15,5 @@ Official objectives (JSON):
 
 Research dossier:
 {{DOSSIER}}
-
+{{TAXONOMY}}
 Return only the TypeScript file in a single ```ts code block, with no text before or after.

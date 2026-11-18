@@ -60,6 +60,8 @@ export interface ChapterExercise extends Partial<ExerciseBody> {
   title: string;
   niveau: 1 | 2 | 3 | 4 | 5;
   objectives: string[];
+  /** Types de la taxonomie verrouillée du chapitre (QA tier 2) ; facultatif, exigé par validate-chapter quand la taxonomie ne liste pas les exercices. */
+  taxonomyTypes?: string[];
   /** Durée estimée en secondes. */
   time: number;
   /** Explication du raisonnement (affichée avec la correction). */
@@ -75,6 +77,7 @@ const ExerciseSchema = z
     title: z.string().min(3),
     niveau: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
     objectives: z.array(z.string()).min(1),
+    taxonomyTypes: z.array(z.string().regex(/^[A-Z]+-T\d{2}$/)).min(1).optional(),
     time: z.number().int().min(10).max(3600),
     reasoning: rich,
     hints: z.array(rich).min(1),
