@@ -28,7 +28,8 @@ export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
 export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; maxTokens: number; system: "full" | "light"; thinking?: "disabled" }> = {
   // 12 000 (pilote, décision du 2026-11-17) : le dossier PC Haiku a utilisé 6 657 / 8 000 tokens (83 %), dont 2 897 de réflexion.
   dossier: { model: MODELS.haiku, effort: "medium", maxTokens: 12000, system: "light" },
-  chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 64000, system: "full" },
+  // 96 000 (décision du 2026-11-18) : besoin estimé 67 453 (chapitre PC : 38 632 visibles, 37 % de réflexion).
+  chapter: { model: MODELS.sonnet, effort: "medium", maxTokens: 96000, system: "full" },
   fix: { model: MODELS.sonnet, effort: "medium", maxTokens: 16000, system: "full" },
   // Criblage sans réflexion (pilote, run 39 : 7 999 / 8 000 tokens de sortie en réflexion sur un chapitre de 45k tokens).
   screen: { model: MODELS.haiku, effort: "low", maxTokens: 8000, system: "light", thinking: "disabled" },

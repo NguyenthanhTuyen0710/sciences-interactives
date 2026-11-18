@@ -336,10 +336,11 @@ describe("criblage sans réflexion (run 39 : sortie entièrement consommée par 
 });
 
 describe("marge de sortie (décision du 2026-11-17)", () => {
-  it("chapitre Opus : 96 000 ; chapitre Sonnet inchangé ; dossier 12 000", () => {
+  it("chapitre Opus : 96 000 ; chapitre Sonnet 96 000 (décision du 2026-11-18) ; dossier 12 000", () => {
     expect(maxTokensFor("chapter", MODELS.opus)).toBe(OPUS_CHAPTER_MAX_TOKENS);
     expect(OPUS_CHAPTER_MAX_TOKENS).toBe(96000);
-    expect(maxTokensFor("chapter", MODELS.sonnet)).toBe(64000);
+    expect(maxTokensFor("chapter", MODELS.sonnet)).toBe(96000);
+    expect(truncationRisk("chapter", MODELS.sonnet)).toBeNull();
     expect(maxTokensFor("dossier", MODELS.haiku)).toBe(12000);
     expect(maxTokensFor("fix", MODELS.opus)).toBe(STEP_CONFIG.fix.maxTokens);
   });

@@ -91,6 +91,18 @@ _Les numéros « run #N » sont les `run_number` du workflow « Generate Lessons
 | Exceptions publish-pr (i)/(ii) du 2026-11-16 | **Caduques**, sauf si elles sont reformulées. |
 | Préparatifs sans API | (a) porte G2 + `verificationMethod` ; (b) une PR par chapitre et rapport du juge nommé par run (**conception à approuver avant code**) ; (c) QA tier 2 déterministe contre la taxonomie verrouillée ; (d) garde-fou de troncature (`max_tokens` ≥ besoin estimé) ; (e) proposition H1 (**envoi après approbation**). |
 
+### Décisions du 18-11-2026
+| Sujet | Décision |
+|---|---|
+| CI de la PR #14 | Chapitre témoin du dry-run de `pr-checks` : `math-3e-calcul-litteral` (au lieu de Pythagore) ; assertion « aucun appel API » inchangée ; dry-runs PC et 1re conservés. Pythagore reste « non validé » (matrice : brouillon, QA en attente) jusqu'à la correction (A). Tout autre contrôle rouge à cause de la QA tier 2 : rapport, jamais d'assouplissement. |
+| (b) une PR par chapitre | **Approuvé** : une branche `pipeline/<chapitre>` et une PR par chapitre ; PR ouverte seulement quand la chaîne est terminée et les contrôles verts ; une collecte sans sortie utilisable ne committe rien et n'ouvre aucune PR. |
+| Chapitre Sonnet | `max_tokens` **96 000** (approuvé). Réservation maximale par chapitre plus élevée (≈ 0,48 $ de sortie en batch) ; coût réel = tokens consommés. Essai D (baisse d'effort/réflexion) après les résultats de H1. |
+| H1 | 2 requêtes Opus 5.5 (effort `low` et `medium`), même prompt de démonstration M1S-SD-05, `max_tokens` 13 500 chacune, maximum 0,29 $. Le garde-fou de troncature s'applique avec l'estimation propre de H1 (aucune exemption). Envoi seulement si le dry-run affiche ≤ 0,30 $ et cumul ≤ 2,892 $ ; sinon ARRÊT et rapport. Rapport : part de réflexion, `stop_reason`, tokens visibles, démonstration complète (3 cas de Δ), tutoiement, conclusion H1. |
+| 4 chapitres de 3e | Approuvés, **en séquence** : `math-3e-calcul-litteral` d'abord, puis `math-3e-equations`, `math-3e-thales-semblables`, `math-3e-trigonometrie`. Un fichier de taxonomie par chapitre (rédigé à la main, sans API ; approuvé puis verrouillé). Thalès et trigonométrie : vérifier d'abord que le moteur prend en charge les figures nécessaires. À soumettre pour calcul littéral : classement G1, propositions G2 (citation verbatim + page), taxonomie. |
+| PR `budget.json` (9,059 $) | Après approbation du G1, du G2 et de la taxonomie de calcul littéral, juste avant le premier batch. |
+| (A) Pythagore | Après fusion de #14 et H1 : une requête de correction ciblée via le pipeline (Sonnet) regroupant 3 MAJEUR + 1 MINEUR du juge et les 3 écarts QA tier 2. Avant : confirmer que le pipeline reconnaît Pythagore comme produit par le pipeline (étape `chapter` au registre, pas de regex) et que l'estimation ≤ reste sous le plafond ; sinon ARRÊT, attendre la PR de relèvement. |
+| Ordre | fusion #14 → PR (b) + étape d'essai H1 → H1 → (A) → chaîne calcul littéral. |
+
 Journal des exceptions publish-pr (caduques depuis le 2026-11-17) : (ii) non appliquée ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
 ## 3. Travail en cours et suivant (par priorité)
