@@ -212,7 +212,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quel est le côté le plus long ?", "Son carré est seul d'un côté de l'égalité."],
   }),
   ex({
-    id: "py3-03", title: "Théorème, réciproque : vrai ou faux ?", niveau: 1, objectives: ["M3-AUTO-03", "M4-EG-04"], time: 150,
+    id: "py3-03", title: "Théorème, réciproque : vrai ou faux ?", niveau: 3, objectives: ["M3-AUTO-03", "M4-EG-04"], time: 150,
     statement: "Vrai ou faux ?",
     parts: [{ interaction: { kind: "vrai-faux", items: [
       "Le théorème de Pythagore s'applique à n'importe quel triangle.",
@@ -223,7 +223,7 @@ const EXERCISES: ChapterExercise[] = [
       "On peut prouver qu'un triangle est rectangle en mesurant l'angle sur le dessin.",
     ], answer: [false, true, true, true, false, false] } }],
     solution: [
-      "Faux : il faut que le triangle soit rectangle (ou que l'égalité soit vérifiée, pour la réciproque).",
+      "Faux : le théorème ne s'applique qu'à un triangle rectangle ; la réciproque part de l'égalité.",
       "Vrai : l'hypoténuse est opposée à l'angle droit, c'est le plus long côté.",
       "Vrai : c'est le théorème de Pythagore.",
       "Vrai : c'est la réciproque du théorème de Pythagore.",
@@ -250,6 +250,23 @@ const EXERCISES: ChapterExercise[] = [
     },
     reasoning: "Cette image mentale (le grand carré sur l'hypoténuse est la somme des deux petits) est la traduction géométrique de l'égalité de Pythagore.",
     hints: ["L'aire d'un carré de côté $x$ vaut $x \\times x$.", "Compare la somme des deux petites aires avec la grande."],
+  }),
+  ex({
+    id: "py3-21", title: "Carrés, racines et triplets pythagoriciens", niveau: 1, objectives: ["M3-AUTO-03"], taxonomyTypes: ["PY-T11"], time: 90,
+    vary: (rng) => {
+      const [a, b, c] = triple(rng, 4, [1, 2]);
+      return {
+        statement: `Le triplet $(${a}\\,;\\,${b}\\,;\\,c)$ est un triplet pythagoricien : $${a}^2 + ${b}^2 = c^2$ avec $c > 0$.`,
+        parts: [etapes([
+          { prompt: `$${a}^2$`, value: a * a },
+          { prompt: `$${b}^2$`, value: b * b },
+          { prompt: "La valeur de $c$", value: c },
+        ])],
+        solution: [`$${a}^2 = ${a * a}$ et $${b}^2 = ${b * b}$.`, `$c^2 = ${a * a} + ${b * b} = ${c * c}$.`, `$c = \\sqrt{${c * c}} = ${c}$.`],
+      };
+    },
+    reasoning: "Connaître les carrés usuels et les triplets courants (3-4-5, 5-12-13, 8-15-17 et leurs multiples) permet de calculer vite.",
+    hints: ["Le carré d'un nombre est ce nombre multiplié par lui-même.", "Additionne les deux carrés, puis cherche le nombre positif dont le carré est la somme."],
   }),
   // ── Niveau 2 : Application directe ──
   ex({
@@ -499,7 +516,7 @@ const EXERCISES: ChapterExercise[] = [
           num(a * a + b * b, [{ match: String(a + b), feedback: "Il faut additionner les carrés, pas les longueurs." }], `2. Calcule $${AB}^2 + ${AC}^2$.`, "cm²"),
           shuffledQcm(rng, [
             `$${N}$ est rectangle en $${A}$, d'après la réciproque du théorème de Pythagore.`,
-            `$${N}$ n'est pas rectangle en $${A}$ : les deux résultats sont différents (contraposée du théorème de Pythagore).`,
+            `$${N}$ n'est pas rectangle en $${A}$ : les deux résultats sont différents (prolongement : contraposée du théorème de Pythagore).`,
             `$${N}$ est rectangle en $${A}$ car l'angle a l'air droit sur le dessin.`,
           ], rect ? 0 : 1, {
             [rect ? 1 : 0]: rect ? "Les deux nombres sont égaux : la réciproque s'applique." : "Les deux nombres sont différents : la réciproque ne s'applique pas.",
@@ -526,7 +543,7 @@ const EXERCISES: ChapterExercise[] = [
       const far = (v: number) => (m: Mistake) => Math.abs(Number(m.match) - v) > 0.05;
       const round1 = { tol: 0.001, decimals: 1, roundingLabel: "au dixième" };
       return {
-        statement: `Un jardin a la forme d'un triangle $${N}$ rectangle en $${A}$, avec $${AB} = ${a}$ m et $${BC} = ${c}$ m. On veut poser une clôture sur tout le pourtour et semer du gazon sur toute la surface. Calcule la longueur de clôture et la surface de gazon (arrondis au dixième).`,
+        statement: `Un jardin a la forme d'un triangle $${N}$ rectangle en $${A}$, avec $${AB} = ${a}$ m et $${BC} = ${c}$ m. On veut poser une clôture sur tout le pourtour et semer du gazon sur toute la surface. Calcule la longueur de clôture et la surface de gazon (arrondis au dixième, sans arrondir avant la fin du calcul).`,
         parts: [
           { prompt: "Longueur de clôture (périmètre)", interaction: { kind: "numerique", suffix: "m", answer: { value: p, ...round1 } }, mistakes: [
             { match: String(r1(a + c + Math.sqrt(a * a + c * c))), feedback: `$[${BC}]$ est l'hypoténuse : le côté manquant s'obtient en **soustrayant** les carrés.` },
@@ -560,7 +577,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Commence par le triangle $ABC$ dont l'angle droit est connu.", "Pour $BCD$, isole le plus grand côté.", "Compare $BD^2$ avec $BC^2 + CD^2$."],
   }),
   ex({
-    id: "py3-20", title: "Type Brevet — Démontrer qu'un triangle n'est pas rectangle", niveau: 5, objectives: ["M4-EG-04"], time: 300,
+    id: "py3-20", title: "Prolongement — Démontrer qu'un triangle n'est pas rectangle", niveau: 4, objectives: ["M4-EG-04"], time: 300,
     statement: "Le triangle $EFG$ a pour côtés $EF = 9$ cm, $EG = 12$ cm et $FG = 16$ cm. Un élève affirme : « $EFG$ est rectangle en $E$ ». Remets dans l'ordre la démonstration qui le contredit, puis donne les deux nombres comparés.",
     parts: [
       { interaction: { kind: "ordonner", items: brevItems, answer: BREV_STEPS.map((s) => brevItems.indexOf(s)), hint: "Première étape en haut" } },
@@ -609,7 +626,7 @@ export const math3ePythagore: ChapterContent = {
       { title: "Exemple 2 — Calculer un côté de l'angle droit", statement: "$EFG$ est rectangle en $E$ avec $FG = 17$ cm et $EF = 8$ cm. Calculer $EG$.", steps: ["$EFG$ est rectangle en $E$ : $FG^2 = EF^2 + EG^2$, donc $EG^2 = FG^2 - EF^2$.", "$EG^2 = 17^2 - 8^2 = 289 - 64 = 225$.", "$EG = \\sqrt{225} = 15$."], answer: "$EG = 15$ cm" },
       { title: "Exemple 3 — Valeur approchée", statement: "$ABC$ est rectangle en $A$ avec $AB = 3$ cm et $AC = 5$ cm. Donner $BC$ arrondi au dixième.", steps: ["$BC^2 = 3^2 + 5^2 = 9 + 25 = 34$.", "$BC = \\sqrt{34}$ (valeur exacte).", "À la calculatrice, $\\sqrt{34} \\approx 5{,}83$, soit $5{,}8$ au dixième."], answer: "$BC \\approx 5{,}8$ cm" },
       { title: "Exemple 4 — Démontrer qu'un triangle est rectangle", statement: "$ABC$ a pour côtés $AB = 20$ cm, $AC = 21$ cm et $BC = 29$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[BC]$ : $BC^2 = 29^2 = 841$.", "$AB^2 + AC^2 = 20^2 + 21^2 = 400 + 441 = 841$.", "Les deux résultats sont égaux : d'après la réciproque du théorème de Pythagore, $ABC$ est rectangle en $A$."], answer: "$ABC$ est rectangle en $A$." },
-      { title: "Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas",statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
+      { title: "Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas", statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
     ],
     illustrations: [
       { svg: squaresSvg("9", "16", "25", "Triangle rectangle de côtés 3, 4 et 5 avec un carré sur chaque côté, d'aires 9, 16 et 25"), alt: "Triangle rectangle de côtés 3, 4 et 5 avec un carré construit sur chaque côté, d'aires 9, 16 et 25.", caption: "$9 + 16 = 25$ : l'aire du grand carré est la somme des deux autres." },

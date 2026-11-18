@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-15 10:54 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-18 12:58 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -15,7 +15,7 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 | mathematiques | 1re | Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019) | 1 | 6 (6) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 6e | Arrêté du 15 juin 2023 (JO du 21/06/2023) modifiant l'arrêté du 9 novembre 2015 ; BO n°25 du 22 juin 2023 | 8 | 38 (38) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 5e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 24 (24) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
-| physique-chimie | 4e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 33 (29) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
+| physique-chimie | 4e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 33 (28) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 3e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 10 | 30 (23) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 
 ## Chapitres produits
@@ -56,7 +56,7 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 
 - Publication : **draft**
 - Objectifs officiels : 3 · couverts par le cours : 3 · par des exercices : 3 · par des jeux : 3
-- Exercices : 20 (niveaux 1:4 2:4 3:4 4:4 5:4) · activités : 3
+- Exercices : 21 (niveaux 1:4 2:4 3:5 4:5 5:3) · activités : 3
 - Revues QA : curriculum = pending · accuracy = pending · exercises = pending · games = pending · technical = pending · language = pending
 - Écarts à la Definition of Done : revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending ; revue games : pending ; revue technical : pending ; revue language : pending
 
