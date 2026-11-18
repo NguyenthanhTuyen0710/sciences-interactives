@@ -9,6 +9,90 @@ import type { ChapterContent, ChapterExercise, ChapterPart } from "../schema";
 import type { Mistake, Rng } from "../../engine/types";
 import { parseNumber, tex } from "../../engine/numbers";
 
+// Provenance (décision du 2026-11-18) : chapitre produit par le pipeline (Gate 0, 2026-11-08, 0,336 $), corrigé à la main
+// (commit 49ad9ce, lot QA C1–C8), puis bloc META injecté de façon déterministe (injectMeta) pour la correction ciblée (A)
+// via le pipeline. Les chiffres de correction de ce chapitre ne sont PAS des chiffres de pipeline pur.
+// <pipeline:meta> générée par pipeline/run.ts depuis la fiche et l'inventaire — ne pas modifier à la main
+const META = {
+  "id": "math-3e-pythagore",
+  "taskId": "SCI-3E-MATH-017",
+  "grade": "3e",
+  "subject": "mathematiques",
+  "treeChapterId": "m3-pythagore",
+  "curriculumChapterIds": [
+    "math-3e-automatismes",
+    "math-4e-pythagore"
+  ],
+  "curriculumVersion": "2026-2027",
+  "title": "Théorème de Pythagore et réciproque",
+  "officialObjectives": [
+    {
+      "id": "M3-AUTO-03",
+      "text": "Images mentales des configurations de Pythagore, Thalès et des lignes trigonométriques.",
+      "source": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème D › Automatismes"
+    },
+    {
+      "id": "M4-EG-03",
+      "text": "Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore.",
+      "source": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (4e) ; Attendus de fin d'année de 4e (2019) (consolidation)"
+    },
+    {
+      "id": "M4-EG-04",
+      "text": "Démontrer qu'un triangle est rectangle (réciproque).",
+      "source": "Attendus de fin d'année de 4e (2019) › Utiliser les notions de géométrie plane pour démontrer (consolidation)"
+    }
+  ],
+  "sources": [
+    {
+      "id": "c4-programme-2020-eduscol-pdf",
+      "title": "Programme du cycle 4 en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+      "kind": "official",
+      "verification": "verified",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+      "accessedAt": "2026-11-07T14:49:44.189Z"
+    },
+    {
+      "id": "c4-attendus-4e-2019-pdf",
+      "title": "Mathématiques 4e — attendus de fin d'année (2019), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf",
+      "kind": "official",
+      "verification": "verified",
+      "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+      "accessedAt": "2026-11-07T14:49:57.494Z"
+    },
+    {
+      "id": "c4-attendus-3e-2019-pdf",
+      "title": "Mathématiques 3e — attendus de fin d'année (2019), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+      "kind": "official",
+      "verification": "verified",
+      "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+      "accessedAt": "2026-11-07T14:50:10.048Z"
+    },
+    {
+      "id": "bo-2019-22-pdf",
+      "title": "Bulletin officiel n° 22 du 29 mai 2019 — repères annuels de progression et attendus de fin d'année (note de service n° 2019-072, NOR MENE1913283N), annexe 26 : mathématiques cycle 4",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+      "kind": "official",
+      "verification": "verified",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+      "accessedAt": "2026-11-07T15:03:14.705Z"
+    }
+  ],
+  "reviewStatus": {
+    "curriculum": "pending",
+    "accuracy": "pending",
+    "exercises": "pending",
+    "games": "pending",
+    "technical": "pending",
+    "language": "pending"
+  },
+  "publicationStatus": "draft"
+} satisfies Partial<import("../schema").ChapterContent>;
+// </pipeline:meta>
+
+
 const T = (x: number) => tex(x);
 const isSq = (n: number) => Number.isInteger(Math.sqrt(n));
 
@@ -44,14 +128,8 @@ function shuffledQcm(rng: Rng, options: string[], answer: number, diag: Record<n
 }
 const etapes = (steps: { prompt: string; value: number; suffix?: string }[]): ChapterPart => ({ interaction: { kind: "etapes", steps: steps.map((s) => ({ prompt: s.prompt, suffix: s.suffix, answer: { value: s.value } })) } });
 
-const O = {
-  "M3-AUTO-03": "Images mentales des configurations de Pythagore, Thalès et des lignes trigonométriques.",
-  "M4-EG-03": "Calculer une longueur dans un triangle rectangle avec le théorème de Pythagore.",
-  "M4-EG-04": "Démontrer qu'un triangle est rectangle (réciproque).",
-} as const;
-type Obj = keyof typeof O;
-const SRC_3E = "Programme du cycle 4 (BO n° 31 du 30 juillet 2020), thème D, automatismes : « images mentales (configurations de Pythagore et de Thalès, lignes trigonométriques dans un triangle rectangle) »";
-const SRC_4E = "Consolidation de 4e — Attendus de fin d'année de 4e (2019), p. 10 ; repères annuels de progression du cycle 4 (BO n° 22 du 29 mai 2019), géométrie plane en 4e";
+// Objectifs (textes dans le bloc META, depuis l'inventaire).
+type Obj = "M3-AUTO-03" | "M4-EG-03" | "M4-EG-04";
 
 const ex = (e: Omit<ChapterExercise, "objectives"> & { objectives: Obj[] }): ChapterExercise => e;
 
@@ -497,27 +575,13 @@ const EXERCISES: ChapterExercise[] = [
 
 // ───────────────────────── Chapitre ─────────────────────────
 export const math3ePythagore: ChapterContent = {
-  id: "math-3e-pythagore",
-  taskId: "SCI-3E-MATH-017",
-  grade: "3e",
-  subject: "mathematiques",
-  treeChapterId: "m3-pythagore",
-  curriculumChapterIds: ["math-3e-automatismes", "math-4e-pythagore"],
-  curriculumVersion: "2026-2027",
-  title: "Théorème de Pythagore et réciproque",
-  officialObjectives: (Object.keys(O) as Obj[]).map((id) => ({ id, text: O[id], source: id.startsWith("M4") ? SRC_4E : SRC_3E })),
+  ...META,
   prerequisites: [
     { text: "Calculer le carré d'un nombre et connaître les carrés des entiers jusqu'à $15$ ; utiliser la racine carrée (valeurs exactes, valeurs approchées à la calculatrice)." },
     { text: "Reconnaître un triangle rectangle, l'angle droit, les côtés de l'angle droit et l'hypoténuse." },
     { text: "Calculer avec des nombres décimaux ; arrondir au dixième ou au centième." },
     { text: "Résoudre une équation simple du type $x^2 = a$ avec $x > 0$." },
     { text: "Utiliser les notations des longueurs ($AB$) et des segments ($[AB]$), avec leurs unités." },
-  ],
-  sources: [
-    { id: "c4-programme-2020-eduscol-pdf", title: "Programme du cycle 4 en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf", kind: "official", verification: "verified", sha256: "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9", accessedAt: "2026-11-07T14:49:44.189Z" },
-    { id: "c4-attendus-4e-2019-pdf", title: "Mathématiques 4e — attendus de fin d'année (2019), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/16-maths-4e-attendus-eduscol1114746pdf-74682.pdf", kind: "official", note: "notions de 4e consolidées en 3e (p. 10)", verification: "verified", sha256: "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966", accessedAt: "2026-11-07T14:49:57.494Z" },
-    { id: "c4-attendus-3e-2019-pdf", title: "Mathématiques 3e — attendus de fin d'année (2019), Éduscol", url: "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf", kind: "official", note: "cadre de la consolidation en 3e", verification: "verified", sha256: "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a", accessedAt: "2026-11-07T14:50:10.048Z" },
-    { id: "bo-2019-22-pdf", title: "Bulletin officiel n° 22 du 29 mai 2019 — repères annuels de progression et attendus de fin d'année (note de service n° 2019-072, NOR MENE1913283N), annexe 26 : mathématiques cycle 4", url: "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf", kind: "official", note: "repères annuels de progression du cycle 4 (géométrie plane en 4e)", verification: "verified", sha256: "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065", accessedAt: "2026-11-07T15:03:14.705Z" },
   ],
   lesson: {
     introduction: "Un menuisier veut vérifier qu'un cadre de porte est bien d'équerre, un déménageur se demande si son échelle de $5$ m atteindra une fenêtre : dans les deux cas, on a un triangle et des longueurs, et on veut savoir si un angle est droit ou calculer une longueur manquante.\nLe **théorème de Pythagore** relie les trois longueurs d'un triangle rectangle, et sa **réciproque** permet de prouver qu'un triangle est rectangle à partir de ses seules longueurs. Ces notions, vues en 4e, reviennent très souvent en 3e (notamment au Brevet) : l'objectif est de bien les consolider et d'avoir en tête l'image de la configuration.",
@@ -659,6 +723,4 @@ export const math3ePythagore: ChapterContent = {
       ] },
     },
   ],
-  reviewStatus: { curriculum: "pending", accuracy: "pending", exercises: "pending", games: "pending", technical: "pending", language: "pending" },
-  publicationStatus: "draft",
 };

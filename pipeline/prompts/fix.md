@@ -2,7 +2,7 @@ The chapter file below failed automatic checks. Fix ONLY the reported problems, 
 
 Automatic check results (validator JSON and TypeScript errors):
 {{ISSUES}}
-
+{{FINDINGS}}
 Current file `src/lib/chapters/data/{{ID}}.ts`:
 ```ts
 {{FILE}}

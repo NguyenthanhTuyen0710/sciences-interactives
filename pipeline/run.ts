@@ -44,7 +44,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[] }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -393,6 +393,26 @@ async function call(step: Step, user: string, hash: string, model: string): Prom
 // ───────── Écriture des sorties (jamais publiées : le chapitre reste « draft » et hors registre) ─────────
 const SCREEN_FILE = reportFile(spec.taskId, "screen", runTag());
 /** Criblage le plus récent présent dans le dépôt (lu par le juge), quel que soit le run qui l'a écrit. */
+/**
+ * Constats du juge à corriger avec la validation (décision du 2026-11-18, correction A de Pythagore) : fiche
+ * `judgeFindingsForFix` = numéros (1, 2, …) des constats du dernier rapport du juge, choisis par le porteur de projet,
+ * plus les types de la taxonomie verrouillée cités par la validation. Vide sans sélection : prompt de correction
+ * identique octet pour octet pour les autres chapitres.
+ */
+function fixFindings(validation: string): string {
+  if (!spec.judgeFindingsForFix?.length) return "";
+  const file = latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "review");
+  if (!file) fail(`judgeFindingsForFix : aucun rapport du juge ${spec.taskId}-QA-api*.md`);
+  const r = parseReview(extractBlock(read(file!), "json"));
+  if (!r.ok) fail(`judgeFindingsForFix : rapport du juge illisible (${file})`);
+  const findings = spec.judgeFindingsForFix.map((n) => r.review.findings[n - 1] ?? fail(`judgeFindingsForFix : constat n° ${n} absent de ${file}`));
+  const taxFile = `research/curriculum/${spec.subject}/taxonomy/${spec.id}.json`;
+  const ids = new Set(validation.match(/\b[A-Z]+-T\d{2}\b/g) ?? []);
+  const types = existsSync(P(taxFile)) ? readJson<{ types: { id: string }[] }>(taxFile).types.filter((t) => ids.has(t.id)) : [];
+  return `\nJudge findings to fix as well (selected by the project owner from ${file}; JSON):\n${JSON.stringify(findings, null, 1)}\n`
+    + (types.length ? `\nLocked taxonomy types cited by the checks (JSON). The taxonomy file cannot change: link a new exercise to a type with \`taxonomyTypes: ["<type id>"]\`; keep each exercise's \`niveau\` within the \`difficulty\` of its types; an « approfondissement » exercise is never titled « Type Brevet — ».\n${JSON.stringify(types, null, 1)}\n` : "")
+    + "\nDo not modify the META block (sources, officialObjectives, statuses).\n";
+}
 const latestScreenFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "screen");
 function saveReport(file: string, label: string, t: string, model: string) {
   const r = parseReview(t);
@@ -565,7 +585,7 @@ async function main() {
     rounds++; state.fixRounds = rounds; saveState();
     const model = fixModel(problemsOf(v.json), rounds);
     console.log(`fix (tour ${rounds}/${MAX_FIX_ROUNDS}) [${model}${model === MODELS.haiku ? " : problèmes tous mineurs" : ""}] :`);
-    const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE) });
+    const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE), FINDINGS: fixFindings(v.json) });
     const t = await call("fix", user, hashOf(user), model);
     if (t === null) return;
     applyFix(t);
@@ -679,7 +699,7 @@ async function reviewDry(validator: string, screen: Review | null) {
 function costPlan(dossierUser: string, chapterUser: string) {
   const tok = (s: string) => Math.ceil(s.length / CHARS_PER_TOKEN);
   const fileText = existsSync(P(CHAPTER_FILE)) ? read(CHAPTER_FILE) : "x".repeat(64000);
-  const fixUser = fill(read("pipeline/prompts/fix.md"), { ISSUES: "x".repeat(3000), ID: spec.id, FILE: fileText });
+  const fixUser = fill(read("pipeline/prompts/fix.md"), { ISSUES: "x".repeat(3000), ID: spec.id, FILE: fileText, FINDINGS: fixFindings("") });
   const screenUser = fill(read("pipeline/prompts/review.md"), { FOCUS: SCREEN_FOCUS, VALIDATOR: "{}", SPEC, FILE: fileText });
   const reviewUser = existsSync(P(CHAPTER_FILE)) ? reviewUserFor("{}", screenResult()) : fill(read("pipeline/prompts/review.md"), { FOCUS: "", VALIDATOR: "{}", SPEC, FILE: "x".repeat(26000) });
   const rows: [string, Step, string, string][] = [

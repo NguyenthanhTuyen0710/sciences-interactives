@@ -50,6 +50,13 @@
       "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
       "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
       "accessedAt": "2026-11-07T14:50:10.048Z"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "title": "Bulletin officiel n° 22 du 29 mai 2019 — repères annuels de progression et attendus de fin d'année (note de service n° 2019-072, NOR MENE1913283N), annexe 26 : mathématiques cycle 4",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+      "accessedAt": "2026-11-07T15:03:14.705Z"
     }
   ],
   "objectiveVerification": {
@@ -69,5 +76,13 @@
       "basis": "Non nommé dans les Attendus 4e (2019) ni le programme 2020 lus ; le programme du cycle 4 (2020, p. 127) initie au « raisonnement par disjonction de cas ou par l'absurde ». À étiqueter « prolongement » pour l'élève.",
       "status": "validé"
     }
-  ]
+  ],
+  "judgeFindingsForFix": [
+    1,
+    2,
+    4,
+    5,
+    6
+  ],
+  "judgeFindingsForFixNote": "Décision du porteur de projet du 2026-11-18 : constats du rapport du juge du run 28 (project/reports/SCI-3E-MATH-017-QA-api-run28.md) transmis à la correction ciblée (A) : n° 1 (py3-20, MAJEUR), 2 (py3-17, MAJEUR), 4 (py3-03, MINEUR) ; n° 5 (py3-18) et 6 (virgule) seulement si le dry-run reste ≤ 0,20 $. N° 3 (BO 22) résolu de façon déterministe : bo-2019-22-pdf ajouté aux officialSources (C2 approuvé le 2026-11-15), jamais retiré par le modèle."
 }
