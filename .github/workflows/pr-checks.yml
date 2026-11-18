@@ -40,10 +40,12 @@ jobs:
       - name: Build (Next.js)
         run: npm run build
 
-      - name: Dry-run du pipeline (Pythagore 3e, 5 exercices, sans clé ni appel API)
+      # Chapitre témoin : math-3e-calcul-litteral (fiche sans chapitre produit). Pythagore n'est plus le témoin depuis
+      # la QA tier 2 (décision du porteur de projet du 2026-11-18) : il reste « needs-human » jusqu'à la correction (A).
+      - name: Dry-run du pipeline (calcul littéral 3e, 5 exercices, sans clé ni appel API)
         shell: bash
         run: |
-          npx tsx pipeline/run.ts math-3e-pythagore --level 3e --subject mathematiques --exercises 5 --batch 2>&1 | tee dry-run.log
+          npx tsx pipeline/run.ts math-3e-calcul-litteral --level 3e --subject mathematiques --exercises 5 --batch 2>&1 | tee dry-run.log
           grep -q "mode dry-run" dry-run.log
           if grep -qE "soumis|coût réel" dry-run.log; then echo "::error::le dry-run a tenté un appel API"; exit 1; fi
           { echo '### Dry-run pipeline'; echo '```'; cat dry-run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
