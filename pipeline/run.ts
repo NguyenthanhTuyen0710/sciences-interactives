@@ -19,10 +19,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, effectiveLimitUsd, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
 import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, H1_STEPS, isExperimentStep, latestReport, reportFile, runTag, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,7 +49,7 @@ interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: 
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
 const args = process.argv.slice(2);
-const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model", "--retry"];
+const VALUE_OPTS = ["--step", "--exercises", "--collect", "--level", "--subject", "--parcours", "--dossier-model", "--retry", "--experiment"];
 const flag = (f: string) => args.includes(f);
 const opt = (f: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : undefined);
 
@@ -100,6 +100,8 @@ if (!chapterId && flag("--next")) {
 }
 const SUBMIT = flag("--submit"), COLLECT = opt("--collect"), RECONCILE = flag("--reconcile");
 const RETRY_REASON = opt("--retry");
+const EXPERIMENT = opt("--experiment");
+if (EXPERIMENT !== undefined && EXPERIMENT !== "h1") { console.error(`ARRÊT : --experiment inconnu : ${EXPERIMENT} (seul « h1 » existe)`); process.exit(2); }
 const LIVE = flag("--live") || SUBMIT || !!COLLECT || RECONCILE, FORCE = flag("--force"), BATCH = flag("--batch") || SUBMIT, ONLY = opt("--step") as Step | undefined;
 if (process.env.PIPELINE_ROOT && LIVE) { console.error("ARRÊT : PIPELINE_ROOT est réservé au dry-run (tests)."); process.exit(2); }
 const EXERCISES = opt("--exercises") === undefined ? undefined : Number(opt("--exercises"));
@@ -128,7 +130,8 @@ const state: State = existsSync(P(STATE_FILE)) ? readJson(STATE_FILE) : { chapte
 const saveState = () => write(STATE_FILE, JSON.stringify(state, null, 2) + "\n");
 const CHAPTER_FILE = `src/lib/chapters/data/${spec.id}.ts`;
 const DOSSIER_FILE = `research/dossiers/${spec.id}.md`;
-const REPORT_FILE = `project/reports/${spec.taskId}-QA-api.md`;
+// Rapports nommés par run (décision du 2026-11-18) : un nouveau rapport n'écrase jamais l'ancien.
+const REPORT_FILE = reportFile(spec.taskId, "review", runTag());
 
 // ───────── Contrôle des données d'entrée (avant toute estimation ou tout appel) ─────────
 function checkInputs() {
@@ -369,7 +372,9 @@ async function call(step: Step, user: string, hash: string, model: string): Prom
 }
 
 // ───────── Écriture des sorties (jamais publiées : le chapitre reste « draft » et hors registre) ─────────
-const SCREEN_FILE = `project/reports/${spec.taskId}-screen-QA-api.md`;
+const SCREEN_FILE = reportFile(spec.taskId, "screen", runTag());
+/** Criblage le plus récent présent dans le dépôt (lu par le juge), quel que soit le run qui l'a écrit. */
+const latestScreenFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "screen");
 function saveReport(file: string, label: string, t: string, model: string) {
   const r = parseReview(t);
   if (!r.ok) fail(`${label} hors schéma : ${r.errors.join(" ; ")}`, 7);
@@ -389,6 +394,9 @@ const OUT: Record<Step, { file: string; replaces: boolean; save: (t: string, mod
   fix: { file: CHAPTER_FILE, replaces: true, save: (t) => applyFix(t) },
   screen: { file: SCREEN_FILE, replaces: false, save: (t, model) => saveReport(SCREEN_FILE, "Criblage QA", t, model) },
   review: { file: REPORT_FILE, replaces: false, save: (t, model) => saveReport(REPORT_FILE, "Relecture QA", t, model) },
+  // Essai H1 : sorties en artefact du run seulement (pipeline-output/), jamais committées sur la branche du chapitre.
+  "h1-low": { file: "pipeline-output/h1/h1-low.md", replaces: true, save: (t) => write("pipeline-output/h1/h1-low.md", t.trim() + "\n") },
+  "h1-medium": { file: "pipeline-output/h1/h1-medium.md", replaces: true, save: (t) => write("pipeline-output/h1/h1-medium.md", t.trim() + "\n") },
 };
 
 /** Mode collect : lit le résultat d'un batch déjà soumis ; aucune nouvelle requête payante. */
@@ -406,7 +414,7 @@ async function collect(batchId: string) {
     logCost(step as Step, r.result.message, true, { batchId });
     out.save(finish(step as Step, r.result.message, { batchId }), r.result.message.model);
     console.log(`${step} écrit dans ${out.file} (brouillon, relecture humaine requise avant tout commit)`);
-    RUN.usableOutputs.push(`${step}:${out.file}`);
+    if (!isExperimentStep(step as Step)) RUN.usableOutputs.push(`${step}:${out.file}`);
     if (step === "chapter" || step === "fix") {
       const v = validate(); qaValidation(v);
       console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
@@ -488,6 +496,9 @@ async function main() {
     RUN.notes.push(msg);
   }
 
+  // Essai H1 (décision du 2026-11-18) : deux requêtes Opus 5.5, même prompt, effort low puis medium, un batch chacune.
+  if (EXPERIMENT === "h1") return experimentH1(OBJ);
+
   // 1. Dossier de recherche (à partir de l'inventaire officiel vérifié uniquement).
   const dossierUser = fill(read("pipeline/prompts/dossier.md"), { SPEC, OBJECTIVES: OBJ });
   // Modèle imposé (--dossier-model, comparaison) : ajouté à l'empreinte ; sinon empreinte inchangée.
@@ -560,7 +571,7 @@ async function main() {
   // 5. Juge, étape 2 : Sonnet sur les seuls exercices signalés et les niveaux 4-5.
   const screen = screenResult();
   if (!screen) {
-    if (doneInLedger("screen", hScreen)) { const n = `criblage soldé mais ${SCREEN_FILE} absent du dépôt : fusionner la PR de publication puis relancer`; RUN.needsHuman.push(n); console.log(n); }
+    if (doneInLedger("screen", hScreen)) { const n = `criblage soldé mais aucun rapport de criblage ${spec.taskId}-screen-QA-api*.md dans le dépôt : lancer la suite sur la branche pipeline/${spec.id}`; RUN.needsHuman.push(n); console.log(n); }
     return;
   }
   const reviewUser = reviewUserFor(v.summary, screen);
@@ -574,7 +585,36 @@ async function main() {
   console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(effectiveLimitUsd(budget.limitUsd))}.`);
 }
 
-const SCREEN_FOCUS = "Screening pass (fast model). Check the whole chapter for French spelling and grammar, consistent « tu », tone and the terminology of the French programme (criterion « language »). For the five other criteria, do not try to be exhaustive: report as a finding, with its exerciseId, anything that looks wrong or doubtful so that a stronger model checks it; give such a criterion NEEDS_REVIEW if you report something under it, PASS otherwise.";
+/**
+ * Essai H1 : la réflexion d'Opus 5.5 baisse-t-elle avec l'effort ? Tâche bornée : la seule démonstration M1S-SD-05.
+ * Aucune exemption : chaque requête passe guard() (plafond, garde-fou de troncature avec l'estimation propre de H1).
+ */
+async function experimentH1(OBJ: string) {
+  if (spec.id !== "math-1re-spe-second-degre") fail("--experiment h1 : réservé à math-1re-spe-second-degre");
+  const objective = (JSON.parse(OBJ) as { objectives: { id: string }[] }[]).flatMap((g) => g.objectives).find((o) => o.id === "M1S-SD-05");
+  if (!objective) fail("--experiment h1 : objectif M1S-SD-05 absent de l'inventaire");
+  const dossier = read(DOSSIER_FILE);
+  const section = dossier.slice(dossier.indexOf("## 4."), dossier.indexOf("## 5."));
+  if (section.length < 200) fail("--experiment h1 : section 4 du dossier introuvable");
+  const user = [
+    "Essai H1. Rédige UNIQUEMENT la démonstration exigible du programme de 1re spécialité (objectif M1S-SD-05) : « Résolution de l'équation du second degré ».",
+    "Contraintes : français standard, tutoiement de l'élève ; Markdown avec LaTeX entre $…$ ; hypothèses (a, b, c réels, a ≠ 0) ; forme canonique ; puis les trois cas Δ < 0, Δ = 0, Δ > 0, chacun avec sa conclusion ; démonstration complète et rigoureuse, niveau 1re, sans calculatrice ; une page au plus ; aucun exercice, aucun jeu, aucun autre contenu.",
+    `Objectif (inventaire vérifié G2) :\n${JSON.stringify(objective, null, 1)}`,
+    `Extrait du dossier de recherche du chapitre :\n${section.trim()}`,
+  ].join("\n\n");
+  const hash = hashOf(user);
+  let total = 0;
+  for (const step of H1_STEPS) {
+    console.log(`${step} :`);
+    const t = await call(step, user, hash, STEP_CONFIG[step].model);
+    if (t !== null) OUT[step].save(t, STEP_CONFIG[step].model);
+    total +=(await estimate(step, user, true, STEP_CONFIG[step].model)).upper;
+  }
+  console.log(`H1 : coût maximal des deux requêtes ${money(total)} ; dépense comptée ${money(spent())} / plafond ${money(effectiveLimitUsd(budget.limitUsd))}.`);
+  RUN.notes.push(`H1 : coût maximal ${money(total)} (2 requêtes Opus, max_tokens ${STEP_CONFIG["h1-low"].maxTokens})`);
+}
+
+const SCREEN_FOCUS ="Screening pass (fast model). Check the whole chapter for French spelling and grammar, consistent « tu », tone and the terminology of the French programme (criterion « language »). For the five other criteria, do not try to be exhaustive: report as a finding, with its exerciseId, anything that looks wrong or doubtful so that a stronger model checks it; give such a criterion NEEDS_REVIEW if you report something under it, PASS otherwise.";
 
 /** Problèmes de validation (texte) à partir du JSON de validate(). */
 function problemsOf(json: string): string[] {
@@ -586,8 +626,9 @@ function problemsOf(json: string): string[] {
 
 /** Résultat du criblage enregistré (JSON validé joint au rapport Markdown), ou null. */
 function screenResult(): Review | null {
-  if (!existsSync(P(SCREEN_FILE))) return null;
-  const r = parseReview(extractBlock(read(SCREEN_FILE), "json"));
+  const file = latestScreenFile();
+  if (!file) return null;
+  const r = parseReview(extractBlock(read(file), "json"));
   return r.ok ? r.review : null;
 }
 

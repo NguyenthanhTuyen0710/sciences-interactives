@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, g2Missing, verificationMethod, requiredMaxTokens, truncationRisk, type Prices } from "../pipeline/models";
+import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, g2Missing, verificationMethod, requiredMaxTokens, truncationRisk, latestReport, reportFile, runTag, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -64,11 +64,36 @@ describe("porte G2 (décision du 2026-11-17)", () => {
   });
 });
 
+describe("rapports QA nommés par run (décision du 2026-11-18)", () => {
+  it("nom écrit par le run ; étiquette « local » hors GitHub", () => {
+    expect(reportFile("SCI-3E-MATH-003", "review", "52")).toBe("project/reports/SCI-3E-MATH-003-QA-api-run52.md");
+    expect(reportFile("SCI-3E-MATH-003", "screen", "52")).toBe("project/reports/SCI-3E-MATH-003-screen-QA-api-run52.md");
+    expect(runTag({ GITHUB_RUN_NUMBER: "52" })).toBe("52");
+    expect(runTag({})).toBe("local");
+  });
+  it("criblage le plus récent : run le plus élevé ; ancien nom = 0 ; local = le plus récent ; autre chapitre ignoré", () => {
+    const files = ["SCI-3E-MATH-017-screen-QA-api.md", "SCI-3E-MATH-017-screen-QA-api-run9.md", "SCI-3E-MATH-017-screen-QA-api-run41.md", "SCI-3E-MATH-017-QA-api-run50.md", "SCI-4E-PC-007-screen-QA-api-run60.md"];
+    expect(latestReport(files, "SCI-3E-MATH-017", "screen")).toBe("project/reports/SCI-3E-MATH-017-screen-QA-api-run41.md");
+    expect(latestReport([...files, "SCI-3E-MATH-017-screen-QA-api-runlocal.md"], "SCI-3E-MATH-017", "screen")).toBe("project/reports/SCI-3E-MATH-017-screen-QA-api-runlocal.md");
+    expect(latestReport(["SCI-3E-MATH-017-screen-QA-api.md"], "SCI-3E-MATH-017", "screen")).toBe("project/reports/SCI-3E-MATH-017-screen-QA-api.md");
+    expect(latestReport(files, "SCI-3E-MATH-003", "screen")).toBeNull();
+  });
+});
+
 describe("garde-fou de troncature (décision du 2026-11-17)", () => {
   it("chapitre Sonnet : 64 000 refusé, 96 000 accepté", () => {
     expect(requiredMaxTokens("chapter", MODELS.sonnet)).toBe(Math.ceil((38632 / 0.63) * 1.1));
     expect(truncationRisk("chapter", MODELS.sonnet, 64000)).toMatch(/max_tokens 64000 < besoin estimé/);
     expect(truncationRisk("chapter", MODELS.sonnet, 96000)).toBeNull();
+  });
+  it("essai H1 : estimation propre (2 500 visibles, 76 %) acceptée à 13 500, sans exemption", () => {
+    for (const s of ["h1-low", "h1-medium"] as const) {
+      expect(STEP_CONFIG[s]).toMatchObject({ model: MODELS.opus, maxTokens: 13500 });
+      expect(requiredMaxTokens(s, MODELS.opus)).toBe(Math.ceil((2500 / 0.24) * 1.1));
+      expect(truncationRisk(s, MODELS.opus)).toBeNull();
+      expect(truncationRisk(s, MODELS.opus, 11000)).toMatch(/besoin estimé/);
+    }
+    expect([STEP_CONFIG["h1-low"].effort, STEP_CONFIG["h1-medium"].effort]).toEqual(["low", "medium"]);
   });
   it("chapitre Opus : besoin au-delà de 128 000 → toujours refusé", () => {
     expect(truncationRisk("chapter", MODELS.opus, 128000)).toMatch(/maximum de sortie de l'API/);

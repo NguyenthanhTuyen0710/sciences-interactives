@@ -63,6 +63,11 @@ on:
         description: "Nouvel envoi motivé (M17) d'une étape payée sans résultat utilisable : motif obligatoire ; une seule fois"
         type: string
         default: ""
+      experience:
+        description: "Essai hors chaîne (h1 : démonstration M1S-SD-05, Opus effort low et medium ; chapitre math-1re-spe-second-degre). Sorties en artefact seulement."
+        type: choice
+        options: [aucune, h1]
+        default: aucune
 
 permissions:
   contents: read
@@ -173,6 +178,7 @@ jobs:
           DOSSIER_MODEL: ${{ inputs.dossier_model || 'defaut' }}
           FORCE: ${{ inputs.force && 'true' || 'false' }}
           RETRY_REASON: ${{ inputs.retry_reason }}
+          EXPERIMENT: ${{ inputs.experience || 'aucune' }}
           # La clé n'est transmise qu'aux modes qui appellent l'API ; GitHub la masque dans les journaux
           # et pipeline/run.ts ne l'affiche jamais. workflow_run → dry-run → aucune clé.
           ANTHROPIC_API_KEY: ${{ needs.setup.outputs.api == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
@@ -183,6 +189,7 @@ jobs:
           if [ "$DOSSIER_MODEL" != "defaut" ]; then args+=(--dossier-model "$DOSSIER_MODEL"); fi
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
           if [ -n "$RETRY_REASON" ]; then args+=(--retry "$RETRY_REASON"); fi
+          if [ "$EXPERIMENT" = "h1" ]; then args+=(--experiment h1); fi
           case "$MODE" in
             dry-run) args+=(--batch) ;;
             pilot)   args+=(--submit) ;;
@@ -250,27 +257,27 @@ jobs:
             pipeline/state/
             research/dossiers/${{ steps.run.outputs.chapter || 'aucun' }}.md
             src/lib/chapters/data/${{ steps.run.outputs.chapter || 'aucun' }}.ts
-            project/reports/*-QA-api.md
+            project/reports/*-QA-api*.md
 
-  # Publication par Pull Request (jamais de commit direct sur la branche par défaut) : après un collect réussi, les
-  # fichiers produits (chapitre TS, dossier, relecture) sont copiés, contrôlés (ChapterSchema, validate-chapter, tsc),
-  # le chapitre est inscrit au registre (brouillon invisible tant qu'il n'est pas « published »), la matrice de
-  # couverture et project/ledger.json sont régénérés, puis une PR est ouverte pour relecture humaine.
-  # Prérequis côté dépôt : Settings → Actions → « Allow GitHub Actions to create and approve pull requests ».
-  publish-pr:
+  # Une branche et une PR par chapitre (décision du 2026-11-18).
+  # - stage-chapter (mode collect, sortie utilisable seulement) : les fichiers produits sont committés sur la branche
+  #   `pipeline/<chapitre>` (créée depuis le commit du run si elle n'existe pas) ; AUCUNE PR. Les étapes suivantes du
+  #   chapitre se lancent sur cette ref, qui porte ainsi le dossier, le chapitre et les rapports déjà produits.
+  #   Collecte sans sortie utilisable (batch non terminé, sortie tronquée) : rien n'est committé.
+  # - publish-pr (mode publish, en fin de chaîne) : sur `pipeline/<chapitre>`, exige le chapitre et un rapport du juge,
+  #   exécute tous les contrôles ; un seul rouge → aucune PR. Sinon ouvre la PR unique du chapitre (ou met à jour sa
+  #   description si elle existe). Prérequis dépôt : « Allow GitHub Actions to create and approve pull requests ».
+  stage-chapter:
     needs: [setup, pipeline]
-    # collect : uniquement si le run a produit une sortie utilisable (pas de PR vide quand le batch n'est pas terminé, cf. PR #10, #12).
-    if: always() && needs.setup.result == 'success' && ((needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun' && needs.pipeline.outputs.usable == 'true') || (needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''))
+    if: always() && needs.setup.result == 'success' && needs.setup.outputs.mode == 'collect' && needs.pipeline.result == 'success' && needs.pipeline.outputs.chapter != 'aucun' && needs.pipeline.outputs.usable == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     permissions:
       contents: write
-      pull-requests: write
     steps:
-      # Base = branche par défaut : la PR ne contient que la publication, quelle que soit la branche du run.
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v5
         with:
@@ -281,33 +288,72 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Récupérer les sorties du run
-        if: needs.setup.outputs.mode == 'collect'
         uses: actions/download-artifact@v7
         with:
           name: lessons-${{ needs.pipeline.outputs.chapter }}-collect-${{ github.run_id }}
           path: ${{ runner.temp }}/out
 
-      - name: Copier et inscrire
-        id: apply
+      - name: Committer sur la branche du chapitre
         env:
-          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
+          CHAPTER: ${{ needs.pipeline.outputs.chapter }}
           OUT: ${{ runner.temp }}/out
         run: |
+          branch="pipeline/$CHAPTER"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            git checkout -B "$branch" "origin/$branch"
+          else
+            git checkout -B "$branch" "$GITHUB_SHA"
+          fi
+          # Seulement les sorties déclarées utilisables par ce run (summary.json → usableOutputs : « étape:fichier »).
+          node -e 'for (const o of require(process.argv[1]).usableOutputs || []) console.log(o.slice(o.indexOf(":") + 1))' "$OUT/pipeline-output/summary.json" > "$RUNNER_TEMP/files.txt"
           copied=0
-          for f in "src/lib/chapters/data/$CHAPTER.ts" "research/dossiers/$CHAPTER.md"; do
+          while IFS= read -r f; do
             if [ -f "$OUT/$f" ]; then mkdir -p "$(dirname "$f")"; cp "$OUT/$f" "$f"; copied=$((copied+1)); fi
-          done
-          for f in "$OUT"/project/reports/*-QA-api.md; do [ -f "$f" ] && cp "$f" project/reports/ && copied=$((copied+1)); done
+          done < "$RUNNER_TEMP/files.txt"
+          if [ "$copied" = 0 ]; then echo "::error::aucune sortie utilisable à committer"; exit 1; fi
           if [ -f "src/lib/chapters/data/$CHAPTER.ts" ]; then npm run dashboard -- register "$CHAPTER"; else npm run dashboard; fi
-          if git diff --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
-          echo "Fichiers copiés depuis l'artefact : $copied"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src/lib/chapters research/dossiers project/reports project/ledger.json project/dashboard.md research/curriculum/coverage-matrix.json research/curriculum/coverage-matrix.md research/curriculum/master-curriculum.json
+          if git diff --cached --quiet; then echo "aucun changement : rien à committer"; exit 0; fi
+          git commit -m "Pipeline : $CHAPTER (run ${{ github.run_number }}, $(tr '\n' ' ' < "$RUNNER_TEMP/files.txt")) — à relire"
+          git push origin "$branch"
+          { echo "### Branche du chapitre : \`$branch\`"; echo ""; echo "Fichiers committés :"; sed 's/^/- /' "$RUNNER_TEMP/files.txt"; echo ""; echo "Aucune PR : elle s'ouvre en fin de chaîne (mode publish, ref \`$branch\`)."; } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-pr:
+    needs: [setup]
+    if: needs.setup.result == 'success' && needs.setup.outputs.mode == 'publish' && inputs.chapitre != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: pipeline/${{ inputs.chapitre }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Chaîne terminée ?
+        env:
+          CHAPTER: ${{ inputs.chapitre }}
+        run: |
+          task=$(node -e 'const s = require("./pipeline/chapters/" + process.argv[1] + ".json"); process.stdout.write(s.taskId)' "$CHAPTER")
+          [ -f "src/lib/chapters/data/$CHAPTER.ts" ] || { echo "::error::chapitre absent de la branche : chaîne non terminée, aucune PR"; exit 1; }
+          ls project/reports/"$task"-QA-api*.md > /dev/null 2>&1 || { echo "::error::aucun rapport du juge ($task-QA-api*.md) : chaîne non terminée, aucune PR"; exit 1; }
 
       # Les PR ouvertes avec GITHUB_TOKEN ne déclenchent pas « PR Checks » : les mêmes contrôles sont exécutés ici, sur
-      # l'état exact de la PR. Un seul contrôle rouge → aucune PR. Le tableau est repris dans la description de la PR.
-      - name: Contrôles de la PR (ChapterSchema, validate-chapter, tsc, tests, lint, build)
-        if: steps.apply.outputs.changed == 'true'
+      # l'état exact de la branche. Un seul contrôle rouge → aucune PR. Le tableau est repris dans la description de la PR.
+      - name: Contrôles (ChapterSchema, validate-chapter, tsc, tests, lint, build)
         env:
-          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
+          CHAPTER: ${{ inputs.chapitre }}
         run: |
           table="$RUNNER_TEMP/checks.md"; failed=0
           printf '| Contrôle | Résultat | Durée |\n|---|---|---|\n' > "$table"
@@ -316,20 +362,16 @@ jobs:
             if "$@" > "$RUNNER_TEMP/check.log" 2>&1; then row "$name" "✔" $((SECONDS - t0))
             else row "$name" "✘ (voir le journal du job)" $((SECONDS - t0)); failed=1; echo "::group::$name (échec)"; tail -n 80 "$RUNNER_TEMP/check.log"; echo "::endgroup::"; fi; }
           file="src/lib/chapters/data/$CHAPTER.ts"
-          if [ -f "$file" ]; then
-            t0=$SECONDS
-            npx tsx scripts/validate-chapter.ts "$file" --json > "$RUNNER_TEMP/validate.json" 2> "$RUNNER_TEMP/validate.err" || true
-            res=$(node -e '
-              const fs = require("fs"); let r;
-              try { r = JSON.parse(fs.readFileSync(process.argv[1], "utf8").trim().split("\n").pop()); } catch { console.log("✘ chargement impossible|✘ chargement impossible"); process.exit(); }
-              const schema = r.issues.filter((i) => i.where.startsWith("schema:")).length;
-              console.log(`${schema ? "✘ " + schema + " écart(s)" : "✔"}|${r.summary.ok ? "✔ " + r.summary.instances + " tirages" : "✘ " + r.summary.issues + " problème(s)"}`);
-            ' "$RUNNER_TEMP/validate.json")
-            row "ChapterSchema" "${res%%|*}" $((SECONDS - t0)); row "validate-chapter" "${res##*|}" $((SECONDS - t0))
-            case "$res" in *✘*) failed=1; cat "$RUNNER_TEMP/validate.err" | tail -n 40 ;; esac
-          else
-            row "ChapterSchema" "sans objet (aucun fichier de chapitre)" 0; row "validate-chapter" "sans objet" 0
-          fi
+          t0=$SECONDS
+          npx tsx scripts/validate-chapter.ts "$file" --json > "$RUNNER_TEMP/validate.json" 2> "$RUNNER_TEMP/validate.err" || true
+          res=$(node -e '
+            const fs = require("fs"); let r;
+            try { r = JSON.parse(fs.readFileSync(process.argv[1], "utf8").trim().split("\n").pop()); } catch { console.log("✘ chargement impossible|✘ chargement impossible"); process.exit(); }
+            const schema = r.issues.filter((i) => i.where.startsWith("schema:")).length;
+            console.log(`${schema ? "✘ " + schema + " écart(s)" : "✔"}|${r.summary.ok ? "✔ " + r.summary.instances + " tirages, taxonomie " + r.summary.taxonomy : "✘ " + r.summary.issues + " problème(s)"}`);
+          ' "$RUNNER_TEMP/validate.json")
+          row "ChapterSchema" "${res%%|*}" $((SECONDS - t0)); row "validate-chapter (QA tier 1-2)" "${res##*|}" $((SECONDS - t0))
+          case "$res" in *✘*) failed=1; tail -n 40 "$RUNNER_TEMP/validate.err" ;; esac
           check "tsc" npx tsc --noEmit
           check "tests (vitest)" npm test
           check "lint (ESLint)" npm run lint
@@ -337,35 +379,27 @@ jobs:
           cat "$table" >> "$GITHUB_STEP_SUMMARY"
           if [ "$failed" = 1 ]; then echo "::error::au moins un contrôle est rouge : aucune PR n'est ouverte"; exit 1; fi
 
-      - name: Ouvrir la Pull Request
-        if: steps.apply.outputs.changed == 'true'
+      - name: Ouvrir (ou mettre à jour) la PR du chapitre
         env:
           GH_TOKEN: ${{ github.token }}
-          CHAPTER: ${{ needs.pipeline.outputs.chapter || inputs.chapitre }}
-          OUT: ${{ runner.temp }}/out
+          CHAPTER: ${{ inputs.chapitre }}
           BASE: ${{ github.event.repository.default_branch }}
         run: |
-          branch="pipeline/$CHAPTER-${{ github.run_id }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
-          git add -A src/lib/chapters research/dossiers project/reports project/ledger.json project/dashboard.md research/curriculum/coverage-matrix.json research/curriculum/coverage-matrix.md research/curriculum/master-curriculum.json
-          git commit -m "Pipeline : $CHAPTER (run ${{ github.run_id }}) — à relire avant publication"
-          git push -u origin "$branch"
+          branch="pipeline/$CHAPTER"
           {
-            echo "Sorties du pipeline pour \`$CHAPTER\` (run ${{ github.run_id }}). **Relecture humaine obligatoire** ; le chapitre reste \`draft\` (invisible) tant que \`publicationStatus\` n'est pas \`published\`."
+            echo "Chaîne du pipeline terminée pour \`$CHAPTER\` (branche \`$branch\`, une PR par chapitre). **Relecture humaine obligatoire** ; le chapitre reste \`draft\` (invisible) tant que \`publicationStatus\` n'est pas \`published\`."
             echo ""
-            cat "$OUT/pipeline-output/summary.md" 2>/dev/null || true
-            echo ""
-            echo "### Contrôles exécutés dans le job (état exact de cette PR)"
+            echo "### Contrôles exécutés dans le job (état exact de la branche)"
             echo ""
             echo "Run : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} (les PR ouvertes par github-actions[bot] ne déclenchent pas « PR Checks »)."
             echo ""
             cat "$RUNNER_TEMP/checks.md"
             echo ""
-            echo "Matrice de couverture et project/ledger.json régénérés ; registre des dépenses : data-store (hors Git)."
+            echo "Rapports QA : project/reports/ (nommés par run). Registre des dépenses : data-store (hors Git)."
           } > "$RUNNER_TEMP/pr-body.md"
-          gh pr create --base "$BASE" --head "$branch" --title "Pipeline : $CHAPTER (run ${{ github.run_id }})" --body-file "$RUNNER_TEMP/pr-body.md"
+          existing=$(gh pr list --head "$branch" --base "$BASE" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then gh pr edit "$existing" --body-file "$RUNNER_TEMP/pr-body.md"; echo "PR #$existing mise à jour"
+          else gh pr create --base "$BASE" --head "$branch" --title "Pipeline : $CHAPTER — chapitre complet à relire" --body-file "$RUNNER_TEMP/pr-body.md"; fi
 
   ledger-push:
     needs: [setup, ledger-pull, pipeline]

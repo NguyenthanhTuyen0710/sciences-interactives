@@ -17,7 +17,10 @@ export const MODELS = { haiku: "claude-haiku-5-5", sonnet: "claude-sonnet-5-5", 
 export const FORBIDDEN_MODEL = /fable|mythos/i;
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
-export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review";
+export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review" | "h1-low" | "h1-medium";
+/** Étapes de l'essai H1 (décision du 2026-11-18) : hors chaîne de production, sorties en artefact seulement. */
+export const H1_STEPS = ["h1-low", "h1-medium"] as const;
+export const isExperimentStep = (s: PipelineStep) => (H1_STEPS as readonly string[]).includes(s);
 
 /**
  * Étapes de pipeline/run.ts. system « light » : règles seules (sans schéma, types ni chapitre d'exemple), pour les
@@ -36,6 +39,10 @@ export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; 
   // Juge approfondi : préfixe « light » (décision du 2026-11-15) : les erreurs de type sont déjà prises par ChapterSchema,
   // tsc et validate-chapter (tier 1) ; la requête contient les extraits d'exercices à juger.
   review: { model: MODELS.sonnet, effort: "low", maxTokens: 12000, system: "light" },
+  // Essai H1 (décision du 2026-11-18) : même prompt (démonstration M1S-SD-05), effort low puis medium ; 13 500 chacune,
+  // coût maximal ≈ 2 × 0,145 $ en batch.
+  "h1-low": { model: MODELS.opus, effort: "low", maxTokens: 13500, system: "light" },
+  "h1-medium": { model: MODELS.opus, effort: "medium", maxTokens: 13500, system: "light" },
 };
 
 /**
@@ -254,6 +261,10 @@ export const OBSERVED_OUTPUT: Partial<Record<PipelineStep, Partial<Record<string
   chapter: { [MODELS.sonnet]: { visible: 38632, thinking: 0.37 }, [MODELS.opus]: { visible: 43000, thinking: 0.76 } },
   screen: { [MODELS.haiku]: { visible: 1898, thinking: 0 } },
   review: { [MODELS.sonnet]: { visible: 2000, thinking: 0 } },
+  // Essai H1 : estimation propre, sans exemption. Démonstration seule ≈ 2 500 tokens visibles (plan du dossier 1re,
+  // section 4 : ≈ 900 tokens, rédigé en entier ≈ ×2,5) ; réflexion au pire observé sur Opus (76 %) → besoin 11 459.
+  "h1-low": { [MODELS.opus]: { visible: 2500, thinking: 0.76 } },
+  "h1-medium": { [MODELS.opus]: { visible: 2500, thinking: 0.76 } },
 };
 export const TRUNCATION_MARGIN = 1.1;
 /** Besoin estimé de `max_tokens` (null = aucune mesure pour ce couple étape/modèle). */
@@ -266,4 +277,22 @@ export function truncationRisk(step: PipelineStep, model: string, maxTokens = ma
   const need = requiredMaxTokens(step, model);
   if (need === null || maxTokens >= need) return null;
   return `garde-fou de troncature : ${step} [${model}] max_tokens ${maxTokens} < besoin estimé ${need} (sortie visible observée ÷ (1 − part de réflexion) × ${TRUNCATION_MARGIN})${need > 128000 ? " ; au-delà du maximum de sortie de l'API (128 000) : découper la requête" : ""}`;
+}
+
+// ───────── Rapports QA nommés par run (décision du 2026-11-18) ─────────
+export type ReportKind = "screen" | "review";
+/** Étiquette du run : numéro du run GitHub (« Generate Lessons »), sinon « local ». */
+export const runTag = (env: Record<string, string | undefined> = process.env) => env.GITHUB_RUN_NUMBER ?? "local";
+/** Chemin du rapport écrit par ce run : `<taskId>-screen-QA-api-run<N>.md` ou `<taskId>-QA-api-run<N>.md`. */
+export const reportFile = (taskId: string, kind: ReportKind, tag: string) =>
+  `project/reports/${taskId}-${kind === "screen" ? "screen-" : ""}QA-api-run${tag}.md`;
+/**
+ * Rapport le plus récent parmi les noms de fichiers donnés : numéro de run le plus élevé ; ancien nom sans run = 0 ;
+ * « local » = le plus récent (exécution locale en cours). null si aucun.
+ */
+export function latestReport(files: string[], taskId: string, kind: ReportKind): string | null {
+  const re = new RegExp(`^${taskId}-${kind === "screen" ? "screen-" : ""}QA-api(?:-run(\\d+|local))?\\.md$`);
+  const ranked = files.flatMap((f) => { const m = re.exec(f); return m ? [{ f, n: m[1] === undefined ? 0 : m[1] === "local" ? Infinity : Number(m[1]) }] : []; });
+  ranked.sort((a, b) => b.n - a.n);
+  return ranked[0] ? `project/reports/${ranked[0].f}` : null;
 }
