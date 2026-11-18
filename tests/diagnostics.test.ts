@@ -108,15 +108,19 @@ describe("taxonomie Pythagore verrouillée (Việc 2, 2026-11-15)", () => {
   const canon = (v: unknown): string => Array.isArray(v) ? `[${v.map(canon).join(", ")}]`
     : v && typeof v === "object" ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}: ${canon((v as Record<string, unknown>)[k])}`).join(", ")}}`
     : JSON.stringify(v);
-  it("empreinte de verrouillage inchangée (seul le champ « brevet » peut évoluer)", async () => {
-    const { createHash } = await import("node:crypto");
-    const d = JSON.parse(JSON.stringify(tax));
-    for (const t of d.types) delete t.brevet;
-    delete d.lockHash; delete d.coverage;
-    expect(tax.status).toBe("verrouillé");
-    expect(tax.lockedAt).toBeTruthy();
-    expect(createHash("sha256").update(canon(d)).digest("hex")).toBe(tax.lockHash);
-  });
+  // Pythagore (2026-11-15) et calcul littéral (2026-11-18).
+  for (const id of ["math-3e-pythagore", "math-3e-calcul-litteral"]) {
+    it(`${id} : empreinte de verrouillage inchangée (seul le champ « brevet » peut évoluer)`, async () => {
+      const { createHash } = await import("node:crypto");
+      const t0 = JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${id}.json`, "utf8"));
+      const d = JSON.parse(JSON.stringify(t0));
+      for (const t of d.types) delete t.brevet;
+      delete d.lockHash; delete d.coverage;
+      expect(t0.status).toBe("verrouillé");
+      expect(t0.lockedAt).toBeTruthy();
+      expect(createHash("sha256").update(canon(d)).digest("hex")).toBe(t0.lockHash);
+    });
+  }
   it("ajustements approuvés présents", () => {
     const byId = Object.fromEntries(tax.types.map((t: { id: string }) => [t.id, t]));
     expect(byId["PY-T11"].competences).toEqual(["Calculer"]);

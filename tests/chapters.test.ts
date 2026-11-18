@@ -282,6 +282,33 @@ describe("QA tier 2 : chapitre ↔ taxonomie verrouillée (validate-chapter)", (
     expect(tier2).toContain("taxonomie:PY-T11 | type obligatoire sans exercice");
     expect(tier2).toContain("py3-20 | exercice d'approfondissement présenté en évaluation finale (titre « Type … — »)");
   }, 120_000);
+  it("taxonomyTypes (décision du 2026-11-18) : exigé si la taxonomie verrouillée ne liste aucun exercice ; type inconnu, niveau hors plage, approfondissement contrôlés", async () => {
+    const { taxonomyIssues } = await import("../scripts/validate-chapter");
+    const tax = JSON.parse(readFileSync("research/curriculum/mathematiques/taxonomy/math-3e-calcul-litteral.json", "utf8"));
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const ex = (id: string, niveau: 1 | 2 | 3 | 4 | 5, taxonomyTypes?: string[], title = "Exercice") => ({ ...base.exercises[0], id, niveau, title, taxonomyTypes });
+    const required = tax.types.filter((t: { level?: string; countsTowardCompleteness?: boolean }) => t.level !== "approfondissement" && t.countsTowardCompleteness !== false);
+    const covering = required.map((t: { id: string; difficulty: number[] }, i: number) => ex(`cl3-${String(i + 1).padStart(2, "0")}`, t.difficulty[0] as 1, [t.id]));
+    const run = (exercises: object[], t = tax) => taxonomyIssues({ ...base, exercises } as never, t).map((i) => `${i.where} | ${i.problem}`);
+    expect(run(covering)).toEqual([]);
+    expect(run([...covering, ex("cl3-90", 2)])).toEqual(["cl3-90 | taxonomyTypes manquant (taxonomie verrouillée sans liste d'exercices)"]);
+    expect(run([...covering, ex("cl3-91", 2, ["CL-T99"])])).toEqual(["cl3-91 | type inconnu dans taxonomyTypes : CL-T99"]);
+    expect(run([...covering, ex("cl3-92", 1, ["CL-T08"])])).toEqual(["cl3-92 | niveau 1 hors de la difficulté du type CL-T08 (3, 4, 5)"]);
+    expect(run([...covering, ex("cl3-93", 4, ["CL-T10"], "Type Brevet — aire")])).toEqual(["cl3-93 | exercice d'approfondissement présenté en évaluation finale (titre « Type … — »)"]);
+    expect(run([...covering, ex("cl3-94", 4, ["CL-T10", "CL-T06"])])).toEqual(["cl3-94 | exercice d'approfondissement rattaché à un type obligatoire (CL-T06)"]);
+    expect(run(covering.slice(1))).toEqual([`taxonomie:${required[0].id} | type obligatoire sans exercice`]);
+    // Taxonomie non verrouillée : signalée, et le champ n'est pas exigé (rattachement par listes seulement).
+    expect(run([...covering, ex("cl3-95", 2)], { ...tax, status: "proposé" })).toEqual(["taxonomie | taxonomie non verrouillée (statut « proposé »)", "cl3-95 | exercice rattaché à aucun type de la taxonomie"]);
+  });
+  it("schéma : taxonomyTypes facultatif, identifiants de type contrôlés", async () => {
+    const { ChapterSchema } = await import("../src/lib/chapters/schema");
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const withTypes = (t: string[]) => ChapterSchema.safeParse({ ...base, exercises: [{ ...base.exercises[0], taxonomyTypes: t }, ...base.exercises.slice(1)] }).success;
+    expect(ChapterSchema.safeParse(base).success).toBe(true);
+    expect(withTypes(["CL-T04"])).toBe(true);
+    expect(withTypes(["cl-t4"])).toBe(false);
+    expect(withTypes([])).toBe(false);
+  });
   it("chapitre sans taxonomie : QA tier 2 non évaluée, pas d'échec", async () => {
     const { spawnSync } = await import("node:child_process");
     const r = spawnSync("npx", ["tsx", "scripts/validate-chapter.ts", "math-5e-nombres-relatifs", "--json", "--seeds", "3"], { encoding: "utf8" });

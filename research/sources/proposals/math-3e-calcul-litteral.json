@@ -1,6 +1,6 @@
 {
  "chapter": "math-3e-calcul-litteral",
- "status": "PROPOSÉ — en attente d'approbation du porteur de projet (G2). Non appliqué : `run.ts apply` refuse sans approvedBy/approvedAt.",
+ "status": "APPROUVÉ par le porteur de projet le 2026-11-18 (G1, G2), avec corrections (voir corrections) ; appliqué par `run.ts apply` (attach_evidence) et classement G1 reporté dans l'inventaire.",
  "note": "Citations copiées du texte extrait (pdftotext) des documents vérifiés par le collecteur (SHA256 identiques au 2026-11-07, re-téléchargés le 2026-11-18). Page = numéro de page du PDF. Objectifs de consolidation 4e (M4-NC-16…18) : niveau « consolidation » en 3e, non obligatoires, G2 non requis par la porte.",
  "changes": [
   {
@@ -12,8 +12,10 @@
     "quote": "Il détermine l’opposé d’une expression littérale.",
     "page": 3,
     "matchType": "b — objectif reformulé à l’infinitif",
-    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation"
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+   "approvedAt": "2026-11-18"
   },
   {
    "op": "attach_evidence",
@@ -24,8 +26,10 @@
     "quote": "Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples.",
     "page": 3,
     "matchType": "b — objectif reformulé",
-    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation"
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+   "approvedAt": "2026-11-18"
   },
   {
    "op": "attach_evidence",
@@ -36,8 +40,11 @@
     "quote": "l’identité a2 – b2 = (a – b)(a + b)",
     "page": 133,
     "matchType": "b — objectif reformulé ; « a2 », « b2 » = a², b² (exposants perdus à l’extraction)",
-    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+    "extractionNote": "Exposants perdus à l'extraction PDF : « a2 – b2 » se lit a² – b² dans le PDF ; citation gardée telle que dans le texte extrait (contrôle mot pour mot)."
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+   "approvedAt": "2026-11-18"
   },
   {
    "op": "attach_evidence",
@@ -48,14 +55,17 @@
     "quote": "Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
     "page": 132,
     "matchType": "b — objectif reformulé (extrait de la citation)",
-    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+    "contiguity": "une seule phrase continue du PDF, p. 132 (compétences associées de « Utiliser le calcul littéral »), sans coupure ni « (…) »"
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+   "approvedAt": "2026-11-18"
   }
  ],
  "g1": {
-  "status": "PROPOSÉ — à valider par le porteur de projet ; non appliqué à l'inventaire",
+  "status": "APPROUVÉ par le porteur de projet le 2026-11-18 ; reporté dans l'inventaire (classification « validé »)",
   "by": "Claude Code (session du 2026-11-18)",
-  "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+  "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
   "objectiveLevelsForFiche": {
    "M3-NC-08": "exigible",
    "M3-NC-09": "exigible",
@@ -136,9 +146,22 @@
      "structure d'une expression (somme, produit)"
     ],
     "competences": [
-     "Représenter",
-     "Raisonner"
-    ]
+     "Calculer",
+     "Communiquer"
+    ],
+    "competencesJustification": [
+     {
+      "competence": "Calculer",
+      "page": "p. 130",
+      "descripteur": "Calculer en utilisant le langage algébrique (lettres, symboles, etc.)."
+     },
+     {
+      "competence": "Communiquer",
+      "page": "p. 130",
+      "descripteur": "Faire le lien entre le langage naturel et le langage algébrique."
+     }
+    ],
+    "g2": "non requis pour ce chapitre (consolidation en 3e) ; required: false via optionalObjectives de la fiche"
    },
    {
     "objectiveId": "M4-NC-17",
@@ -152,7 +175,15 @@
     ],
     "competences": [
      "Calculer"
-    ]
+    ],
+    "competencesJustification": [
+     {
+      "competence": "Calculer",
+      "page": "p. 130",
+      "descripteur": "Calculer en utilisant le langage algébrique (lettres, symboles, etc.)."
+     }
+    ],
+    "g2": "non requis pour ce chapitre (consolidation en 3e) ; required: false via optionalObjectives de la fiche"
    },
    {
     "objectiveId": "M4-NC-18",
@@ -167,8 +198,27 @@
     "competences": [
      "Raisonner",
      "Communiquer"
-    ]
+    ],
+    "competencesJustification": [
+     {
+      "competence": "Raisonner",
+      "page": "p. 130",
+      "descripteur": "Démontrer : utiliser un raisonnement logique et des règles établies (propriétés, théorèmes, formules) pour parvenir à une conclusion."
+     },
+     {
+      "competence": "Communiquer",
+      "page": "p. 130",
+      "descripteur": "Expliquer à l’oral ou à l’écrit (sa démarche, son raisonnement, un calcul, un protocole de construction géométrique, un algorithme), comprendre les explications d’un autre et argumenter dans l’échange."
+     }
+    ],
+    "g2": "non requis pour ce chapitre (consolidation en 3e) ; required: false via optionalObjectives de la fiche"
    }
   ]
- }
+ },
+ "corrections": [
+  "M3-NC-11 : citation déjà d'un seul tenant (une phrase continue, p. 132, sans « (…) ») ; contrôlée mot pour mot par quoteFound sur le PDF de SHA256 vérifié (re-téléchargé le 2026-11-18, empreinte identique).",
+  "M3-NC-10 : « a2 – b2 » conservé tel que dans le texte extrait ; les exposants (a², b²) sont perdus à l'extraction PDF (pdftotext), le PDF imprime bien des carrés.",
+  "G1 : compétences de M4-NC-16…18 justifiées par les descripteurs officiels (liste des six compétences p. 129, descripteurs p. 129-130) ; M4-NC-16 passe de « Représenter, Raisonner » à « Calculer, Communiquer » (descripteurs plus proches de l'objectif).",
+  "Objectifs de consolidation 4e (M4-NC-16…18) : G2 non requis pour ce chapitre (niveau « consolidation » en 3e, non exigible) ; la fiche les déclare `optionalObjectives` → `required: false` dans le META et hors porte G2. Leur G2 sera fait avec le chapitre de 4e, où ils sont exigibles."
+ ]
 }

@@ -1597,19 +1597,77 @@
                       "id": "M4-NC-16",
                       "text": "Identifier la structure d'une expression littérale (somme, produit).",
                       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Calcul littéral (4e) ; Attendus de fin d'année de 4e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "structure d'une expression (somme, produit)"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Communiquer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     },
                     {
                       "id": "M4-NC-17",
                       "text": "Développer, factoriser et réduire avec la distributivité simple.",
                       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Distributivité (4e) ; Attendus de fin d'année de 4e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "distributivité simple",
+                        "développer, factoriser, réduire"
+                      ],
+                      "competences": [
+                        "Calculer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     },
                     {
                       "id": "M4-NC-18",
                       "text": "Démontrer l'équivalence de deux programmes de calcul ; notion d'identité.",
                       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Expressions littérales (4e) ; Attendus de fin d'année de 4e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "level": {
+                        "4e": "exigible",
+                        "3e": "consolidation"
+                      },
+                      "notions": [
+                        "programmes de calcul équivalents",
+                        "notion d'identité"
+                      ],
+                      "competences": [
+                        "Raisonner",
+                        "Communiquer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     }
                   ],
                   "prerequisites": [
@@ -2189,25 +2247,155 @@
                       "id": "M3-NC-08",
                       "text": "Déterminer l'opposé d'une expression littérale.",
                       "officialRef": "Attendus de fin d'année de 3e (2019) › Utiliser le calcul littéral",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-attendus-3e-2019-pdf",
+                        "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+                        "quote": "Il détermine l’opposé d’une expression littérale.",
+                        "page": 3,
+                        "matchType": "b — objectif reformulé à l’infinitif",
+                        "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+                        "accessedAt": "2026-11-07T14:50:10.048Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+                        "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "approvedAt": "2026-11-18"
+                      },
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "expression littérale",
+                        "opposé d'une somme",
+                        "suppression de parenthèses"
+                      ],
+                      "competences": [
+                        "Calculer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     },
                     {
                       "id": "M3-NC-09",
                       "text": "Développer avec la double distributivité, factoriser et réduire des expressions simples.",
                       "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Distributivité (3e) ; Attendus de fin d'année de 3e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-attendus-3e-2019-pdf",
+                        "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+                        "quote": "Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples.",
+                        "page": 3,
+                        "matchType": "b — objectif reformulé",
+                        "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+                        "accessedAt": "2026-11-07T14:50:10.048Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+                        "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "approvedAt": "2026-11-18"
+                      },
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "double distributivité",
+                        "factorisation par un facteur commun",
+                        "réduction d'une expression"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Raisonner"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     },
                     {
                       "id": "M3-NC-10",
                       "text": "Factoriser a²−b² et développer (a+b)(a−b).",
                       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Utiliser le calcul littéral ; Attendus de fin d'année de 3e (2019)",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "quote": "l’identité a2 – b2 = (a – b)(a + b)",
+                        "page": 133,
+                        "matchType": "b — objectif reformulé ; « a2 », « b2 » = a², b² (exposants perdus à l’extraction)",
+                        "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+                        "extractionNote": "Exposants perdus à l'extraction PDF : « a2 – b2 » se lit a² – b² dans le PDF ; citation gardée telle que dans le texte extrait (contrôle mot pour mot).",
+                        "accessedAt": "2026-11-07T14:49:44.189Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "approvedAt": "2026-11-18"
+                      },
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "identité a² − b² = (a − b)(a + b)",
+                        "différence de deux carrés"
+                      ],
+                      "competences": [
+                        "Calculer",
+                        "Raisonner"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     },
                     {
                       "id": "M3-NC-11",
                       "text": "Utiliser le calcul littéral pour démontrer un résultat général ou réfuter une conjecture.",
                       "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Utiliser le calcul littéral",
-                      "verified": true
+                      "verified": true,
+                      "evidence": {
+                        "seedId": "c4-programme-2020-eduscol-pdf",
+                        "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                        "quote": "Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
+                        "page": 132,
+                        "matchType": "b — objectif reformulé (extrait de la citation)",
+                        "reason": "proposition Claude Code (2026-11-18), approuvée par le porteur de projet le 2026-11-18 : correspondance objectif ↔ citation",
+                        "contiguity": "une seule phrase continue du PDF, p. 132 (compétences associées de « Utiliser le calcul littéral »), sans coupure ni « (…) »",
+                        "accessedAt": "2026-11-07T14:49:44.189Z",
+                        "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                        "approvedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "approvedAt": "2026-11-18"
+                      },
+                      "level": {
+                        "3e": "exigible"
+                      },
+                      "notions": [
+                        "identité",
+                        "contre-exemple",
+                        "démonstration d'un résultat général",
+                        "programme de calcul"
+                      ],
+                      "competences": [
+                        "Raisonner",
+                        "Modéliser",
+                        "Communiquer"
+                      ],
+                      "classification": {
+                        "status": "validé",
+                        "by": "Claude Code (session du 2026-11-18)",
+                        "toValidate": "porteur de projet",
+                        "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                        "validatedBy": "Nguyễn Thanh Tuyền (porteur de projet)",
+                        "validatedAt": "2026-11-18"
+                      }
                     }
                   ],
                   "prerequisites": [

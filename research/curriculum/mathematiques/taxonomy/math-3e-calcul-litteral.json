@@ -1,11 +1,11 @@
 {
  "chapter": "math-3e-calcul-litteral",
  "taskId": "SCI-3E-MATH-003",
- "status": "proposé",
- "lockedAt": null,
- "lockedBy": null,
- "lockHash": null,
- "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-18, sans API) à partir de l'inventaire (M3-NC-08…11, M4-NC-16…18) et des textes vérifiés : attendus 3e 2019 p. 3, programme cycle 4 2020 p. 132-133, repères 2019 (BO n° 22) p. 286. À approuver puis verrouiller par le porteur de projet. Les listes « exercises » se remplissent au moment de la génération (voir rapport : rattachement exercice ↔ type).",
+ "status": "verrouillé",
+ "lockedAt": "2026-11-18",
+ "lockedBy": "Nguyễn Thanh Tuyền (porteur de projet), approbation du 2026-11-18 avec corrections (CL-T10 : preuve du niveau ; CL-T01 : compétences alignées sur le G1)",
+ "lockHash": "6f72b6d31393a456db6f9dfb50918ec596224784921d1f2817bbb3ddfa710331",
+ "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-18, sans API) à partir de l'inventaire (M3-NC-08…11, M4-NC-16…18) et des textes vérifiés : attendus 3e 2019 p. 3, programme cycle 4 2020 p. 132-133, repères 2019 (BO n° 22) p. 286. Approuvée et verrouillée par le porteur de projet le 2026-11-18. Les listes « exercises » restent vides : le rattachement exercice ↔ type se fait par le champ `taxonomyTypes` de chaque exercice (ChapterSchema), contrôlé par validate-chapter.",
  "sources": [
   "c4-attendus-3e-2019-pdf p. 3 : « Il détermine l’opposé d’une expression littérale. » ; « Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples. »",
   "c4-programme-2020-eduscol-pdf p. 132 : « Propriétés de distributivité (simple et double). » ; « Factorisation de a2 - b2. » ; p. 133 (automatismes) : « l’identité a2 – b2 = (a – b)(a + b) »",
@@ -20,7 +20,7 @@
    "title": "Reconnaître la structure d'une expression (somme ou produit)",
    "objectives": ["M4-NC-16"],
    "level": "consolidation",
-   "competences": ["Représenter", "Raisonner"],
+   "competences": ["Calculer", "Communiquer"],
    "prerequisites": ["priorités opératoires (math-5e)"],
    "difficulty": [1, 2],
    "variants": ["dernière opération effectuée", "nombre de termes ou de facteurs", "expression avec parenthèses imbriquées"],
@@ -140,7 +140,17 @@
    "objectives": [],
    "level": "approfondissement",
    "countsTowardCompleteness": false,
-   "rule": "Hors programme exigible en 3e (fiche : programme de 2nde) ; seulement en approfondissement explicitement signalé, jamais au niveau 1 à 3 ni en « Type Brevet — ».",
+   "rule": "Hors programme exigible en 3e ; seulement en approfondissement explicitement signalé, jamais au niveau 1 à 3 ni en « Type Brevet — ».",
+   "levelEvidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quotes": [
+     { "page": 132, "quote": "Factorisation de a2 - b2." },
+     { "page": 133, "quote": "l’identité a2 – b2 = (a – b)(a + b) ;" }
+    ],
+    "argument": "Preuve par énumération, non par mention explicite : les connaissances du calcul littéral (p. 132) et la liste fermée de ce que l'élève « doit avoir mémorisé ou automatisé » (p. 132-133) ne citent qu'une identité, a² − b² ; (a + b)² et (a − b)² n'y figurent pas (recherche dans les trois documents vérifiés : aucune occurrence). Ces identités ne sont donc pas exigibles en 3e ; leur développement par double distributivité reste permis (M3-NC-09), d'où le niveau approfondissement, sans objectif propre. « a2 », « b2 » = a², b² (exposants perdus à l'extraction PDF).",
+    "unverified": "« programme de 2nde » (version précédente) : SOURCE_INACCESSIBLE, aucun programme de 2nde lu ; mention retirée."
+   },
    "competences": ["Calculer"],
    "prerequisites": ["CL-T04"],
    "difficulty": [4],

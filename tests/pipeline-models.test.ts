@@ -241,7 +241,9 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
   // (empreinte de l'étape chapitre seule changée ; dossier, fix, criblage et relecture inchangés). Une modification volontaire d'un prompt
   // du collège met à jour cette table dans le même commit, avec sa justification.
   const COLLEGE_PROMPTS: Record<string, string> = {
-    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "54ec615f95f20d67", // modifié volontairement : propositions A et C (2026-11-15)
+    // chapter : modifié volontairement (propositions A et C, 2026-11-15 ; variable {{TAXONOMY}}, 2026-11-18). L'empreinte
+    // est prise avec {{TAXONOMY}} vide (chapitre sans taxonomie verrouillée) : prompt résolu identique à celui d'avant.
+    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "54ec615f95f20d67",
     "mathematiques/fix": "ecc7a2b99610772e", "mathematiques/review": "f84f4e7803af6a9c",
     "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "0cce633843c2cc8b", // idem
     "physique-chimie/fix": "ecc7a2b99610772e", "physique-chimie/review": "216835bdc19e6453",
@@ -249,7 +251,7 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
   it("prompts résolus identiques", () => {
     for (const [k, h] of Object.entries(COLLEGE_PROMPTS)) {
       const [subj, f] = k.split("/") as ["mathematiques" | "physique-chimie", string];
-      const t = promptSections(readFileSync(`pipeline/prompts/${f}.md`, "utf8"), sectionKeys(subj, "3e"));
+      const t = promptSections(readFileSync(`pipeline/prompts/${f}.md`, "utf8"), sectionKeys(subj, "3e")).replace("{{TAXONOMY}}", "");
       expect(createHash("sha256").update(t).digest("hex").slice(0, 16), k).toBe(h);
     }
   });
@@ -390,4 +392,31 @@ describe("M17 minimal : nouvel envoi motivé, une seule fois, seulement sans ré
     expect(retryPlan(unusable, "c", "review", "h", "motif")).toMatchObject({ error: expect.stringMatching(/aucune opération/) });
     expect(retryPlan(unusable, "c", "screen", "h", "  ")).toMatchObject({ error: expect.stringMatching(/obligatoire/) });
   });
+});
+
+describe("calcul littéral : dossier approuvé (décision du 2026-11-18)", () => {
+  const inv = JSON.parse(readFileSync("research/curriculum/mathematiques/curriculum-math.json", "utf8")) as { grades: { domains: { chapters: { objectives: { id: string; level?: Record<string, string>; competences?: string[]; classification?: { status: string } }[] }[] }[] }[] };
+  const all = inv.grades.flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
+  const fiche = JSON.parse(readFileSync("pipeline/chapters/math-3e-calcul-litteral.json", "utf8")) as { objectiveLevels: Record<string, string>; optionalObjectives: string[] };
+  it("G1 appliqué : 7 objectifs classés et validés ; G2 : 4 objectifs exigibles vérifiés, consolidation hors porte", () => {
+    const ids = Object.keys(fiche.objectiveLevels);
+    expect(ids).toHaveLength(7);
+    for (const id of ids) expect(all.find((o) => o.id === id)?.classification?.status, id).toBe("validé");
+    expect(g2Missing(all.filter((o) => ids.includes(o.id)), "3e", fiche.objectiveLevels)).toEqual([]);
+    expect(fiche.optionalObjectives).toEqual(ids.filter((id) => fiche.objectiveLevels[id] === "consolidation"));
+  });
+  it("dry-run : Gate 1 et porte G2 atteints ; optionalObjectives inconnu refusé", () => {
+    const { status, out } = dryRun(["math-3e-calcul-litteral", "--batch"]);
+    expect(status, out).toBe(0);
+    expect(out).not.toMatch(/Gate 1 non atteint|porte G2/);
+    const bad = dryRun(["math-3e-calcul-litteral", "--batch"], { "pipeline/chapters/math-3e-calcul-litteral.json": JSON.stringify({ ...fiche, optionalObjectives: ["M9-XX-99"] }) });
+    expect(bad.status).not.toBe(0);
+    expect(bad.out).toContain("optionalObjectives : objectif(s) absent(s) du chapitre : M9-XX-99");
+  }, 60_000);
+  it("prompt du chapitre modifié : un chapitre existant n'est pas régénéré sans --force", () => {
+    // Taxonomie verrouillée → {{TAXONOMY}} non vide → nouvelle empreinte de l'étape chapitre ; le fichier existant est gardé
+    // (la suite du dry-run s'arrête à la validation, faute de code source dans ce fixture : hors sujet ici).
+    const { out } = dryRun(["math-3e-pythagore", "--batch"], { "src/lib/chapters/data/math-3e-pythagore.ts": readFileSync("src/lib/chapters/data/math-3e-pythagore.ts", "utf8") });
+    expect(out).toContain("chapter : src/lib/chapters/data/math-3e-pythagore.ts existe déjà, conservé (--force pour le régénérer).");
+  }, 60_000);
 });

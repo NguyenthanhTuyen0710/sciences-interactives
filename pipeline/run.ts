@@ -44,7 +44,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string> }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[] }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -193,9 +193,28 @@ function objectives(): string {
     if (!objectives.length) throw new Error(`aucun objectif retenu pour ${id}`);
     return { chapter: id, kind, objectives };
   });
-  return JSON.stringify([...pick(spec.officialChapterIds, `officiel ${spec.grade}`, spec.objectiveIds), ...pick(spec.consolidationChapterIds, "consolidation")], null, 1);
+  const groups = [...pick(spec.officialChapterIds, `officiel ${spec.grade}`, spec.objectiveIds), ...pick(spec.consolidationChapterIds, "consolidation")];
+  // Fiche `optionalObjectives` (décision du 2026-11-18) : objectifs non exigés dans CE chapitre → required: false
+  // (META, critère d'achèvement, porte G2), sans toucher l'inventaire partagé avec les autres niveaux.
+  const optional = new Set(spec.optionalObjectives ?? []);
+  const unknown = [...optional].filter((id) => !groups.some((g) => (g.objectives as { id: string }[]).some((o) => o.id === id)));
+  if (unknown.length) throw new Error(`optionalObjectives : objectif(s) absent(s) du chapitre : ${unknown.join(", ")}`);
+  const marked = groups.map((g) => ({ ...g, objectives: (g.objectives as { id: string }[]).map((o) => (optional.has(o.id) ? { ...o, required: false } : o)) }));
+  return JSON.stringify(marked, null, 1);
 }
 const SPEC = JSON.stringify(spec, null, 1);
+/**
+ * Taxonomie verrouillée du chapitre pour le prompt (décision du 2026-11-18) : vide sans taxonomie verrouillée, si bien
+ * que le prompt des autres chapitres reste identique octet pour octet (même empreinte anti-doublon).
+ */
+function taxonomyPrompt(): string {
+  const file = `research/curriculum/${spec.subject}/taxonomy/${spec.id}.json`;
+  if (!existsSync(P(file))) return "";
+  const tax = readJson<{ status: string; types: { id: string; title: string; objectives: string[]; level?: string; difficulty: number[]; variants: string[]; countsTowardCompleteness?: boolean; transversal?: boolean; rule?: string }[] }>(file);
+  if (tax.status !== "verrouillé") return "";
+  const types = tax.types.map(({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }) => ({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }));
+  return `\nLocked exercise taxonomy (JSON). Every exercise declares \`taxonomyTypes: ["<type id>", …]\` with ids from this list only; its \`niveau\` must be in the \`difficulty\` of each declared type; every type that is not « approfondissement », not transversal and not \`countsTowardCompleteness: false\` has at least one exercise; an « approfondissement » type is never combined with a required type and never used in a « Type Brevet — » exercise; variants differ by structure or reasoning step, never only by numbers.\n${JSON.stringify(types, null, 1)}\n`;
+}
 
 // ───────── Contrôles déterministes ─────────
 function validate(): { ok: boolean; json: string; summary: string } {
@@ -504,7 +523,7 @@ async function main() {
   // Modèle imposé (--dossier-model, comparaison) : ajouté à l'empreinte ; sinon empreinte inchangée.
   const hDossier = inputHash([SYSTEM_LIGHT, dossierUser], opt("--dossier-model") ? DOSSIER_MODEL : undefined);
   const dossierText = () => (existsSync(P(DOSSIER_FILE)) ? read(DOSSIER_FILE) : "(dossier non encore produit : estimation avec un dossier d'environ 8 000 caractères)".padEnd(8000, " "));
-  const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { SUBJECT: spec.subject, PARCOURS: spec.parcours ?? "", ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier })
+  const chapterUserFor = (dossier: string) => fill(read("pipeline/prompts/chapter.md"), { SUBJECT: spec.subject, PARCOURS: spec.parcours ?? "", ID: spec.id, EXPORT: spec.exportName, TASK: spec.taskId, GRADE: spec.grade, TREE: spec.treeChapterId, TITLE: spec.title, PREFIX: spec.exercisePrefix, SPEC, OBJECTIVES: OBJ, DOSSIER: dossier, TAXONOMY: taxonomyPrompt() })
     + (EXERCISES ? `\n\nPilot override (takes precedence over the "at least 30 exercises" rule): write exactly ${EXERCISES} exercises, progressive in level and covering every objective listed above, and set \`exerciseCountJustification\` to « Pilote API : ${EXERCISES} exercices pour valider la chaîne de production. ». All other rules still apply, including at least 3 games.` : "");
   if (!LIVE) costPlan(dossierUser, chapterUserFor(dossierText()));
   if (wanted("dossier") && !done("dossier", hDossier)) {
