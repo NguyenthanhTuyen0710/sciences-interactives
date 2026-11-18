@@ -112,6 +112,7 @@ Journal des exceptions publish-pr (caduques depuis le 2026-11-17) : (ii) non app
 4. **Préparatifs de la première vague** (décisions du 17-11-2026, sans API) : branche `claude/stoic-dirac-asjcs0` repartie de `main` (`38cf04e`).
    - **Fait** : (a) porte G2 dans `run.ts` (`verificationMethod` calculée : « g2 » = preuve `attach_evidence` approuvée) ; P4-E-04 `verified: false`. (c) QA tier 2 dans `validate-chapter` (Pythagore : 3 écarts — py3-03, PY-T11, py3-20). (d) garde-fou de troncature (chapitre Sonnet à 64 000 refusé : besoin 67 453 → décision 96 000 attendue).
    - **En attente d'approbation** : (b) une PR par chapitre + rapport du juge nommé par run ; (e) essai H1 ; liste des 4 chapitres de 3e ; 4 taxonomies (nouveaux fichiers) ; PR `budget.json` pour la vague.
+   - **2026-11-18** : CI de #14 verte (témoin calcul littéral) ; chapitre Sonnet à 96 000 ; dossier d'approbation de calcul littéral soumis (`research/sources/proposals/math-3e-calcul-litteral.json` : G1 + G2 ; `research/curriculum/mathematiques/taxonomy/math-3e-calcul-litteral.json` : statut « proposé »). Point ouvert : rattachement exercice ↔ type pour un chapitre nouveau (taxonomie verrouillée avant génération, listes `exercises` vides).
    - **G2 à faire** : Pythagore 0 (déjà approuvé le 2026-11-07) ; 4 chapitres proposés : 11 objectifs obligatoires (+ classement G1 de 10 objectifs de 3e et de leurs objectifs de consolidation de 4e).
 
 ## 4. Erreurs récurrentes et leçons
