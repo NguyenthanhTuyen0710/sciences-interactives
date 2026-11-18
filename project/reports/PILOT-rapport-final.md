@@ -161,3 +161,63 @@ Relecture du contenu (Claude Code, les deux textes lus en entier) :
 - Essai D (baisse d'effort ou de réflexion sur le chapitre Sonnet) : à proposer maintenant que H1 est connu.
 
 Dépense cumulée après H1 : **2,428 $** (aucune réservation ouverte) ; reste 0,464 $ sous le plafond 2,892 $.
+
+## 10. Conception lycée en deux requêtes (proposition du 2026-11-18, document seulement, aucun code, **à approuver**)
+Décision du porteur de projet du 2026-11-18 : H1 montre la faisabilité à petite échelle (≈ 2 000 tokens de contenu) ; une **requête réelle cours + démonstrations (≈ 15 000 tokens visibles)** reste à mesurer, avec une **évaluation indépendante** (juge ou lecture du porteur de projet). D4 est modifiée pour le lycée seulement ; le collège garde une requête de chapitre.
+
+### 10.1 Découpage
+| | Requête 1 : `lesson` | Requête 2 : `exercises` |
+|---|---|---|
+| Modèle, effort | Opus 5.5, `low` | Sonnet 5.5, `medium` (configuration par défaut du chapitre) |
+| Contenu produit | `lesson` complet : introduction, définitions, propriétés et théorèmes, **démonstrations exigibles de la fiche (`demonstrations`) rédigées en entier**, méthodes, exemples résolus, erreurs fréquentes, fiche de synthèse, illustrations | `prerequisites`, `EXERCISES` (≥ 30, niveaux 1-5, `taxonomyTypes` si taxonomie verrouillée), `games` (≥ 3) |
+| Entrée | système (schéma de la leçon, types, cours d'un chapitre d'exemple), fiche, objectifs G2, dossier | système complet (schéma, types, chapitre d'exemple), fiche, objectifs, dossier, taxonomie verrouillée, **cours produit par la requête 1** (lecture seule) |
+| Sortie attendue (visible) | 12 000-15 000 tokens | ≈ 30 000 tokens (≈ 38 600 observés pour un chapitre PC complet) |
+| `max_tokens` proposé | **40 000** (tient jusqu'à ≈ 58 % de réflexion pour 15 000 visibles, marge 1,1) | 96 000 (marge observée à 37 % de réflexion) |
+| Forme de sortie | un bloc ```ts contenant seulement `const LESSON = { … } satisfies ChapterContent["lesson"];` | un bloc ```ts contenant les imports, aides, `const EXERCISES = [ … ]`, `prerequisites`, `games` ; **interdit** : `lesson`, `META`, `export` |
+
+Ordre : la requête 2 part après la collecte et le contrôle de la requête 1 (deux batches successifs). Une requête 1 inutilisable arrête la chaîne avant toute dépense Sonnet.
+
+### 10.2 Assemblage (déterministe, sans IA)
+1. Extraire le bloc `ts` de chaque sortie ; refuser si `stop_reason` ≠ `end_turn` (garde existant : sortie tronquée = `usable: false`, aucune écriture).
+2. Fichier = imports de la requête 2 + bloc META (`injectMeta`, inchangé) + `LESSON` (requête 1) + corps de la requête 2 + `export const <exportName>: ChapterContent = { ...META, prerequisites, lesson: LESSON, exercises: EXERCISES, games };` écrit par le pipeline.
+3. Collision de noms (un identifiant défini dans les deux blocs) : refus avant écriture, avec la liste des noms.
+4. Ensuite, chaîne existante sans changement : `validate-chapter` + tsc, corrections ciblées (≤ 2 tours, sur le fichier assemblé), criblage, juge, une PR par chapitre.
+
+### 10.3 Contrôle des manques de sortie (avant et après assemblage)
+| Contrôle | Requête | Effet si échec |
+|---|---|---|
+| `stop_reason` = `end_turn`, bloc `ts` unique et fermé | 1 et 2 | `usable: false`, ARRÊT (M17 : un seul nouvel envoi motivé, sous plafond) |
+| Chaque démonstration de `spec.demonstrations` présente, rédigée (hypothèses, étapes, conclusion), repérée par son identifiant d'objectif | 1 | ARRÊT avant la requête 2 |
+| Rubriques du cours non vides : définitions, propriétés, méthodes, ≥ 3 exemples résolus, erreurs fréquentes, synthèse ; `LESSON` conforme à `LessonSchema` | 1 | ARRÊT avant la requête 2 |
+| Chaque objectif exigible a ≥ 1 exercice ; niveaux 1 à 5 présents ; ≥ 30 exercices ; ≥ 3 jeux ; `taxonomyTypes` valides | 2 (puis `validate-chapter`) | correction ciblée (≤ 2 tours) puis needs-human |
+| Tutoiement, unités, chiffres significatifs, doublons, réponses | fichier assemblé (`validate-chapter`) | correction ciblée puis needs-human |
+
+### 10.4 Pilote de mesure (avant toute production lycée, approbation séparée)
+- Chapitre : `math-1re-spe-second-degre` (dossier relu, G2 approuvé, démonstration M1S-SD-05).
+- Étape 1 seule : **une requête 1** (Opus 5.5, `low`, `max_tokens` 40 000). Mesures : part de réflexion, `stop_reason`, tokens visibles, rubriques présentes, démonstration complète (3 cas de Δ).
+- **Évaluation indépendante** : juge Sonnet (prompt de relecture limité au cours et aux démonstrations, effort `low`) **et/ou** lecture du porteur de projet ; l'auto-évaluation de Claude Code ne suffit pas.
+- Critères d'arrêt : sortie tronquée ; réflexion > 50 % ; démonstration incomplète ou fausse selon l'évaluateur indépendant → ARRÊT et rapport, aucune requête 2.
+- Si les critères sont remplis : requête 2 sur le même chapitre (approbation séparée), puis chaîne complète.
+- Code à écrire après approbation de cette conception (pas avant) : étapes `lesson` et `exercises` dans `STEP_CONFIG` et le registre, assembleur, contrôles 10.3, estimations du garde-fou de troncature par taille de requête (H1 : 14-23 % pour 2 000 visibles ; chapitre entier : 76 %).
+
+### 10.5 Estimation (Message Batches, tarifs `pipeline/prices.json` : Opus 2 $ / 10 $ par M entrée / sortie, Sonnet 1 $ / 5 $)
+| Poste | Max | Réaliste | Hypothèses |
+|---|---|---|---|
+| Requête 1 (Opus `low`) | 0,53 $ | 0,33 $ | entrée ≤ 63 000 (lot 3 : 63 143) ; sortie ≤ 40 000 ; réaliste 15 000 visibles + 25 % de réflexion |
+| Juge du cours (Sonnet `low`) | 0,09 $ | 0,04 $ | entrée ≈ 25 000 ; sortie ≤ 12 000 |
+| **Pilote (étape 1 + juge)** | **0,62 $** | **0,37 $** | |
+| Requête 2 (Sonnet `medium`) | 0,56 $ | 0,32 $ | entrée ≈ 81 000 (cours compris) ; sortie ≤ 96 000 ; réaliste 30 000 visibles + 37 % |
+| Chapitre lycée complet sans correction (dossier Sonnet, R1, R2, criblage, juge) | ≈ 1,20 $ | ≈ 0,75 $ | |
+| Pire cas (+ 2 corrections Sonnet, + 1 nouvel envoi M17 de R1) | ≈ 2,10 $ | — | |
+Comparaison : lot 3 (une requête Opus) a coûté 1,086 $ pour une sortie inutilisable ; ici une requête 1 tronquée coûte au plus 0,53 $ et arrête la chaîne.
+
+### 10.6 Risques
+| Risque | Mesure |
+|---|---|
+| Part de réflexion plus forte à 15 000 visibles qu'à 2 000 (H1 non extrapolable) | pilote 10.4 ; arrêt si > 50 % ; `max_tokens` 40 000 borne la perte à 0,53 $ |
+| Incohérence cours ↔ exercices (notations, méthodes) | cours de R1 en entrée de R2 ; juge sur le fichier assemblé |
+| Assemblage fragile (noms en double, imports) | assembleur déterministe, refus avant écriture, tests unitaires |
+| Délai doublé (deux batches successifs) | accepté : la chaîne n'est pas urgente |
+| Correction ciblée sur un fichier assemblé plus long | inchangé : remplacements exacts, ≤ 2 tours |
+| Coût lycée plus élevé que le collège | budget par niveau, un niveau à la fois, cumul vérifié avant chaque batch |
+| Écart entre évaluation automatique et qualité réelle des démonstrations | évaluation indépendante obligatoire au pilote, puis relecture humaine avant publication |
