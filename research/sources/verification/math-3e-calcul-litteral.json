@@ -1,0 +1,284 @@
+{
+  "chapter": "math-3e-calcul-litteral",
+  "checkedAt": "2026-11-18T11:54:25.915Z",
+  "method": "(a) citation mot pour mot (espaces et typographie normalisés) → verified ; (b) sinon needs_manual_review avec le meilleur passage de chaque document (part de mots porteurs : indice de recherche, jamais une preuve)",
+  "documents": [
+    {
+      "seedId": "c4-programme-2020-eduscol-pdf",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9"
+    },
+    {
+      "seedId": "c4-attendus-4e-2019-pdf",
+      "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966"
+    },
+    {
+      "seedId": "c4-attendus-3e-2019-pdf",
+      "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065"
+    }
+  ],
+  "results": [
+    {
+      "objectiveId": "M3-NC-08",
+      "chapter": "math-3e-calcul-litteral",
+      "text": "Déterminer l'opposé d'une expression littérale.",
+      "officialRef": "Attendus de fin d'année de 3e (2019) › Utiliser le calcul littéral",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "Utiliser le calcul littéral Ce que sait faire l’élève  Il détermine l’opposé d’une expression littérale.",
+          "wordCoverage": 0.75
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 213,
+          "excerpt": "Utiliser le calcul littéral Ce que sait faire l’élève  Il détermine l’opposé d’une expression littérale.",
+          "wordCoverage": 0.75
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 101,
+          "excerpt": "« objet-interaction ». Exploiter l’expression littérale scalaire de la loi de Expérimenter des situations d’équilibre © Direction générale de l’enseignement scolaire > www.eduscol.education.fr",
+          "wordCoverage": 0.5
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Utiliser le calcul littéral Ce que sait faire l’élève  Il identifie la structure d’une expression littérale (somme, produit).",
+          "wordCoverage": 0.5
+        }
+      ]
+    },
+    {
+      "objectiveId": "M3-NC-09",
+      "chapter": "math-3e-calcul-litteral",
+      "text": "Développer avec la double distributivité, factoriser et réduire des expressions simples.",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Distributivité (3e) ; Attendus de fin d'année de 3e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Développer, factoriser, réduire des expressions algébriques dans des cas très simples. - Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
+          "wordCoverage": 0.86
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 286,
+          "excerpt": "La propriété de distributivité simple est formalisée et est utilisée pour développer un produit, factoriser une somme, réduire une expression littérale. La double distributivité est abordée.",
+          "wordCoverage": 0.71
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale. ",
+          "wordCoverage": 0.57
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": " Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples.",
+          "wordCoverage": 0.43
+        }
+      ]
+    },
+    {
+      "objectiveId": "M3-NC-10",
+      "chapter": "math-3e-calcul-litteral",
+      "text": "Factoriser a²−b² et développer (a+b)(a−b).",
+      "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Utiliser le calcul littéral ; Attendus de fin d'année de 3e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "Compétences associées - Développer, factoriser, réduire des expressions algébriques dans des cas très simples.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 1,
+          "excerpt": "e Mathématiques",
+          "wordCoverage": 0
+        }
+      ]
+    },
+    {
+      "objectiveId": "M3-NC-11",
+      "chapter": "math-3e-calcul-litteral",
+      "text": "Utiliser le calcul littéral pour démontrer un résultat général ou réfuter une conjecture.",
+      "officialRef": "Programme cycle 4 2020 (BO n°31 du 30-07-2020) › Thème A › Utiliser le calcul littéral",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Développer, factoriser, réduire des expressions algébriques dans des cas très simples. - Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 286,
+          "excerpt": "(suite) Calcul littéral Expressions littérales Les expressions littérales sont introduites à travers Le travail sur les formules est poursuivi, des formules mettant en jeu des grandeurs ou parallèlement à la présentation de la notion traduisant des programmes de calcul. L’usage de la d’identité (égalité vraie pour toute valeur des lettre permet d’exprimer un résultat général (par indéterminées).",
+          "wordCoverage": 0.5
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Quelles sont toutes les compositions de bouquets possibles ? Utiliser le calcul littéral Ce que sait faire l’élève ",
+          "wordCoverage": 0.38
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "Détermine l’heure à laquelle elles s’allumeront de nouveau ensemble. Utiliser le calcul littéral Ce que sait faire l’élève ",
+          "wordCoverage": 0.38
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-16",
+      "chapter": "math-4e-calcul-litteral",
+      "text": "Identifier la structure d'une expression littérale (somme, produit).",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Calcul littéral (4e) ; Attendus de fin d'année de 4e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Il identifie la structure d’une expression littérale (somme, produit). ",
+          "wordCoverage": 0.83
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 286,
+          "excerpt": "La structure d’une expression littérale (somme ou produit) est étudiée. La propriété de distributivité simple est formalisée et est utilisée pour développer un produit, factoriser une somme, réduire une expression littérale.",
+          "wordCoverage": 0.83
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "- Somme, différence, produit, quotient de nombres décimaux, de deux nombres rationnels. - Puissance d’un nombre (exposants entiers, positifs ou négatifs).",
+          "wordCoverage": 0.33
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "Il détermine l’opposé d’une expression littérale. ",
+          "wordCoverage": 0.33
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-17",
+      "chapter": "math-4e-calcul-litteral",
+      "text": "Développer, factoriser et réduire avec la distributivité simple.",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Distributivité (4e) ; Attendus de fin d'année de 4e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Développer, factoriser, réduire des expressions algébriques dans des cas très simples. - Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": " Il utilise la propriété de distributivité simple pour développer un produit, factoriser une somme ou réduire une expression littérale.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": " Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples.",
+          "wordCoverage": 0.2
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-18",
+      "chapter": "math-4e-calcul-litteral",
+      "text": "Démontrer l'équivalence de deux programmes de calcul ; notion d'identité.",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Expressions littérales (4e) ; Attendus de fin d'année de 4e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "Les élèves abordent les bases du calcul littéral, qu’ils mettent en œuvre pour modéliser une situation, démontrer une propriété générale et résoudre des problèmes se ramenant à des équations du premier degré. Les élèves sont progressivement familiarisés aux différents statuts de la lettre (indéterminée, variable, inconnue, paramètre) et du signe égal (pour fournir le résultat d’une opération, pour",
+          "wordCoverage": 0.57
+        },
+        {
+          "seedId": "c4-attendus-4e-2019-pdf",
+          "sha256": "d0edabd6a21d6345d36d32c5506ddcf225e819ddca25d27c1ecc3f97b87a8966",
+          "page": 4,
+          "excerpt": "Il démontre l’équivalence de deux programmes de calcul. ",
+          "wordCoverage": 0.57
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 286,
+          "excerpt": "(suite) Calcul littéral Expressions littérales Les expressions littérales sont introduites à travers Le travail sur les formules est poursuivi, des formules mettant en jeu des grandeurs ou parallèlement à la présentation de la notion traduisant des programmes de calcul. L’usage de la d’identité (égalité vraie pour toute valeur des lettre permet d’exprimer un résultat général (par indéterminées).",
+          "wordCoverage": 0.57
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 11,
+          "excerpt": "Il gère l’interaction entre deux lutins, par exemple en faisant dire une phrase à l’un lorsque l’autre le touche. ",
+          "wordCoverage": 0.14
+        }
+      ]
+    }
+  ]
+}

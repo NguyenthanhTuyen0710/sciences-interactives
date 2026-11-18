@@ -1,0 +1,174 @@
+{
+ "chapter": "math-3e-calcul-litteral",
+ "status": "PROPOSÉ — en attente d'approbation du porteur de projet (G2). Non appliqué : `run.ts apply` refuse sans approvedBy/approvedAt.",
+ "note": "Citations copiées du texte extrait (pdftotext) des documents vérifiés par le collecteur (SHA256 identiques au 2026-11-07, re-téléchargés le 2026-11-18). Page = numéro de page du PDF. Objectifs de consolidation 4e (M4-NC-16…18) : niveau « consolidation » en 3e, non obligatoires, G2 non requis par la porte.",
+ "changes": [
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-08",
+   "evidence": {
+    "seedId": "c4-attendus-3e-2019-pdf",
+    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+    "quote": "Il détermine l’opposé d’une expression littérale.",
+    "page": 3,
+    "matchType": "b — objectif reformulé à l’infinitif",
+    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-09",
+   "evidence": {
+    "seedId": "c4-attendus-3e-2019-pdf",
+    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+    "quote": "Il développe (par simple et double distributivités), factorise, réduit des expressions algébriques simples.",
+    "page": 3,
+    "matchType": "b — objectif reformulé",
+    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-10",
+   "evidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quote": "l’identité a2 – b2 = (a – b)(a + b)",
+    "page": 133,
+    "matchType": "b — objectif reformulé ; « a2 », « b2 » = a², b² (exposants perdus à l’extraction)",
+    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-11",
+   "evidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quote": "Utiliser le calcul littéral pour traduire une propriété générale (par exemple la distributivité simple), pour démontrer un résultat général (par exemple que la somme de trois entiers consécutifs est un multiple de trois), pour valider ou réfuter une conjecture, pour modéliser une situation.",
+    "page": 132,
+    "matchType": "b — objectif reformulé (extrait de la citation)",
+    "reason": "proposition Claude Code (2026-11-18), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  }
+ ],
+ "g1": {
+  "status": "PROPOSÉ — à valider par le porteur de projet ; non appliqué à l'inventaire",
+  "by": "Claude Code (session du 2026-11-18)",
+  "competencesSource": "Programme du cycle 4 (2020), Éduscol, p. 129 : chercher, modéliser, représenter, raisonner, calculer, communiquer",
+  "objectiveLevelsForFiche": {
+   "M3-NC-08": "exigible",
+   "M3-NC-09": "exigible",
+   "M3-NC-10": "exigible",
+   "M3-NC-11": "exigible",
+   "M4-NC-16": "consolidation",
+   "M4-NC-17": "consolidation",
+   "M4-NC-18": "consolidation"
+  },
+  "classification": [
+   {
+    "objectiveId": "M3-NC-08",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "expression littérale",
+     "opposé d'une somme",
+     "suppression de parenthèses"
+    ],
+    "competences": [
+     "Calculer"
+    ]
+   },
+   {
+    "objectiveId": "M3-NC-09",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "double distributivité",
+     "factorisation par un facteur commun",
+     "réduction d'une expression"
+    ],
+    "competences": [
+     "Calculer",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M3-NC-10",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "identité a² − b² = (a − b)(a + b)",
+     "différence de deux carrés"
+    ],
+    "competences": [
+     "Calculer",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M3-NC-11",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "identité",
+     "contre-exemple",
+     "démonstration d'un résultat général",
+     "programme de calcul"
+    ],
+    "competences": [
+     "Raisonner",
+     "Modéliser",
+     "Communiquer"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-16",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "structure d'une expression (somme, produit)"
+    ],
+    "competences": [
+     "Représenter",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-17",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "distributivité simple",
+     "développer, factoriser, réduire"
+    ],
+    "competences": [
+     "Calculer"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-18",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "programmes de calcul équivalents",
+     "notion d'identité"
+    ],
+    "competences": [
+     "Raisonner",
+     "Communiquer"
+    ]
+   }
+  ]
+ }
+}
