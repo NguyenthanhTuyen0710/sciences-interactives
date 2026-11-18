@@ -138,3 +138,26 @@ Constat : un chapitre lycée complet en une requête Opus dépasse la sortie max
 9. Essais isolés et approuvés séparément : B (`kit.ts`), D (effort `low` sur le chapitre Sonnet), H1/H2 (Opus lycée), conception lycée en deux requêtes.
 10. Fiche 1re : sources alignées sur le collecteur (`bo-2026-14-pdf`).
 11. Rapport du juge nommé par run (ne plus écraser `*-QA-api.md`).
+
+## 9. Essai H1 (2026-11-18) : réflexion d'Opus 5.5 selon l'effort
+Décision du porteur de projet du 2026-11-18 : 2 requêtes Opus 5.5, même prompt (rédiger la seule démonstration exigible M1S-SD-05, « Résolution de l'équation du second degré », à partir de la section 4 du dossier 1re), effort `low` puis `medium`, `max_tokens` 13 500, maximum 0,29 $. Garde-fou de troncature appliqué sans exemption (estimation propre : 2 500 visibles, 76 % de réflexion → besoin 11 459).
+- Dry-run sur `main` avec le registre réel (run #50) : 0,284 $ au maximum ; cumul 2,359 $ ≤ 2,892 $ ; aucun blocage → envoi au run #51.
+- Batches : `h1-low` = `msgbatch_01CQ7osNq7PLT9SugDEsiTWw` (collecté au run #52), `h1-medium` = `msgbatch_01QgBnhrCovwwvn2NpDpk58u` (run #53). Textes : artefacts des runs #52 et #53 (`pipeline-output/h1/`), non committés.
+
+| Requête | Entrée | Sortie | dont réflexion | **Part de réflexion** | Visible | `stop_reason` | Coût réel |
+|---|---|---|---|---|---|---|---|
+| `h1-low` | 3 479 | 2 463 | 337 | **13,7 %** | 2 126 | `end_turn` | 0,032 $ |
+| `h1-medium` | 3 479 | 3 039 | 708 | **23,3 %** | 2 331 | `end_turn` | 0,037 $ |
+| **Total** | | | | | | | **0,069 $** (estimation max 0,284 $) |
+
+Relecture du contenu (Claude Code, les deux textes lus en entier) :
+- **Démonstration complète dans les deux cas** : hypothèses (a ≠ 0, donc 4a² > 0), factorisation par a et complétion du carré, forme canonique, équivalence (E) ⇔ (x + b/2a)² = Δ/4a², puis **les trois cas** Δ < 0 (carré positif ≠ négatif → aucune solution), Δ = 0 (solution unique −b/2a), Δ > 0 (k = √Δ/2|a|, X² = k² ⇔ (X − k)(X + k) = 0, passage de |a| à a justifié, deux solutions distinctes car leur différence vaut √Δ/a ≠ 0), chacun avec sa conclusion. Aucune erreur mathématique relevée.
+- **Tutoiement** : présent et cohérent (« Tu peux donc diviser par a », « Développe… », « Tu en déduis », « Tu distingues ») ; aucun vouvoiement.
+- Différence `medium` / `low` : `medium` justifie explicitement que toutes les transformations sont des équivalences ; contenu par ailleurs équivalent.
+
+**Conclusion : H1 atteinte.** À effort `low`, la réflexion représente 13,7 % de la sortie (< 50 %) et la démonstration est complète ; même à `medium`, 23,3 %. Le taux de 76 % du chapitre 1re (lot 3) tient donc surtout à l'**ampleur de la requête** (chapitre entier), non à l'effort seul. Conséquences proposées (non codées) :
+- La conception lycée en deux requêtes (§ 7) est viable : une requête Opus « cours + démonstrations » (≈ 12 000-15 000 tokens visibles) tiendrait en `max_tokens` ≈ 32 000 même à 50 % de réflexion ; effort `low` suffit pour la démonstration mesurée ici.
+- Les mesures du garde-fou de troncature pour Opus sont à séparer par taille de requête (76 % = chapitre entier ; 14-23 % = démonstration seule).
+- Essai D (baisse d'effort ou de réflexion sur le chapitre Sonnet) : à proposer maintenant que H1 est connu.
+
+Dépense cumulée après H1 : **2,428 $** (aucune réservation ouverte) ; reste 0,464 $ sous le plafond 2,892 $.
