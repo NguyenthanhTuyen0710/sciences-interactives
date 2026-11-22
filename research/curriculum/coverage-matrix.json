@@ -36,7 +36,8 @@
    "byState": {
     "published": 2,
     "draft": 2,
-    "todo": 12
+    "researched": 1,
+    "todo": 11
    }
   },
   {
@@ -1421,7 +1422,7 @@
    "domain": "NC",
    "chapterId": "math-3e-calcul-litteral",
    "title": "Calcul littéral : double distributivité, identités",
-   "state": "todo",
+   "state": "researched",
    "objectives": {
     "total": 4,
     "verified": 4
