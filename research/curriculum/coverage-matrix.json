@@ -1,6 +1,6 @@
 {
  "note": "Généré par `npm run dashboard` — ne pas modifier à la main. États : todo → researched → draft → qa-passed → published. apiCostUsd null = registre des dépenses absent localement (data-store).",
- "costsAvailable": true,
+ "costsAvailable": false,
  "summary": [
   {
    "subject": "mathematiques",
@@ -44,7 +44,7 @@
    "grade": "1re",
    "chapters": 1,
    "byState": {
-    "todo": 1
+    "researched": 1
    }
   },
   {
@@ -60,7 +60,8 @@
    "grade": "5e",
    "chapters": 9,
    "byState": {
-    "todo": 9
+    "todo": 8,
+    "draft": 1
    }
   },
   {
@@ -68,7 +69,8 @@
    "grade": "4e",
    "chapters": 9,
    "byState": {
-    "todo": 9
+    "todo": 8,
+    "draft": 1
    }
   },
   {
@@ -76,7 +78,8 @@
    "grade": "3e",
    "chapters": 10,
    "byState": {
-    "todo": 10
+    "todo": 9,
+    "draft": 1
    }
   }
  ],
@@ -1189,14 +1192,14 @@
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
-    "sha256": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
+    "sha256": "1798901b94c1be9b4aa51032c14aed3243dc3b7d356297de92987af63de285ae",
     "registered": true,
     "publication": "draft",
-    "exercises": 20,
+    "exercises": 21,
     "perLevel": [
      4,
      4,
-     4,
+     5,
      4,
      4
     ],
@@ -1210,7 +1213,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
@@ -1673,14 +1676,14 @@
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
-    "sha256": "ee3bc04b5c7fac11dfd9bf4464cf9406fb77d6914e3484e5e2567eb4d84667d6",
+    "sha256": "1798901b94c1be9b4aa51032c14aed3243dc3b7d356297de92987af63de285ae",
     "registered": true,
     "publication": "draft",
-    "exercises": 20,
+    "exercises": 21,
     "perLevel": [
      4,
      4,
-     4,
+     5,
      4,
      4
     ],
@@ -1694,7 +1697,7 @@
      "language": "pending"
     },
     "qaPassed": false,
-    "apiCostUsd": 0.69214
+    "apiCostUsd": null
    },
    "missing": [
     "revue curriculum : pending",
@@ -1713,7 +1716,7 @@
    "domain": "M1S-ALG",
    "chapterId": "math-1re-spe-second-degre",
    "title": "Équations, fonctions polynômes du second degré",
-   "state": "todo",
+   "state": "researched",
    "objectives": {
     "total": 6,
     "verified": 6
@@ -1985,15 +1988,46 @@
    "domain": "pc-c4-5-e",
    "chapterId": "pc-5e-circuits-electriques",
    "title": "Circuits électriques : série et dérivation",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": null,
-   "content": null,
+   "pipelineSpec": "pc-4e-electricite",
+   "content": {
+    "id": "pc-4e-electricite",
+    "taskId": "SCI-4E-PC-007",
+    "file": "src/lib/chapters/data/pc-4e-electricite.ts",
+    "sha256": "4107cf5db66bcf4679967f763612dbffd9dd15ae899392eea33cb52523571f46",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 36,
+    "perLevel": [
+     6,
+     8,
+     8,
+     9,
+     5
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -2121,15 +2155,46 @@
    "domain": "pc-c4-4-e",
    "chapterId": "pc-4e-lois-electricite",
    "title": "Intensité, tension et lois des circuits",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 4,
-    "verified": 4
+    "verified": 3
    },
    "pipelineSpec": "pc-4e-electricite",
-   "content": null,
+   "content": {
+    "id": "pc-4e-electricite",
+    "taskId": "SCI-4E-PC-007",
+    "file": "src/lib/chapters/data/pc-4e-electricite.ts",
+    "sha256": "4107cf5db66bcf4679967f763612dbffd9dd15ae899392eea33cb52523571f46",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 36,
+    "perLevel": [
+     6,
+     8,
+     8,
+     9,
+     5
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -2308,15 +2373,48 @@
    "domain": "pc-c4-3-e",
    "chapterId": "pc-3e-puissance-energie-electrique",
    "title": "Loi d'Ohm, puissance et énergie électriques",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 4,
     "verified": 4
    },
    "pipelineSpec": "pc-4e-electricite",
-   "content": null,
+   "content": {
+    "id": "pc-4e-electricite",
+    "taskId": "SCI-4E-PC-007",
+    "file": "src/lib/chapters/data/pc-4e-electricite.ts",
+    "sha256": "4107cf5db66bcf4679967f763612dbffd9dd15ae899392eea33cb52523571f46",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 36,
+    "perLevel": [
+     6,
+     8,
+     8,
+     9,
+     5
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending",
+    "objectif P3-E-08 non repris dans le chapitre",
+    "objectif P3-E-09 non repris dans le chapitre"
    ]
   },
   {

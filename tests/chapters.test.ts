@@ -154,7 +154,7 @@ describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master gén
     "math-3e-arithmetique": "d0cf16f9d03ddd26128e8063073984b7065803cab1c4b2ebbdc22d91cbca985c",
     "math-3e-pourcentages-evolution": "006db69983018ecf2ff05232d80325760722bc4f75309180312835c296a1643b",
     "math-3e-puissances-calculs": "7239a34eb246c59efd5d4486ebdaba4e2167ca918f464c3dc39cd2fcf569adec",
-    "math-3e-pythagore": "328d5b1a6fcde8c77c650c1862b57d02e1462ead2cd87189591536142262394c", // META injecté (décision du 2026-11-18, correction A)
+    "math-3e-pythagore": "1798901b94c1be9b4aa51032c14aed3243dc3b7d356297de92987af63de285ae", // META (2026-11-18) + correction pipeline run 56 + corrections manuelles du 2026-11-22 (py3-20 niveau 5, décisions 7 et 8)
     "math-5e-nombres-relatifs": "0e6398cc3698886779ce51491bab71972e32e1800991a9614fae5bbdecf86fcd",
   };
   it("chapitres du collège : mêmes identifiants, mêmes empreintes de fichier, toujours conformes au schéma", async () => {
@@ -272,15 +272,14 @@ describe("tutoiement : tous les textes élève contrôlés par validate-chapter"
 });
 
 describe("QA tier 2 : chapitre ↔ taxonomie verrouillée (validate-chapter)", () => {
-  it("Pythagore : écarts connus détectés (entrée de la correction ciblée A)", async () => {
+  it("Pythagore : écarts connus (correction ciblée A) tous corrigés — run 56 + niveau de py3-20 à la main", async () => {
     const { spawnSync } = await import("node:child_process");
     const r = spawnSync("npx", ["tsx", "scripts/validate-chapter.ts", "math-3e-pythagore", "--json", "--seeds", "3"], { encoding: "utf8" });
     const out = JSON.parse(r.stdout.trim().split("\n").pop() ?? "{}") as { summary: { taxonomy: string }; issues: { where: string; problem: string }[] };
     expect(out.summary.taxonomy).toBe("verrouillé");
     const tier2 = out.issues.map((i) => `${i.where} | ${i.problem}`);
-    expect(tier2).toContain("py3-03 | niveau 1 hors de la difficulté du type PY-T06 (3, 4, 5)");
-    expect(tier2).toContain("taxonomie:PY-T11 | type obligatoire sans exercice");
-    expect(tier2).toContain("py3-20 | exercice d'approfondissement présenté en évaluation finale (titre « Type … — »)");
+    // Avant correction : py3-03 niveau 1 hors PY-T06, PY-T11 sans exercice, py3-20 titré « Type Brevet — » (détecteurs : tests taxonomyIssues ci-dessous).
+    expect(tier2).toEqual([]);
   }, 120_000);
   it("taxonomyTypes (décision du 2026-11-18) : exigé si la taxonomie verrouillée ne liste aucun exercice ; type inconnu, niveau hors plage, approfondissement contrôlés", async () => {
     const { taxonomyIssues } = await import("../scripts/validate-chapter");

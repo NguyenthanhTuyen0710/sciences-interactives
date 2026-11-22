@@ -151,10 +151,11 @@ describe("paliers", () => {
 });
 
 describe("juge approfondi : extraits d'exercices", () => {
-  it("Pythagore : 20 blocs, niveaux 4/4/4/4/4", () => {
+  it("Pythagore : 21 blocs (py3-21 ajouté par la correction du run 56), niveaux 4/4/5/4/4", () => {
     const blocks = exerciseBlocks(readFileSync("src/lib/chapters/data/math-3e-pythagore.ts", "utf8"), "py3-");
-    expect(blocks.map((b) => b.id)).toEqual(Array.from({ length: 20 }, (_, i) => `py3-${String(i + 1).padStart(2, "0")}`));
-    expect([1, 2, 3, 4, 5].map((n) => blocks.filter((b) => b.niveau === n).length)).toEqual([4, 4, 4, 4, 4]);
+    const ids = Array.from({ length: 20 }, (_, i) => `py3-${String(i + 1).padStart(2, "0")}`);
+    expect(blocks.map((b) => b.id)).toEqual([...ids.slice(0, 4), "py3-21", ...ids.slice(4)]);
+    expect([1, 2, 3, 4, 5].map((n) => blocks.filter((b) => b.niveau === n).length)).toEqual([4, 4, 5, 4, 4]);
     for (const b of blocks) expect(b.text).toContain(`id: "${b.id}"`);
   });
 });
