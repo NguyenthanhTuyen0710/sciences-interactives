@@ -2,7 +2,7 @@
   "limitUsd": 8.83,
   "creditVerified": true,
   "creditNote": "Passer creditVerified à true UNIQUEMENT après vérification par le porteur de projet, dans la Console Anthropic, que le workspace de la clé utilise les crédits API Startup et qu'une limite de dépense mensuelle (≤ crédit disponible) est active. Tant que c'est false, le pipeline refuse tout appel payant.",
-  "limitNote": "Pilote élargi (décision du porteur de projet du 2026-11-15) : plafond propre au pilote 2,20 $ ajouté aux 0,692 $ déjà dépensés = plafond cumulé 2,892 $. Ne pas relever sans décision.",
+  "limitNote": "Plafond cumulé actuel : 8,83 $, relevé le 2026-11-22 sur décision de Nguyễn Thanh Tuyền (porteur de projet) : 2,428 $ dépensés au 2026-11-18 + 6,40 $ pour la vague de chapitres 3e (calcul littéral d'abord). Plafond précédent : 2,892 $ (pilote élargi, décision du 2026-11-15). Ne pas relever sans décision.",
   "creditCheck": {
     "date": "2026-11-15",
     "by": "Nguyễn Thanh Tuyền (porteur de projet)",
