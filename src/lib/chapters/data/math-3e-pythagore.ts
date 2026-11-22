@@ -3,7 +3,7 @@
 // (M4-EG-03, M4-EG-04), mobilisées en 3e (DNB). Seul objectif rattaché à la 3e : M3-AUTO-03 (images mentales).
 // Contenu original rédigé à partir du dossier research/dossiers/math-3e-pythagore.md.
 // Remarque : la citation officielle retenue ne mentionne que la démonstration « le triangle est rectangle » ;
-// montrer qu'un triangle n'est pas rectangle (contraposée) est présenté comme prolongement logique du théorème.
+// montrer qu'un triangle n'est pas rectangle (contraposée) est présenté comme approfondissement facultatif (décision 7 du 2026-11-22).
 // Pilote : 20 exercices.
 import type { ChapterContent, ChapterExercise, ChapterPart } from "../schema";
 import type { Mistake, Rng } from "../../engine/types";
@@ -516,7 +516,7 @@ const EXERCISES: ChapterExercise[] = [
           num(a * a + b * b, [{ match: String(a + b), feedback: "Il faut additionner les carrés, pas les longueurs." }], `2. Calcule $${AB}^2 + ${AC}^2$.`, "cm²"),
           shuffledQcm(rng, [
             `$${N}$ est rectangle en $${A}$, d'après la réciproque du théorème de Pythagore.`,
-            `$${N}$ n'est pas rectangle en $${A}$ : les deux résultats sont différents (prolongement : contraposée du théorème de Pythagore).`,
+            `Les deux résultats sont différents, donc $${N}$ n'est pas rectangle en $${A}$.`,
             `$${N}$ est rectangle en $${A}$ car l'angle a l'air droit sur le dessin.`,
           ], rect ? 0 : 1, {
             [rect ? 1 : 0]: rect ? "Les deux nombres sont égaux : la réciproque s'applique." : "Les deux nombres sont différents : la réciproque ne s'applique pas.",
@@ -526,7 +526,7 @@ const EXERCISES: ChapterExercise[] = [
         solution: [`1. $${BC}^2 = ${d}^2 = ${d * d}$.`, `2. $${AB}^2 + ${AC}^2 = ${a}^2 + ${b}^2 = ${a * a} + ${b * b} = ${a * a + b * b}$.`, rect ? `3. $${BC}^2 = ${AB}^2 + ${AC}^2$ : d'après la réciproque du théorème de Pythagore, $${N}$ est rectangle en $${A}$.` : `3. $${BC}^2 \\neq ${AB}^2 + ${AC}^2$ ($${d * d} \\neq ${a * a + b * b}$) : si $${N}$ était rectangle en $${A}$, le théorème de Pythagore donnerait l'égalité. Donc $${N}$ n'est pas rectangle en $${A}$.`],
       };
     },
-    reasoning: "Rédaction attendue : isoler le plus grand côté, calculer les deux quantités séparément, les comparer, puis citer la réciproque (ou la contraposée) et conclure.",
+    reasoning: "Rédaction attendue : isoler le plus grand côté, calculer les deux quantités séparément, les comparer, puis conclure : égalité → rectangle d'après la réciproque ; résultats différents → pas rectangle.",
     hints: ["Le plus grand côté est le candidat pour l'hypoténuse.", "Calcule séparément les deux quantités sans arrondir.", "Égalité → réciproque ; sinon → le triangle n'est pas rectangle."],
   }),
   ex({
@@ -576,9 +576,9 @@ const EXERCISES: ChapterExercise[] = [
     reasoning: "On enchaîne le théorème (pour obtenir $BC$) puis la réciproque (pour conclure sur $BCD$) ; le plus grand côté de $BCD$ est $[BD]$.",
     hints: ["Commence par le triangle $ABC$ dont l'angle droit est connu.", "Pour $BCD$, isole le plus grand côté.", "Compare $BD^2$ avec $BC^2 + CD^2$."],
   }),
-  // ── Prolongement (niveau 5, hors évaluation finale « Type Brevet ») ──
+  // ── Approfondissement facultatif (niveau 5, hors évaluation finale « Type Brevet ») ──
   ex({
-    id: "py3-20", title: "Prolongement — Démontrer qu'un triangle n'est pas rectangle", niveau: 5, objectives: ["M4-EG-04"], time: 300,
+    id: "py3-20", title: "Approfondissement (facultatif) — Démontrer qu'un triangle n'est pas rectangle", niveau: 5, objectives: ["M4-EG-04"], time: 300,
     statement: "Le triangle $EFG$ a pour côtés $EF = 9$ cm, $EG = 12$ cm et $FG = 16$ cm. Un élève affirme : « $EFG$ est rectangle en $E$ ». Remets dans l'ordre la démonstration qui le contredit, puis donne les deux nombres comparés.",
     parts: [
       { interaction: { kind: "ordonner", items: brevItems, answer: BREV_STEPS.map((s) => brevItems.indexOf(s)), hint: "Première étape en haut" } },
@@ -586,7 +586,7 @@ const EXERCISES: ChapterExercise[] = [
       num(225, [{ match: "21", feedback: "Il faut additionner les carrés, pas les longueurs." }], "$EF^2 + EG^2$ (en cm²)", "cm²"),
     ],
     solution: [...BREV_STEPS, "$256 \\neq 225$ : les deux nombres sont différents, l'élève a tort. Une mesure sur la figure n'aurait rien prouvé ; la comparaison des carrés exacts, si."],
-    reasoning: "Prolongement (raisonnement par l'absurde, cycle 4) : pour prouver qu'un triangle n'est pas rectangle, on montre que l'égalité de Pythagore est fausse ; le théorème, appliqué à un triangle rectangle, la donnerait.",
+    reasoning: "Approfondissement facultatif, au-delà du programme exigible (raisonnement par l'absurde, cycle 4) : pour prouver qu'un triangle n'est pas rectangle, on montre que l'égalité de Pythagore est fausse ; le théorème, appliqué à un triangle rectangle, la donnerait.",
     hints: ["Commence par repérer le plus grand côté.", "Calcule séparément $FG^2$ et $EF^2 + EG^2$.", "Conclus sur le lien entre l'inégalité et l'angle droit."],
   }),
 ];
@@ -607,14 +607,14 @@ export const math3ePythagore: ChapterContent = {
       { term: "Hypoténuse", text: "Dans un triangle rectangle, l'**hypoténuse** est le côté opposé à l'angle droit. C'est le plus long côté du triangle. Les deux autres côtés sont les **côtés de l'angle droit**." },
       { term: "Théorème de Pythagore", text: "Si le triangle $ABC$ est rectangle en $A$, alors $BC^2 = AB^2 + AC^2$.\nAutrement dit : le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés." },
       { term: "Réciproque du théorème de Pythagore", text: "Si, dans un triangle $ABC$, on a $BC^2 = AB^2 + AC^2$, alors $ABC$ est rectangle en $A$.\nOn l'utilise pour **démontrer** qu'un triangle est rectangle à partir des longueurs de ses côtés." },
-      { term: "Contraposée (prolongement)", text: "Si, dans un triangle $ABC$, $BC^2 \\neq AB^2 + AC^2$, alors $ABC$ n'est **pas** rectangle en $A$. En effet, s'il l'était, le théorème de Pythagore donnerait l'égalité. Ce raisonnement (par l'absurde, travaillé au cycle 4) prolonge le programme, qui demande de démontrer qu'un triangle **est** rectangle." },
-      { term: "Valeur exacte, valeur approchée", text: "$\\sqrt{13}$ est une valeur **exacte** ; $3{,}6$ est une valeur **approchée** (arrondi au dixième). Quand on demande une valeur exacte, on garde la racine ; quand on demande un arrondi, on l'effectue **à la fin** du calcul." },
+      { term: "Contraposée (approfondissement facultatif)", text: "Si, dans un triangle $ABC$, $BC^2 \\neq AB^2 + AC^2$, alors $ABC$ n'est **pas** rectangle en $A$. En effet, s'il l'était, le théorème de Pythagore donnerait l'égalité. Ce raisonnement (par l'absurde, travaillé au cycle 4) va au-delà du programme exigible, qui demande de démontrer qu'un triangle **est** rectangle." },
+      { term: "Valeur exacte, valeur approchée", text: "$\\sqrt{13}$ est une valeur **exacte** ; $\\sqrt{13} \\approx 3{,}6$ au dixième : $3{,}6$ est une valeur **approchée**. Quand on demande une valeur exacte, on garde la racine ; quand on demande un arrondi, on l'effectue **à la fin** du calcul." },
       { term: "Image mentale de la configuration", text: "On construit un carré sur chacun des trois côtés d'un triangle rectangle : l'aire du grand carré (sur l'hypoténuse) est la somme des aires des deux petits carrés. Exemple : $3^2 + 4^2 = 9 + 16 = 25 = 5^2$." },
     ],
     properties: [
       { title: "Calculer l'hypoténuse", statement: "Si $ABC$ est rectangle en $A$, alors $BC = \\sqrt{AB^2 + AC^2}$.", conditions: "Le triangle doit être rectangle ; $[BC]$ doit être le côté opposé à l'angle droit." },
       { title: "Calculer un côté de l'angle droit", statement: "Si $ABC$ est rectangle en $A$, alors $AB^2 = BC^2 - AC^2$, donc $AB = \\sqrt{BC^2 - AC^2}$.", conditions: "On soustrait quand l'inconnue est un côté de l'angle droit." },
-      { title: "Démontrer qu'un triangle est rectangle", statement: "On calcule le carré du plus grand côté d'une part, la somme des carrés des deux autres côtés d'autre part. Si les deux résultats sont égaux, le triangle est rectangle (réciproque) ; s'ils sont différents, il ne l'est pas (contraposée).", conditions: "On compare des carrés **exacts**, sans arrondir. Le triangle est rectangle au sommet opposé au plus grand côté." },
+      { title: "Démontrer qu'un triangle est rectangle", statement: "On calcule le carré du plus grand côté d'une part, la somme des carrés des deux autres côtés d'autre part. Si les deux résultats sont égaux, le triangle est rectangle (réciproque) ; s'ils sont différents, il ne l'est pas (approfondissement : contraposée).", conditions: "On compare des carrés **exacts**, sans arrondir. Le triangle est rectangle au sommet opposé au plus grand côté." },
     ],
     explanations: [
       { title: "1. Théorème ou réciproque ?", body: "Le théorème **part** d'un triangle rectangle (connu) pour **donner** une égalité sur les longueurs. La réciproque **part** d'une égalité sur les longueurs pour **prouver** que le triangle est rectangle. On utilise donc le théorème pour calculer une longueur, la réciproque pour montrer qu'un angle est droit." },
@@ -627,7 +627,7 @@ export const math3ePythagore: ChapterContent = {
       { title: "Exemple 2 — Calculer un côté de l'angle droit", statement: "$EFG$ est rectangle en $E$ avec $FG = 17$ cm et $EF = 8$ cm. Calculer $EG$.", steps: ["$EFG$ est rectangle en $E$ : $FG^2 = EF^2 + EG^2$, donc $EG^2 = FG^2 - EF^2$.", "$EG^2 = 17^2 - 8^2 = 289 - 64 = 225$.", "$EG = \\sqrt{225} = 15$."], answer: "$EG = 15$ cm" },
       { title: "Exemple 3 — Valeur approchée", statement: "$ABC$ est rectangle en $A$ avec $AB = 3$ cm et $AC = 5$ cm. Donner $BC$ arrondi au dixième.", steps: ["$BC^2 = 3^2 + 5^2 = 9 + 25 = 34$.", "$BC = \\sqrt{34}$ (valeur exacte).", "À la calculatrice, $\\sqrt{34} \\approx 5{,}83$, soit $5{,}8$ au dixième."], answer: "$BC \\approx 5{,}8$ cm" },
       { title: "Exemple 4 — Démontrer qu'un triangle est rectangle", statement: "$ABC$ a pour côtés $AB = 20$ cm, $AC = 21$ cm et $BC = 29$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[BC]$ : $BC^2 = 29^2 = 841$.", "$AB^2 + AC^2 = 20^2 + 21^2 = 400 + 441 = 841$.", "Les deux résultats sont égaux : d'après la réciproque du théorème de Pythagore, $ABC$ est rectangle en $A$."], answer: "$ABC$ est rectangle en $A$." },
-      { title: "Exemple 5 (prolongement) — Démontrer qu'il ne l'est pas", statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
+      { title: "Exemple 5 (approfondissement facultatif) — Démontrer qu'il ne l'est pas", statement: "$EFG$ a pour côtés $EF = 4$ cm, $EG = 5$ cm et $FG = 7$ cm. Est-il rectangle ?", steps: ["Le plus grand côté est $[FG]$ : $FG^2 = 49$.", "$EF^2 + EG^2 = 16 + 25 = 41$.", "$49 \\neq 41$ : si $EFG$ était rectangle en $E$, on aurait l'égalité."], answer: "$EFG$ n'est pas rectangle." },
     ],
     illustrations: [
       { svg: squaresSvg("9", "16", "25", "Triangle rectangle de côtés 3, 4 et 5 avec un carré sur chaque côté, d'aires 9, 16 et 25"), alt: "Triangle rectangle de côtés 3, 4 et 5 avec un carré construit sur chaque côté, d'aires 9, 16 et 25.", caption: "$9 + 16 = 25$ : l'aire du grand carré est la somme des deux autres." },
@@ -721,7 +721,7 @@ export const math3ePythagore: ChapterContent = {
         { niveau: 2, calc: "$7^2 = 14$", correct: false, errors: ["Le carré a été confondu avec le double", "Le carré a été confondu avec la racine", "Il manque l'unité"], error: 0, explanation: "$7^2 = 7 \\times 7 = 49$." },
         { niveau: 3, calc: "Un triangle de côtés $6$, $8$ et $10$ est rectangle car $6 + 8 > 10$.", correct: false, errors: ["La condition utilisée n'est pas celle de la réciproque : il faut comparer les carrés", "Il fallait comparer $6 + 8$ et $2 \\times 10$", "Il fallait mesurer l'angle"], error: 0, explanation: "$6^2 + 8^2 = 100 = 10^2$ : c'est cette égalité qui prouve que le triangle est rectangle." },
         { niveau: 3, calc: "$6^2 + 8^2 = 100 = 10^2$, donc, d'après la réciproque du théorème de Pythagore, le triangle est rectangle.", correct: true, explanation: "Égalité des carrés, avec le plus grand côté isolé : la réciproque s'applique." },
-        { niveau: 3, calc: "Triangle $4$, $5$, $6$ : $4^2 + 5^2 = 41$ et $6^2 = 36$, donc il est rectangle.", correct: false, errors: ["Les deux nombres sont différents : le triangle n'est pas rectangle", "Il fallait comparer $4^2 + 6^2$ et $5^2$", "Il fallait arrondir avant de comparer"], error: 0, explanation: "$41 \\neq 36$ : pas d'égalité, donc le triangle n'est pas rectangle." },
+        { niveau: 3, calc: "Triangle $4$, $5$, $6$ : $4^2 + 5^2 = 41$ et $6^2 = 36$, donc il est rectangle.", correct: false, errors: ["Les deux nombres sont différents : le triangle n'est pas rectangle", "Il fallait comparer $4^2 + 6^2$ et $5^2$", "On a comparé $6$ avec $4 + 5$"], error: 0, explanation: "$41 \\neq 36$ : pas d'égalité, donc le triangle n'est pas rectangle." },
         { niveau: 4, calc: "On mesure l'angle sur le dessin : $90°$, donc le triangle est rectangle.", correct: false, errors: ["Une mesure sur une figure ne prouve rien", "Il fallait utiliser le théorème de Pythagore et non la réciproque", "Il fallait mesurer avec une règle"], error: 0, explanation: "Seul le calcul exact des carrés, avec la réciproque, démontre qu'un triangle est rectangle." },
         { niveau: 4, calc: "$ABC$ rectangle en $A$, $AB = 2$, $AC = 3$ : $BC = \\sqrt{13}$ cm (valeur exacte).", correct: true, explanation: "$BC^2 = 4 + 9 = 13$ ; $13$ n'est pas un carré parfait, on garde la racine." },
       ] },
