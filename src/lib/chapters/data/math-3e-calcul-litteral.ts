@@ -329,7 +329,7 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Quand les deux facteurs ne diffèrent que par le signe du second terme, les termes « du milieu » se compensent : il reste $a^{2} - b^{2}$.",
-    hints: ["Écris les quatre produits de la double distributivité.", "Que valent $-${p}x$ et $+${p}x$ quand on les additionne ?".replace("${p}", "px").replace("${p}", "px")],
+    hints: ["Écris les quatre produits de la double distributivité.", "Que vaut la somme des deux termes en $x$ ?"],
   }),
   ex({
     id: "cl3-14", title: "Calcul mental astucieux", niveau: 2, objectives: ["M3-NC-10"], taxonomyTypes: ["CL-T06"], time: 120,
@@ -440,7 +440,7 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Mettre un nombre négatif en facteur change le signe de chaque terme restant par rapport à l'expression de départ : on divise chaque terme par $-k$.",
-    hints: ["Divise chaque terme par $-" + "le nombre choisi$ (en tenant compte des signes).", "Contrôle en redéveloppant."],
+    hints: ["Divise chaque terme par le nombre négatif mis en facteur (attention aux signes).", "Contrôle en redéveloppant."],
   }),
   ex({
     id: "cl3-22", title: "Factoriser une différence de deux carrés", niveau: 3, objectives: ["M3-NC-10"], taxonomyTypes: ["CL-T06"], time: 180,
@@ -594,7 +594,7 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       const p = rng.int(2, 9), t = rng.int(3, 12);
       return {
-        statement: `**Programme A** : choisir un nombre ; lui ajouter $${p}$ ; lui retrancher $${p}$ (séparément) ; multiplier les deux résultats.\n**Programme B** : choisir un nombre ; le multiplier par lui-même ; retrancher $${p * p}$.`,
+        statement: `**Programme A** : choisir un nombre ; calculer d'une part ce nombre plus $${p}$, d'autre part ce même nombre moins $${p}$ (deux calculs séparés, à partir du nombre choisi) ; multiplier les deux résultats.\n**Programme B** : choisir un nombre ; le multiplier par lui-même ; retrancher $${p * p}$.`,
         parts: [
           steps([[`Résultat du programme A pour $${t}$`, (t + p) * (t - p)], [`Résultat du programme B pour $${t}$`, t * t - p * p]], `1. On choisit le nombre $${t}$.`),
           tt(`2. En notant $x$ le nombre choisi, le programme A donne $(x + ${p})(x - ${p}) = x^{2} -$ [[0]]`, [nb(p * p)]),
@@ -637,7 +637,7 @@ const EXERCISES: ChapterExercise[] = [
         statement: "Démontre que, pour tout entier $n$, le nombre $(n + 3)^{2} - (n - 3)^{2}$ est un multiple de $12$.",
         parts: [
           { ...shuffledOrder(rng, lines), prompt: "1. Remets dans l'ordre les étapes de la démonstration." },
-          vf(["Vérifier la propriété pour $n = 1$, $n = 2$ et $n = 3$ suffit à la démontrer.", "Dans la ligne 3, on aurait pu développer chaque carré, mais l'identité $a^{2} - b^{2}$ est plus rapide.", "Pour $n = 5$, le nombre vaut $60$, un multiple de $12$."], [false, true, true], "2. Vrai ou faux ?"),
+          vf(["Vérifier la propriété pour $n = 1$, $n = 2$ et $n = 3$ suffit à la démontrer.", "Au lieu d'appliquer l'identité $a^{2} - b^{2}$, on aurait pu développer chaque carré, mais l'identité est plus rapide.", "Pour $n = 5$, le nombre vaut $60$, un multiple de $12$."], [false, true, true], "2. Vrai ou faux ?"),
         ],
         solution: [...lines, "Vérifier quelques valeurs ne démontre rien : il faut un calcul valable pour un entier $n$ quelconque.", "Pour $n = 5$ : $8^{2} - 2^{2} = 64 - 4 = 60 = 12 \\times 5$ ✓."],
       };
