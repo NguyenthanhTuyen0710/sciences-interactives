@@ -39,8 +39,8 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 |---|---|---|---|---|---|---|---|
 | mathematiques | 6e | 22 | 22 | 0 | 0 | 0 | 0 |
 | mathematiques | 5e | 21 | 18 | 0 | 0 | 0 | 3 |
-| mathematiques | 4e | 21 | 18 | 0 | 1 | 0 | 2 |
-| mathematiques | 3e | 16 | 11 | 1 | 2 | 0 | 2 |
+| mathematiques | 4e | 21 | 17 | 0 | 2 | 0 | 2 |
+| mathematiques | 3e | 16 | 11 | 0 | 3 | 0 | 2 |
 | mathematiques | 1re | 1 | 0 | 1 | 0 | 0 | 0 |
 | physique-chimie | 6e | 8 | 8 | 0 | 0 | 0 | 0 |
 | physique-chimie | 5e | 9 | 8 | 0 | 1 | 0 | 0 |
@@ -53,11 +53,12 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 | math-5e-relatifs-addition-soustraction | published | 4 (4) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | — |
 | math-5e-reperage | published | 2 (2) | `math-5e-nombres-relatifs` | 36 / 4 | pass | — | — |
 | math-4e-nombres-premiers | published | 4 (4) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
+| math-4e-calcul-litteral | draft | 3 (3) | `math-3e-calcul-litteral` (hors registre) | 37 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-4e-proportionnalite | published | 4 (4) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | objectif M4-OGDF-07 non repris dans le chapitre ; objectif M4-OGDF-09 non repris dans le chapitre |
 | math-4e-pythagore | draft | 2 (2) | `math-3e-pythagore` | 21 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-arithmetique | published | 3 (3) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
 | math-3e-puissances-calculs | draft | 4 (4) | `math-3e-puissances-calculs` | 35 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
-| math-3e-calcul-litteral | researched | 4 (4) | — | — | — | — | chapitre complet |
+| math-3e-calcul-litteral | draft | 4 (4) | `math-3e-calcul-litteral` (hors registre) | 37 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-pourcentages-evolution | published | 1 (1) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | — |
 | math-3e-automatismes | draft | 3 (3) | `math-3e-pythagore` | 21 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-1re-spe-second-degre | researched | 6 (6) | — | — | — | — | chapitre complet |
@@ -65,5 +66,5 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 | pc-4e-lois-electricite | draft | 4 (3) | `pc-4e-electricite` (hors registre) | 36 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | pc-3e-puissance-energie-electrique | draft | 4 (4) | `pc-4e-electricite` (hors registre) | 36 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 
-Chapitres d'inventaire au statut `todo` : 102 (détail dans `coverage-matrix.json`).
+Chapitres d'inventaire au statut `todo` : 101 (détail dans `coverage-matrix.json`).
 <!-- END GENERATED -->

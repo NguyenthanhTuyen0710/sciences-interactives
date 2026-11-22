@@ -24,9 +24,9 @@
    "grade": "4e",
    "chapters": 21,
    "byState": {
-    "todo": 18,
+    "todo": 17,
     "published": 2,
-    "draft": 1
+    "draft": 2
    }
   },
   {
@@ -35,8 +35,7 @@
    "chapters": 16,
    "byState": {
     "published": 2,
-    "draft": 2,
-    "researched": 1,
+    "draft": 3,
     "todo": 11
    }
   },
@@ -1003,15 +1002,46 @@
    "domain": "NC",
    "chapterId": "math-4e-calcul-litteral",
    "title": "Calcul littéral : distributivité simple, réduction",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": null,
-   "content": null,
+   "pipelineSpec": "math-3e-calcul-litteral",
+   "content": {
+    "id": "math-3e-calcul-litteral",
+    "taskId": "SCI-3E-MATH-003",
+    "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
+    "sha256": "b191db6874d12f3273617e423be68601fdcf3e2b17f20c49ca958be86add8d32",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 37,
+    "perLevel": [
+     5,
+     11,
+     10,
+     6,
+     5
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -1422,15 +1452,46 @@
    "domain": "NC",
    "chapterId": "math-3e-calcul-litteral",
    "title": "Calcul littéral : double distributivité, identités",
-   "state": "researched",
+   "state": "draft",
    "objectives": {
     "total": 4,
     "verified": 4
    },
    "pipelineSpec": "math-3e-calcul-litteral",
-   "content": null,
+   "content": {
+    "id": "math-3e-calcul-litteral",
+    "taskId": "SCI-3E-MATH-003",
+    "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
+    "sha256": "b191db6874d12f3273617e423be68601fdcf3e2b17f20c49ca958be86add8d32",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 37,
+    "perLevel": [
+     5,
+     11,
+     10,
+     6,
+     5
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {

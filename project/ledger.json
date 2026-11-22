@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-22T09:20:00.317Z",
+  "updatedAt": "2026-11-22T10:12:56.543Z",
   "tasks": [
     {
       "id": "SCI-INFRA-001",
@@ -939,14 +939,14 @@
       "id": "SCI-3E-MATH-003",
       "kind": "chapter",
       "title": "Calcul littéral : double distributivité, identités",
-      "state": "TODO",
+      "state": "QA_PENDING",
       "grade": "3e",
       "subject": "mathematiques",
       "chapterId": "math-3e-calcul-litteral",
       "dependsOn": [
         "SCI-INFRA-002"
       ],
-      "next": "A2/A3 : dossier de recherche"
+      "next": "Relecture humaine de la PR (revues QA), puis décision de publication"
     },
     {
       "id": "SCI-3E-MATH-004",
