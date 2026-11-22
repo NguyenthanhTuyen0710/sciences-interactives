@@ -576,8 +576,9 @@ const EXERCISES: ChapterExercise[] = [
     reasoning: "On enchaîne le théorème (pour obtenir $BC$) puis la réciproque (pour conclure sur $BCD$) ; le plus grand côté de $BCD$ est $[BD]$.",
     hints: ["Commence par le triangle $ABC$ dont l'angle droit est connu.", "Pour $BCD$, isole le plus grand côté.", "Compare $BD^2$ avec $BC^2 + CD^2$."],
   }),
+  // ── Prolongement (niveau 5, hors évaluation finale « Type Brevet ») ──
   ex({
-    id: "py3-20", title: "Prolongement — Démontrer qu'un triangle n'est pas rectangle", niveau: 4, objectives: ["M4-EG-04"], time: 300,
+    id: "py3-20", title: "Prolongement — Démontrer qu'un triangle n'est pas rectangle", niveau: 5, objectives: ["M4-EG-04"], time: 300,
     statement: "Le triangle $EFG$ a pour côtés $EF = 9$ cm, $EG = 12$ cm et $FG = 16$ cm. Un élève affirme : « $EFG$ est rectangle en $E$ ». Remets dans l'ordre la démonstration qui le contredit, puis donne les deux nombres comparés.",
     parts: [
       { interaction: { kind: "ordonner", items: brevItems, answer: BREV_STEPS.map((s) => brevItems.indexOf(s)), hint: "Première étape en haut" } },

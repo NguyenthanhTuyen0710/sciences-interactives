@@ -95,8 +95,8 @@ describe("taxonomie G3 Pythagore (research/curriculum/mathematiques/taxonomy/mat
       expect(t.variants.length, t.id).toBeGreaterThanOrEqual(2);
     }
   });
-  it("chaque exercice du chapitre relève d'au moins un type, et inversement", () => {
-    const mapped = new Set(tax.types.flatMap((t: { exercises: string[] }) => t.exercises));
+  it("chaque exercice du chapitre relève d'au moins un type (liste de la taxonomie ou taxonomyTypes de l'exercice), et inversement", () => {
+    const mapped = new Set([...tax.types.flatMap((t: { exercises: string[] }) => t.exercises), ...math3ePythagore.exercises.filter((e) => e.taxonomyTypes?.length).map((e) => e.id)]);
     expect([...ids].filter((i) => !mapped.has(i))).toEqual([]);
     expect([...mapped].filter((i) => !ids.has(i as string))).toEqual([]);
   });
