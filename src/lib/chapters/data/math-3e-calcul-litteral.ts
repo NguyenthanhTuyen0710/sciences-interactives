@@ -525,13 +525,13 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       const p = rng.int(3, 9), q = rng.int(1, p - 1);
       return {
-        statement: `Factorise $(x + ${p})^{2} - ${q * q}$ en posant $a = x + ${p}$ et $b = ${q}$. Ne développe pas $(x + ${p})^{2}$.`,
+        statement: `Factorise $(x + ${p})^{2} - ${q * q}$ en posant $a = x + ${p}$ et $b = ${q}$. Ne développe pas $(x + ${p})^{2}$. Dans ta réponse, le premier facteur contient la différence $a - b$ et le second la somme $a + b$.`,
         parts: [tt("$(x + " + p + ")^{2} - " + q * q + " = (x +$ [[0]] $)(x +$ [[1]] $)$", [nb(p - q), nb(p + q)])],
         solution: [`$${q * q} = ${q}^{2}$ : on a $a^{2} - b^{2}$ avec $a = x + ${p}$ et $b = ${q}$.`, `$a - b = x + ${p} - ${q} = x + ${p - q}$ et $a + b = x + ${p} + ${q} = x + ${p + q}$.`, `Donc $(x + ${p})^{2} - ${q * q} = (x + ${p - q})(x + ${p + q})$.`],
       };
     },
     reasoning: "Dans $a^{2} - b^{2} = (a - b)(a + b)$, la lettre $a$ peut désigner une expression entière comme $x + p$.",
-    hints: ["Identifie $a$ (l'expression élevée au carré) et $b$ (la racine de $" + "q^{2}$).", "Calcule $a - b$ puis $a + b$ en réduisant."],
+    hints: ["Identifie $a$ (l'expression élevée au carré) et $b$ (le nombre positif dont le carré est soustrait).", "Calcule $a - b$ puis $a + b$ en réduisant."],
   }),
   ex({
     id: "cl3-29", title: "Un programme dont le résultat est un carré", niveau: 4, objectives: ["M3-NC-11", "M3-NC-10"], taxonomyTypes: ["CL-T08"], time: 240,
