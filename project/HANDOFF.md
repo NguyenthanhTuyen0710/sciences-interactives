@@ -166,6 +166,20 @@ Journal des exceptions publish-pr (caduques depuis le 2026-11-17) : (ii) non app
      Total calcul littéral : **0,469 $** ; registre **3,081 $** ; reste **5,749 $** sous 8,83 $.
      Juge run #86 (`SCI-3E-MATH-003-QA-api-run86.md`) : curriculum, accuracy, games, technical, language PASS ; **les 2 MAJEUR du run #80 ont disparu** ; **1 nouveau MAJEUR** : `cl3-28` — les deux blancs sont attendus dans l'ordre (x + p − q)(x + p + q) ; l'ordre inverse, juste par commutativité, serait refusé (vérifié dans le code : `texte-trous` à deux blancs ordonnés). **ARRÊT, pas de tour suivant ; PR du chapitre non ouverte** ; `curriculum.ts` non modifié (`m3-calcul-litteral` absent ; Pythagore utilisait un nœud `m3-pythagore` déjà présent, donc l'intégration de calcul littéral demandera d'ajouter un nœud).
      MINEUR restants (juge #86) : cl3-28 (indice : lettre q non définie), cl3-33 (t ≤ p donne des résultats négatifs en partie 1 ; formulation « deux calculs séparés » jugée peu claire), cl3-29 (retour « toujours p² » confus), cl3-36 (indice 3 donne la réponse), cl3-37 (indice : « wx », w non défini), cl3-02 (consigne mêlant deux formulations).
+     → décisions 16 et 17.
+   - **Calcul littéral, correction manuelle de cl3-28 (décision 16, `c61b13c`)** — **dernière étape manuelle** : consigne « le premier facteur contient la différence $a - b$ et le second la somme $a + b$ » (option (i) : même convention que cl3-22 et cl3-34, où le gabarit fixe l'ordre ; l'option (ii) aurait modifié le correcteur commun à tous les chapitres) ; indice sans lettre q. validate vert ; 722 tests, tsc, lint (0 erreur) verts.
+
+     | Run | Étape | Modèle | Estimation max | Coût réel | Sortie (dont réflexion) | Fin |
+     |---|---|---|---|---|---|---|
+     | #87 | dry-run | — | criblage 0,004 $ + juge 0,072 $ | — | — | — |
+     | #88 → #89 | criblage (imposé par le pipeline : fichier modifié) | Haiku | 0,004 $ | **0,002 $** | — | non tronqué |
+     | #90 | dry-run juge | — | 0,075 $ | — | — | — |
+     | #91 → #92 | juge | Sonnet | 0,075 $ | **0,026 $** | 2 235 (1 757 = 79 %) | non tronqué |
+
+     Total calcul littéral : **0,497 $** ; registre **3,109 $** ; reste **5,721 $** sous 8,83 $.
+     Juge run #92 (`SCI-3E-MATH-003-QA-api-run92.md`) : curriculum, accuracy, games, technical PASS ; **aucun MAJEUR**. Criblage #89 : 4 MAJEUR (cl3-28, cl3-02, cl3-14, cl3-26) non confirmés par le juge.
+     Nœud **nouveau** `m3-calcul-litteral` ajouté à `curriculum.ts` (`1fc09fc`, avant `m3-equations`) ; PR du chapitre ouverte par le mode publish (draft, sans fusion).
+     MINEUR restants : juge #92 — cl3-37 (indice « wx », w non défini), jeu chasse-erreurs (« Il fallait diviser par 3 sans parenthèse » peu clair) ; juge #86, non corrigés (décision 16) — cl3-33, cl3-29, cl3-36, cl3-02.
 1. **Lot 3** : fermé (décision du 2026-11-17, option A) ; aucune correction, criblage ni juge du chapitre 1re.
 2. **Rapport du pilote** : **fait** — `project/reports/PILOT-rapport-final.md` (pièce : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md`).
 3. **PR de synthèse** : **fusionnée** (PR #13, commit de fusion `38cf04e`, 2026-11-17 ~14:09 UTC). Historique : (https://github.com/NguyenthanhTuyen0710/sciences-interactives/pull/13 ; base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées le 2026-11-17 sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
