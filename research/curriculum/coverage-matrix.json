@@ -1192,7 +1192,7 @@
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
-    "sha256": "9ed046a4d49ad5f55a52d329ca5e29cacacb4af16667b922916fb4f227a24c60",
+    "sha256": "51820542cea1ca8afdff2eebd49120766bb1498face1e43948722d73086815e1",
     "registered": true,
     "publication": "draft",
     "exercises": 21,
@@ -1200,8 +1200,8 @@
      4,
      4,
      5,
-     5,
-     3
+     4,
+     4
     ],
     "games": 3,
     "review": {
@@ -1676,7 +1676,7 @@
     "id": "math-3e-pythagore",
     "taskId": "SCI-3E-MATH-017",
     "file": "src/lib/chapters/data/math-3e-pythagore.ts",
-    "sha256": "9ed046a4d49ad5f55a52d329ca5e29cacacb4af16667b922916fb4f227a24c60",
+    "sha256": "51820542cea1ca8afdff2eebd49120766bb1498face1e43948722d73086815e1",
     "registered": true,
     "publication": "draft",
     "exercises": 21,
@@ -1684,8 +1684,8 @@
      4,
      4,
      5,
-     5,
-     3
+     4,
+     4
     ],
     "games": 3,
     "review": {

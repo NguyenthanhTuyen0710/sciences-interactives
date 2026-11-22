@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-18 12:58 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-22 08:39 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -56,7 +56,7 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 
 - Publication : **draft**
 - Objectifs officiels : 3 · couverts par le cours : 3 · par des exercices : 3 · par des jeux : 3
-- Exercices : 21 (niveaux 1:4 2:4 3:5 4:5 5:3) · activités : 3
+- Exercices : 21 (niveaux 1:4 2:4 3:5 4:4 5:4) · activités : 3
 - Revues QA : curriculum = pending · accuracy = pending · exercises = pending · games = pending · technical = pending · language = pending
 - Écarts à la Definition of Done : revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending ; revue games : pending ; revue technical : pending ; revue language : pending
 
