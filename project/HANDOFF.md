@@ -132,6 +132,22 @@ Constat de reprise (2026-11-18) : PR #16 fusionnée (`33b99ae`, `main` = `33b99a
 Journal des exceptions publish-pr (caduques depuis le 2026-11-17) : (ii) non appliquée ; (i) : run #37 (job 134024697098), run #41 (job 134036690749), run #43 (job 134042527165) ; erreur identique : `tests/pipeline-models.test.ts:128 TypeError: .toMatch() expects to receive a string, but got undefined`.
 
 ## 3. Travail en cours et suivant (par priorité)
+
+   - **Calcul littéral, chaîne du 2026-11-22 (décision 13, configuration par défaut ; branche `pipeline/math-3e-calcul-litteral`)** :
+
+     | Run | Étape | Modèle | Estimation max | Coût réel | Sortie (dont réflexion) | Fin |
+     |---|---|---|---|---|---|---|
+     | #70 | dry-run (chaîne) | — | 0,630 $ sans fix · 0,796 $ avec 1 fix Sonnet · 0,963 $ pire cas | — | — | — |
+     | #71 → #72 | dossier | Haiku | 0,003 $ | **0,001 $** | 3 956 (1 029 = 26 %) | non tronqué |
+     | #73 → #74 | chapitre | Sonnet 5.5, batch, 96 000 | 0,542 $ | **0,376 $** | 62 780 (26 531 = **42,3 %**) | non tronqué |
+     | #75 | dry-run criblage | — | 0,004 $ | — | — | — |
+     | #76 → #77 | criblage | Haiku | 0,004 $ | **0,002 $** | 1 050 (0) | non tronqué |
+     | #78 | dry-run juge | — | 0,102 $ | — | — | — |
+     | #79 → #80 | juge | Sonnet | 0,102 $ | **0,054 $** | 2 196 (1 394 = 63 %) | non tronqué |
+
+     Total calcul littéral : **0,433 $** ; registre **3,045 $** ; reste **5,785 $** sous 8,83 $. Chapitre : 37 exercices (5/11/10/6/5), 32 à tirage variable, 3 jeux ; validate-chapter **vert dès la génération** (QA tier 2 / taxonomie verrouillée : 0 écart ; 16 005 tirages en local ; 722 tests, tsc, lint verts). Aucun (a ± b)² dans le chapitre. Avertissement : `m3-calcul-litteral` absent de `src/lib/content/curriculum.ts` (à ajouter à l'intégration).
+     Juge run #80 (`SCI-3E-MATH-003-QA-api-run80.md`) : curriculum, accuracy, games, language PASS ; **2 MAJEUR** confirmés à la lecture du code : `cl3-13` (indice 2 : `.replace` sur une chaîne non interpolée → affiche « $-pxx$ ») ; `cl3-33` (programme A « ajouter p ; retrancher p (séparément) » ambigu). MINEUR : `cl3-35` (« ligne 3 » alors que les étapes sont mélangées) ; `cl3-21` (mots dans le LaTeX : « $-le nombre choisi$ »). Criblage #77 : 4 MAJEUR non confirmés par le juge (cl3-14, cl3-31, cl3-16, leçon) + 2 MINEUR.
+     **ARRÊT avant correction** : la boucle de correction de `pipeline/run.ts` ne s'exécute que si la validation échoue (`while (!v.ok …)`) ; validation verte → aucun tour de correction possible par le pipeline pour des constats du juge. Décision du porteur de projet attendue.
 1. **Lot 3** : fermé (décision du 2026-11-17, option A) ; aucune correction, criblage ni juge du chapitre 1re.
 2. **Rapport du pilote** : **fait** — `project/reports/PILOT-rapport-final.md` (pièce : `project/reports/SCI-1RE-SD-chapter-TRUNCATED.md`).
 3. **PR de synthèse** : **fusionnée** (PR #13, commit de fusion `38cf04e`, 2026-11-17 ~14:09 UTC). Historique : (https://github.com/NguyenthanhTuyen0710/sciences-interactives/pull/13 ; base `main`, tête `claude/stoic-dirac-asjcs0`) ; PR du bot #8-#12 fermées le 2026-11-17 sans fusion, avec motif. Contenu : rapport, publish-pr seulement si sortie utilisable, plafond affiché = plafond appliqué, correctifs de tests, HANDOFF/STATUS. **Non inclus (décision attendue)** : `budget.json` revenu à 10 (un relèvement du plafond effectif : non fait sans décision), `verificationMethod` et porte G2 dans `run.ts`, rapport du juge nommé par run, une PR par chapitre (rapport § 8).
