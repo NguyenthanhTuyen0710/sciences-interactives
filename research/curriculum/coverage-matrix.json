@@ -1013,7 +1013,7 @@
     "taskId": "SCI-3E-MATH-003",
     "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
     "sha256": "b191db6874d12f3273617e423be68601fdcf3e2b17f20c49ca958be86add8d32",
-    "registered": false,
+    "registered": true,
     "publication": "draft",
     "exercises": 37,
     "perLevel": [
@@ -1463,7 +1463,7 @@
     "taskId": "SCI-3E-MATH-003",
     "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
     "sha256": "b191db6874d12f3273617e423be68601fdcf3e2b17f20c49ca958be86add8d32",
-    "registered": false,
+    "registered": true,
     "publication": "draft",
     "exercises": 37,
     "perLevel": [
