@@ -149,5 +149,25 @@
   "Inéquations : aucune occurrence du mot dans les trois documents vérifiés (programme cycle 4 2020, attendus 3e 2019, BO n° 22 du 29-05-2019) ; manifeste : « Hors programme 3e 2020 (inéquations : 2nde) » (mention 2nde non vérifiée : aucun programme de 2nde lu, SOURCE_INACCESSIBLE). Approfondissement explicitement signalé seulement (type EQ-T09).",
   "Équations du second degré générales, discriminant : non cités (lycée) ; exclus.",
   "Systèmes d'équations : non cités ; exclus."
- ]
+ ],
+ "outOfScopeEvidence": {
+  "source": {
+   "seedId": "c4-programme-2020-eduscol-pdf",
+   "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+   "title": "Programme du cycle 4, en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), annexe 3, Éduscol",
+   "section": "Mathématiques › Thème A – Nombres et calculs (p. 131) › attendu « Utiliser le calcul littéral » (p. 132)"
+  },
+  "quotes": [
+   {
+    "page": 132,
+    "quote": "Utiliser le calcul littéral Connaissances - Notions d’inconnue, d’équation, d’indéterminée, d’identité. - Propriétés de distributivité (simple et double). - Annulation d’un produit (démonstration possible par disjonction de cas). - Factorisation de a2 - b2."
+   },
+   {
+    "page": 132,
+    "quote": "- Mettre un problème en équation en vue de sa résolution. - Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a."
+   }
+  ],
+  "conclusion": "Inéquations HORS de la partie exigible : les connaissances et compétences associées de l'attendu « Utiliser le calcul littéral » n'énumèrent que des équations ; le mot « inéquation » n'apparaît nulle part dans le programme 2020 (texte intégral, tous cycles et disciplines), ni dans les attendus 3e 2019, ni dans le BO n° 22 du 29-05-2019 (recherche dans les textes extraits, 2026-11-23). « inégalité » n'y apparaît qu'au sens de l'inégalité triangulaire (géométrie) ou d'inégalités sociales.",
+  "method": "Preuve par énumération (citations contrôlées mot pour mot par quoteFound) et recherche d'occurrences ; pas de mention explicite « hors programme » dans le texte officiel."
+ }
 }
