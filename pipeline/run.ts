@@ -38,7 +38,7 @@ const write = (f: string, s: string) => { mkdirSync(dirname(P(f)), { recursive: 
 // « low » (2026-11-08 : 11 260 des 12 000 tokens de sortie étaient de la réflexion au run #9). Ni le modèle ni l'effort
 // n'entrent dans l'empreinte anti-doublon (inputHash = texte du prompt).
 const MAX_FIX_ROUNDS = 2;
-// Tour unique de correction sur les MAJEUR du juge (décision 19 du 2026-11-23) : Sonnet, batch, coût maximal par tour.
+// Tour unique de correction sur les BLOQUANT et MAJEUR du juge (décisions 19 et 21 du 2026-11-23) : Sonnet, batch, coût maximal par tour.
 const JUDGE_FIX_CAP_USD = 0.2;
 // Estimation hors ligne (dry-run) ; remplacée par count_tokens en mode réel. Mesuré sur les runs #5 à #8 (Sonnet 5.5,
 // français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
@@ -401,7 +401,7 @@ const SCREEN_FILE = reportFile(spec.taskId, "screen", runTag());
  * `judgeFindingsForFix` = numéros (1, 2, …) des constats du dernier rapport du juge, choisis par le porteur de projet,
  * plus les types de la taxonomie verrouillée cités par la validation. Vide sans sélection : prompt de correction
  * identique octet pour octet pour les autres chapitres. `judgeFindingsForFix: true` (décision 19) : tour unique sur les
- * MAJEUR du juge quand la validation est verte (étape 6), sans effet ici.
+ * BLOQUANT et MAJEUR du juge quand la validation est verte (étape 6), sans effet ici.
  */
 function fixFindings(validation: string): string {
   const selection = Array.isArray(spec.judgeFindingsForFix) ? spec.judgeFindingsForFix : [];
@@ -423,9 +423,9 @@ function taxonomyAndMeta(validation: string): string {
 }
 const latestScreenFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "screen");
 const latestJudgeFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "review");
-/** Consigne du tour de correction sur constats du juge (décision 19) : MAJEUR confirmés par le juge seulement. */
+/** Consigne du tour de correction sur constats du juge (décisions 19 et 21) : BLOQUANT et MAJEUR confirmés par le juge seulement. */
 function judgeFixFindings(findings: Review["findings"], validation: string): string {
-  return `\nThe automatic checks pass. Fix ONLY the judge findings below (severity MAJEUR or above, confirmed by the in-depth judge in ${latestJudgeFile()}; JSON). Do not change anything else; keep every exercise valid.\n${JSON.stringify(findings, null, 1)}\n` + taxonomyAndMeta(validation);
+  return `\nThe automatic checks pass. Fix ONLY the judge findings below (severity BLOQUANT or MAJEUR, confirmed by the in-depth judge in ${latestJudgeFile()}; JSON). Do not change anything else; keep every exercise valid.\n${JSON.stringify(findings, null, 1)}\n` + taxonomyAndMeta(validation);
 }
 function saveReport(file: string, label: string, t: string, model: string) {
   const r = parseReview(t);
@@ -637,19 +637,20 @@ async function main() {
     OUT.review.save(t, STEP_CONFIG.review.model); markDone("review", hReview);
   }
 
-  // 6. Tour unique de correction sur les MAJEUR confirmés par le juge (décision 19 ; opt-in `judgeFindingsForFix: true`).
-  //    Criblage et juge sont ensuite relancés d'office (empreinte du fichier modifiée) ; MAJEUR restant → arrêt (décision 17).
+  // 6. Tour unique de correction sur les BLOQUANT et MAJEUR confirmés par le juge (décisions 19 et 21 ; opt-in
+  //    `judgeFindingsForFix: true`). Criblage et juge sont ensuite relancés d'office (empreinte du fichier modifiée) ;
+  //    BLOQUANT ou MAJEUR restant ou nouveau → arrêt (décisions 17 et 21), et la PR du chapitre reste bloquée.
   if (spec.judgeFindingsForFix === true && done("review", hReview)) {
     const file = latestJudgeFile(), parsed = file ? parseReview(extractBlock(read(file), "json")) : null;
     if (!parsed?.ok) { const n = `juge soldé mais rapport ${spec.taskId}-QA-api*.md absent ou illisible : tour de correction sur constats du juge non évalué`; RUN.needsHuman.push(n); console.log(n); return; }
     const plan = judgeFixPlan(true, parsed.review, judgeFixRoundUsed(ledger(), spec.id));
     if (plan.action === "stop") {
-      const n = `MAJEUR du juge après le tour de correction (${plan.findings.map((f) => f.exerciseId || f.criterion).join(", ")}) : ARRÊT, classer chaque constat (réel / faux positif) — décisions 17 et 19`;
+      const n = `BLOQUANT/MAJEUR du juge après le tour de correction (${plan.findings.map((f) => `${f.severity} ${f.exerciseId || f.criterion}`).join(", ")}) : ARRÊT, pas de PR du chapitre ; classer chaque constat (réel / faux positif) — décisions 17, 19 et 21`;
       RUN.needsHuman.push(n); console.log(n); return;
     }
     if (plan.action === "fix" && wanted("fix")) {
-      if (!generatedHere) { const n = "MAJEUR du juge sur un brouillon non produit par le pipeline : correction humaine"; RUN.needsHuman.push(n); console.log(n); return; }
-      console.log(`fix sur constats du juge (tour unique, ${plan.findings.length} constat(s) MAJEUR) [${MODELS.sonnet}, plafond ${money(JUDGE_FIX_CAP_USD)}] :`);
+      if (!generatedHere) { const n = "BLOQUANT/MAJEUR du juge sur un brouillon non produit par le pipeline : correction humaine"; RUN.needsHuman.push(n); console.log(n); return; }
+      console.log(`fix sur constats du juge (tour unique, ${plan.findings.length} constat(s) BLOQUANT/MAJEUR) [${MODELS.sonnet}, plafond ${money(JUDGE_FIX_CAP_USD)}] :`);
       const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE), FINDINGS: judgeFixFindings(plan.findings, v.json) });
       const t = await call("fix", user, hashOf(user) + JUDGE_FIX_SUFFIX, MODELS.sonnet, JUDGE_FIX_CAP_USD);
       if (t === null) return;

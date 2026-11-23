@@ -80,15 +80,15 @@ export function outputProblem(step: string, stopReason: string | null, text: str
 }
 
 /**
- * Tour de correction sur les constats du juge (décision 19 du 2026-11-23), chapitre activé par
- * `judgeFindingsForFix: true` : seuls les constats MAJEUR (ou BLOQUANT) du juge sont corrigés, jamais un MINEUR ni un
- * constat du seul criblage, et un seul tour par chapitre. Après ce tour, tout MAJEUR restant ou nouveau arrête la chaîne
- * (décision 17) : lecture du code et classement réel / faux positif par un humain.
+ * Tour de correction sur les constats du juge (décisions 19 et 21 du 2026-11-23), chapitre activé par
+ * `judgeFindingsForFix: true` : seuls les constats BLOQUANT et MAJEUR du juge sont corrigés, jamais un MINEUR ni un
+ * constat du seul criblage, et un seul tour par chapitre. Après ce tour, tout BLOQUANT ou MAJEUR restant ou nouveau
+ * arrête la chaîne (décisions 17 et 21) : lecture du code et classement réel / faux positif par un humain.
  */
 export type JudgeFixPlan = { action: "none" } | { action: "fix"; findings: Review["findings"] } | { action: "stop"; findings: Review["findings"] };
 export function judgeFixPlan(optIn: boolean, judge: Review | null, roundUsed: boolean): JudgeFixPlan {
   if (!optIn || !judge) return { action: "none" };
-  const findings = judge.findings.filter((f) => f.severity !== "MINEUR");
+  const findings = judge.findings.filter((f) => f.severity === "BLOQUANT" || f.severity === "MAJEUR");
   if (!findings.length) return { action: "none" };
   return roundUsed ? { action: "stop", findings } : { action: "fix", findings };
 }

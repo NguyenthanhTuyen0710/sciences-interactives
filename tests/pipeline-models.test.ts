@@ -173,14 +173,14 @@ describe("registre : dépense par modèle", () => {
   });
 });
 
-describe("tour de correction sur constats du juge (décision 19, données factices, aucun appel API)", () => {
+describe("tour de correction sur constats du juge (décisions 19 et 21, données factices, aucun appel API)", () => {
   const f = (severity: "BLOQUANT" | "MAJEUR" | "MINEUR", exerciseId: string) => ({ criterion: "exercises" as const, severity, exerciseId, issue: "défaut", fix: "correction" });
   const review = (...findings: Review["findings"]): Review => ({ verdict: findings.some((x) => x.severity !== "MINEUR") ? "NEEDS_REVIEW" : "PASS", criteria: [], findings });
   it("désactivé par défaut (opt-in) ou sans rapport du juge : rien", () => {
     expect(judgeFixPlan(false, review(f("MAJEUR", "x-01")), false)).toEqual({ action: "none" });
     expect(judgeFixPlan(true, null, false)).toEqual({ action: "none" });
   });
-  it("seulement les MAJEUR (ou BLOQUANT) du juge ; jamais un MINEUR seul", () => {
+  it("BLOQUANT et MAJEUR du juge seulement ; jamais un MINEUR seul", () => {
     expect(judgeFixPlan(true, review(f("MINEUR", "x-02")), false)).toEqual({ action: "none" });
     const p = judgeFixPlan(true, review(f("BLOQUANT", "x-00"), f("MAJEUR", "x-01"), f("MINEUR", "x-02")), false);
     expect(p.action).toBe("fix");
@@ -190,6 +190,10 @@ describe("tour de correction sur constats du juge (décision 19, données factic
     const p = judgeFixPlan(true, review(f("MAJEUR", "x-09")), true);
     expect(p).toEqual({ action: "stop", findings: [f("MAJEUR", "x-09")] });
     expect(judgeFixPlan(true, review(f("MINEUR", "x-02")), true)).toEqual({ action: "none" });
+  });
+  it("BLOQUANT seul : corrigé au tour ; BLOQUANT restant ou nouveau après le tour → arrêt (décision 21)", () => {
+    expect(judgeFixPlan(true, review(f("BLOQUANT", "x-03")), false)).toEqual({ action: "fix", findings: [f("BLOQUANT", "x-03")] });
+    expect(judgeFixPlan(true, review(f("BLOQUANT", "x-04"), f("MINEUR", "x-05")), true)).toEqual({ action: "stop", findings: [f("BLOQUANT", "x-04")] });
   });
   it("registre : tour engagé dès la réservation, distinct des corrections de validation, rendu si échec", () => {
     const fix = (id: string, inputHash: string, chapter = "c"): LedgerEntry => ({ type: "reserve", id, at: "t", chapter, step: "fix", inputHash, mode: "batch", maxUsd: 0.2, model: MODELS.sonnet });
