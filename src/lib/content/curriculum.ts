@@ -162,6 +162,7 @@ export const CURRICULUM: Record<Subject, Level[]> = {
       ]),
       ch("m3-arithmetique", "Arithmétique : nombres premiers, diviseurs et multiples", NC),
       ch("m3-puissances", "Fractions, puissances et racines carrées", NC),
+      ch("m3-calcul-litteral", "Calcul littéral : développer, factoriser, identités", NC),
       ch("m3-pourcentages", "Ratios, pourcentages et évolutions", GD),
       ch("m3-equations", "Équations et inéquations", NC),
       ch("m3-thales", "Théorème de Thalès", EG),
