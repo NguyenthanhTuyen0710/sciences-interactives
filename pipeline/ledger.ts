@@ -148,6 +148,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   process.exit(issues.length ? 1 : 0);
 }
 
+/** Suffixe d'empreinte du tour de correction sur les MAJEUR du juge (décision 19) : distingue ce tour des corrections de validation. */
+export const JUDGE_FIX_SUFFIX = ":judge-fix=1";
+/** Le tour unique de correction sur constats du juge est-il déjà engagé pour ce chapitre (réservé, soumis ou soldé) ? */
+export const judgeFixRoundUsed = (entries: LedgerEntry[], chapter: string) =>
+  ops(entries).some((o) => o.reserve?.chapter === chapter && o.reserve.step === "fix" && o.reserve.inputHash.includes(JUDGE_FIX_SUFFIX) && o.state !== "failed");
+
 /** Suffixe d'empreinte du nouvel envoi motivé (M17, version minimale). */
 export const RETRY_SUFFIX = ":retry=1";
 /**

@@ -78,3 +78,17 @@ export function outputProblem(step: string, stopReason: string | null, text: str
   if (step === "review" || step === "screen") { const r = parseReview(text); if (!r.ok) return `JSON hors schéma : ${r.errors.slice(0, 5).join(" ; ")}`; }
   return null;
 }
+
+/**
+ * Tour de correction sur les constats du juge (décision 19 du 2026-11-23), chapitre activé par
+ * `judgeFindingsForFix: true` : seuls les constats MAJEUR (ou BLOQUANT) du juge sont corrigés, jamais un MINEUR ni un
+ * constat du seul criblage, et un seul tour par chapitre. Après ce tour, tout MAJEUR restant ou nouveau arrête la chaîne
+ * (décision 17) : lecture du code et classement réel / faux positif par un humain.
+ */
+export type JudgeFixPlan = { action: "none" } | { action: "fix"; findings: Review["findings"] } | { action: "stop"; findings: Review["findings"] };
+export function judgeFixPlan(optIn: boolean, judge: Review | null, roundUsed: boolean): JudgeFixPlan {
+  if (!optIn || !judge) return { action: "none" };
+  const findings = judge.findings.filter((f) => f.severity !== "MINEUR");
+  if (!findings.length) return { action: "none" };
+  return roundUsed ? { action: "stop", findings } : { action: "fix", findings };
+}

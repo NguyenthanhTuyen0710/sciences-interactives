@@ -8,7 +8,8 @@ import { createHash } from "node:crypto";
 import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { retryPlan, RETRY_SUFFIX, spentByModel, type LedgerEntry } from "../pipeline/ledger";
+import { judgeFixRoundUsed, JUDGE_FIX_SUFFIX, retryPlan, RETRY_SUFFIX, spentByModel, type LedgerEntry } from "../pipeline/ledger";
+import { judgeFixPlan, type Review } from "../pipeline/review-format";
 
 const prices = JSON.parse(readFileSync("pipeline/prices.json", "utf8")) as Prices;
 
@@ -169,6 +170,42 @@ describe("registre : dépense par modèle", () => {
       { type: "actual", id: "b", at: "t", usd: 0.004, model: MODELS.haiku, tokens: { input: 1, cacheWrite: 0, cacheRead: 0, output: 1 } },
     ];
     expect(spentByModel(l)).toEqual({ [MODELS.sonnet]: 0.3, [MODELS.haiku]: 0.004 });
+  });
+});
+
+describe("tour de correction sur constats du juge (décision 19, données factices, aucun appel API)", () => {
+  const f = (severity: "BLOQUANT" | "MAJEUR" | "MINEUR", exerciseId: string) => ({ criterion: "exercises" as const, severity, exerciseId, issue: "défaut", fix: "correction" });
+  const review = (...findings: Review["findings"]): Review => ({ verdict: findings.some((x) => x.severity !== "MINEUR") ? "NEEDS_REVIEW" : "PASS", criteria: [], findings });
+  it("désactivé par défaut (opt-in) ou sans rapport du juge : rien", () => {
+    expect(judgeFixPlan(false, review(f("MAJEUR", "x-01")), false)).toEqual({ action: "none" });
+    expect(judgeFixPlan(true, null, false)).toEqual({ action: "none" });
+  });
+  it("seulement les MAJEUR (ou BLOQUANT) du juge ; jamais un MINEUR seul", () => {
+    expect(judgeFixPlan(true, review(f("MINEUR", "x-02")), false)).toEqual({ action: "none" });
+    const p = judgeFixPlan(true, review(f("BLOQUANT", "x-00"), f("MAJEUR", "x-01"), f("MINEUR", "x-02")), false);
+    expect(p.action).toBe("fix");
+    expect(p.action !== "none" && p.findings.map((x) => x.exerciseId)).toEqual(["x-00", "x-01"]);
+  });
+  it("un seul tour : MAJEUR restant ou nouveau après le tour → arrêt (décision 17)", () => {
+    const p = judgeFixPlan(true, review(f("MAJEUR", "x-09")), true);
+    expect(p).toEqual({ action: "stop", findings: [f("MAJEUR", "x-09")] });
+    expect(judgeFixPlan(true, review(f("MINEUR", "x-02")), true)).toEqual({ action: "none" });
+  });
+  it("registre : tour engagé dès la réservation, distinct des corrections de validation, rendu si échec", () => {
+    const fix = (id: string, inputHash: string, chapter = "c"): LedgerEntry => ({ type: "reserve", id, at: "t", chapter, step: "fix", inputHash, mode: "batch", maxUsd: 0.2, model: MODELS.sonnet });
+    expect(judgeFixRoundUsed([fix("a", "h1")], "c")).toBe(false);
+    expect(judgeFixRoundUsed([fix("b", "h2" + JUDGE_FIX_SUFFIX, "autre")], "c")).toBe(false);
+    expect(judgeFixRoundUsed([fix("c", "h3" + JUDGE_FIX_SUFFIX)], "c")).toBe(true);
+    expect(judgeFixRoundUsed([fix("d", "h4" + JUDGE_FIX_SUFFIX + RETRY_SUFFIX)], "c")).toBe(true);
+    expect(judgeFixRoundUsed([fix("e", "h5" + JUDGE_FIX_SUFFIX), { type: "failed", id: "e", at: "t", reason: "test" }], "c")).toBe(false);
+  });
+  it("run.ts : opt-in `true`, Sonnet, plafond 0,20 $, empreinte suffixée ; sélection numérotée (Pythagore) inchangée", () => {
+    const src = readFileSync("pipeline/run.ts", "utf8");
+    expect(src).toMatch(/const JUDGE_FIX_CAP_USD = 0\.2;/);
+    expect(src).toMatch(/spec\.judgeFindingsForFix === true && done\("review", hReview\)/);
+    expect(src).toMatch(/call\("fix", user, hashOf\(user\) \+ JUDGE_FIX_SUFFIX, MODELS\.sonnet, JUDGE_FIX_CAP_USD\)/);
+    expect(src).toMatch(/!judgeFixUsed && wanted\("fix"\)/);
+    expect(JSON.parse(readFileSync("pipeline/chapters/math-3e-pythagore.json", "utf8")).judgeFindingsForFix).toBeInstanceOf(Array);
   });
 });
 
