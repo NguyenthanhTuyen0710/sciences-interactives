@@ -17,8 +17,8 @@
 // dépense déjà réalisée : si le total dépasse budget.limitUsd, le pipeline s'arrête sans appeler l'API.
 // La clé API n'est jamais lue autrement que par le SDK (variable d'environnement) et n'est jamais affichée.
 import Anthropic from "@anthropic-ai/sdk";
-import { appendLedger, effectiveLimitUsd, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
-import { outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
+import { appendLedger, effectiveLimitUsd, JUDGE_FIX_SUFFIX, judgeFixRoundUsed, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
+import { judgeFixPlan, outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
 import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, H1_STEPS, isExperimentStep, latestReport, reportFile, runTag, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -38,13 +38,15 @@ const write = (f: string, s: string) => { mkdirSync(dirname(P(f)), { recursive: 
 // « low » (2026-11-08 : 11 260 des 12 000 tokens de sortie étaient de la réflexion au run #9). Ni le modèle ni l'effort
 // n'entrent dans l'empreinte anti-doublon (inputHash = texte du prompt).
 const MAX_FIX_ROUNDS = 2;
+// Tour unique de correction sur les BLOQUANT et MAJEUR du juge (décisions 19 et 21 du 2026-11-23) : Sonnet, batch, coût maximal par tour.
+const JUDGE_FIX_CAP_USD = 0.2;
 // Estimation hors ligne (dry-run) ; remplacée par count_tokens en mode réel. Mesuré sur les runs #5 à #8 (Sonnet 5.5,
 // français + TypeScript) : 2,02 à 2,17 caractères par token ; 2 donne une légère surestimation.
 const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -286,7 +288,7 @@ async function estimate(step: Step, user: string, batch: boolean, model: string)
 }
 
 /** Estime le coût maximal et applique TOUS les contrôles de dépense ; en dry-run, les affiche sans bloquer. */
-async function guard(step: Step, user: string, batch: boolean, hash: string, model: string) {
+async function guard(step: Step, user: string, batch: boolean, hash: string, model: string, capUsd?: number) {
   if (LIVE) { // conditions indépendantes du coût : vérifiées avant toute requête, même gratuite (count_tokens)
     const pre = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: 0 }, readiness());
     if (pre.length) { for (const b of pre) console.error(`  ARRÊT : ${b}`); process.exit(3); }
@@ -299,6 +301,7 @@ async function guard(step: Step, user: string, batch: boolean, hash: string, mod
   const blockers = spendBlockers(ledger(), { chapter: spec.id, step, inputHash: hash, maxUsd: e.upper }, readiness());
   const trunc = truncationRisk(step, model);
   if (trunc) { blockers.push(trunc); RUN.notes.push(trunc); }
+  if (capUsd !== undefined && e.upper > capUsd) blockers.push(`coût maximal ${money(e.upper)} > plafond du tour ${money(capUsd)}`);
   if (!LIVE) { for (const b of blockers) console.log(`  (envoi réel bloqué : ${b})`); return e; }
   if (blockers.length) { for (const b of blockers) console.error(`  ARRÊT : ${b}`); process.exit(3); }
   return e;
@@ -349,7 +352,7 @@ function finish(step: Step, msg: Anthropic.Message, ref: { opId?: string; batchI
 }
 
 /** Exécute une étape : renvoie le texte, ou null si un batch est en attente. */
-async function call(step: Step, user: string, hash: string, model: string): Promise<string | null> {
+async function call(step: Step, user: string, hash: string, model: string, capUsd?: number): Promise<string | null> {
   // M17 minimal : --retry "motif" renvoie une fois une étape payée sans résultat utilisable (empreinte suffixée).
   let retry: { retryOf: string; retryReason: string } | undefined;
   if (RETRY_REASON !== undefined) {
@@ -371,7 +374,7 @@ async function call(step: Step, user: string, hash: string, model: string): Prom
     }
     throw new Error(`batch ${step} : aucun résultat`);
   }
-  const e = await guard(step, user, batch, hash, model);
+  const e = await guard(step, user, batch, hash, model, capUsd);
   if (!LIVE || !client) { console.log(`  dry-run : appel ${step} non envoyé.`); return null; }
   const opId = reserve(step, hash, batch ? "batch" : "sync", e.upper, model, retry);
   // Pas de nouvelle tentative automatique pour un envoi payant : une erreur laisse l'issue « inconnue » (→ --reconcile).
@@ -397,23 +400,33 @@ const SCREEN_FILE = reportFile(spec.taskId, "screen", runTag());
  * Constats du juge à corriger avec la validation (décision du 2026-11-18, correction A de Pythagore) : fiche
  * `judgeFindingsForFix` = numéros (1, 2, …) des constats du dernier rapport du juge, choisis par le porteur de projet,
  * plus les types de la taxonomie verrouillée cités par la validation. Vide sans sélection : prompt de correction
- * identique octet pour octet pour les autres chapitres.
+ * identique octet pour octet pour les autres chapitres. `judgeFindingsForFix: true` (décision 19) : tour unique sur les
+ * BLOQUANT et MAJEUR du juge quand la validation est verte (étape 6), sans effet ici.
  */
 function fixFindings(validation: string): string {
-  if (!spec.judgeFindingsForFix?.length) return "";
-  const file = latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "review");
+  const selection = Array.isArray(spec.judgeFindingsForFix) ? spec.judgeFindingsForFix : [];
+  if (!selection.length) return "";
+  const file = latestJudgeFile();
   if (!file) fail(`judgeFindingsForFix : aucun rapport du juge ${spec.taskId}-QA-api*.md`);
   const r = parseReview(extractBlock(read(file!), "json"));
   if (!r.ok) fail(`judgeFindingsForFix : rapport du juge illisible (${file})`);
-  const findings = spec.judgeFindingsForFix.map((n) => r.review.findings[n - 1] ?? fail(`judgeFindingsForFix : constat n° ${n} absent de ${file}`));
+  const findings = selection.map((n) => r.review.findings[n - 1] ?? fail(`judgeFindingsForFix : constat n° ${n} absent de ${file}`));
+  return `\nJudge findings to fix as well (selected by the project owner from ${file}; JSON):\n${JSON.stringify(findings, null, 1)}\n` + taxonomyAndMeta(validation);
+}
+/** Types de la taxonomie verrouillée cités par la validation, et interdiction de toucher au bloc META (texte commun aux corrections). */
+function taxonomyAndMeta(validation: string): string {
   const taxFile = `research/curriculum/${spec.subject}/taxonomy/${spec.id}.json`;
   const ids = new Set(validation.match(/\b[A-Z]+-T\d{2}\b/g) ?? []);
   const types = existsSync(P(taxFile)) ? readJson<{ types: { id: string }[] }>(taxFile).types.filter((t) => ids.has(t.id)) : [];
-  return `\nJudge findings to fix as well (selected by the project owner from ${file}; JSON):\n${JSON.stringify(findings, null, 1)}\n`
-    + (types.length ? `\nLocked taxonomy types cited by the checks (JSON). The taxonomy file cannot change: link a new exercise to a type with \`taxonomyTypes: ["<type id>"]\`; keep each exercise's \`niveau\` within the \`difficulty\` of its types; an « approfondissement » exercise is never titled « Type Brevet — ».\n${JSON.stringify(types, null, 1)}\n` : "")
+  return (types.length ? `\nLocked taxonomy types cited by the checks (JSON). The taxonomy file cannot change: link a new exercise to a type with \`taxonomyTypes: ["<type id>"]\`; keep each exercise's \`niveau\` within the \`difficulty\` of its types; an « approfondissement » exercise is never titled « Type Brevet — ».\n${JSON.stringify(types, null, 1)}\n` : "")
     + "\nDo not modify the META block (sources, officialObjectives, statuses).\n";
 }
 const latestScreenFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "screen");
+const latestJudgeFile = () => latestReport(existsSync(P("project/reports")) ? readdirSync(P("project/reports")) : [], spec.taskId, "review");
+/** Consigne du tour de correction sur constats du juge (décisions 19 et 21) : BLOQUANT et MAJEUR confirmés par le juge seulement. */
+function judgeFixFindings(findings: Review["findings"], validation: string): string {
+  return `\nThe automatic checks pass. Fix ONLY the judge findings below (severity BLOQUANT or MAJEUR, confirmed by the in-depth judge in ${latestJudgeFile()}; JSON). Do not change anything else; keep every exercise valid.\n${JSON.stringify(findings, null, 1)}\n` + taxonomyAndMeta(validation);
+}
 function saveReport(file: string, label: string, t: string, model: string) {
   const r = parseReview(t);
   if (!r.ok) fail(`${label} hors schéma : ${r.errors.join(" ; ")}`, 7);
@@ -581,7 +594,9 @@ async function main() {
   // Brouillon du pipeline : bloc META inséré par le pipeline (draft) ; un brouillon écrit à la main n'est jamais corrigé ici.
   const generatedHere = pipelineGenerated && isPipelineDraft(read(CHAPTER_FILE));
   let rounds = Math.max(state.fixRounds, ledgerOps.filter((o) => o.reserve!.step === "fix").length);
-  while (!v.ok && generatedHere && wanted("fix") && rounds < MAX_FIX_ROUNDS) {
+  // Après le tour sur constats du juge (décision 19), plus aucune correction automatique : un échec de validation va à l'humain.
+  const judgeFixUsed = judgeFixRoundUsed(ledger(), spec.id);
+  while (!v.ok && generatedHere && !judgeFixUsed && wanted("fix") && rounds < MAX_FIX_ROUNDS) {
     rounds++; state.fixRounds = rounds; saveState();
     const model = fixModel(problemsOf(v.json), rounds);
     console.log(`fix (tour ${rounds}/${MAX_FIX_ROUNDS}) [${model}${model === MODELS.haiku ? " : problèmes tous mineurs" : ""}] :`);
@@ -593,7 +608,7 @@ async function main() {
     console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary}`);
   }
   if (!v.ok) {
-    RUN.needsHuman.push(generatedHere ? `validation en échec après ${rounds}/${MAX_FIX_ROUNDS} tour(s) de correction` : "validation en échec sur un fichier existant (jamais modifié par l'IA)");
+    RUN.needsHuman.push(!generatedHere ? "validation en échec sur un fichier existant (jamais modifié par l'IA)" : judgeFixUsed ? "validation en échec après le tour de correction sur constats du juge (décision 19)" : `validation en échec après ${rounds}/${MAX_FIX_ROUNDS} tour(s) de correction`);
     console.error("ARRÊT : le chapitre ne passe pas la validation automatique ; correction humaine nécessaire (needs-human)."); process.exit(6);
   }
 
@@ -620,6 +635,31 @@ async function main() {
     const t = await call("review", reviewUser, hReview, STEP_CONFIG.review.model);
     if (t === null) return;
     OUT.review.save(t, STEP_CONFIG.review.model); markDone("review", hReview);
+  }
+
+  // 6. Tour unique de correction sur les BLOQUANT et MAJEUR confirmés par le juge (décisions 19 et 21 ; opt-in
+  //    `judgeFindingsForFix: true`). Criblage et juge sont ensuite relancés d'office (empreinte du fichier modifiée) ;
+  //    BLOQUANT ou MAJEUR restant ou nouveau → arrêt (décisions 17 et 21), et la PR du chapitre reste bloquée.
+  if (spec.judgeFindingsForFix === true && done("review", hReview)) {
+    const file = latestJudgeFile(), parsed = file ? parseReview(extractBlock(read(file), "json")) : null;
+    if (!parsed?.ok) { const n = `juge soldé mais rapport ${spec.taskId}-QA-api*.md absent ou illisible : tour de correction sur constats du juge non évalué`; RUN.needsHuman.push(n); console.log(n); return; }
+    const plan = judgeFixPlan(true, parsed.review, judgeFixRoundUsed(ledger(), spec.id));
+    if (plan.action === "stop") {
+      const n = `BLOQUANT/MAJEUR du juge après le tour de correction (${plan.findings.map((f) => `${f.severity} ${f.exerciseId || f.criterion}`).join(", ")}) : ARRÊT, pas de PR du chapitre ; classer chaque constat (réel / faux positif) — décisions 17, 19 et 21`;
+      RUN.needsHuman.push(n); console.log(n); return;
+    }
+    if (plan.action === "fix" && wanted("fix")) {
+      if (!generatedHere) { const n = "BLOQUANT/MAJEUR du juge sur un brouillon non produit par le pipeline : correction humaine"; RUN.needsHuman.push(n); console.log(n); return; }
+      console.log(`fix sur constats du juge (tour unique, ${plan.findings.length} constat(s) BLOQUANT/MAJEUR) [${MODELS.sonnet}, plafond ${money(JUDGE_FIX_CAP_USD)}] :`);
+      const user = fill(read("pipeline/prompts/fix.md"), { ISSUES: v.json, ID: spec.id, FILE: read(CHAPTER_FILE), FINDINGS: judgeFixFindings(plan.findings, v.json) });
+      const t = await call("fix", user, hashOf(user) + JUDGE_FIX_SUFFIX, MODELS.sonnet, JUDGE_FIX_CAP_USD);
+      if (t === null) return;
+      applyFix(t);
+      v = validate(); qaValidation(v);
+      console.log(`validation : ${v.ok ? "OK" : "échecs"} — ${v.summary} ; criblage et juge à relancer (obligatoires après le tour).`);
+      if (!v.ok) RUN.needsHuman.push("validation en échec après le tour de correction sur constats du juge (décision 19)");
+      return;
+    }
   }
   console.log(`Terminé. Dépense totale de la phase pilote : ${money(spent())} / ${money(effectiveLimitUsd(budget.limitUsd))}.`);
 }

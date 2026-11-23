@@ -1,0 +1,65 @@
+{
+  "id": "math-3e-equations",
+  "taskId": "SCI-3E-MATH-004",
+  "grade": "3e",
+  "subject": "mathematiques",
+  "treeChapterId": "m3-equations",
+  "title": "Équations : premier degré, produit nul, x² = a",
+  "exportName": "math3eEquations",
+  "exercisePrefix": "eq3-",
+  "officialChapterIds": [
+    "math-3e-equations"
+  ],
+  "consolidationChapterIds": [
+    "math-4e-equations"
+  ],
+  "scopeNotes": [
+    "Programme 2020 en vigueur en 3e (BO n° 31 du 30-07-2020) + repères et attendus 2019 (BO n° 22 du 29-05-2019).",
+    "Exigible (à confirmer par le G1/G2) : équations du premier degré et problèmes s'y ramenant, équations produit nul après factorisation, équations x² = a sur des exemples simples.",
+    "Hors périmètre exigible : inéquations (manifeste : « Hors programme 3e 2020 (inéquations : 2nde) ») — seulement en approfondissement explicitement signalé, jamais dans un exercice de niveau 1 à 3 ; équations du second degré générales et formule du discriminant (lycée) exclues.",
+    "Factorisation (a² − b², facteur commun) : prérequis du chapitre calcul littéral, réutilisé pour le produit nul."
+  ],
+  "exampleChapter": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
+  "notion": {
+    "status": "SOURCE_INACCESSIBLE",
+    "reason": "aucune URL Notion disponible dans la session ; connecteur Notion non autorisé"
+  },
+  "officialSources": [
+    {
+      "seedId": "c4-programme-2020-eduscol-pdf",
+      "title": "Programme du cycle 4 en vigueur à la rentrée 2020 (d'après le BOEN n° 31 du 30 juillet 2020), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+      "accessedAt": "2026-11-07T14:49:44.189Z"
+    },
+    {
+      "seedId": "c4-attendus-3e-2019-pdf",
+      "title": "Mathématiques 3e — attendus de fin d'année (2019), Éduscol",
+      "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+      "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+      "accessedAt": "2026-11-07T14:50:10.048Z"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "title": "Bulletin officiel n° 22 du 29 mai 2019 — repères annuels de progression et attendus de fin d'année (note de service n° 2019-072, NOR MENE1913283N), annexe 26 : mathématiques cycle 4",
+      "url": "https://www.education.gouv.fr/sites/default/files/document/BO_22_MENJ_1132537.pdf-231744.pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+      "accessedAt": "2026-11-07T15:03:14.705Z"
+    }
+  ],
+  "objectiveLevels": {
+    "M3-NC-12": "exigible",
+    "M3-NC-13": "exigible",
+    "M3-NC-14": "exigible",
+    "M4-NC-19": "consolidation",
+    "M4-NC-20": "consolidation",
+    "M4-NC-21": "consolidation"
+  },
+  "optionalObjectives": [
+    "M4-NC-19",
+    "M4-NC-20",
+    "M4-NC-21"
+  ],
+  "optionalObjectivesNote": "Proposition du 2026-11-23 (décision 22), à approuver avec le G1 : objectifs de consolidation 4e, non exigibles en 3e → required: false (META) et hors porte G2 pour ce chapitre, comme M4-NC-16…18 pour calcul littéral.",
+  "judgeFindingsForFixNote": "Décision 22 du 2026-11-23 : tour de correction sur constats du juge désactivé au premier passage (pas de champ judgeFindingsForFix) ; arrêt après le premier juge, activation sur décision du porteur de projet."
+}

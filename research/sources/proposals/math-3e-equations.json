@@ -1,0 +1,153 @@
+{
+ "chapter": "math-3e-equations",
+ "status": "PROPOSÉ (décision 22 du 2026-11-23) — à approuver par Nguyễn Thanh Tuyền (relecteur G2) ; rien d'appliqué à l'inventaire, aucune approbation inscrite.",
+ "note": "Citations copiées du texte extrait (pdftotext) des documents vérifiés par le collecteur (SHA256 identiques à ceux de la fiche, cache local du 2026-11-18) et contrôlées mot pour mot (quoteFound, ≥ 20 caractères). Page = numéro de page du PDF. Rapprochement automatique : research/sources/verification/math-3e-equations.json (run.ts match, sans IA : 0 verified / 6 needs_manual_review, d'où les citations choisies ici). Objectifs de consolidation 4e (M4-NC-19…21) : niveau « consolidation » en 3e, non obligatoires (optionalObjectives), G2 non requis par la porte, comme M4-NC-16…18 pour calcul littéral.",
+ "changes": [
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-12",
+   "evidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quote": "résoudre des problèmes se ramenant à des équations du premier degré",
+    "page": 131,
+    "matchType": "b — objectif reformulé à l’infinitif (« résoudre des équations du premier degré et des problèmes s’y ramenant »)",
+    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-13",
+   "evidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quote": "Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits)",
+    "page": 132,
+    "matchType": "b — objectif reformulé ; « équations produits » ; l’annulation d’un produit figure dans les connaissances de la même page (« Annulation d’un produit (démonstration possible par disjonction de cas). »)",
+    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-NC-14",
+   "evidence": {
+    "seedId": "c4-programme-2020-eduscol-pdf",
+    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+    "quote": "en particulier des équations du type x2 = a",
+    "page": 132,
+    "matchType": "b — objectif reformulé ; « x2 » = x² (exposant perdu à l’extraction)",
+    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation",
+    "extractionNote": "Exposant perdu à l'extraction PDF : « x2 = a » se lit x² = a dans le PDF ; citation gardée telle que dans le texte extrait (contrôle mot pour mot). « sur des exemples simples » : attendus 3e 2019 p. 3 (« équations de la forme x = a sur des exemples simples », exposant également perdu)."
+   }
+  }
+ ],
+ "g1": {
+  "status": "PROPOSÉ — à valider par le porteur de projet",
+  "by": "Claude Code (session du 2026-11-23)",
+  "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+  "objectiveLevelsForFiche": {
+   "M3-NC-12": "exigible",
+   "M3-NC-13": "exigible",
+   "M3-NC-14": "exigible",
+   "M4-NC-19": "consolidation",
+   "M4-NC-20": "consolidation",
+   "M4-NC-21": "consolidation"
+  },
+  "levelEvidence": "Niveau 3e : attendus de fin d'année de 3e (2019), p. 3 : « Il résout algébriquement différents types d’équations : - équation du premier degré ; - équation s’y ramenant (équations produits) ; » puis « équations de la forme x = a sur des exemples simples. » (deux citations contrôlées séparément : un « 2 » isolé, exposant perdu de x², les sépare dans le texte extrait) ; programme 2020 p. 132 (compétences associées du cycle 4).",
+  "classification": [
+   {
+    "objectiveId": "M3-NC-12",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "équation du premier degré",
+     "mise en équation d'un problème",
+     "inconnue"
+    ],
+    "competences": [
+     "Modéliser",
+     "Calculer"
+    ]
+   },
+   {
+    "objectiveId": "M3-NC-13",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "équation produit nul",
+     "annulation d'un produit",
+     "factorisation préalable"
+    ],
+    "competences": [
+     "Calculer",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M3-NC-14",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "équation x² = a",
+     "racine carrée",
+     "nombre de solutions selon le signe de a"
+    ],
+    "competences": [
+     "Calculer",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-19",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "inconnue",
+     "mise en équation"
+    ],
+    "competences": [
+     "Modéliser"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-20",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "solution d'une équation",
+     "test par substitution"
+    ],
+    "competences": [
+     "Calculer",
+     "Raisonner"
+    ]
+   },
+   {
+    "objectiveId": "M4-NC-21",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "résolution algébrique",
+     "équations ax = b et a + x = b"
+    ],
+    "competences": [
+     "Calculer"
+    ]
+   }
+  ]
+ },
+ "outOfScope": [
+  "Inéquations : aucune occurrence du mot dans les trois documents vérifiés (programme cycle 4 2020, attendus 3e 2019, BO n° 22 du 29-05-2019) ; manifeste : « Hors programme 3e 2020 (inéquations : 2nde) » (mention 2nde non vérifiée : aucun programme de 2nde lu, SOURCE_INACCESSIBLE). Approfondissement explicitement signalé seulement (type EQ-T09).",
+  "Équations du second degré générales, discriminant : non cités (lycée) ; exclus.",
+  "Systèmes d'équations : non cités ; exclus."
+ ]
+}
