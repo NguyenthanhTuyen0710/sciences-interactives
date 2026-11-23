@@ -16,6 +16,12 @@
   "EQ-T04",
   "EQ-T08"
  ],
+ "taggingRules": [
+  "`difficulty` est une liste de niveaux autorisés (validate-chapter : `includes`), pas un intervalle ; un exercice rattaché à plusieurs types doit avoir un niveau présent dans chacune de leurs listes.",
+  "EQ-T08 (niveaux 4-5) ne se cumule jamais avec EQ-T03, EQ-T05 ou EQ-T07 (niveaux 2-3) : plages disjointes (même conflit que PY-T07 / PY-T09 pour Pythagore). Un problème de synthèse déclare EQ-T08 seul, ou avec EQ-T04 (niveaux 4-5) ou EQ-T06 (niveau 4).",
+  "Cumuls à intersection d'un seul niveau, permis mais à viser explicitement : EQ-T02 + EQ-T03 → niveau 2 ; EQ-T03 + EQ-T04 → niveau 3 ; EQ-T05 + EQ-T06 → niveau 3 ; EQ-T06 + EQ-T08 → niveau 4.",
+  "EQ-T09 (approfondissement) ne se cumule avec aucun type obligatoire (règle de validate-chapter)."
+ ],
  "types": [
   {
    "id": "EQ-T01",
@@ -128,6 +134,7 @@
    ],
    "difficulty": [
     3,
+    4,
     5
    ],
    "variants": [
@@ -225,19 +232,24 @@
     3
    ],
    "variants": [
-    "a > 0 : deux solutions √a et −√a",
-    "a = 0 : une solution",
-    "a < 0 : aucune solution",
-    "valeur exacte ou approchée"
+    "a > 0 carré parfait : deux solutions entières opposées",
+    "a > 0 non carré parfait : solutions exactes √a et −√a, puis valeur approchée si demandée",
+    "a = 0 : une seule solution, 0",
+    "a < 0 : aucune solution"
    ],
-   "method": "Discuter selon le signe de a : si a > 0, x = √a ou x = −√a ; si a = 0, x = 0 ; si a < 0, pas de solution (un carré est positif).",
+   "method": "Discuter selon le signe de a. Si a > 0 : x = √a ou x = −√a (deux solutions opposées). Si a = 0 : x² = 0 seulement pour x = 0 (une solution). Si a < 0 : aucune solution, car un carré est toujours positif ou nul. Ramener d'abord à la forme x² = a si besoin (ex. 2x² = 18 ; x² + 5 = 1).",
    "commonMistakes": [
-    "oublier la solution négative",
-    "donner une solution pour a < 0",
+    "oublier la solution négative −√a",
+    "donner √a pour a < 0 ou une solution « négative » à x² = −4",
+    "annoncer deux solutions (0 et −0) pour a = 0",
     "confondre x² = a et 2x = a"
    ],
    "brevet": "Lien avec Pythagore (longueur à partir d'une aire).",
-   "exercises": []
+   "exercises": [],
+   "requiredCases": {
+    "rule": "Le chapitre couvre les trois cas (a > 0, a = 0, a < 0), chacun dans au moins un exercice ou une partie d'exercice rattaché à EQ-T07.",
+    "answerFormat": "Le nombre de solutions et le cas « aucune solution » se demandent par choix (qcm ou select de texte-trous) ou vrai-faux, jamais par un champ numérique seul ; les solutions de a > 0 se saisissent séparément (deux champs) avec une consigne qui fixe l'ordre (par exemple « la solution positive d'abord ») pour ne pas refuser l'ordre inverse (cf. cl3-28)."
+   }
   },
   {
    "id": "EQ-T08",
