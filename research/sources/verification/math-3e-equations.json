@@ -1,0 +1,201 @@
+{
+  "chapter": "math-3e-equations",
+  "checkedAt": "2026-11-23T15:23:40.323Z",
+  "method": "(a) citation mot pour mot (espaces et typographie normalisés) → verified ; (b) sinon needs_manual_review avec le meilleur passage de chaque document (part de mots porteurs : indice de recherche, jamais une preuve)",
+  "documents": [
+    {
+      "seedId": "c4-programme-2020-eduscol-pdf",
+      "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9"
+    },
+    {
+      "seedId": "c4-attendus-3e-2019-pdf",
+      "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a"
+    },
+    {
+      "seedId": "bo-2019-22-pdf",
+      "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065"
+    }
+  ],
+  "results": [
+    {
+      "objectiveId": "M3-NC-12",
+      "chapter": "math-3e-equations",
+      "text": "Résoudre des équations du premier degré et des problèmes s'y ramenant.",
+      "officialRef": "Attendus de fin d'année de 3e (2019) › Utiliser le calcul littéral",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "Les puissances sont introduites pour faciliter l’évaluation d’ordres de grandeurs (notamment en relation avec d’autres disciplines) et la simplification de certaines écritures. Les élèves abordent les bases du calcul littéral, qu’ils mettent en œuvre pour modéliser une situation, démontrer une propriété générale et résoudre des problèmes se ramenant à des équations du premier degré.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 287,
+          "excerpt": "La factorisation d’une expression du type a - b permet de résoudre des équations produits se ramenant au premier degré (notamment des 2 équations du type x = a en lien avec la racine carrée). 2",
+          "wordCoverage": 0.83
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "- équation du premier degré ; - équation s’y ramenant (équations produits) ;",
+          "wordCoverage": 0.67
+        }
+      ]
+    },
+    {
+      "objectiveId": "M3-NC-13",
+      "chapter": "math-3e-equations",
+      "text": "Résoudre des équations produits nuls (après factorisation).",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (3e) ; Attendus de fin d'année de 3e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 287,
+          "excerpt": "2 La factorisation d’une expression du type a - b permet de résoudre des équations produits se ramenant au premier degré (notamment des 2 équations du type x = a en lien avec la racine carrée).",
+          "wordCoverage": 0.67
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Mettre un problème en équation en vue de sa résolution. - Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a.",
+          "wordCoverage": 0.5
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "- équation s’y ramenant (équations produits) ; 2",
+          "wordCoverage": 0.33
+        }
+      ]
+    },
+    {
+      "objectiveId": "M3-NC-14",
+      "chapter": "math-3e-equations",
+      "text": "Résoudre des équations du type x² = a sur des exemples simples.",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (3e) ; Attendus de fin d'année de 3e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 101,
+          "excerpt": "Les activités proposées permettent d'introduire expérimentalement des exemples de transformations chimiques dès la classe de 5e, avec des liens possibles avec l'histoire des sciences d'une part, et les situations de la vie courante d'autre part. L'utilisation d'équations de réaction pour modéliser les transformations peut être initiée en classe de 4e dans des cas simples.",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "2 - équations de la forme x = a sur des exemples simples.",
+          "wordCoverage": 0.6
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 43,
+          "excerpt": "Il observe des récurrences dans des phrases simples, (nous…ons, vous…ez, ils…ent) et collecte des exemples. Il se sert des collectes pour résoudre des problèmes par analogie.",
+          "wordCoverage": 0.6
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-19",
+      "chapter": "math-4e-equations",
+      "text": "Désigner une inconnue par une lettre et mettre un problème en équation.",
+      "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser le calcul littéral",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": "Il introduit une lettre pour désigner une valeur inconnue et met un problème en équation. ",
+          "wordCoverage": 0.83
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 131,
+          "excerpt": "Les élèves abordent les bases du calcul littéral, qu’ils mettent en œuvre pour modéliser une situation, démontrer une propriété générale et résoudre des problèmes se ramenant à des équations du premier degré. Les élèves sont progressivement familiarisés aux différents statuts de la lettre (indéterminée, variable, inconnue, paramètre) et du signe égal (pour fournir le résultat d’une opération, pour",
+          "wordCoverage": 0.5
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "Il résout algébriquement différents types d’équations : - équation du premier degré ;",
+          "wordCoverage": 0.17
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-20",
+      "chapter": "math-4e-equations",
+      "text": "Tester si un nombre est solution d'une équation.",
+      "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser le calcul littéral",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": " Il teste si un nombre est solution d’une équation.",
+          "wordCoverage": 0.75
+        },
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 127,
+          "excerpt": "Une place importante doit être accordée à la résolution de problèmes. Mais pour être en capacité de résoudre des problèmes, il faut à la fois prendre des initiatives, imaginer des pistes de solution et s’y engager sans s’égarer en procédant par analogie, en rattachant une situation particulière à une classe plus générale de problèmes, en identifiant une configuration géométrique ou la forme d’un n",
+          "wordCoverage": 0.5
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 2,
+          "excerpt": " Une bactérie « se divise » en deux bactéries, chacune des deux bactéries obtenues « se partage » en deux nouvelles bactéries… Lorsque les conditions sont favorables, le nombre de bactéries peut être multiplié par deux toutes les trente minutes.",
+          "wordCoverage": 0.25
+        }
+      ]
+    },
+    {
+      "objectiveId": "M4-NC-21",
+      "chapter": "math-4e-equations",
+      "text": "Résoudre algébriquement une équation du premier degré.",
+      "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (4e) ; Attendus de fin d'année de 4e (2019)",
+      "status": "needs_manual_review",
+      "candidates": [
+        {
+          "seedId": "c4-programme-2020-eduscol-pdf",
+          "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+          "page": 132,
+          "excerpt": "- Mettre un problème en équation en vue de sa résolution. - Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a.",
+          "wordCoverage": 1
+        },
+        {
+          "seedId": "c4-attendus-3e-2019-pdf",
+          "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+          "page": 3,
+          "excerpt": "Il résout algébriquement différents types d’équations : - équation du premier degré ;",
+          "wordCoverage": 0.8
+        },
+        {
+          "seedId": "bo-2019-22-pdf",
+          "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+          "page": 196,
+          "excerpt": " Il résout algébriquement une équation du premier degré.",
+          "wordCoverage": 0.8
+        }
+      ]
+    }
+  ]
+}

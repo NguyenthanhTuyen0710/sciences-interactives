@@ -1,0 +1,309 @@
+{
+ "chapter": "math-3e-equations",
+ "taskId": "SCI-3E-MATH-004",
+ "status": "proposé",
+ "lockedAt": null,
+ "lockedBy": null,
+ "lockHash": null,
+ "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-23, sans API, décision 22) à partir de l'inventaire (M3-NC-12…14, M4-NC-19…21) et des textes vérifiés : programme cycle 4 2020 p. 131-133, attendus 3e 2019 p. 3. À approuver puis verrouiller par le porteur de projet (Nguyễn Thanh Tuyền). Les listes « exercises » restent vides : rattachement exercice ↔ type par le champ `taxonomyTypes` de chaque exercice (ChapterSchema), contrôlé par validate-chapter.",
+ "sources": [
+  "c4-programme-2020-eduscol-pdf p. 131 : « résoudre des problèmes se ramenant à des équations du premier degré » ; p. 132 : « Annulation d’un produit (démonstration possible par disjonction de cas). » ; « Mettre un problème en équation en vue de sa résolution. » ; « Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a. » ; p. 133 (automatismes) : « les procédures de résolution d’équations du type ax = b et a + x = b. »",
+  "c4-attendus-3e-2019-pdf p. 3 : « Il résout algébriquement différents types d’équations : - équation du premier degré ; - équation s’y ramenant (équations produits) ; » ; « équations de la forme x = a sur des exemples simples. » ; « Il résout des problèmes s’y ramenant, qui peuvent être internes aux mathématiques ou en lien avec d’autres disciplines. »"
+ ],
+ "brevetNote": "Champ « brevet » à compléter avec les annales officielles (G5) ; aucune annale lue pour cette proposition.",
+ "lockPolicy": "Après verrouillage, seul le champ « brevet » des types peut être modifié (mise à jour avec les annales, G5). Toute autre modification exige une nouvelle validation du porteur de projet et un nouveau verrouillage.",
+ "redactionCriterionRequiredFor": [
+  "EQ-T04",
+  "EQ-T08"
+ ],
+ "types": [
+  {
+   "id": "EQ-T01",
+   "title": "Tester si un nombre est solution d'une équation",
+   "objectives": [
+    "M4-NC-20"
+   ],
+   "level": "consolidation",
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "substitution d'une valeur dans une expression (math-4e-calcul-litteral)"
+   ],
+   "difficulty": [
+    1,
+    2
+   ],
+   "variants": [
+    "nombre entier, décimal ou relatif",
+    "équation avec l'inconnue dans les deux membres",
+    "choisir la solution parmi plusieurs nombres"
+   ],
+   "method": "Remplacer l'inconnue par le nombre dans chaque membre, calculer séparément, comparer les deux résultats.",
+   "commonMistakes": [
+    "ne calculer qu'un membre",
+    "conclure « solution » sur un seul exemple de calcul faux"
+   ],
+   "brevet": "Question de vérification fréquente avant ou après une résolution.",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T02",
+   "title": "Résoudre ax = b et a + x = b",
+   "objectives": [
+    "M4-NC-21"
+   ],
+   "level": "consolidation",
+   "competences": [
+    "Calculer"
+   ],
+   "prerequisites": [
+    "opérations sur les relatifs et les fractions (math-4e)"
+   ],
+   "difficulty": [
+    1,
+    2
+   ],
+   "variants": [
+    "a, b entiers ou relatifs",
+    "solution fractionnaire",
+    "calcul mental (automatisme)"
+   ],
+   "method": "Effectuer la même opération sur les deux membres pour isoler x : soustraire a, ou diviser par a (a ≠ 0).",
+   "commonMistakes": [
+    "soustraire au lieu de diviser (ax = b → x = b − a)",
+    "erreur de signe en divisant par un négatif"
+   ],
+   "brevet": "Automatisme exigé (programme 2020, liste de ce qui doit être « mémorisé ou automatisé »).",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T03",
+   "title": "Résoudre une équation du premier degré (inconnue dans les deux membres, parenthèses)",
+   "objectives": [
+    "M3-NC-12",
+    "M4-NC-21"
+   ],
+   "competences": [
+    "Calculer"
+   ],
+   "prerequisites": [
+    "EQ-T02",
+    "développer et réduire (math-3e-calcul-litteral)"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "ax + b = cx + d",
+    "avec parenthèses à développer",
+    "coefficients décimaux ou fractionnaires",
+    "solution unique non entière"
+   ],
+   "method": "Développer et réduire chaque membre, regrouper les termes en x d'un côté et les constantes de l'autre, puis isoler x ; vérifier en remplaçant.",
+   "commonMistakes": [
+    "changer de membre sans changer de signe",
+    "oublier de distribuer le signe moins devant une parenthèse",
+    "diviser seulement un terme"
+   ],
+   "brevet": "Question classique du DNB (résolution directe).",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T04",
+   "title": "Mettre un problème en équation et le résoudre",
+   "objectives": [
+    "M3-NC-12",
+    "M4-NC-19"
+   ],
+   "competences": [
+    "Modéliser",
+    "Calculer",
+    "Communiquer"
+   ],
+   "prerequisites": [
+    "EQ-T03"
+   ],
+   "difficulty": [
+    3,
+    5
+   ],
+   "variants": [
+    "problème d'âges, de prix, de partage",
+    "programme de calcul : quel nombre de départ ?",
+    "géométrie : périmètre ou aire donnés",
+    "phrase-réponse exigée"
+   ],
+   "method": "Choisir l'inconnue (phrase « Soit x … »), traduire l'énoncé par une équation, la résoudre, vérifier la solution dans l'énoncé et conclure par une phrase.",
+   "commonMistakes": [
+    "ne pas définir l'inconnue",
+    "résoudre sans répondre à la question posée",
+    "garder une solution incompatible avec le contexte (longueur négative)"
+   ],
+   "brevet": "Fréquent au DNB (programmes de calcul, problèmes concrets) ; rédaction attendue.",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T05",
+   "title": "Résoudre une équation produit nul",
+   "objectives": [
+    "M3-NC-13"
+   ],
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "EQ-T03"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "(ax + b)(cx + d) = 0",
+    "un facteur constant ou x seul : x(ax + b) = 0",
+    "écrire les deux solutions ou les deux cas"
+   ],
+   "method": "Un produit est nul si et seulement si l'un au moins de ses facteurs est nul : résoudre séparément chaque équation « facteur = 0 ».",
+   "commonMistakes": [
+    "développer le produit au lieu d'utiliser la propriété",
+    "ne donner qu'une solution",
+    "appliquer la propriété à un produit égal à un nombre non nul"
+   ],
+   "brevet": "Programme 2020 p. 132 : « Annulation d’un produit (démonstration possible par disjonction de cas). »",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T06",
+   "title": "Se ramener à une équation produit nul par factorisation",
+   "objectives": [
+    "M3-NC-13"
+   ],
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "EQ-T05",
+    "factorisation par facteur commun et a² − b² (math-3e-calcul-litteral)"
+   ],
+   "difficulty": [
+    3,
+    4
+   ],
+   "variants": [
+    "facteur commun",
+    "différence de deux carrés",
+    "tout ramener dans un membre avant de factoriser"
+   ],
+   "method": "Ramener l'équation à « expression = 0 », factoriser, puis appliquer la propriété du produit nul.",
+   "commonMistakes": [
+    "diviser les deux membres par x et perdre la solution 0",
+    "factoriser incorrectement a² − b²"
+   ],
+   "brevet": "Question de DNB enchaînée avec une factorisation demandée avant.",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T07",
+   "title": "Résoudre x² = a sur des exemples simples",
+   "objectives": [
+    "M3-NC-14"
+   ],
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "racine carrée (math-4e-racine-carree, math-3e-puissances-calculs)"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "a > 0 : deux solutions √a et −√a",
+    "a = 0 : une solution",
+    "a < 0 : aucune solution",
+    "valeur exacte ou approchée"
+   ],
+   "method": "Discuter selon le signe de a : si a > 0, x = √a ou x = −√a ; si a = 0, x = 0 ; si a < 0, pas de solution (un carré est positif).",
+   "commonMistakes": [
+    "oublier la solution négative",
+    "donner une solution pour a < 0",
+    "confondre x² = a et 2x = a"
+   ],
+   "brevet": "Lien avec Pythagore (longueur à partir d'une aire).",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T08",
+   "title": "Problème se ramenant à un produit nul ou à x² = a",
+   "objectives": [
+    "M3-NC-12",
+    "M3-NC-13",
+    "M3-NC-14"
+   ],
+   "competences": [
+    "Modéliser",
+    "Raisonner",
+    "Communiquer"
+   ],
+   "prerequisites": [
+    "EQ-T04",
+    "EQ-T06",
+    "EQ-T07"
+   ],
+   "difficulty": [
+    4,
+    5
+   ],
+   "variants": [
+    "aire d'un carré ou d'un disque donnée",
+    "problème géométrique avec x² = a",
+    "contexte à solution unique malgré deux solutions algébriques"
+   ],
+   "method": "Mettre en équation, résoudre (produit nul ou x² = a), puis sélectionner les solutions compatibles avec le contexte et conclure.",
+   "commonMistakes": [
+    "garder la solution négative pour une longueur",
+    "ne pas justifier le rejet d'une solution"
+   ],
+   "brevet": "Problème de synthèse type DNB.",
+   "exercises": []
+  },
+  {
+   "id": "EQ-T09",
+   "title": "Inéquations du premier degré",
+   "objectives": [],
+   "level": "approfondissement",
+   "competences": [
+    "Calculer"
+   ],
+   "prerequisites": [
+    "EQ-T03"
+   ],
+   "difficulty": [
+    4
+   ],
+   "variants": [
+    "ax + b < c",
+    "représentation des solutions sur une droite graduée"
+   ],
+   "method": "Mêmes transformations que pour une équation, en changeant le sens de l'inégalité quand on multiplie ou divise par un nombre négatif.",
+   "commonMistakes": [
+    "ne pas changer le sens en divisant par un négatif"
+   ],
+   "brevet": "Non évalué au DNB.",
+   "countsTowardCompleteness": false,
+   "rule": "Hors programme exigible en 3e ; seulement en approfondissement explicitement signalé, jamais au niveau 1 à 3 ni en « Type Brevet — ».",
+   "levelEvidence": {
+    "argument": "Preuve par énumération : le mot « inéquation » n'apparaît dans aucun des trois documents vérifiés (programme cycle 4 2020, attendus 3e 2019, BO n° 22 du 29-05-2019 ; recherche dans les textes extraits). Les équations exigibles sont énumérées p. 132 du programme : « Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits), en particulier des équations du type x2 = a. »",
+    "unverified": "« inéquations : 2nde » (manifeste) : SOURCE_INACCESSIBLE, aucun programme de 2nde lu."
+   },
+   "exercises": []
+  }
+ ]
+}
