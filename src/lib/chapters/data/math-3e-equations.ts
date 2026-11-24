@@ -489,7 +489,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris l'égalité des deux coûts.", "Résous puis compare pour une valeur supérieure."],
   }),
   ex({
-    id: "eq3-28", title: "Type Brevet — Équation factorisée complète", niveau: 5, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360,
+    id: "eq3-28", title: "Type Brevet — Équation factorisée complète", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360,
     vary: (rng) => {
       const a = rng.int(2, 7), b = rng.int(1, 6);
       return {
@@ -603,16 +603,24 @@ export const math3eEquations: ChapterContent = {
           ["Résous $x + 5 = 2$", "-3", "$2 - 5$."],
           ["Résous $3x + 1 = 10$", "3", "$3x = 9$."],
           ["Résous $5x - 4 = 11$", "3", "$5x = 15$."],
+          ["Résous $4x - 7 = 5$", "3", "$4x = 12$."],
+          ["Résous $7x = -21$", "-3", "$-21 \\div 7$."],
         ]],
         ["Produit nul", [
           ["Plus grande solution de $(x - 3)(x + 8) = 0$", "3", "$x = 3$ ou $x = -8$."],
           ["Plus petite solution de $(x - 3)(x + 8) = 0$", "-8", "$x + 8 = 0$."],
           ["Plus grande solution de $x(x - 6) = 0$", "6", "$x = 0$ ou $x = 6$."],
+          ["Plus petite solution de $x(x - 6) = 0$", "0", "$x = 0$ ou $x = 6$."],
+          ["Plus grande solution de $(x + 1)(x - 5) = 0$", "5", "$x = -1$ ou $x = 5$."],
+          ["Plus petite solution de $(x + 1)(x - 5) = 0$", "-1", "$x + 1 = 0$."],
         ]],
         ["$x^{2} = a$", [
           ["Solution positive de $x^{2} = 49$", "7", "$7^{2} = 49$."],
           ["Solution négative de $x^{2} = 81$", "-9", "$(-9)^{2} = 81$."],
           ["Solution positive de $x^{2} = 144$", "12", "$12^{2} = 144$."],
+          ["Solution négative de $x^{2} = 16$", "-4", "$(-4)^{2} = 16$."],
+          ["Solution positive de $x^{2} = 100$", "10", "$10^{2} = 100$."],
+          ["Solution négative de $x^{2} = 36$", "-6", "$(-6)^{2} = 36$."],
         ]],
       ]),
     },

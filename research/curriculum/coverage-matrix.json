@@ -1060,16 +1060,16 @@
     "id": "math-3e-equations",
     "taskId": "SCI-3E-MATH-004",
     "file": "src/lib/chapters/data/math-3e-equations.ts",
-    "sha256": "a2e0bf895c332e4d97fd078f18ccf52f327004257c7b47e5cb1871f898f23262",
-    "registered": false,
+    "sha256": "e579d76a9fe300ee2e6d7208c433534adfb6632d39100aae35ca2dc2caa5ac19",
+    "registered": true,
     "publication": "draft",
     "exercises": 30,
     "perLevel": [
      5,
      8,
      7,
-     6,
-     4
+     7,
+     3
     ],
     "games": 3,
     "review": {
@@ -1541,16 +1541,16 @@
     "id": "math-3e-equations",
     "taskId": "SCI-3E-MATH-004",
     "file": "src/lib/chapters/data/math-3e-equations.ts",
-    "sha256": "a2e0bf895c332e4d97fd078f18ccf52f327004257c7b47e5cb1871f898f23262",
-    "registered": false,
+    "sha256": "e579d76a9fe300ee2e6d7208c433534adfb6632d39100aae35ca2dc2caa5ac19",
+    "registered": true,
     "publication": "draft",
     "exercises": 30,
     "perLevel": [
      5,
      8,
      7,
-     6,
-     4
+     7,
+     3
     ],
     "games": 3,
     "review": {
