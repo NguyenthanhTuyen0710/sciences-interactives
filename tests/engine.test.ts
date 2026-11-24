@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { createHash } from "node:crypto";
+import { geometry, plot, triangle } from "../src/lib/engine/svg";
 import { STATIC_GENERATORS } from "../src/lib/content/registry-static";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise, checkNumber, checkPart } from "../src/lib/engine/check";
@@ -122,5 +124,42 @@ describe("exercices enseignants paramétrés", () => {
   });
   it("rejette un schéma incohérent", () => {
     expect(validateCustom({ statement: "x", parts: [{ kind: "qcm", options: ["a", "b"], correct: [5] }] }).ok).toBe(false);
+  });
+});
+
+describe("figures : geometry() (Thalès, triangles semblables) ; triangle() et plot() inchangés", () => {
+  const sha = (s: string) => createHash("sha256").update(s).digest("hex");
+  // Papillon : (MN) // (BC), droites (BM) et (CN) sécantes en A.
+  const papillon = () => geometry({
+    points: { A: [0, 0], B: [4, 2], C: [4, -1], M: [-2, -1], N: [-2, 0.5] },
+    segments: [{ from: "M", to: "B", line: true }, { from: "N", to: "C", line: true }, { from: "M", to: "N", parallel: 1, label: "MN" }, { from: "B", to: "C", parallel: 1, label: "6 cm" }],
+    angles: [{ at: "A", from: "B", to: "C", marks: 2 }],
+    title: "Configuration papillon",
+  });
+  it("sortie SVG complète : points nommés, chevrons de parallélisme, arcs d'angle, étiquettes", () => {
+    const svg = papillon();
+    expect(svg.startsWith("<svg")).toBe(true);
+    expect(svg).toContain('aria-label="Configuration papillon"');
+    for (const n of ["A", "B", "C", "M", "N"]) expect(svg).toMatch(new RegExp(`>${n}</text>`));
+    expect(svg.match(/<polyline/g)).toHaveLength(2);
+    expect(svg.match(/<path d="M [^"]+ A 2[05] /g)).toHaveLength(2);
+    expect(svg).toContain(">6 cm</text>");
+    expect(svg).toBe(papillon());
+  });
+  it("mise à l'échelle : toutes les coordonnées restent dans le cadre, quelle que soit l'unité", () => {
+    for (const k of [0.01, 1, 1000]) {
+      const svg = geometry({ points: { A: [0, 0], B: [5 * k, 0], C: [0, 3 * k] }, segments: [{ from: "A", to: "B", line: true }, { from: "B", to: "C" }, { from: "C", to: "A" }], title: "t" });
+      const nums = [...svg.matchAll(/(?:x1|y1|x2|y2|cx|cy)="(-?[\d.]+)"/g)].map((m) => Number(m[1]));
+      expect(Math.min(...nums)).toBeGreaterThanOrEqual(0);
+      expect(Math.max(...nums)).toBeLessThanOrEqual(360);
+    }
+  });
+  it("nom de point inconnu → erreur ; étiquettes échappées", () => {
+    expect(() => geometry({ points: { A: [0, 0] }, segments: [{ from: "A", to: "Z" }], title: "t" })).toThrow(/point « Z » absent/);
+    expect(geometry({ points: { A: [0, 0], B: [1, 0] }, segments: [{ from: "A", to: "B", label: "x < 3" }], title: "t" })).toContain("x &lt; 3");
+  });
+  it("triangle() et plot() : sortie identique octet pour octet à celle d'avant geometry()", () => {
+    expect(sha(triangle({ pts: [[0, 0], [4, 0], [0, 3]], names: ["A", "B", "C"], rightAngleAt: 0, sideLabels: ["4", "5", null], angleLabel: { at: 1, text: "α" }, title: "t" }))).toBe("fc8f79f5d61371618018e559efe612678c5e369906b96f3d0593b1cb0862e3fd");
+    expect(sha(plot({ xmin: -3, xmax: 3, ymin: -2, ymax: 5, fns: [{ f: (x) => x * x, label: "f" }], points: [{ x: 1, y: 1, label: "P" }], title: "p" }))).toBe("5ea3e3325bd50f164b0d657d2634591daa6a8da791b7232426bfb348119e4f20");
   });
 });
