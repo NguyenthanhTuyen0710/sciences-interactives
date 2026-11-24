@@ -15,6 +15,7 @@ import { toPublic } from "../src/lib/engine/public";
 import { gcd, parseNumber } from "../src/lib/engine/numbers";
 import { flashFeedback, type FlashLevel } from "../src/lib/games/logic";
 import type { Interaction } from "../src/lib/engine/types";
+import { solveCheckIssues } from "./solve-check";
 
 export interface Issue { where: string; problem: string; example?: string }
 
@@ -136,7 +137,11 @@ async function main() {
   const vousSeen = new Set<string>();
   // Couverture des cas limites (réponses numériques) : zéro, un, négatif, décimal, arrondi — par exercice, sur tous les tirages.
   const special: Record<string, Record<string, number>> = {};
+  // Contrôle par résolution : équation relue dans le texte élève et résolue, un signalement par problème distinct.
+  let solveChecked = 0;
   for (const e of c.exercises) {
+    if (e.solveCheck) solveChecked++;
+    const solveSeen = new Set<string>();
     const g = exerciseGenerator(c, e);
     const n = e.vary ? seeds : 1;
     const statements = new Set<string>();
@@ -153,6 +158,10 @@ async function main() {
       for (const i of vouvoiementIssues(instanceTexts(inst, e.id))) {
         const key = i.where.replace(/\[\d+\]/g, "[]");
         if (!vousSeen.has(key)) { vousSeen.add(key); add(i.where, i.problem, seed); }
+      }
+      for (const p of e.solveCheck ? solveCheckIssues(inst, e.solveCheck) : []) {
+        const key = p.replace(/\$[^$]*\$|\{[^}]*\}|-?\d+(\.\d+)?/g, "…");
+        if (!solveSeen.has(key)) { solveSeen.add(key); add(e.id, p, seed); }
       }
       const pub = JSON.stringify(toPublic(inst));
       if (pub.includes('"answer"') || pub.includes('"mistakes"')) add(e.id, "fuite de la réponse vers le navigateur", seed);
@@ -194,10 +203,10 @@ async function main() {
   if (taxonomy) for (const t of taxonomyIssues(c, taxonomy)) add(t.where, t.problem);
 
   const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
-  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, taxonomy: taxonomy ? taxonomy.status : "absente", issues: issues.length, ok: issues.length === 0 };
+  const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, taxonomy: taxonomy ? taxonomy.status : "absente", solveChecked, issues: issues.length, ok: issues.length === 0 };
   if (asJson) console.log(JSON.stringify({ summary, issues, special }));
   else {
-    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification, taxonomie : ${summary.taxonomy}${taxonomy ? "" : " (QA tier 2 non évaluée)"}`);
+    console.log(`${c.id} : ${summary.exercises} exercices (niveaux ${perLevel.join("/")}), ${solveChecked} avec contrôle par résolution, ${summary.vary} à tirage variable, ${summary.games} jeux, ${instances} tirages vérifiés, ${pendingSources}/${c.sources.length} source(s) en attente de vérification, taxonomie : ${summary.taxonomy}${taxonomy ? "" : " (QA tier 2 non évaluée)"}`);
     const cov = Object.entries(special).map(([id, v]) => `${id} ${Object.entries(v).map(([k, n]) => `${k}×${n}`).join(" ")}`);
     if (cov.length) console.log(`  cas limites rencontrés (réponses numériques) : ${cov.join(" · ")}`);
     for (const i of issues) console.log(`  ✘ ${i.where} : ${i.problem}${i.example ? ` (graine ${i.example})` : ""}`);

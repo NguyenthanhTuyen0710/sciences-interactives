@@ -145,7 +145,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Remplace $x$ par la valeur dans le membre de gauche.", "Compare avec le membre de droite."],
   }),
   ex({
-    id: "eq3-02", title: "Choisir la solution", niveau: 1, objectives: ["M4-NC-20"], taxonomyTypes: ["EQ-T01"], time: 90,
+    id: "eq3-02", title: "Choisir la solution", niveau: 1, objectives: ["M4-NC-20"], taxonomyTypes: ["EQ-T01"], time: 90, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 5), c = rng.pick([1, 2, 3, 4].filter((v) => v !== a)), s = rng.int(2, 8), b = rng.int(1, 6), d = (a - c) * s + b;
       const opts = rng.shuffle([s, s + 1, s - 1, s + 2]);
@@ -159,7 +159,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Calcule les deux membres pour une valeur proposée.", "Une seule valeur rend les deux membres égaux."],
   }),
   ex({
-    id: "eq3-03", title: "Équation comme une balance", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90,
+    id: "eq3-03", title: "Équation comme une balance", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90, solveCheck: [{ equation: 0, answer: 0 }],
     vary: (rng) => {
       const b = rng.int(2, 9), s = rng.int(1, 12);
       return {
@@ -172,7 +172,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quelle opération annule l'ajout de la masse connue ?", "Fais la même opération des deux côtés."],
   }),
   ex({
-    id: "eq3-04", title: "Résoudre ax = b", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90,
+    id: "eq3-04", title: "Résoudre ax = b", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 9), s = sgn(rng, 1, 9);
       return {
@@ -185,7 +185,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Par quel nombre est multiplié $x$ ?", "Divise les deux membres par ce nombre."],
   }),
   ex({
-    id: "eq3-05", title: "Résoudre a + x = b", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90,
+    id: "eq3-05", title: "Résoudre a + x = b", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = sgn(rng, 1, 9), b = sgn(rng, 1, 9);
       return {
@@ -199,7 +199,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 2 ──
   ex({
-    id: "eq3-06", title: "Équation ax + b = c", niveau: 2, objectives: ["M3-NC-12", "M4-NC-21"], taxonomyTypes: ["EQ-T03"], time: 120,
+    id: "eq3-06", title: "Équation ax + b = c", niveau: 2, objectives: ["M3-NC-12", "M4-NC-21"], taxonomyTypes: ["EQ-T03"], time: 120, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 9), s = sgn(rng, 1, 9), b = sgn(rng, 1, 12), c = a * s + b;
       return {
@@ -212,7 +212,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Commence par éliminer le terme constant.", "Divise ensuite par le coefficient de $x$."],
   }),
   ex({
-    id: "eq3-07", title: "Inconnue dans les deux membres", niveau: 2, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 150,
+    id: "eq3-07", title: "Inconnue dans les deux membres", niveau: 2, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 150, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const c = rng.int(1, 4), a = c + rng.int(1, 5), s = sgn(rng, 1, 8), b = sgn(rng, 1, 9), d = (a - c) * s + b;
       return {
@@ -225,7 +225,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Retire $" + "cx" + "$ des deux membres.", "Puis isole $x$ comme d'habitude."],
   }),
   ex({
-    id: "eq3-08", title: "Équation avec parenthèses", niveau: 2, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 150,
+    id: "eq3-08", title: "Équation avec parenthèses", niveau: 2, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 150, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const k = rng.int(2, 5), b = sgn(rng, 1, 6), s = sgn(rng, 1, 7), e = rng.int(1, 9), c = k * (s + b) + e;
       return {
@@ -238,7 +238,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Applique la distributivité.", "Isole ensuite $x$."],
   }),
   ex({
-    id: "eq3-09", title: "Solution fractionnaire", niveau: 2, objectives: ["M3-NC-12", "M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 120,
+    id: "eq3-09", title: "Solution fractionnaire", niveau: 2, objectives: ["M3-NC-12", "M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 120, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.pick([2, 4, 5, 8]), b = rng.int(1, 9);
       let p = rng.int(1, 15);
@@ -254,7 +254,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Soustrais d'abord le terme constant.", "Divise ensuite, puis simplifie la fraction."],
   }),
   ex({
-    id: "eq3-10", title: "Équation produit nul simple", niveau: 2, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 120,
+    id: "eq3-10", title: "Équation produit nul simple", niveau: 2, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 120, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       let p = 0, q = 0;
       do { p = sgn(rng, 1, 9); q = sgn(rng, 1, 9); } while (p === q);
@@ -269,7 +269,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Annule chaque facteur séparément.", "Attention au signe de la solution de chaque facteur."],
   }),
   ex({
-    id: "eq3-11", title: "Produit nul avec x en facteur", niveau: 2, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 120,
+    id: "eq3-11", title: "Produit nul avec x en facteur", niveau: 2, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 120, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 5), s = sgn(rng, 1, 6), b = -a * s;
       const lo = Math.min(0, s), hi = Math.max(0, s);
@@ -283,7 +283,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Un des facteurs est simplement $x$.", "Résous l'autre facteur comme une équation du premier degré."],
   }),
   ex({
-    id: "eq3-12", title: "x² = a avec a donné", niveau: 2, objectives: ["M3-NC-14"], taxonomyTypes: ["EQ-T07"], time: 120,
+    id: "eq3-12", title: "x² = a avec a donné", niveau: 2, objectives: ["M3-NC-14"], taxonomyTypes: ["EQ-T07"], time: 120, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const n = rng.int(2, 13);
       return {
@@ -305,7 +305,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 3 ──
   ex({
-    id: "eq3-14", title: "Équation à coefficients relatifs", niveau: 3, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 180,
+    id: "eq3-14", title: "Équation à coefficients relatifs", niveau: 3, objectives: ["M3-NC-12"], taxonomyTypes: ["EQ-T03"], time: 180, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 6), c = rng.int(1, 3), s = sgn(rng, 1, 7), k = rng.int(2, 4), e = sgn(rng, 1, 8);
       const left = `${k}(x - ${a}) + ${e < 0 ? `(${e})` : e}`;
@@ -321,7 +321,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Développe la parenthèse.", "Regroupe les termes en $x$ d'un côté."],
   }),
   ex({
-    id: "eq3-15", title: "Produit nul avec deux facteurs affines", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 180,
+    id: "eq3-15", title: "Produit nul avec deux facteurs affines", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 180, solveCheck: [{ equation: "statement", answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 5), c = rng.int(2, 5), s = sgn(rng, 1, 5), t = s + rng.int(1, 4);
       return {
@@ -334,7 +334,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Annule le premier facteur.", "Annule le second facteur."],
   }),
   ex({
-    id: "eq3-16", title: "Factoriser par un facteur commun", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T06"], time: 180,
+    id: "eq3-16", title: "Factoriser par un facteur commun", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T06"], time: 180, solveCheck: [{ equation: "statement", answer: 0 }, { equation: 0, answer: 0 }],
     vary: (rng) => {
       const a = rng.int(2, 6), s = rng.int(1, 8);
       return {
@@ -347,7 +347,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Passe tout dans le membre de gauche.", "Cherche le facteur commun."],
   }),
   ex({
-    id: "eq3-17", title: "Différence de deux carrés", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T06"], time: 180,
+    id: "eq3-17", title: "Différence de deux carrés", niveau: 3, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T06"], time: 180, solveCheck: [{ equation: "statement", answer: 0 }, { equation: 0, answer: 0 }],
     vary: (rng) => {
       const n = rng.int(2, 12);
       return {
@@ -382,7 +382,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Un carré est-il négatif ?", "Pense à l'opposé."],
   }),
   ex({
-    id: "eq3-20", title: "Programme de calcul", niveau: 3, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 180,
+    id: "eq3-20", title: "Programme de calcul", niveau: 3, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 180, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const k = rng.int(2, 5), c = rng.int(1, 9), s = rng.int(1, 12), r = k * (s + c);
       return {
@@ -396,7 +396,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 4 ──
   ex({
-    id: "eq3-21", title: "Partage d'une somme", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240,
+    id: "eq3-21", title: "Partage d'une somme", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const x = rng.int(10, 40), d1 = rng.int(5, 20), k = rng.int(2, 3), tot = x + (x + d1) + k * x;
       return {
@@ -409,7 +409,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Exprime les trois parts avec $x$.", "La somme des parts vaut le total."],
   }),
   ex({
-    id: "eq3-22", title: "Périmètre d'un rectangle", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240,
+    id: "eq3-22", title: "Périmètre d'un rectangle", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const l = rng.int(3, 12), d = rng.int(2, 8), P = 2 * (l + l + d);
       return {
@@ -422,7 +422,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Exprime la longueur avec $x$.", "Écris le périmètre."],
   }),
   ex({
-    id: "eq3-23", title: "Aire d'un carré donnée", niveau: 4, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 210,
+    id: "eq3-23", title: "Aire d'un carré donnée", niveau: 4, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 210, solveCheck: [{ equation: 0, answer: 0 }, { equation: 0, answer: 1, positive: true }],
     vary: (rng) => {
       const n = rng.int(3, 15);
       return {
@@ -435,7 +435,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Résous $x^{2} = a$.", "Vérifie le sens dans le contexte."],
   }),
   ex({
-    id: "eq3-24", title: "Âges", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240,
+    id: "eq3-24", title: "Âges", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const x = rng.int(8, 12), n = rng.int(2, 6), P = 3 * x + 2 * n;
       const eqs = [`$${P} + ${n} = 3(x + ${n})$`, `$${P} = 3(x + ${n})$`, `$${P} + ${n} = 3x + ${n}$`, `$3(${P} + ${n}) = x + ${n}$`];
@@ -450,7 +450,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Ajoute le même nombre d'années aux deux âges.", "Le parent aura alors le triple de l'âge de l'enfant : écris cette égalité."],
   }),
   ex({
-    id: "eq3-25", title: "Problème avec produit nul", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 240,
+    id: "eq3-25", title: "Problème avec produit nul", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 240, solveCheck: [{ equation: "statement", answer: 1, positive: true }, { equation: 0, answer: 1, positive: true }],
     vary: (rng) => {
       const a = rng.int(2, 9);
       return {
@@ -463,7 +463,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Ramène tout dans un membre.", "Élimine la solution qui n'a pas de sens."],
   }),
   ex({
-    id: "eq3-26", title: "Choisir la bonne mise en équation", niveau: 4, objectives: ["M4-NC-19", "M3-NC-12"], taxonomyTypes: ["EQ-T04"], time: 180,
+    id: "eq3-26", title: "Choisir la bonne mise en équation", niveau: 4, objectives: ["M4-NC-19", "M3-NC-12"], taxonomyTypes: ["EQ-T04"], time: 180, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const p = rng.int(2, 6), f = rng.int(5, 15), n = rng.int(3, 8), T = p * n + f;
       const opts = rng.shuffle([`$${p}x + ${f} = ${T}$`, `$${p + f}x = ${T}$`, `$${p}(x + ${f}) = ${T}$`, `$${p}x - ${f} = ${T}$`]);
@@ -478,7 +478,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 5 ──
   ex({
-    id: "eq3-27", title: "Type Brevet — Deux tarifs", niveau: 5, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
+    id: "eq3-27", title: "Type Brevet — Deux tarifs", niveau: 5, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const a = rng.int(2, 4), b = a + rng.int(1, 3), s = rng.int(5, 15), g = (b - a) * s;
       return {
@@ -491,7 +491,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Écris le coût de chaque tarif en fonction de $x$.", "Résous l'égalité, puis calcule les deux coûts juste avant et juste après."],
   }),
   ex({
-    id: "eq3-28", title: "Équation factorisée complète", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360,
+    id: "eq3-28", title: "Équation factorisée complète", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360, solveCheck: [{ equation: "statement", answer: 1 }, { equation: 0, answer: 1 }],
     vary: (rng) => {
       const a = rng.int(2, 7), b = rng.int(1, 6);
       return {
@@ -504,7 +504,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Passe tout dans un membre.", "Repère le facteur commun."],
   }),
   ex({
-    id: "eq3-29", title: "Type Brevet — Agrandir un carré", niveau: 5, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 360,
+    id: "eq3-29", title: "Type Brevet — Agrandir un carré", niveau: 5, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 360, solveCheck: [{ equation: 0, answer: 1 }, { equation: 0, answer: 2, positive: true }],
     vary: (rng) => {
       const n = rng.int(3, 12), e = rng.int(2, 6), m = n + e, A = sq(m);
       const eqs = [`$(x + ${e})^{2} = ${A}$`, `$x^{2} + ${e} = ${A}$`, `$x^{2} + ${sq(e)} = ${A}$`, `$4(x + ${e}) = ${A}$`];
@@ -519,7 +519,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Exprime le côté du nouveau carré en fonction de $x$.", "Un carré égal à un nombre positif : deux possibilités."],
   }),
   ex({
-    id: "eq3-30", title: "Type Brevet — Programmes équivalents", niveau: 5, objectives: ["M3-NC-12", "M3-NC-13", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
+    id: "eq3-30", title: "Type Brevet — Programmes équivalents", niveau: 5, objectives: ["M3-NC-12", "M3-NC-13", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
       const k = rng.int(2, 5), s = rng.int(2, 9), c = rng.int(1, k - 1), v = k * s - c * s;
       return {
