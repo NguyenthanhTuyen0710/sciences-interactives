@@ -178,9 +178,9 @@ function thalesData2(rng: Rng) {
   return { a: 4, m: 6, b: 5, mn: 7.5 };
 }
 /** Rapport p/q irréductible ; toutes les longueurs sont entières : m/a = n/c = mn/b = p/q. */
-function ratioSet(rng: Rng) {
+function ratioSet(rng: Rng, ks: number[] = [1, 2, 3, 4]) {
   const [p, q] = rng.pick<[number, number]>([[2, 3], [3, 2], [3, 4], [4, 3], [5, 4], [2, 5], [5, 3], [3, 5]]);
-  const [k1, k2, k3] = rng.shuffle([1, 2, 3, 4]);
+  const [k1, k2, k3] = rng.shuffle(ks);
   return { p, q, a: q * k1, m: p * k1, c: q * k2, n: p * k2, b: q * k3, mn: p * k3 };
 }
 const BASES: [number, number, number][] = [[3, 4, 5], [4, 5, 6], [5, 6, 8], [6, 7, 9]];
@@ -292,7 +292,7 @@ const EXERCISES: ChapterExercise[] = [
           2: "Les côtés ne sont pas associés dans le bon couple : $AB$ correspond à $AM$ (même droite), $AC$ à $AN$.",
           3: "Le deuxième rapport est inversé : $AN$ est au numérateur dans les autres rapports.",
         })],
-        solution: ["Les côtés correspondants sont $[AM]$ et $[AB]$, $[AN]$ et $[AC]$, $[MN]$ et $[BC]$.", "On écrit chaque rapport avec le côté du petit triangle $AMN$ au numérateur : $\\dfrac{AM}{AB} = \\dfrac{AN}{AC} = \\dfrac{MN}{BC}$."],
+        solution: ["Les côtés correspondants sont $[AM]$ et $[AB]$, $[AN]$ et $[AC]$, $[MN]$ et $[BC]$.", "On écrit chaque rapport avec le côté du triangle $AMN$ au numérateur : $\\dfrac{AM}{AB} = \\dfrac{AN}{AC} = \\dfrac{MN}{BC}$."],
       };
     },
     reasoning: "Chaque rapport compare un côté de $AMN$ à son côté correspondant de $ABC$, toujours dans le même sens.",
@@ -412,10 +412,10 @@ const EXERCISES: ChapterExercise[] = [
           }, "1. Quelle égalité de rapports peut-on écrire ?"),
           num(n, wrongs(c, m, a, c + m - a), `2. En remplaçant, l'égalité devient $\\dfrac{x}{${T(c)}} = \\dfrac{${T(m)}}{${T(a)}}$, où $x$ désigne la longueur $AN$. Calcule $x$.`, "cm"),
         ],
-        solveCheck: [{ equation: 1, answer: 1, positive: true }],
         solution: ["$(BC) // (MN)$, avec $B$, $A$, $M$ et $C$, $A$, $N$ alignés dans cet ordre : d'après le théorème de Thalès, $\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$.", `$\\dfrac{${T(m)}}{${T(a)}} = \\dfrac{AN}{${T(c)}}$, donc $AN = \\dfrac{${T(c)} \\times ${T(m)}}{${T(a)}} = ${T(n)}$ cm.`],
       };
     },
+    solveCheck: [{ equation: 1, answer: 1, positive: true }],
     reasoning: "On écrit l'égalité des rapports avec les bons côtés, on remplace, puis on résout par produit en croix.",
     hints: ["Associe $AM$ à $AB$ et $AN$ à $AC$.", "Un produit en croix donne $AN$ en fonction des trois longueurs connues."],
   }),
@@ -432,10 +432,10 @@ const EXERCISES: ChapterExercise[] = [
           }, "1. Quelle égalité de rapports peut-on écrire ?"),
           num(n, wrongs(c, m, a, c + m - a), `2. En remplaçant, l'égalité devient $\\dfrac{x}{${T(c)}} = \\dfrac{${T(m)}}{${T(a)}}$, où $x$ désigne la longueur $AN$. Calcule $x$.`, "cm"),
         ],
-        solveCheck: [{ equation: 1, answer: 1, positive: true }],
         solution: ["$(MN) // (BC)$, $M \\in [AB]$ et $N \\in [AC]$ : d'après le théorème de Thalès, $\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$.", `$AN = \\dfrac{${T(c)} \\times ${T(m)}}{${T(a)}} = ${T(n)}$ cm.`],
       };
     },
+    solveCheck: [{ equation: 1, answer: 1, positive: true }],
     reasoning: "Dans les triangles emboîtés, le petit triangle $AMN$ est une réduction du grand $ABC$ : les rapports portent sur des côtés entiers.",
     hints: ["Quel est le petit triangle, quel est le grand ?", "Produit en croix avec les côtés entiers $AB$ et $AC$."],
   }),
@@ -689,7 +689,8 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "th3-24", title: "Largeur d'un étang", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09", "TS-T04"], time: 360,
     vary: (rng) => {
-      const { a, m, c, n, b, mn } = ratioSet(rng);
+      // Coefficients {2, 3, 4} : triangles ABC et AMN constructibles (inégalité triangulaire stricte).
+      const { a, m, c, n, b, mn } = ratioSet(rng, [2, 3, 4]);
       return {
         statement: `Pour trouver la largeur $BC$ d'un étang (les points $B$ et $C$ sont sur les rives), Léa choisit un point $A$ à terre. Elle place $M$ et $N$ de façon que $A$ soit entre $B$ et $M$ et entre $C$ et $N$. Elle mesure $AB = ${a}$ m, $AM = ${m}$ m, $AC = ${c}$ m, $AN = ${n}$ m et $MN = ${mn}$ m.`,
         figure: { kind: "svg", svg: papSvg({ a, m, c, n, lab: [lb(a), lb(m), lb(c), lb(n)], lmn: lb(mn), title: "Configuration papillon : B et C sont les rives de l'étang, MN est mesuré" }), caption: `Situation modélisée. ${NE}` },
@@ -846,7 +847,7 @@ export const math3eThalesSemblables: ChapterContent = {
       { title: "Triangles semblables : angles", statement: "Si deux angles d'un triangle sont égaux à deux angles d'un autre triangle, alors les deux triangles sont semblables.", conditions: "Dans la configuration papillon avec $(BC) // (MN)$, les angles alternes-internes donnent $ABC$ et $AMN$ semblables." },
     ],
     explanations: [
-      { title: "1. Lire les rapports", body: "Dans le théorème de Thalès, chaque rapport compare une longueur du petit triangle $AMN$ à la longueur correspondante du grand triangle $ABC$ : $AM$ avec $AB$ (même droite), $AN$ avec $AC$ (même droite), $MN$ avec $BC$ (parallèles). Garde le même sens dans les trois rapports. On peut aussi échanger les « extrêmes » : $\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$ équivaut à $\\dfrac{AM}{AN} = \\dfrac{AB}{AC}$." },
+      { title: "1. Lire les rapports", body: "Dans le théorème de Thalès, chaque rapport compare une longueur du triangle $AMN$ à la longueur correspondante du triangle $ABC$ (dans la configuration papillon, $AMN$ peut être plus petit ou plus grand que $ABC$) : $AM$ avec $AB$ (même droite), $AN$ avec $AC$ (même droite), $MN$ avec $BC$ (parallèles). Garde le même sens dans les trois rapports. On peut aussi échanger les « extrêmes » : $\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$ équivaut à $\\dfrac{AM}{AN} = \\dfrac{AB}{AC}$." },
       { title: "2. Pourquoi Thalès donne des triangles semblables", body: "Quand $(BC) // (MN)$, les angles alternes-internes sont égaux et les triangles $ABC$ et $AMN$ ont donc les mêmes angles : ils sont semblables, de coefficient $\\dfrac{AM}{AB}$. Les trois rapports de l'égalité de Thalès sont les rapports entre côtés homologues." },
       { title: "3. Le produit en croix", body: "Si $\\dfrac{x}{6} = \\dfrac{4}{5}$, alors $5x = 6 \\times 4 = 24$, donc $x = 4{,}8$. Une longueur trouvée doit être positive et d'un ordre de grandeur plausible." },
       { title: "4. L'ordre des points", body: "La réciproque ne fonctionne que si les points sont dans le même ordre sur les deux droites (ici $B$, $A$, $M$ et $C$, $A$, $N$). Sans cette condition, l'égalité des rapports ne suffit pas." },
@@ -864,7 +865,7 @@ export const math3eThalesSemblables: ChapterContent = {
     ],
     commonMistakes: [
       { mistake: "Appliquer le théorème de Thalès sans que le parallélisme soit donné.", correction: "Utiliser la réciproque pour démontrer le parallélisme, puis seulement Thalès.", why: "Le théorème a pour hypothèse $(BC) // (MN)$." },
-      { mistake: "$\\dfrac{AM}{AB} = \\dfrac{AC}{AN}$ (un rapport inversé).", correction: "$\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$.", why: "Les deux rapports doivent comparer le petit triangle au grand, dans le même sens." },
+      { mistake: "$\\dfrac{AM}{AB} = \\dfrac{AC}{AN}$ (un rapport inversé).", correction: "$\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$.", why: "Les deux rapports doivent comparer $AMN$ à $ABC$, dans le même sens." },
       { mistake: "Conclure à un parallélisme sans vérifier l'ordre des points.", correction: "Vérifier que $A$ est entre $B$ et $M$ et entre $C$ et $N$.", why: "La réciproque exige le même ordre sur les deux droites." },
       { mistake: "Comparer des côtés non homologues dans deux triangles semblables.", correction: "Associer les côtés opposés aux angles égaux, ou ranger les côtés par ordre croissant.", why: "Seuls les côtés homologues ont le rapport $k$." },
       { mistake: "Conclure à la semblance avec seulement deux côtés proportionnels.", correction: "Vérifier les trois rapports ou deux angles égaux.", why: "Un troisième côté peut ne pas suivre." },
