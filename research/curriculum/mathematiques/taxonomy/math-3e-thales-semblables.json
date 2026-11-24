@@ -14,19 +14,19 @@
  "brevetNote": "Champ « brevet » à compléter avec les annales officielles (G5) ; aucune annale lue pour cette proposition.",
  "lockPolicy": "Après verrouillage, seul le champ « brevet » des types peut être modifié (mise à jour avec les annales, G5). Toute autre modification exige une nouvelle validation du porteur de projet et un nouveau verrouillage.",
  "redactionCriterionRequiredFor": [
-  "TH-T04",
-  "TH-T07",
-  "TH-T09"
+  "TS-T04",
+  "TS-T07",
+  "TS-T09"
  ],
  "taggingRules": [
   "`difficulty` est une liste de niveaux autorisés (validate-chapter : `includes`), pas un intervalle ; un exercice rattaché à plusieurs types doit avoir un niveau présent dans chacune de leurs listes.",
-  "TH-T09 (niveaux 4-5) ne se cumule jamais avec TH-T01, TH-T02, TH-T03, TH-T06 ou TH-T08 (niveaux 1-3) : plages disjointes. Un problème de synthèse déclare TH-T09 seul, ou avec TH-T04 ou TH-T07 (niveau 4 commun).",
-  "Cumuls à intersection d'un seul niveau, permis mais à viser explicitement : TH-T03 + TH-T04 → niveau 3 ; TH-T06 + TH-T07 → niveau 3 ; TH-T01 + TH-T06 → niveaux 1-2.",
-  "TH-T05 (approfondissement) ne se cumule avec aucun type obligatoire (règle de validate-chapter)."
+  "TS-T09 (niveaux 4-5) ne se cumule jamais avec TS-T01, TS-T02, TS-T03, TS-T06 ou TS-T08 (niveaux 1-3) : plages disjointes. Un problème de synthèse déclare TS-T09 seul, ou avec TS-T04 ou TS-T07 (niveau 4 commun).",
+  "Cumuls à intersection d'un seul niveau, permis mais à viser explicitement : TS-T03 + TS-T04 → niveau 3 ; TS-T06 + TS-T07 → niveau 3 ; TS-T01 + TS-T06 → niveaux 1-2.",
+  "TS-T05 (approfondissement) ne se cumule avec aucun type obligatoire (règle de validate-chapter)."
  ],
  "types": [
   {
-   "id": "TH-T01",
+   "id": "TS-T01",
    "title": "Reconnaître une configuration de Thalès et écrire l'égalité des rapports",
    "objectives": [
     "M3-EG-03",
@@ -58,7 +58,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T02",
+   "id": "TS-T02",
    "title": "Calculer une longueur dans la configuration des triangles emboîtés",
    "objectives": [
     "M4-EG-05"
@@ -68,7 +68,7 @@
     "Calculer"
    ],
    "prerequisites": [
-    "TH-T01",
+    "TS-T01",
     "produit en croix (math-4e-proportionnalite)"
    ],
    "difficulty": [
@@ -89,7 +89,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T03",
+   "id": "TS-T03",
    "title": "Calculer une longueur dans la configuration papillon",
    "objectives": [
     "M3-EG-03"
@@ -99,8 +99,8 @@
     "Raisonner"
    ],
    "prerequisites": [
-    "TH-T01",
-    "TH-T02"
+    "TS-T01",
+    "TS-T02"
    ],
    "difficulty": [
     2,
@@ -117,13 +117,13 @@
     "associer AM à AC"
    ],
    "requiredCases": {
-    "rule": "Au moins un exercice rattaché à TH-T03 demande une longueur du triangle de A vers (MN), au moins un une longueur du triangle de A vers (BC)."
+    "rule": "Au moins un exercice rattaché à TS-T03 demande une longueur du triangle de A vers (MN), au moins un une longueur du triangle de A vers (BC)."
    },
    "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
    "exercises": []
   },
   {
-   "id": "TH-T04",
+   "id": "TS-T04",
    "title": "Démontrer que deux droites sont parallèles (réciproque du théorème de Thalès)",
    "objectives": [
     "M3-EG-03",
@@ -134,7 +134,7 @@
     "Communiquer"
    ],
    "prerequisites": [
-    "TH-T01",
+    "TS-T01",
     "comparaison de fractions"
    ],
    "difficulty": [
@@ -153,13 +153,13 @@
     "conclure avec des valeurs arrondies"
    ],
    "requiredCases": {
-    "rule": "Au moins un exercice rattaché à TH-T04 est en configuration papillon. La comparaison se fait sur des valeurs exactes (fractions ou produits en croix), jamais sur des valeurs arrondies."
+    "rule": "Au moins un exercice rattaché à TS-T04 est en configuration papillon. La comparaison se fait sur des valeurs exactes (fractions ou produits en croix), jamais sur des valeurs arrondies."
    },
    "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
    "exercises": []
   },
   {
-   "id": "TH-T05",
+   "id": "TS-T05",
    "title": "Démontrer que deux droites ne sont pas parallèles (contraposée, approfondissement)",
    "objectives": [],
    "level": "approfondissement",
@@ -168,7 +168,7 @@
     "Raisonner"
    ],
    "prerequisites": [
-    "TH-T04"
+    "TS-T04"
    ],
    "difficulty": [
     4,
@@ -189,7 +189,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T06",
+   "id": "TS-T06",
    "title": "Reconnaître des triangles semblables (côtés proportionnels)",
    "objectives": [
     "M3-EG-04"
@@ -220,7 +220,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T07",
+   "id": "TS-T07",
    "title": "Démontrer que deux triangles sont semblables par leurs angles",
    "objectives": [
     "M3-EG-04"
@@ -252,7 +252,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T08",
+   "id": "TS-T08",
    "title": "Calculer des longueurs dans des triangles semblables",
    "objectives": [
     "M3-EG-04"
@@ -261,7 +261,7 @@
     "Calculer"
    ],
    "prerequisites": [
-    "TH-T06"
+    "TS-T06"
    ],
    "difficulty": [
     2,
@@ -281,7 +281,7 @@
    "exercises": []
   },
   {
-   "id": "TH-T09",
+   "id": "TS-T09",
    "title": "Problème à plusieurs étapes (type Brevet)",
    "objectives": [
     "M3-EG-03",
@@ -293,9 +293,9 @@
     "Communiquer"
    ],
    "prerequisites": [
-    "TH-T03",
-    "TH-T04",
-    "TH-T07",
+    "TS-T03",
+    "TS-T04",
+    "TS-T07",
     "théorème de Pythagore (math-3e-pythagore)"
    ],
    "difficulty": [
