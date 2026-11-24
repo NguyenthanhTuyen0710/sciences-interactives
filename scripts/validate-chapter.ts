@@ -64,6 +64,16 @@ const FINAL_TITLE = /^Type (Brevet|épreuve anticipée|bac) —/;
  * verrouillée dont toutes les listes `exercises` sont vides (chapitre généré après verrouillage) : `taxonomyTypes`
  * est obligatoire pour chaque exercice (décision du 2026-11-18).
  */
+/**
+ * `solveCheck` déclaré dans l'objet renvoyé par `vary` au lieu de l'exercice : ignoré par le contrôle par résolution
+ * et non signalé par tsc (décision 38 : th3-10 et th3-11, run 120). Un tirage suffit : la clé est structurelle.
+ */
+export function misplacedSolveCheck(e: ChapterExercise): Issue | null {
+  if (!e.vary) return null;
+  const body = e.vary(createRng("v0")) as unknown as Record<string, unknown>;
+  return "solveCheck" in body ? { where: e.id, problem: "solveCheck dans l'objet renvoyé par vary : ignoré ; le déclarer sur l'exercice, à côté de vary" } : null;
+}
+
 export function taxonomyIssues(c: ChapterContent, tax: Taxonomy): Issue[] {
   const out: Issue[] = [];
   if (tax.status !== "verrouillé") out.push({ where: "taxonomie", problem: `taxonomie non verrouillée (statut « ${tax.status} »)` });
@@ -141,6 +151,8 @@ async function main() {
   let solveChecked = 0;
   for (const e of c.exercises) {
     if (e.solveCheck) solveChecked++;
+    const misplaced = misplacedSolveCheck(e);
+    if (misplaced) add(misplaced.where, misplaced.problem);
     const solveSeen = new Set<string>();
     const g = exerciseGenerator(c, e);
     const n = e.vary ? seeds : 1;
