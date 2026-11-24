@@ -1,0 +1,319 @@
+{
+ "chapter": "math-3e-thales-semblables",
+ "taskId": "SCI-3E-MATH-012",
+ "status": "proposé",
+ "lockedAt": null,
+ "lockedBy": null,
+ "lockHash": null,
+ "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-24, sans API) à partir de l'inventaire (M3-EG-03, M3-EG-04, M4-EG-05, M4-EG-06) et des textes vérifiés : attendus 3e 2019 p. 5, 8, 9 ; programme cycle 4 2020 p. 136 ; BO n° 22 p. 201, 292. À approuver puis verrouiller par le porteur de projet (Nguyễn Thanh Tuyền). Les listes « exercises » restent vides : rattachement exercice ↔ type par le champ `taxonomyTypes` de chaque exercice, contrôlé par validate-chapter.",
+ "sources": [
+  "c4-attendus-3e-2019-pdf p. 8 : « le théorème de Thalès et sa réciproque dans la configuration papillon » ; « les triangles semblables : une définition et une propriété caractéristique » ; p. 5 : « Il utilise la proportionnalité pour calculer des longueurs dans une configuration de Thalès, dans des triangles semblables, dans le cadre des homothéties. » ; p. 9 : « En appliquant le théorème de Thalès, il effectue des calculs de longueurs. » ; « Démontrer que les triangles ACE et CBD sont semblables. »",
+  "c4-programme-2020-eduscol-pdf p. 136 : « triangles semblables (une définition et une propriété caractéristique) » ; « Le théorème de Thalès et sa réciproque (configurations des triangles emboîtés et du papillon). »",
+  "bo-2019-22-pdf p. 292 (repères 3e) : « Deux triangles semblables peuvent être définis par la proportionnalité des mesures de leurs côtés. Une caractérisation angulaire de cette définition peut être donnée et démontrée à partir d’un cas d’égalité des triangles et d’une caractérisation angulaire du parallélisme. » ; p. 201 : « le théorème de Thalès et sa réciproque dans la configuration des triangles emboîtés »"
+ ],
+ "brevetNote": "Champ « brevet » à compléter avec les annales officielles (G5) ; aucune annale lue pour cette proposition.",
+ "lockPolicy": "Après verrouillage, seul le champ « brevet » des types peut être modifié (mise à jour avec les annales, G5). Toute autre modification exige une nouvelle validation du porteur de projet et un nouveau verrouillage.",
+ "redactionCriterionRequiredFor": [
+  "TH-T04",
+  "TH-T07",
+  "TH-T09"
+ ],
+ "taggingRules": [
+  "`difficulty` est une liste de niveaux autorisés (validate-chapter : `includes`), pas un intervalle ; un exercice rattaché à plusieurs types doit avoir un niveau présent dans chacune de leurs listes.",
+  "TH-T09 (niveaux 4-5) ne se cumule jamais avec TH-T01, TH-T02, TH-T03, TH-T06 ou TH-T08 (niveaux 1-3) : plages disjointes. Un problème de synthèse déclare TH-T09 seul, ou avec TH-T04 ou TH-T07 (niveau 4 commun).",
+  "Cumuls à intersection d'un seul niveau, permis mais à viser explicitement : TH-T03 + TH-T04 → niveau 3 ; TH-T06 + TH-T07 → niveau 3 ; TH-T01 + TH-T06 → niveaux 1-2.",
+  "TH-T05 (approfondissement) ne se cumule avec aucun type obligatoire (règle de validate-chapter)."
+ ],
+ "types": [
+  {
+   "id": "TH-T01",
+   "title": "Reconnaître une configuration de Thalès et écrire l'égalité des rapports",
+   "objectives": [
+    "M3-EG-03",
+    "M4-EG-05"
+   ],
+   "competences": [
+    "Représenter",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "proportionnalité (math-4e-proportionnalite)"
+   ],
+   "difficulty": [
+    1,
+    2
+   ],
+   "variants": [
+    "papillon ou triangles emboîtés à identifier",
+    "associer les côtés correspondants des deux triangles",
+    "écrire les trois rapports égaux dans le bon ordre"
+   ],
+   "method": "Repérer les deux droites sécantes en A, les deux droites parallèles, puis les deux triangles ; écrire AM/AB = AN/AC = MN/BC en plaçant au numérateur les côtés du même triangle.",
+   "commonMistakes": [
+    "mélanger les côtés des deux triangles dans un même rapport",
+    "oublier le troisième rapport (côtés parallèles)",
+    "voir un papillon quand les droites ne sont pas parallèles"
+   ],
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T02",
+   "title": "Calculer une longueur dans la configuration des triangles emboîtés",
+   "objectives": [
+    "M4-EG-05"
+   ],
+   "level": "consolidation",
+   "competences": [
+    "Calculer"
+   ],
+   "prerequisites": [
+    "TH-T01",
+    "produit en croix (math-4e-proportionnalite)"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "longueur cherchée sur le petit triangle",
+    "longueur cherchée sur le grand triangle",
+    "longueur d'un segment obtenue par différence (MB = AB − AM)"
+   ],
+   "method": "Vérifier les hypothèses (points alignés, droites parallèles), écrire l'égalité des rapports, garder les deux rapports utiles, appliquer le produit en croix.",
+   "commonMistakes": [
+    "prendre MB au lieu de AB",
+    "produit en croix inversé"
+   ],
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T03",
+   "title": "Calculer une longueur dans la configuration papillon",
+   "objectives": [
+    "M3-EG-03"
+   ],
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "TH-T01",
+    "TH-T02"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "longueur cherchée sur l'un ou l'autre triangle",
+    "longueurs décimales",
+    "valeur exacte puis valeur arrondie si demandée"
+   ],
+   "method": "Points A, M, B et A, N, C alignés de part et d'autre de A, (MN) // (BC) : AM/AB = AN/AC = MN/BC ; produit en croix.",
+   "commonMistakes": [
+    "additionner les longueurs comme dans les triangles emboîtés (AB = AM + MB)",
+    "associer AM à AC"
+   ],
+   "requiredCases": {
+    "rule": "Au moins un exercice rattaché à TH-T03 demande une longueur du triangle de A vers (MN), au moins un une longueur du triangle de A vers (BC)."
+   },
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T04",
+   "title": "Démontrer que deux droites sont parallèles (réciproque du théorème de Thalès)",
+   "objectives": [
+    "M3-EG-03",
+    "M4-EG-06"
+   ],
+   "competences": [
+    "Raisonner",
+    "Communiquer"
+   ],
+   "prerequisites": [
+    "TH-T01",
+    "comparaison de fractions"
+   ],
+   "difficulty": [
+    3,
+    4
+   ],
+   "variants": [
+    "configuration papillon",
+    "configuration des triangles emboîtés",
+    "rapports égaux sous forme fractionnaire ou décimale"
+   ],
+   "method": "Calculer séparément AM/AB et AN/AC ; s'ils sont égaux et si les points A, M, B et A, N, C sont alignés dans le même ordre, conclure (MN) // (BC) par la réciproque du théorème de Thalès.",
+   "commonMistakes": [
+    "oublier la condition d'alignement dans le même ordre",
+    "utiliser le troisième rapport MN/BC dans la réciproque",
+    "conclure avec des valeurs arrondies"
+   ],
+   "requiredCases": {
+    "rule": "Au moins un exercice rattaché à TH-T04 est en configuration papillon. La comparaison se fait sur des valeurs exactes (fractions ou produits en croix), jamais sur des valeurs arrondies."
+   },
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T05",
+   "title": "Démontrer que deux droites ne sont pas parallèles (contraposée, approfondissement)",
+   "objectives": [],
+   "level": "approfondissement",
+   "countsTowardCompleteness": false,
+   "competences": [
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "TH-T04"
+   ],
+   "difficulty": [
+    4,
+    5
+   ],
+   "variants": [
+    "rapports différents en configuration papillon"
+   ],
+   "method": "Si AM/AB ≠ AN/AC, les droites (MN) et (BC) ne sont pas parallèles (contraposée du théorème de Thalès).",
+   "commonMistakes": [
+    "conclure « non parallèles » avec des valeurs arrondies proches"
+   ],
+   "rule": "Hors programme exigible en 3e ; seulement en approfondissement explicitement signalé, jamais au niveau 1 à 3 ni en « Type Brevet — ».",
+   "levelEvidence": {
+    "argument": "Preuve par énumération : « contraposée » n'apparaît dans aucun des trois documents vérifiés (programme cycle 4 2020, attendus 3e 2019, BO n° 22 du 29-05-2019 ; recherche dans les textes extraits, 2026-11-24). Les connaissances citées sont « le théorème de Thalès et sa réciproque » (attendus 3e p. 8 ; programme p. 136). Même traitement que PY-T07 (Pythagore)."
+   },
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T06",
+   "title": "Reconnaître des triangles semblables (côtés proportionnels)",
+   "objectives": [
+    "M3-EG-04"
+   ],
+   "competences": [
+    "Calculer",
+    "Raisonner"
+   ],
+   "prerequisites": [
+    "proportionnalité (math-4e-proportionnalite)"
+   ],
+   "difficulty": [
+    1,
+    2,
+    3
+   ],
+   "variants": [
+    "tableau des longueurs triées par ordre croissant",
+    "côtés non donnés dans le même ordre",
+    "contre-exemple : rapports différents"
+   ],
+   "method": "Ranger les côtés de chaque triangle du plus petit au plus grand, calculer les trois rapports ; s'ils sont égaux, les triangles sont semblables et ce rapport est le coefficient d'agrandissement ou de réduction.",
+   "commonMistakes": [
+    "comparer les côtés dans l'ordre de l'énoncé et non par ordre de longueur",
+    "croire que deux triangles ayant un côté commun sont semblables"
+   ],
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T07",
+   "title": "Démontrer que deux triangles sont semblables par leurs angles",
+   "objectives": [
+    "M3-EG-04"
+   ],
+   "competences": [
+    "Raisonner",
+    "Communiquer"
+   ],
+   "prerequisites": [
+    "somme des angles d'un triangle",
+    "angles alternes-internes et correspondants (math-5e)"
+   ],
+   "difficulty": [
+    3,
+    4
+   ],
+   "variants": [
+    "deux angles égaux donnés",
+    "angles égaux à justifier (parallèles, angles opposés par le sommet)",
+    "triangles d'une configuration de Thalès"
+   ],
+   "method": "Montrer que deux angles de l'un sont égaux à deux angles de l'autre ; conclure que les triangles sont semblables, puis identifier les sommets et les côtés homologues.",
+   "commonMistakes": [
+    "se contenter d'un seul angle égal",
+    "mal associer les sommets homologues"
+   ],
+   "source": "Exemple de réussite, attendus 3e p. 9 : « Démontrer que les triangles ACE et CBD sont semblables. »",
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T08",
+   "title": "Calculer des longueurs dans des triangles semblables",
+   "objectives": [
+    "M3-EG-04"
+   ],
+   "competences": [
+    "Calculer"
+   ],
+   "prerequisites": [
+    "TH-T06"
+   ],
+   "difficulty": [
+    2,
+    3
+   ],
+   "variants": [
+    "coefficient k donné",
+    "coefficient k à calculer à partir de deux côtés homologues",
+    "réduction (k < 1) ou agrandissement (k > 1)"
+   ],
+   "method": "Identifier les côtés homologues, calculer le coefficient k = longueur image / longueur de départ, multiplier (ou diviser) par k.",
+   "commonMistakes": [
+    "inverser le coefficient",
+    "associer des côtés non homologues"
+   ],
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  },
+  {
+   "id": "TH-T09",
+   "title": "Problème à plusieurs étapes (type Brevet)",
+   "objectives": [
+    "M3-EG-03",
+    "M3-EG-04"
+   ],
+   "competences": [
+    "Modéliser",
+    "Raisonner",
+    "Communiquer"
+   ],
+   "prerequisites": [
+    "TH-T03",
+    "TH-T04",
+    "TH-T07",
+    "théorème de Pythagore (math-3e-pythagore)"
+   ],
+   "difficulty": [
+    4,
+    5
+   ],
+   "variants": [
+    "Thalès puis Pythagore",
+    "triangles semblables puis calcul de longueurs (exemple de réussite, attendus 3e p. 9)",
+    "situation concrète (ombre, rivière, échelle)"
+   ],
+   "method": "Identifier la configuration à chaque étape, citer le théorème utilisé, rédiger chaque conclusion avant de l'utiliser.",
+   "commonMistakes": [
+    "utiliser un résultat non démontré",
+    "appliquer Thalès sans avoir justifié le parallélisme"
+   ],
+   "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
+   "exercises": []
+  }
+ ]
+}
