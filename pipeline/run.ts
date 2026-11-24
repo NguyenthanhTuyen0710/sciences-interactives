@@ -215,11 +215,13 @@ const SPEC = JSON.stringify(spec, null, 1);
 function taxonomyPrompt(): string {
   const file = `research/curriculum/${spec.subject}/taxonomy/${spec.id}.json`;
   if (!existsSync(P(file))) return "";
-  const tax = readJson<{ status: string; types: { id: string; title: string; objectives: string[]; level?: string; difficulty: number[]; variants: string[]; countsTowardCompleteness?: boolean; transversal?: boolean; rule?: string }[] }>(file);
+  const tax = readJson<{ status: string; types: { id: string; title: string; objectives: string[]; level?: string; difficulty: number[]; variants: string[]; countsTowardCompleteness?: boolean; transversal?: boolean; rule?: string; requiredCases?: unknown }[]; taggingRules?: string[] }>(file);
   if (tax.status !== "verrouillé") return "";
   // `excludedTaxonomyTypes` de la fiche (décision 28) : types absents du prompt, donc aucun exercice ; taxonomie et lockHash inchangés.
-  const types = tax.types.filter((t) => !(spec.excludedTaxonomyTypes ?? []).includes(t.id)).map(({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }) => ({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }));
-  return `\nLocked exercise taxonomy (JSON). Every exercise declares \`taxonomyTypes: ["<type id>", …]\` with ids from this list only; its \`niveau\` must be in the \`difficulty\` of each declared type; every type that is not « approfondissement », not transversal and not \`countsTowardCompleteness: false\` has at least one exercise; an « approfondissement » type is never combined with a required type and never used in a « Type Brevet — » exercise; variants differ by structure or reasoning step, never only by numbers.\n${JSON.stringify(types, null, 1)}\n`;
+  const types = tax.types.filter((t) => !(spec.excludedTaxonomyTypes ?? []).includes(t.id)).map(({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule, requiredCases }) => ({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule, requiredCases }));
+  // Décision 37 (point 10) : `requiredCases` (par type) et `taggingRules` (taxonomie) transmis au modèle ; absents → prompt inchangé.
+  const rules = tax.taggingRules?.length ? `Tagging rules (mandatory):\n${tax.taggingRules.map((r) => `- ${r}`).join("\n")}\nEvery \`requiredCases\` rule of a type is satisfied by the exercises linked to that type.\n` : "";
+  return `\nLocked exercise taxonomy (JSON). Every exercise declares \`taxonomyTypes: ["<type id>", …]\` with ids from this list only; its \`niveau\` must be in the \`difficulty\` of each declared type; every type that is not « approfondissement », not transversal and not \`countsTowardCompleteness: false\` has at least one exercise; an « approfondissement » type is never combined with a required type and never used in a « Type Brevet — » exercise; variants differ by structure or reasoning step, never only by numbers.\n${JSON.stringify(types, null, 1)}\n${rules}`;
 }
 
 // ───────── Contrôles déterministes ─────────
