@@ -24,9 +24,9 @@
    "grade": "4e",
    "chapters": 21,
    "byState": {
-    "todo": 16,
+    "todo": 15,
     "published": 2,
-    "draft": 3
+    "draft": 4
    }
   },
   {
@@ -35,9 +35,8 @@
    "chapters": 16,
    "byState": {
     "published": 2,
-    "draft": 4,
-    "todo": 9,
-    "researched": 1
+    "draft": 5,
+    "todo": 9
    }
   },
   {
@@ -1293,15 +1292,46 @@
    "domain": "EG",
    "chapterId": "math-4e-thales",
    "title": "Théorème de Thalès (triangles emboîtés)",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": null,
-   "content": null,
+   "pipelineSpec": "math-3e-thales-semblables",
+   "content": {
+    "id": "math-3e-thales-semblables",
+    "taskId": "SCI-3E-MATH-012",
+    "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
+    "sha256": "f260fdcfd37615fa4f1d2ed43d5bb05f9ebc79eeb08da5e59d52493872f01f46",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     3,
+     9,
+     9,
+     6,
+     3
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -1723,15 +1753,46 @@
    "domain": "EG",
    "chapterId": "math-3e-thales-semblables",
    "title": "Thalès (configuration papillon) et triangles semblables",
-   "state": "researched",
+   "state": "draft",
    "objectives": {
     "total": 2,
     "verified": 2
    },
    "pipelineSpec": "math-3e-thales-semblables",
-   "content": null,
+   "content": {
+    "id": "math-3e-thales-semblables",
+    "taskId": "SCI-3E-MATH-012",
+    "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
+    "sha256": "f260fdcfd37615fa4f1d2ed43d5bb05f9ebc79eeb08da5e59d52493872f01f46",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     3,
+     9,
+     9,
+     6,
+     3
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {

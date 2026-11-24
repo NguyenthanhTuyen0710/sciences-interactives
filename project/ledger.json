@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T08:55:47.614Z",
+  "updatedAt": "2026-11-24T10:41:59.228Z",
   "tasks": [
     {
       "id": "SCI-INFRA-001",
@@ -1056,14 +1056,14 @@
       "id": "SCI-3E-MATH-012",
       "kind": "chapter",
       "title": "Thalès (configuration papillon) et triangles semblables",
-      "state": "TODO",
+      "state": "QA_PENDING",
       "grade": "3e",
       "subject": "mathematiques",
       "chapterId": "math-3e-thales-semblables",
       "dependsOn": [
         "SCI-INFRA-002"
       ],
-      "next": "A2/A3 : dossier de recherche"
+      "next": "Relecture humaine de la PR (revues QA), puis décision de publication"
     },
     {
       "id": "SCI-3E-MATH-013",
