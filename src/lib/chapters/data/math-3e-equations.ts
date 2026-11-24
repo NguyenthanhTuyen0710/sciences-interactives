@@ -115,6 +115,7 @@ function lin(a: number, b: number): string {
   return b === 0 ? ax : `${ax} ${b < 0 ? "-" : "+"} ${Math.abs(b)}`;
 }
 const sq = (n: number) => n * n;
+const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b));
 
 const O = {
   "M3-NC-12": "Résoudre des équations du premier degré et des problèmes s'y ramenant.",
@@ -146,10 +147,10 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-02", title: "Choisir la solution", niveau: 1, objectives: ["M4-NC-20"], taxonomyTypes: ["EQ-T01"], time: 90,
     vary: (rng) => {
-      const a = rng.int(2, 5), c = rng.int(1, 4), s = rng.int(2, 8), b = rng.int(1, 6), d = (a - c) * s + b;
+      const a = rng.int(2, 5), c = rng.pick([1, 2, 3, 4].filter((v) => v !== a)), s = rng.int(2, 8), b = rng.int(1, 6), d = (a - c) * s + b;
       const opts = rng.shuffle([s, s + 1, s - 1, s + 2]);
       return {
-        statement: `Quel nombre est solution de $${a}x + ${b} = ${c}x + ${d}$ ?`,
+        statement: `Quel nombre est solution de $${a}x + ${b} = ${lin(c, d)}$ ?`,
         parts: [qcm(opts.map((v) => `$${v}$`), opts.indexOf(s))],
         solution: [`Pour $x = ${s}$ : membre de gauche $${a * s + b}$, membre de droite $${c * s + d}$.`, "Les deux membres sont égaux : c'est la solution. Les autres valeurs donnent des résultats différents."],
       };
@@ -168,7 +169,7 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "Retirer la même quantité des deux côtés conserve l'égalité.",
-    hints: ["Quelle opération annule « $+ " + "b$ » ?", "Fais la même opération des deux côtés."],
+    hints: ["Quelle opération annule l'ajout de la masse connue ?", "Fais la même opération des deux côtés."],
   }),
   ex({
     id: "eq3-04", title: "Résoudre ax = b", niveau: 1, objectives: ["M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 90,
@@ -239,16 +240,18 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-09", title: "Solution fractionnaire", niveau: 2, objectives: ["M3-NC-12", "M4-NC-21"], taxonomyTypes: ["EQ-T02"], time: 120,
     vary: (rng) => {
-      const a = rng.pick([2, 4, 5, 8]), s = rng.int(1, 9) * (a === 2 ? 1 : 1), b = rng.int(1, 9);
-      const c = a * s + b;
+      const a = rng.pick([2, 4, 5, 8]), b = rng.int(1, 9);
+      let p = rng.int(1, 15);
+      while (p % a === 0) p = rng.int(1, 15);
+      const g = gcd(p, a), c = p + b;
       return {
-        statement: `Résous $${a}x + ${b} = ${c}$ puis donne la valeur de $x$.`,
-        parts: [{ interaction: { kind: "numerique", answer: { value: s, fraction: [s, 1] } } }],
-        solution: [`$${a}x = ${c - b}$.`, `$x = ${c - b}/${a} = ${s}$.`],
+        statement: `Résous $${a}x + ${b} = ${c}$. Donne la solution sous forme de fraction irréductible.`,
+        parts: [{ interaction: { kind: "numerique", answer: { value: p / a, fraction: [p, a] } } }],
+        solution: [`$${a}x = ${c} - ${b} = ${p}$.`, `$x = \\dfrac{${p}}{${a}}${g > 1 ? ` = \\dfrac{${p / g}}{${a / g}}` : ""}$.`],
       };
     },
-    reasoning: "La division des deux membres donne la solution exacte.",
-    hints: ["Soustrais d'abord le terme constant.", "Divise ensuite."],
+    reasoning: "La division des deux membres donne la solution exacte, qui peut être une fraction.",
+    hints: ["Soustrais d'abord le terme constant.", "Divise ensuite, puis simplifie la fraction."],
   }),
   ex({
     id: "eq3-10", title: "Équation produit nul simple", niveau: 2, objectives: ["M3-NC-13"], taxonomyTypes: ["EQ-T05"], time: 120,
@@ -373,8 +376,8 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-19", title: "Discuter selon le signe de a", niveau: 3, objectives: ["M3-NC-14"], taxonomyTypes: ["EQ-T07"], time: 150,
     statement: "Vrai ou faux ?",
-    parts: [vf(["$x^{2} = 25$ a pour seule solution $5$.", "$x^{2} = -4$ n'a aucune solution.", "$x^{2} = 0$ a pour seule solution $0$.", "$\\sqrt{-4}$ est un nombre du collège."], [false, true, true, false])],
-    solution: ["Faux : $-5$ est aussi solution.", "Vrai : un carré est positif ou nul.", "Vrai.", "Faux : on ne peut pas calculer la racine d'un nombre négatif au collège."],
+    parts: [vf(["$x^{2} = 25$ a pour seule solution $5$.", "$x^{2} = -4$ n'a aucune solution.", "$x^{2} = 0$ a pour seule solution $0$.", "On peut calculer $\\sqrt{-4}$."], [false, true, true, false])],
+    solution: ["Faux : $-5$ est aussi solution.", "Vrai : un carré est positif ou nul.", "Vrai.", "Faux : la racine carrée d'un nombre négatif n'existe pas, car un carré n'est jamais négatif."],
     reasoning: "On discute selon le signe de $a$.",
     hints: ["Un carré est-il négatif ?", "Pense à l'opposé."],
   }),
@@ -434,25 +437,24 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-24", title: "Âges", niveau: 4, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 240,
     vary: (rng) => {
-      const e = rng.int(8, 14), k = rng.int(3, 4), n = rng.int(3, 9), p = k * e;
-      // dans n ans : p+n = 2(e+n)? choisir relation cohérente: p + n = m(e+n)
-      const m = 2, ea = e;
-      const parent = m * (ea + n) - n;
+      const x = rng.int(8, 12), n = rng.int(2, 6), P = 3 * x + 2 * n;
+      const eqs = [`$${P} + ${n} = 3(x + ${n})$`, `$${P} = 3(x + ${n})$`, `$${P} + ${n} = 3x + ${n}$`, `$3(${P} + ${n}) = x + ${n}$`];
+      const opts = rng.shuffle(eqs);
       return {
-        statement: `Un parent a aujourd'hui $${parent}$ ans et son enfant $x$ ans. Dans $${n}$ ans, l'âge du parent sera le double de celui de l'enfant (${p > 0 ? "" : ""}équation $${parent} + ${n} = 2(x + ${n})$).`,
-        parts: [num(ea, [{ match: String(parent), feedback: "Tu as recopié l'âge du parent : résous l'équation." }], "Âge actuel de l'enfant")],
-        solution: [`$${parent + n} = 2x + ${2 * n}$.`, `$2x = ${parent - n}$, donc $x = ${ea}$.`, `Vérification : dans $${n}$ ans, $${parent + n} = 2 \\times ${ea + n}$ ✓.`],
+        statement: `Un parent a aujourd'hui $${P}$ ans. Dans $${n}$ ans, il aura le triple de l'âge qu'aura alors son enfant. On note $x$ l'âge actuel de l'enfant.`,
+        parts: [qcm(opts, opts.indexOf(eqs[0]), [], "1. Quelle équation traduit l'énoncé ?"), num(x, [{ match: String(P), feedback: "Tu as recopié l'âge du parent : résous l'équation." }], "2. Âge actuel de l'enfant")],
+        solution: [`Dans $${n}$ ans, le parent aura $${P + n}$ ans et l'enfant $x + ${n}$ ans : $${P} + ${n} = 3(x + ${n})$.`, `$${P + n} = 3x + ${3 * n}$, donc $3x = ${P - 2 * n}$ et $x = ${x}$.`, `Vérification : dans $${n}$ ans, $${P + n} = 3 \\times ${x + n}$.`],
       };
     },
-    reasoning: "On exprime les âges futurs avec $x$.",
-    hints: ["Développe $2(x + n)$.", "Isole $x$."],
+    reasoning: "On ajoute le même nombre d'années aux deux âges, puis on traduit « le triple » par une égalité.",
+    hints: ["Ajoute le même nombre d'années aux deux âges.", "Le parent aura alors le triple de l'âge de l'enfant : écris cette égalité."],
   }),
   ex({
     id: "eq3-25", title: "Problème avec produit nul", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 240,
     vary: (rng) => {
       const a = rng.int(2, 9);
       return {
-        statement: `Un rectangle a pour côtés $x$ cm et $(x + ${a})$ cm. On veut que son aire soit égale à $x$ fois $${2 * a}$ (soit $x(x + ${a}) = ${2 * a}x$). Cherche $x$ avec $x > 0$.`,
+        statement: `Un premier rectangle a pour côtés $x$ cm et $(x + ${a})$ cm ; un second a pour côtés $x$ cm et $${2 * a}$ cm. On cherche $x > 0$ pour que les deux rectangles aient la même aire, soit $x(x + ${a}) = ${2 * a}x$.`,
         parts: [tt(`$x(x + ${a}) - ${2 * a}x = 0$ donne $x(x -$ [[0]] $) = 0$`, [nb(a)]), num(a, [{ match: "0", feedback: "$0$ n'est pas une longueur acceptable." }], "Valeur de $x$ possible (en cm)")],
         solution: [`$x(x + ${a}) - ${2 * a}x = x(x - ${a})$.`, `$x = 0$ ou $x = ${a}$.`, `$x$ est une longueur non nulle : $x = ${a}$ cm.`],
       };
@@ -476,20 +478,20 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 5 ──
   ex({
-    id: "eq3-27", title: "Type Brevet — Deux forfaits", niveau: 5, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
+    id: "eq3-27", title: "Type Brevet — Deux tarifs", niveau: 5, objectives: ["M3-NC-12", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
     vary: (rng) => {
-      const a = rng.int(2, 4), b = a + rng.int(1, 3), f = rng.int(6, 20), s = rng.int(5, 15), g = (b - a) * s + f;
+      const a = rng.int(2, 4), b = a + rng.int(1, 3), s = rng.int(5, 15), g = (b - a) * s;
       return {
-        statement: `Forfait A : $${a}$ € par séance. Forfait B : $${b}$ € par séance, avec $${g}$ € de moins… Plus précisément, le forfait A coûte $${a}x + ${g}$ € et le forfait B coûte $${b}x$ € pour $x$ séances.`,
-        parts: [tt(`1. Équation : [[0]] $x + ${g} = ${b}x$`, [nb(a)]), num(g / (b - a), [], "2. Nombre de séances pour lequel les prix sont égaux (en séances)"), vf([`Pour $${s + 1}$ séances, le forfait A est plus avantageux.`], [false], "3. Vrai ou faux ?")].map((p, i) => i === 1 ? num(s) : p),
-        solution: [`1. $${a}x + ${g} = ${b}x$.`, `2. $${g} = ${b - a}x$, donc $x = ${s}$.`, `3. Au-delà de $${s}$ séances, le forfait B coûte plus, donc A devient plus avantageux : cette phrase dépend du sens ; vérifie : pour $${s + 1}$ séances, A coûte $${a * (s + 1) + g}$ € et B $${b * (s + 1)}$ €.`],
+        statement: `Une salle de sport propose deux tarifs. Tarif A : un abonnement de $${g}$ € puis $${a}$ € par séance. Tarif B : $${b}$ € par séance, sans abonnement. On note $x$ le nombre de séances.`,
+        parts: [tt(`1. Les deux tarifs coûtent autant lorsque [[0]] $x + ${g} = ${b}x$`, [nb(a)]), num(s, [{ match: String(g), feedback: "C'est le prix de l'abonnement : résous l'équation." }], "2. Nombre de séances pour lequel les deux tarifs coûtent autant"), vf([`Pour $${s + 1}$ séances, le tarif A est plus avantageux.`, `Pour $${s - 1}$ séances, le tarif A est plus avantageux.`], [true, false], "3. Vrai ou faux ?")],
+        solution: [`1. Tarif A : $${a}x + ${g}$ € ; tarif B : $${b}x$ €. Égalité : $${a}x + ${g} = ${b}x$.`, `2. $${g} = ${b - a}x$, donc $x = ${s}$.`, `3. Pour $${s + 1}$ séances, A coûte $${a * (s + 1) + g}$ € et B $${b * (s + 1)}$ € : A est moins cher (vrai). Pour $${s - 1}$ séances, A coûte $${a * (s - 1) + g}$ € et B $${b * (s - 1)}$ € : B est moins cher (faux).`],
       };
     },
-    reasoning: "On égale les deux coûts pour trouver le point de croisement.",
-    hints: ["Écris l'égalité des deux coûts.", "Résous puis compare pour une valeur supérieure."],
+    reasoning: "On égale les deux coûts pour trouver le nombre de séances où les tarifs se croisent, puis on compare juste avant et juste après.",
+    hints: ["Écris le coût de chaque tarif en fonction de $x$.", "Résous l'égalité, puis calcule les deux coûts juste avant et juste après."],
   }),
   ex({
-    id: "eq3-28", title: "Type Brevet — Équation factorisée complète", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360,
+    id: "eq3-28", title: "Équation factorisée complète", niveau: 4, objectives: ["M3-NC-13", "M3-NC-12"], taxonomyTypes: ["EQ-T06"], time: 360,
     vary: (rng) => {
       const a = rng.int(2, 7), b = rng.int(1, 6);
       return {
@@ -502,17 +504,19 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Passe tout dans un membre.", "Repère le facteur commun."],
   }),
   ex({
-    id: "eq3-29", title: "Type Brevet — Le carré et le disque", niveau: 5, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 360,
+    id: "eq3-29", title: "Type Brevet — Agrandir un carré", niveau: 5, objectives: ["M3-NC-14", "M3-NC-12"], taxonomyTypes: ["EQ-T08"], time: 360,
     vary: (rng) => {
-      const n = rng.int(3, 12), e = rng.int(2, 6);
+      const n = rng.int(3, 12), e = rng.int(2, 6), m = n + e, A = sq(m);
+      const eqs = [`$(x + ${e})^{2} = ${A}$`, `$x^{2} + ${e} = ${A}$`, `$x^{2} + ${sq(e)} = ${A}$`, `$4(x + ${e}) = ${A}$`];
+      const opts = rng.shuffle(eqs);
       return {
-        statement: `Un carré a pour côté $x$ cm. On agrandit un côté de $${e}$ cm pour obtenir un rectangle d'aire $${sq(n) + e * n}$ cm², c'est-à-dire $x(x + ${e}) = ${sq(n) + e * n}$ avec $x = ${n}$ … Ici, on veut simplement trouver $x$ dans $x^{2} + ${e}x = ${sq(n) + e * n}$ en vérifiant $x = ${n}$.`,
-        parts: [steps([[`Valeur de $${n}^{2} + ${e} \\times ${n}$`, sq(n) + e * n]], "1. Teste $x = " + n + "."), vf([`$${n}$ est solution de l'équation.`, "Une longueur doit être positive."], [true, true], "2. Vrai ou faux ?")],
-        solution: [`1. $${sq(n)} + ${e * n} = ${sq(n) + e * n}$.`, "2. $" + n + "$ est bien solution ; on retient la valeur positive dans le contexte."],
+        statement: `Un carré a pour côté $x$ cm. On allonge chacun de ses côtés de $${e}$ cm : le nouveau carré a une aire de $${A}$ cm².`,
+        parts: [qcm(opts, opts.indexOf(eqs[0]), [], "1. Quelle équation vérifie $x$ ?"), tt(`2. $(x + ${e})^{2} = ${A}$ donne $x + ${e} = ${m}$ ou $x + ${e} = -${m}$, soit $x =$ [[0]] ou $x =$ [[1]] (ordre croissant).`, [nb(-m - e), nb(n)]), num(n, [{ match: String(-m - e), feedback: "Une longueur ne peut pas être négative." }, { match: String(m), feedback: "C'est le côté du nouveau carré : retire l'allongement." }], "3. Côté du carré de départ (en cm)")],
+        solution: [`1. Le nouveau carré a pour côté $x + ${e}$ : $(x + ${e})^{2} = ${A}$.`, `2. $${A} > 0$ : $x + ${e} = ${m}$ ou $x + ${e} = -${m}$, donc $x = ${n}$ ou $x = ${-m - e}$.`, `3. Une longueur est positive : le côté de départ mesure $${n}$ cm.`],
       };
     },
-    reasoning: "Tester une solution proposée, puis vérifier le sens dans le contexte.",
-    hints: ["Remplace $x$ par la valeur.", "Pense au signe d'une longueur."],
+    reasoning: "On se ramène à une équation du type $X^{2} = a$ avec $X = x + e$, puis on garde la solution qui a un sens.",
+    hints: ["Exprime le côté du nouveau carré en fonction de $x$.", "Un carré égal à un nombre positif : deux possibilités."],
   }),
   ex({
     id: "eq3-30", title: "Type Brevet — Programmes équivalents", niveau: 5, objectives: ["M3-NC-12", "M3-NC-13", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
