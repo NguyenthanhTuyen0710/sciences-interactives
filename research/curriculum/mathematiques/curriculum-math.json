@@ -2060,13 +2060,52 @@
                   "id": "M4-EG-05",
                   "text": "Calculer des longueurs avec le théorème de Thalès dans la configuration des triangles emboîtés.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (4e) ; Attendus de fin d'année de 4e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "configuration des triangles emboîtés",
+                    "calcul de longueurs"
+                  ],
+                  "competences": [
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-24)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M4-EG-06",
                   "text": "Démontrer un parallélisme à l'aide de rapports de longueurs (réciproque).",
                   "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser les notions de géométrie plane pour démontrer",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "réciproque du théorème de Thalès",
+                    "parallélisme"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Communiquer"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-24)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 }
               ],
               "prerequisites": [
@@ -2788,13 +2827,81 @@
                   "id": "M3-EG-03",
                   "text": "Utiliser le théorème de Thalès et sa réciproque dans la configuration papillon.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (3e) ; Attendus de fin d'année de 3e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-attendus-3e-2019-pdf",
+                    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+                    "quote": "le théorème de Thalès et sa réciproque dans la configuration papillon",
+                    "page": 8,
+                    "matchType": "b — objectif reformulé (« utiliser le théorème de Thalès et sa réciproque dans la configuration papillon »)",
+                    "reason": "proposition Claude Code (2026-11-24), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
+                    "context": "Attendus de fin d'année de 3e, « Utiliser les notions de géométrie plane pour démontrer », liste des connaissances. Même énoncé dans le BO n° 22, p. 218 (annexe reprenant les attendus 3e).",
+                    "accessedAt": "2026-11-07T14:50:10.048Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+                    "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "approvedAt": "2026-11-24"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "configuration papillon",
+                    "théorème de Thalès",
+                    "réciproque du théorème de Thalès",
+                    "alignement dans le même ordre"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-24)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M3-EG-04",
                   "text": "Définir et caractériser des triangles semblables et calculer des longueurs.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Géométrie plane (3e) ; Attendus de fin d'année de 3e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-attendus-3e-2019-pdf",
+                    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+                    "quote": "les triangles semblables : une définition et une propriété caractéristique",
+                    "page": 8,
+                    "matchType": "b — objectif reformulé (« définir et caractériser des triangles semblables ») ; le calcul de longueurs figure p. 5 : « Il utilise la proportionnalité pour calculer des longueurs dans une configuration de Thalès, dans des triangles semblables, dans le cadre des homothéties. »",
+                    "reason": "proposition Claude Code (2026-11-24), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
+                    "accessedAt": "2026-11-07T14:50:10.048Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/18-maths-3e-attendus-eduscol1114748pdf-74688.pdf",
+                    "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "approvedAt": "2026-11-24"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "triangles semblables",
+                    "côtés homologues",
+                    "proportionnalité des longueurs",
+                    "caractérisation angulaire"
+                  ],
+                  "competences": [
+                    "Raisonner",
+                    "Calculer",
+                    "Représenter"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-24)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 }
               ],
               "prerequisites": [

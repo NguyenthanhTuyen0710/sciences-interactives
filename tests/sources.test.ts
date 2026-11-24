@@ -120,7 +120,7 @@ describe("preuves G2 dans l'inventaire", () => {
     .flatMap((g) => g.domains.flatMap((d) => d.chapters.flatMap((c) => c.objectives)));
   it("chaque preuve est approuvée, datée, motivée et rattachée à un document vérifié de même SHA256", () => {
     const withEv = objs.filter((o) => o.evidence);
-    expect(withEv.map((o) => o.id).sort()).toEqual(["M1S-SD-01", "M1S-SD-02", "M1S-SD-03", "M1S-SD-04", "M1S-SD-05", "M1S-SD-06", "M3-AUTO-03", "M3-NC-08", "M3-NC-09", "M3-NC-10", "M3-NC-11", "M3-NC-12", "M3-NC-13", "M3-NC-14", "M4-EG-03", "M4-EG-04"]);
+    expect(withEv.map((o) => o.id).sort()).toEqual(["M1S-SD-01", "M1S-SD-02", "M1S-SD-03", "M1S-SD-04", "M1S-SD-05", "M1S-SD-06", "M3-AUTO-03", "M3-EG-03", "M3-EG-04", "M3-NC-08", "M3-NC-09", "M3-NC-10", "M3-NC-11", "M3-NC-12", "M3-NC-13", "M3-NC-14", "M4-EG-03", "M4-EG-04"]);
     for (const o of withEv) {
       const e = o.evidence!;
       expect(e.approvedBy).toBeTruthy(); expect(e.approvedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/); expect(e.reason).toBeTruthy(); expect(e.page).toBeGreaterThan(0);

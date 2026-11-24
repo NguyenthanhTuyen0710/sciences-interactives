@@ -15,11 +15,12 @@
   ],
   "scopeNotes": [
     "Programme 2020 en vigueur en 3e (BO n° 31 du 30-07-2020) + repères et attendus 2019 (BO n° 22 du 29-05-2019).",
-    "Exigible en 3e (proposé, à confirmer par le G1/G2) : théorème de Thalès et sa réciproque dans la configuration papillon ; triangles semblables, une définition (proportionnalité des longueurs des côtés) et une propriété caractéristique (angulaire) ; calculs de longueurs.",
+    "Exigible en 3e (G1/G2 approuvés le 2026-11-24) : théorème de Thalès et sa réciproque dans la configuration papillon ; triangles semblables, une définition (proportionnalité des longueurs des côtés) et une propriété caractéristique (angulaire) ; calculs de longueurs.",
     "Consolidation 4e : Thalès et réciproque dans la configuration des triangles emboîtés (attendus 4e) ; non obligatoire en 3e, réinvesti dans les problèmes.",
     "Contraposée du théorème de Thalès (démontrer que deux droites ne sont pas parallèles) : non citée dans les trois textes vérifiés ; approfondissement explicitement signalé seulement (comme PY-T07 pour Pythagore).",
     "Homothéties, agrandissement-réduction et effet sur les aires : chapitres math-3e-rotations-homotheties et math-4e-agrandissement-reduction ; hors de ce chapitre, sauf mention du lien avec la proportionnalité.",
-    "Figures : générateur geometry() de src/lib/engine/svg.ts (option A du relecteur, 2026-11-24 ; PR séparée, préalable au chapitre) — points nommés, segments ou droites, étiquettes de longueur, chevrons de parallélisme, arcs d'angles de même mesure, mise à l'échelle automatique ; figures calculées à partir des valeurs tirées (pas de SVG écrit à la main)."
+    "Figures : générateur geometry() de src/lib/engine/svg.ts (option A du relecteur, 2026-11-24 ; PR séparée, préalable au chapitre) — points nommés, segments ou droites, étiquettes de longueur, chevrons de parallélisme, arcs d'angles de même mesure, mise à l'échelle automatique ; figures calculées à partir des valeurs tirées (pas de SVG écrit à la main).",
+    "Contrôle par résolution (solveCheck) : quand un exercice fait résoudre une égalité de rapports, l'écrire avec l'inconnue x (par exemple $\\dfrac{x}{6} = \\dfrac{4}{5}$, la longueur cherchée étant nommée x dans l'énoncé ou la partie) et déclarer solveCheck avec positive: true."
   ],
   "exampleChapter": "src/lib/chapters/data/math-3e-pythagore.ts",
   "notion": {
@@ -59,7 +60,8 @@
     "M4-EG-05",
     "M4-EG-06"
   ],
-  "optionalObjectivesNote": "Proposition du 2026-11-24, à approuver avec le G1 : objectifs de consolidation 4e (configuration des triangles emboîtés), non exigibles en 3e → required: false (META) et hors porte G2, comme M4-NC-19…21 pour équations.",
+  "optionalObjectivesNote": "Proposition du 2026-11-24, approuvée avec le G1 par Nguyễn Thanh Tuyền le 2026-11-24 (modèle 1) : objectifs de consolidation 4e (configuration des triangles emboîtés), non exigibles en 3e → required: false (META) et hors porte G2, comme M4-NC-19…21 pour équations.",
   "judgeFindingsForFixNote": "Comme équations (décision 22) : pas de champ judgeFindingsForFix au premier passage ; arrêt après le premier juge.",
-  "chapterEffortNote": "Point 8, NON DÉCIDÉ (G2 modèle 3, 2026-11-24) : champ chapterEffort absent → effort par défaut (medium). Proposition « low » (comme équations, décision 28 : réflexion 0 %, 0,160 $) en attente du juge d'équations ; préférence du relecteur : medium."
+  "chapterEffortNote": "Point 8 tranché par Nguyễn Thanh Tuyền le 2026-11-24 : medium (équations en low, décisions 32-33 : 3 BLOQUANT et 3 MAJEUR réels corrigés à la main ; coût réel medium 0,336-0,376 $ contre 0,160 $ en low).",
+  "chapterEffort": "medium"
 }
