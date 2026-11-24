@@ -38,10 +38,29 @@ describe("format de relecture", () => {
     expect(p.criteria.items.properties.criterion.enum).toEqual([...REVIEW_KEYS]);
     expect(JSON.stringify(REVIEW_JSON_SCHEMA)).not.toMatch(/minLength|maxItems|minimum|maximum/); // mots-clés refusés par structured outputs
   });
-  it("refuse : critère manquant, constats non triés, PASS avec MAJEUR", () => {
+  it("refuse : critère manquant, PASS avec MAJEUR", () => {
     expect(parseReview(JSON.stringify({ ...ok, criteria: crit().slice(1) })).ok).toBe(false);
-    expect(parseReview(JSON.stringify({ ...ok, findings: [...ok.findings].reverse() })).ok).toBe(false);
     expect(parseReview(JSON.stringify({ ...ok, verdict: "PASS" })).ok).toBe(false);
+  });
+  it("constats dans le désordre : triés par gravité (tri stable), même contenu ; rapport déjà trié inchangé", () => {
+    const f = (severity: string, exerciseId: string) => ({ criterion: "exercises", severity, exerciseId, issue: "Défaut.", fix: "Corriger." });
+    const mixed = [f("MAJEUR", "a"), f("MINEUR", "b"), f("BLOQUANT", "c"), f("MAJEUR", "d"), f("MINEUR", "e")];
+    const r = parseReview(JSON.stringify({ ...ok, findings: mixed }));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.review.findings.map((x) => `${x.severity}:${x.exerciseId}`)).toEqual(["BLOQUANT:c", "MAJEUR:a", "MAJEUR:d", "MINEUR:b", "MINEUR:e"]);
+    const sorted = parseReview(JSON.stringify(ok));
+    expect(sorted.ok && sorted.review).toEqual(ok);
+    expect(parseReview(JSON.stringify({ ...ok, findings: [...ok.findings].reverse() })).ok).toBe(true);
+    expect(outputProblem("screen", "end_turn", JSON.stringify({ ...ok, findings: [...ok.findings].reverse() }))).toBeNull();
+  });
+  it("contenu hors schéma toujours refusé, même dans le désordre : gravité inconnue, champ manquant ou en trop, texte vide", () => {
+    const bad = (x: Record<string, unknown>) => parseReview(JSON.stringify({ ...ok, findings: [ok.findings[1], { ...ok.findings[0], ...x }] }));
+    expect(bad({ severity: "CRITIQUE" }).ok).toBe(false);
+    expect(bad({ severity: undefined }).ok).toBe(false);
+    expect(bad({ fix: "" }).ok).toBe(false);
+    expect(bad({ extra: 1 }).ok).toBe(false);
+    expect(bad({ criterion: "style" }).ok).toBe(false);
+    expect(parseReview(JSON.stringify({ ...ok, findings: "aucun" })).ok).toBe(false);
   });
   it("PASS court accepté et rendu en Markdown", () => {
     const r = parseReview(JSON.stringify({ verdict: "PASS", criteria: crit(), findings: [] }));
