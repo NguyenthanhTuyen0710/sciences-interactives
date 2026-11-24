@@ -521,7 +521,7 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-30", title: "Type Brevet — Programmes équivalents", niveau: 5, objectives: ["M3-NC-12", "M3-NC-13", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360,
     vary: (rng) => {
-      const k = rng.int(2, 5), s = rng.int(2, 9), c = rng.int(1, 5), v = k * s - c * s;
+      const k = rng.int(2, 5), s = rng.int(2, 9), c = rng.int(1, k - 1), v = k * s - c * s;
       return {
         statement: `Programme A : choisir un nombre, le multiplier par $${k}$. Programme B : choisir un nombre, le multiplier par $${c}$ puis ajouter $${v}$. Pour quel nombre $x$ les deux programmes donnent-ils le même résultat ?`,
         parts: [tt(`1. Équation : $${k}x =$ [[0]] $x + ${v}$`, [nb(c)]), num(s, [], "2. Valeur de $x$"), steps([[`Résultat des deux programmes pour $x = ${s}$`, k * s]], "3. Vérifie.")],
