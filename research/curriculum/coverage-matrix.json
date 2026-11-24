@@ -1727,7 +1727,7 @@
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "math-3e-thales-semblables",
    "content": null,
    "missing": [
     "chapitre complet"
