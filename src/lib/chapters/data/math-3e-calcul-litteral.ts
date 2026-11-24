@@ -140,16 +140,7 @@ function shuffledOrder(rng: Rng, lines: string[]): ChapterPart {
   return orderPart(lines, items);
 }
 
-const O = {
-  "M3-NC-08": "Déterminer l'opposé d'une expression littérale.",
-  "M3-NC-09": "Développer avec la double distributivité, factoriser et réduire des expressions simples.",
-  "M3-NC-10": "Factoriser a²−b² et développer (a+b)(a−b).",
-  "M3-NC-11": "Utiliser le calcul littéral pour démontrer un résultat général ou réfuter une conjecture.",
-  "M4-NC-16": "Identifier la structure d'une expression littérale (somme, produit).",
-  "M4-NC-17": "Développer, factoriser et réduire avec la distributivité simple.",
-  "M4-NC-18": "Démontrer l'équivalence de deux programmes de calcul ; notion d'identité.",
-} as const;
-type Obj = keyof typeof O;
+type Obj = "M3-NC-08" | "M3-NC-09" | "M3-NC-10" | "M3-NC-11" | "M4-NC-16" | "M4-NC-17" | "M4-NC-18";
 type TT = "CL-T01" | "CL-T02" | "CL-T03" | "CL-T04" | "CL-T05" | "CL-T06" | "CL-T07" | "CL-T08" | "CL-T09";
 const ex = (e: Omit<ChapterExercise, "objectives" | "taxonomyTypes"> & { objectives: Obj[]; taxonomyTypes: TT[] }): ChapterExercise => e;
 
@@ -170,7 +161,7 @@ const EXERCISES: ChapterExercise[] = [
       const a = sgnInt(rng, 1, 9), b = sgnInt(rng, 1, 9), e = lin(a, b);
       return {
         statement: `Détermine l'opposé de l'expression $${e}$ et écris-le sans parenthèses sous la forme $px + q$.`,
-        parts: [tt(`Opposé de $${e}$ : [[0]] $x$ + [[1]]`, [nb(-a), nb(-b)])],
+        parts: [tt(`Opposé de $${e}$ : $p =$ [[0]] et $q =$ [[1]]`, [nb(-a), nb(-b)])],
         solution: [`L'opposé de $${e}$ est $-(${e})$.`, `Le signe $-$ change le signe de **chaque** terme : le coefficient de $x$ devient $${-a}$ et le terme constant devient $${-b}$.`, `$-(${e}) = ${lin(-a, -b)}$.`],
       };
     },
@@ -541,7 +532,7 @@ const EXERCISES: ChapterExercise[] = [
         statement: `Programme : choisir un nombre $x$ ; calculer $x + ${p}$ ; calculer $x - ${p}$ ; multiplier ces deux résultats ; ajouter $${p * p}$.`,
         parts: [
           tt(`$(x + ${p})(x - ${p}) + ${p * p} = x^{2} -$ [[0]] $+$ [[1]] $= x^{2}$`, [nb(p * p), nb(p * p)], "1. Développe l'expression qui traduit le programme."),
-          shuffledQcm(rng, ["le carré du nombre de départ", "le nombre de départ", `toujours $${p * p}$`, "le double du carré du nombre de départ"], 0, { 2: `$${p * p}$ est ajouté à la fin mais les autres termes ne s'annulent pas tous : il reste $x^{2}$.` }, "2. Que peut-on dire du résultat du programme ?"),
+          shuffledQcm(rng, ["le carré du nombre de départ", "le nombre de départ", `toujours $${p * p}$`, "le double du carré du nombre de départ"], 0, { 2: `Le $-${p * p}$ du produit et le $+${p * p}$ ajouté s'annulent : il reste $x^{2}$, qui dépend du nombre choisi.` }, "2. Que peut-on dire du résultat du programme ?"),
         ],
         solution: [`Le programme s'écrit $(x + ${p})(x - ${p}) + ${p * p}$.`, `$(x + ${p})(x - ${p}) = x^{2} - ${p * p}$ (identité $(a + b)(a - b) = a^{2} - b^{2}$).`, `$x^{2} - ${p * p} + ${p * p} = x^{2}$ : le résultat est toujours le carré du nombre de départ.`],
       };
@@ -592,9 +583,9 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "cl3-33", title: "Type Brevet — Deux programmes de calcul", niveau: 5, objectives: ["M3-NC-10", "M3-NC-11", "M4-NC-18"], taxonomyTypes: ["CL-T08"], time: 360,
     vary: (rng) => {
-      const p = rng.int(2, 9), t = rng.int(3, 12);
+      const p = rng.int(2, 9), t = p + rng.int(1, 8);
       return {
-        statement: `**Programme A** : choisir un nombre ; calculer d'une part ce nombre plus $${p}$, d'autre part ce même nombre moins $${p}$ (deux calculs séparés, à partir du nombre choisi) ; multiplier les deux résultats.\n**Programme B** : choisir un nombre ; le multiplier par lui-même ; retrancher $${p * p}$.`,
+        statement: `**Programme A** : choisir un nombre ; calculer ce nombre plus $${p}$, puis ce même nombre moins $${p}$ ; multiplier les deux résultats obtenus.\n**Programme B** : choisir un nombre ; le multiplier par lui-même ; retrancher $${p * p}$.`,
         parts: [
           steps([[`Résultat du programme A pour $${t}$`, (t + p) * (t - p)], [`Résultat du programme B pour $${t}$`, t * t - p * p]], `1. On choisit le nombre $${t}$.`),
           tt(`2. En notant $x$ le nombre choisi, le programme A donne $(x + ${p})(x - ${p}) = x^{2} -$ [[0]]`, [nb(p * p)]),
@@ -655,7 +646,7 @@ const EXERCISES: ChapterExercise[] = [
     ],
     solution: ["1. $(1 + 1)(1 + 2) = 2 \\times 3 = 6$ et $1^{2} + 2 = 3$ : $6 \\neq 3$.", "2. $2(x + 3) + 3(x - 1) = 2x + 6 + 3x - 3 = 5x + 3$ : l'égalité est une identité.", "3. Léo : $x = 1$ est un contre-exemple, sa conjecture est réfutée. Inès : le développement prouve l'égalité pour tout $x$. Avec $x = 0$, Léo trouverait $2 = 2$ : ce test ne réfute rien, il faut choisir une autre valeur."],
     reasoning: "On réfute avec un contre-exemple, on démontre avec un calcul littéral ; il faut choisir la valeur du test avec soin, car certaines valeurs « cachent » l'erreur.",
-    hints: ["Pour la partie 1, calcule chaque membre séparément.", "Pour la partie 2, utilise la distributivité simple deux fois, puis réduis.", "Pour la dernière affirmation, calcule les deux membres de la conjecture de Léo avec $x = 0$."],
+    hints: ["Pour la partie 1, calcule chaque membre séparément.", "Pour la partie 2, utilise la distributivité simple deux fois, puis réduis.", "Pour la dernière affirmation, demande-toi si n'importe quelle valeur de $x$ permet de voir l'erreur."],
   }),
   ex({
     id: "cl3-37", title: "Type Brevet — Le terrain et la bande cédée", niveau: 5, objectives: ["M3-NC-09", "M3-NC-11"], taxonomyTypes: ["CL-T09"], time: 360,
@@ -673,7 +664,7 @@ const EXERCISES: ChapterExercise[] = [
       };
     },
     reasoning: "La forme développée traduit « aire du carré − aire de la bande » ; la forme factorisée traduit « aire d'un rectangle ». Les deux expressions sont égales.",
-    hints: ["Aire de la bande = largeur × longueur du côté.", "$x^{2}$ et $" + "w" + "x$ ont un facteur commun.", "Pour la partie 3, la forme factorisée est la plus rapide."],
+    hints: ["Aire de la bande = largeur × longueur du côté.", "$x^{2}$ et le terme en $x$ ont un facteur commun.", "Pour la partie 3, la forme factorisée est la plus rapide."],
   }),
 ];
 
@@ -809,7 +800,7 @@ export const math3eCalculLitteral: ChapterContent = {
         [1, "$2(x + 3) = 2x + 3$", "$2(x + 3) = 2x + 6$ : le facteur multiplie chaque terme.", ["Le facteur n'a multiplié que le premier terme", "Le facteur a été ajouté au lieu d'être multiplié", "Le signe du second terme a été changé"], 0],
         [2, "$(x + 2)(x - 3) = x^{2} - x - 6$", "$x^{2} - 3x + 2x - 6 = x^{2} - x - 6$."],
         [2, "$(x + 2)(x - 3) = x^{2} - 6$", "Il manque les produits « croisés » : $x^{2} - 3x + 2x - 6 = x^{2} - x - 6$.", ["Seuls le premier et le dernier produits ont été calculés", "Le produit $2 \\times (-3)$ a le mauvais signe", "Il fallait additionner les deux parenthèses"], 0],
-        [2, "$3x + 3 = 3x(1 + 1)$", "$3x + 3 = 3(x + 1)$ : le facteur commun est $3$, pas $3x$.", ["Le facteur choisi n'est pas commun aux deux termes", "Il fallait mettre $x$ en facteur", "Il fallait diviser par $3$ sans parenthèse"], 0],
+        [2, "$3x + 3 = 3x(1 + 1)$", "$3x + 3 = 3(x + 1)$ : le facteur commun est $3$, pas $3x$.", ["Le facteur choisi n'est pas commun aux deux termes", "Il fallait mettre $x$ en facteur", "Il fallait développer au lieu de factoriser"], 0],
         [3, "$x^{2} - 25 = (x - 5)(x + 5)$", "Identité $a^{2} - b^{2} = (a - b)(a + b)$ avec $a = x$ et $b = 5$."],
         [3, "$a^{2} - b^{2} = (a - b)^{2}$", "Le produit correct est $(a - b)(a + b)$ ; par exemple $5^{2} - 3^{2} = 16$ mais $(5 - 3)^{2} = 4$.", ["On a oublié que les deux facteurs sont différents", "Il fallait écrire $(a + b)^{2}$", "Il fallait écrire $a^{2} + b^{2}$"], 0],
         [3, "$x^{2} + 9 = (x - 3)(x + 3)$", "$(x - 3)(x + 3) = x^{2} - 9$ : l'identité s'applique à une **différence** de deux carrés.", ["On a appliqué l'identité à une somme de deux carrés", "$3$ n'est pas la racine de $9$", "Les deux parenthèses sont inversées"], 0],
