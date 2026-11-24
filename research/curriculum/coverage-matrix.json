@@ -24,9 +24,9 @@
    "grade": "4e",
    "chapters": 21,
    "byState": {
-    "todo": 17,
+    "todo": 16,
     "published": 2,
-    "draft": 2
+    "draft": 3
    }
   },
   {
@@ -35,8 +35,7 @@
    "chapters": 16,
    "byState": {
     "published": 2,
-    "draft": 3,
-    "researched": 1,
+    "draft": 4,
     "todo": 10
    }
   },
@@ -1051,15 +1050,46 @@
    "domain": "NC",
    "chapterId": "math-4e-equations",
    "title": "Équations du premier degré",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": null,
-   "content": null,
+   "pipelineSpec": "math-3e-equations",
+   "content": {
+    "id": "math-3e-equations",
+    "taskId": "SCI-3E-MATH-004",
+    "file": "src/lib/chapters/data/math-3e-equations.ts",
+    "sha256": "a2e0bf895c332e4d97fd078f18ccf52f327004257c7b47e5cb1871f898f23262",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     5,
+     8,
+     7,
+     6,
+     4
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -1501,15 +1531,46 @@
    "domain": "NC",
    "chapterId": "math-3e-equations",
    "title": "Équations produits et équations x² = a",
-   "state": "researched",
+   "state": "draft",
    "objectives": {
     "total": 3,
     "verified": 3
    },
    "pipelineSpec": "math-3e-equations",
-   "content": null,
+   "content": {
+    "id": "math-3e-equations",
+    "taskId": "SCI-3E-MATH-004",
+    "file": "src/lib/chapters/data/math-3e-equations.ts",
+    "sha256": "a2e0bf895c332e4d97fd078f18ccf52f327004257c7b47e5cb1871f898f23262",
+    "registered": false,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     5,
+     8,
+     7,
+     6,
+     4
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
