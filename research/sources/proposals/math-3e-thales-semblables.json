@@ -1,6 +1,6 @@
 {
  "chapter": "math-3e-thales-semblables",
- "status": "PROPOSÉ (2026-11-24) — à approuver par Nguyễn Thanh Tuyền (relecteur G2) ; rien d'appliqué à l'inventaire, aucune approbation inscrite.",
+ "status": "PROPOSÉ — G2 modèle 3 (non approuvé, 2026-11-24) : en attente de la lecture des 10 points par Nguyễn Thanh Tuyền ; rien d'appliqué à l'inventaire, aucune approbation inscrite.",
  "note": "Citations copiées du texte extrait (pdftotext) des trois documents vérifiés par le collecteur (re-téléchargés le 2026-11-24, SHA256 identiques à ceux de la fiche) et contrôlées mot pour mot (quoteFound, ≥ 20 caractères). Page = numéro de page du PDF. Objectifs de consolidation 4e (M4-EG-05, M4-EG-06) : niveau « consolidation » en 3e, non obligatoires (optionalObjectives), G2 non requis par la porte. Aucun rapprochement automatique (run.ts match) committé : il créerait un 4e fichier (research/sources/verification/), non autorisé.",
  "changes": [
   {
@@ -52,7 +52,7 @@
    "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
    "page": 292,
    "quote": "Deux triangles semblables peuvent être définis par la proportionnalité des mesures de leurs côtés. Une caractérisation angulaire de cette définition peut être donnée et démontrée à partir d’un cas d’égalité des triangles et d’une caractérisation angulaire du parallélisme.",
-   "why": "Précise la définition (côtés proportionnels) et la propriété caractéristique (angulaire) retenues par la taxonomie (TH-T06, TH-T07)."
+   "why": "Précise la définition (côtés proportionnels) et la propriété caractéristique (angulaire) retenues par la taxonomie (TS-T06, TS-T07)."
   }
  ],
  "g1": {
@@ -132,19 +132,20 @@
   ]
  },
  "outOfScope": [
-  "Contraposée du théorème de Thalès (prouver que deux droites ne sont pas parallèles) : le mot « contraposée » n'apparaît dans aucun des trois documents vérifiés (recherche du 2026-11-24) ; approfondissement explicitement signalé seulement (type TH-T05), comme PY-T07 pour Pythagore.",
+  "Contraposée du théorème de Thalès (prouver que deux droites ne sont pas parallèles) : le mot « contraposée » n'apparaît dans aucun des trois documents vérifiés (recherche du 2026-11-24) ; approfondissement explicitement signalé seulement (type TS-T05), comme PY-T07 pour Pythagore.",
   "Homothéties (rapport positif ou négatif) : objectif M3-EG-06, chapitre math-3e-rotations-homotheties ; lien avec Thalès seulement mentionné.",
   "Effet d'un agrandissement ou d'une réduction sur les aires et les volumes : M4-GM-04 (math-4e-agrandissement-reduction) ; hors de ce chapitre."
  ],
  "openPoints": [
-  "1. Source G2 : attendus 3e (2019, p. 8), plus précis sur l'année que le programme 2020 (p. 136, cycle entier). Alternative : repères BO n° 22 p. 292 (voir alternativeEvidence). Équations avait cité le programme 2020.",
-  "2. M3-EG-04 : une seule citation (connaissances) ; le calcul de longueurs est cité p. 5 dans le matchType. Faut-il une seconde preuve séparée ?",
-  "3. Page 201 du BO n° 22 attribuée aux attendus de 4e d'après son contexte (« Ce que sait faire l'élève », cas d'égalité, cosinus) : à vérifier dans le PDF.",
-  "4. Contraposée (TH-T05) en approfondissement : aucune source ne la cite ; même traitement que PY-T07. Alternative : l'exclure du chapitre comme EQ-T09.",
-  "5. Définition retenue des triangles semblables : côtés proportionnels (BO p. 292), caractérisation : deux angles deux à deux égaux. Les textes ne disent pas laquelle est « la » définition (« une définition ») ; choix à valider.",
-  "6. Titre du nœud m3-thales (« Théorème de Thalès » dans src/lib/content/curriculum.ts:168) différent du titre de la fiche (« Thalès (configuration papillon) et triangles semblables ») : renommage à décider, dans la PR du chapitre (comme équations).",
-  "7. Figures : aucun générateur de configuration de Thalès dans le moteur ; proposé : SVG écrit dans le fichier du chapitre (précédent Pythagore). Alternative : générateur thales() dans src/lib/engine/svg.ts (modification du moteur, PR séparée avant le chapitre). Les SVG d'exercices (figure) ne sont pas contrôlés par validate-chapter (seul lesson.illustrations l'est).",
-  "8. Effort du chapitre : décision 28 (effort low) propre à équations ; à reprendre ou non pour ce chapitre (champ chapterEffort de la fiche, non posé).",
-  "9. Champ « brevet » des types : laissé à compléter (G5) ; seule source lue : l'exemple de réussite des attendus 3e p. 9 (ACE et CBD semblables), utilisé pour TH-T07 et TH-T09."
+  "1. Source G2 : attendus 3e 2019 p. 8 (précise l'année) plutôt que programme 2020 p. 136 (cycle entier ; équations l'avait cité). Recommandation : attendus 3e p. 8 ; repères BO n° 22 p. 292 en preuve alternative.",
+  "2. M3-EG-04 : une seule citation (connaissances), le calcul de longueurs (p. 5) n'est que dans le matchType. Recommandation : suffisant (l'objectif reformule les deux, la porte G2 n'exige qu'une preuve) ; le relecteur peut demander une seconde preuve séparée.",
+  "3. BO n° 22 p. 201 attribuée aux attendus de 4e d'après son contexte (cas d'égalité, cosinus, « Ce que sait faire l'élève »). Recommandation : vérifier dans le PDF avant approbation ; ne sert qu'au niveau « consolidation » de M4-EG-05/06.",
+  "4. TS-T05 (contraposée) : aucune source ne la cite. Options : (a) approfondissement balisé, comme PY-T07 de Pythagore ; (b) exclusion par excludedTaxonomyTypes, comme EQ-T09. Recommandation : (a), car la contraposée est la forme logique du théorème du programme (pas un contenu d'une autre classe, contrairement aux inéquations) ; (b) si le relecteur veut un périmètre strict.",
+  "5. Définition des triangles semblables : côtés proportionnels (BO n° 22 p. 292, « peuvent être définis par la proportionnalité des mesures de leurs côtés ») ; propriété caractéristique : deux angles deux à deux égaux. Recommandation : ce choix, qui suit le texte des repères 3e.",
+  "6. Titre du nœud m3-thales (« Théorème de Thalès », src/lib/content/curriculum.ts:168) ≠ titre de la fiche. Recommandation : renommer en « Thalès (configuration papillon) et triangles semblables » dans la PR du chapitre (comme équations), sans condition de recherche particulière.",
+  "7. Figures : option A retenue (geometry(), PR #41). Condition : PR #41 fusionnée avant la génération du chapitre, sinon le prompt décrit un générateur absent de main.",
+  "8. chapterEffort (décision nouvelle ; la décision 28 ne vaut que pour équations) : NON DÉCIDÉ (G2 modèle 3) ; champ retiré de la fiche (défaut medium) ; préférence du relecteur : medium, en attente du juge d'équations. Recommandation initiale : low (équations : 0 % de réflexion, 0,160 $), à revoir avec le bilan de la décision 31 (2 BLOQUANT et 3 MAJEUR relevés par le criblage, lien avec l'effort non établi).",
+  "9. Champ « brevet » des types : à compléter (G5) ; seule source lue : exemple de réussite des attendus 3e p. 9 (TS-T07, TS-T09). Recommandation : laisser vide jusqu'à G5.",
+  "10. taggingRules et requiredCases (TS-T03, TS-T04) : aucun contrôle automatique (décision 26). Recommandation : contrôle manuel par Claude Code après génération, avant criblage, comme équations : TS-T03 une longueur de chaque triangle ; TS-T04 au moins un papillon, comparaison sur valeurs exactes ; TS-T09 jamais cumulé avec TS-T01/T02/T03/T06/T08 ; TS-T05 jamais cumulé avec un type obligatoire."
  ]
 }
