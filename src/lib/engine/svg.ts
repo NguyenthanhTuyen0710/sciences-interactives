@@ -67,6 +67,74 @@ export function triangle(opts: {
   return wrap(W, H, body, opts.title);
 }
 
+// ---------- Figures de géométrie plane (Thalès, triangles semblables, agrandissement) ----------
+/** Segment [from, to] (ou droite (from to) si `line`) ; `parallel` = nombre de chevrons marquant le parallélisme. */
+export interface GeoSegment { from: string; to: string; label?: string; line?: boolean; dashed?: boolean; parallel?: number; color?: string }
+/** Angle de sommet `at` entre [at from) et [at to) ; `marks` = nombre d'arcs (angles de même mesure : même nombre). */
+export interface GeoAngle { at: string; from: string; to: string; marks?: number; label?: string }
+
+/**
+ * Figure plane à partir de points nommés (unités arbitraires, axe des ordonnées vers le haut), mise à l'échelle
+ * automatiquement dans le cadre. Un nom de point inconnu lève une erreur (détectée par validate-chapter au tirage).
+ */
+export function geometry(opts: { points: Record<string, [number, number]>; segments: GeoSegment[]; angles?: GeoAngle[]; title: string; width?: number; height?: number }) {
+  const W = opts.width ?? 360, H = opts.height ?? 260, pad = 36, EXT = 0.25;
+  const pt = (n: string) => { const p = opts.points[n]; if (!p) throw new Error(`geometry : point « ${n} » absent`); return p; };
+  const ends = (s: GeoSegment): [number, number][] => {
+    const A = pt(s.from), B = pt(s.to);
+    if (!s.line) return [A, B];
+    const dx = B[0] - A[0], dy = B[1] - A[1];
+    return [[A[0] - dx * EXT, A[1] - dy * EXT], [B[0] + dx * EXT, B[1] + dy * EXT]];
+  };
+  const all = [...Object.values(opts.points), ...opts.segments.flatMap(ends)];
+  const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const s = Math.min((W - 2 * pad) / (maxX - minX || 1), (H - 2 * pad) / (maxY - minY || 1));
+  const ox = pad + ((W - 2 * pad) - (maxX - minX) * s) / 2, oy = pad + ((H - 2 * pad) - (maxY - minY) * s) / 2;
+  const S = ([x, y]: [number, number]): [number, number] => [ox + (x - minX) * s, H - oy - (y - minY) * s];
+  const names = Object.keys(opts.points);
+  const cx = names.reduce((a, n) => a + S(pt(n))[0], 0) / (names.length || 1), cy = names.reduce((a, n) => a + S(pt(n))[1], 0) / (names.length || 1);
+  const f = (v: number) => v.toFixed(1);
+  let body = "";
+  for (const seg of opts.segments) {
+    const [P, Q] = ends(seg).map(S);
+    const col = seg.color ?? C.blue;
+    body += `<line x1="${f(P[0])}" y1="${f(P[1])}" x2="${f(Q[0])}" y2="${f(Q[1])}" stroke="${col}" stroke-width="2.2" stroke-linecap="round"${seg.dashed ? ' stroke-dasharray="6 5"' : ""}/>`;
+    const A = S(pt(seg.from)), B = S(pt(seg.to));
+    const dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1;
+    // Chevrons orientés de la même façon sur deux droites parallèles, quel que soit l'ordre from/to.
+    const flip = dx < -1e-9 || (Math.abs(dx) <= 1e-9 && dy > 0) ? -1 : 1, ux = (flip * dx) / len, uy = (flip * dy) / len;
+    for (let k = 0; k < (seg.parallel ?? 0); k++) {
+      const t = (k - ((seg.parallel ?? 1) - 1) / 2) * 7, mx = A[0] + dx * 0.4 + ux * t, my = A[1] + dy * 0.4 + uy * t;
+      body += `<polyline points="${f(mx - ux * 5 - uy * 5)},${f(my - uy * 5 + ux * 5)} ${f(mx)},${f(my)} ${f(mx - ux * 5 + uy * 5)},${f(my - uy * 5 - ux * 5)}" fill="none" stroke="${col}" stroke-width="1.8"/>`;
+    }
+    if (seg.label) {
+      const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+      let nx = -uy, ny = ux;
+      if ((mx - cx) * nx + (my - cy) * ny < 0) { nx = -nx; ny = -ny; }
+      const off = 14 + seg.label.length * 3.6 * Math.abs(nx) + 6 * Math.abs(ny);
+      body += text(mx + nx * off, my + ny * off, seg.label, { size: 14, color: C.red, weight: 600 });
+    }
+  }
+  for (const a of opts.angles ?? []) {
+    const O = S(pt(a.at)), U = S(pt(a.from)), V = S(pt(a.to));
+    const a1 = Math.atan2(U[1] - O[1], U[0] - O[0]);
+    let d = Math.atan2(V[1] - O[1], V[0] - O[0]) - a1;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d <= -Math.PI) d += 2 * Math.PI;
+    for (let k = 0; k < Math.max(1, a.marks ?? 1); k++) {
+      const r = 20 + 5 * k;
+      body += `<path d="M ${f(O[0] + r * Math.cos(a1))} ${f(O[1] + r * Math.sin(a1))} A ${r} ${r} 0 0 ${d > 0 ? 1 : 0} ${f(O[0] + r * Math.cos(a1 + d))} ${f(O[1] + r * Math.sin(a1 + d))}" fill="none" stroke="${C.orange}" stroke-width="1.8"/>`;
+    }
+    if (a.label) body += text(O[0] + 42 * Math.cos(a1 + d / 2), O[1] + 42 * Math.sin(a1 + d / 2), a.label, { size: 13, color: C.orange, weight: 600 });
+  }
+  for (const n of names) {
+    const [x, y] = S(pt(n)), dx = x - cx, dy = y - cy, m = Math.hypot(dx, dy) || 1;
+    body += `<circle cx="${f(x)}" cy="${f(y)}" r="2.8" fill="${C.ink}"/>` + text(x + (dx / m) * 16, y + (dy / m) * 16, n, { size: 16, weight: 600 });
+  }
+  return wrap(W, H, body, opts.title);
+}
+
 // ---------- Repère et courbes ----------
 export function plot(opts: {
   xmin: number; xmax: number; ymin: number; ymax: number;
