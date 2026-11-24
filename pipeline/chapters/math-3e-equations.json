@@ -16,7 +16,7 @@
   "scopeNotes": [
     "Programme 2020 en vigueur en 3e (BO n° 31 du 30-07-2020) + repères et attendus 2019 (BO n° 22 du 29-05-2019).",
     "Exigible (G1/G2 approuvés le 2026-11-24) : équations du premier degré et problèmes s'y ramenant, équations produit nul après factorisation, équations x² = a sur des exemples simples.",
-    "Hors périmètre exigible : inéquations (manifeste : « Hors programme 3e 2020 (inéquations : 2nde) ») — seulement en approfondissement explicitement signalé, jamais dans un exercice de niveau 1 à 3 ; équations du second degré générales et formule du discriminant (lycée) exclues.",
+    "Hors périmètre : inéquations — aucune occurrence dans les textes officiels vérifiés ; décision 28 : AUCUN exercice, exemple, méthode, corrigé ni jeu portant sur une inéquation (type EQ-T09 exclu du chapitre) ; au plus une phrase du cours signalant qu'elles ne sont pas au programme de 3e. Équations du second degré générales et formule du discriminant (lycée) exclues.",
     "Factorisation (a² − b², facteur commun) : prérequis du chapitre calcul littéral, réutilisé pour le produit nul."
   ],
   "exampleChapter": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
@@ -61,5 +61,11 @@
     "M4-NC-21"
   ],
   "optionalObjectivesNote": "Proposition du 2026-11-23 (décision 22), approuvée avec le G1 par Nguyễn Thanh Tuyền le 2026-11-24 (modèle 1) : objectifs de consolidation 4e, non exigibles en 3e → required: false (META) et hors porte G2 pour ce chapitre, comme M4-NC-16…18 pour calcul littéral.",
-  "judgeFindingsForFixNote": "Décision 22 du 2026-11-23 : tour de correction sur constats du juge désactivé au premier passage (pas de champ judgeFindingsForFix) ; arrêt après le premier juge, activation sur décision du porteur de projet."
+  "judgeFindingsForFixNote": "Décision 22 du 2026-11-23 : tour de correction sur constats du juge désactivé au premier passage (pas de champ judgeFindingsForFix) ; arrêt après le premier juge, activation sur décision du porteur de projet.",
+  "excludedTaxonomyTypes": [
+    "EQ-T09"
+  ],
+  "excludedTaxonomyTypesNote": "Décision 28 du 2026-11-24 : EQ-T09 (inéquations, approfondissement) retiré du prompt du chapitre ; la taxonomie verrouillée n'est pas modifiée.",
+  "chapterEffort": "low",
+  "chapterEffortNote": "Décision 28 du 2026-11-24 : réflexion limitée par l'effort (Sonnet 5.5 refuse budget_tokens et thinking disabled) ; calcul littéral à effort medium : réflexion 42,3 % de la sortie."
 }

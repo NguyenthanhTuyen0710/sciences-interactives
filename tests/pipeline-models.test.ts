@@ -468,3 +468,24 @@ describe("calcul littéral : dossier approuvé (décision du 2026-11-18)", () =>
     expect(out).toContain("chapter : src/lib/chapters/data/math-3e-pythagore.ts existe déjà, conservé (--force pour le régénérer).");
   }, 60_000);
 });
+
+describe("équations : G2 approuvé, effort et types exclus du chapitre (décision 28, 2026-11-24)", () => {
+  const fiche = JSON.parse(readFileSync("pipeline/chapters/math-3e-equations.json", "utf8")) as Record<string, unknown>;
+  const chapterLine = (out: string) => out.split("\n").find((l) => l.includes("\"model\":\"claude-sonnet-5-5\"") && l.includes("\"max_tokens\":96000")) ?? "";
+  const chars = (line: string) => Number(/(\d+) car\./.exec(line)?.[1]);
+  const example = { "src/lib/chapters/data/math-3e-calcul-litteral.ts": readFileSync("src/lib/chapters/data/math-3e-calcul-litteral.ts", "utf8") };
+  it("dry-run : porte G2 atteinte, chapitre en effort low, EQ-T09 absent du prompt", () => {
+    const { status, out } = dryRun(["math-3e-equations", "--batch"], example);
+    expect(status, out).toBe(0);
+    expect(out).not.toMatch(/Gate 1 non atteint|porte G2/);
+    expect(out).toContain("chapter=claude-sonnet-5-5/low");
+    expect(chapterLine(out)).toContain("\"effort\":\"low\"");
+    const { excludedTaxonomyTypes: _x, chapterEffort: _e, ...plain } = fiche;
+    const full = dryRun(["math-3e-equations", "--batch"], { ...example, "pipeline/chapters/math-3e-equations.json": JSON.stringify(plain, null, 2) });
+    expect(chapterLine(full.out)).toContain("\"effort\":\"medium\"");
+    expect(chars(chapterLine(out))).toBeLessThan(chars(chapterLine(full.out)));
+    const bad = dryRun(["math-3e-equations", "--batch"], { ...example, "pipeline/chapters/math-3e-equations.json": JSON.stringify({ ...fiche, chapterEffort: "max" }) });
+    expect(bad.status).not.toBe(0);
+    expect(bad.out).toContain("chapterEffort invalide : max");
+  }, 90_000);
+});

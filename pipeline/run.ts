@@ -46,7 +46,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true; chapterEffort?: "low" | "medium" | "high"; excludedTaxonomyTypes?: string[] }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -116,6 +116,9 @@ if ([SUBMIT, !!COLLECT, RECONCILE].filter(Boolean).length > 1) fail("--submit, -
 if (COLLECT !== undefined && !/^msgbatch_[A-Za-z0-9]+$/.test(COLLECT)) fail("identifiant de batch invalide (attendu : msgbatch_…)");
 if (EXERCISES !== undefined && !(Number.isInteger(EXERCISES) && EXERCISES >= 1 && EXERCISES <= 60)) fail("--exercises doit être un entier entre 1 et 60");
 const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
+/** Effort d'une étape : `chapterEffort` de la fiche pour l'étape « chapitre » (décision 28 : réflexion limitée, Sonnet 5.5 refuse budget_tokens et disabled), STEP_CONFIG sinon. */
+const effortFor = (step: Step) => step === "chapter" && spec.chapterEffort ? spec.chapterEffort : STEP_CONFIG[step].effort;
+if (spec.chapterEffort && !["low", "medium", "high"].includes(spec.chapterEffort)) fail(`chapterEffort invalide : ${spec.chapterEffort}`);
 const prices = readJson<Prices>("pipeline/prices.json");
 const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline/budget.json");
 // Dossier : modèle forcé pour la comparaison du pilote (--dossier-model haiku|sonnet) ; sinon STEP_CONFIG.
@@ -214,7 +217,8 @@ function taxonomyPrompt(): string {
   if (!existsSync(P(file))) return "";
   const tax = readJson<{ status: string; types: { id: string; title: string; objectives: string[]; level?: string; difficulty: number[]; variants: string[]; countsTowardCompleteness?: boolean; transversal?: boolean; rule?: string }[] }>(file);
   if (tax.status !== "verrouillé") return "";
-  const types = tax.types.map(({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }) => ({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }));
+  // `excludedTaxonomyTypes` de la fiche (décision 28) : types absents du prompt, donc aucun exercice ; taxonomie et lockHash inchangés.
+  const types = tax.types.filter((t) => !(spec.excludedTaxonomyTypes ?? []).includes(t.id)).map(({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }) => ({ id, title, objectives, level, difficulty, variants, countsTowardCompleteness, transversal, rule }));
   return `\nLocked exercise taxonomy (JSON). Every exercise declares \`taxonomyTypes: ["<type id>", …]\` with ids from this list only; its \`niveau\` must be in the \`difficulty\` of each declared type; every type that is not « approfondissement », not transversal and not \`countsTowardCompleteness: false\` has at least one exercise; an « approfondissement » type is never combined with a required type and never used in a « Type Brevet — » exercise; variants differ by structure or reasoning step, never only by numbers.\n${JSON.stringify(types, null, 1)}\n`;
 }
 
@@ -262,7 +266,7 @@ const params = (step: Step, user: string, batch: boolean, model: string): Anthro
   max_tokens: maxTokensFor(step, model),
   ...(thinkingParam(step, model) ? { thinking: thinkingParam(step, model) } : {}),
   // Relecture et criblage : JSON imposé par structured outputs (Message Batches compatibles), revérifié par parseReview.
-  output_config: step === "review" || step === "screen" ? { effort: STEP_CONFIG[step].effort, format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: STEP_CONFIG[step].effort },
+  output_config: step === "review" || step === "screen" ? { effort: effortFor(step), format: { type: "json_schema", schema: REVIEW_JSON_SCHEMA } } : { effort: effortFor(step) },
   system: [{ type: "text", text: systemFor(step), ...(cacheSystem(step, batch) ? { cache_control: { type: "ephemeral" as const, ttl: "1h" as const } } : {}) }],
   messages: [{ role: "user", content: user }],
 });
@@ -417,7 +421,7 @@ function fixFindings(validation: string): string {
 function taxonomyAndMeta(validation: string): string {
   const taxFile = `research/curriculum/${spec.subject}/taxonomy/${spec.id}.json`;
   const ids = new Set(validation.match(/\b[A-Z]+-T\d{2}\b/g) ?? []);
-  const types = existsSync(P(taxFile)) ? readJson<{ types: { id: string }[] }>(taxFile).types.filter((t) => ids.has(t.id)) : [];
+  const types = existsSync(P(taxFile)) ? readJson<{ types: { id: string }[] }>(taxFile).types.filter((t) => ids.has(t.id) && !(spec.excludedTaxonomyTypes ?? []).includes(t.id)) : [];
   return (types.length ? `\nLocked taxonomy types cited by the checks (JSON). The taxonomy file cannot change: link a new exercise to a type with \`taxonomyTypes: ["<type id>"]\`; keep each exercise's \`niveau\` within the \`difficulty\` of its types; an « approfondissement » exercise is never titled « Type Brevet — ».\n${JSON.stringify(types, null, 1)}\n` : "")
     + "\nDo not modify the META block (sources, officialObjectives, statuses).\n";
 }
@@ -512,7 +516,7 @@ const markDone = (step: Step, hash: string, note?: string) => { state.steps[step
 
 // ───────── Programme ─────────
 async function main() {
-  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèles ${Object.entries(STEP_CONFIG).map(([s, c]) => `${s}=${s === "dossier" ? DOSSIER_MODEL : s === "chapter" ? CHAPTER_MODEL : s === "fix" ? "haiku|sonnet" : c.model}/${c.effort}`).join(", ")}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
+  console.log(`Pipeline ${spec.id} (${spec.taskId}) — modèles ${Object.entries(STEP_CONFIG).map(([s, c]) => `${s}=${s === "dossier" ? DOSSIER_MODEL : s === "chapter" ? CHAPTER_MODEL : s === "fix" ? "haiku|sonnet" : c.model}/${effortFor(s as Step)}`).join(", ")}, mode ${RECONCILE ? "reconcile" : COLLECT ? "collect" : SUBMIT ? "submit (batch)" : LIVE ? "RÉEL" : "dry-run"}${BATCH && !SUBMIT ? " + batch" : ""}`);
   if (LIVE) {
     if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) { console.error("ARRÊT : aucune clé dans l'environnement (ANTHROPIC_API_KEY)."); process.exit(4); }
     client = new Anthropic({ maxRetries: 2 }); // nouvelles tentatives réservées aux lectures ; les envois payants passent maxRetries: 0
