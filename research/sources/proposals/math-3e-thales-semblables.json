@@ -1,0 +1,150 @@
+{
+ "chapter": "math-3e-thales-semblables",
+ "status": "PROPOSÉ (2026-11-24) — à approuver par Nguyễn Thanh Tuyền (relecteur G2) ; rien d'appliqué à l'inventaire, aucune approbation inscrite.",
+ "note": "Citations copiées du texte extrait (pdftotext) des trois documents vérifiés par le collecteur (re-téléchargés le 2026-11-24, SHA256 identiques à ceux de la fiche) et contrôlées mot pour mot (quoteFound, ≥ 20 caractères). Page = numéro de page du PDF. Objectifs de consolidation 4e (M4-EG-05, M4-EG-06) : niveau « consolidation » en 3e, non obligatoires (optionalObjectives), G2 non requis par la porte. Aucun rapprochement automatique (run.ts match) committé : il créerait un 4e fichier (research/sources/verification/), non autorisé.",
+ "changes": [
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-EG-03",
+   "evidence": {
+    "seedId": "c4-attendus-3e-2019-pdf",
+    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+    "quote": "le théorème de Thalès et sa réciproque dans la configuration papillon",
+    "page": 8,
+    "matchType": "b — objectif reformulé (« utiliser le théorème de Thalès et sa réciproque dans la configuration papillon »)",
+    "reason": "proposition Claude Code (2026-11-24), à approuver par le porteur de projet : correspondance objectif ↔ citation",
+    "context": "Attendus de fin d'année de 3e, « Utiliser les notions de géométrie plane pour démontrer », liste des connaissances. Même énoncé dans le BO n° 22, p. 218 (annexe reprenant les attendus 3e)."
+   }
+  },
+  {
+   "op": "attach_evidence",
+   "objectiveId": "M3-EG-04",
+   "evidence": {
+    "seedId": "c4-attendus-3e-2019-pdf",
+    "sha256": "49ccdca4d97ba4cf25875dfc731474e84d0332985c15396d3abfb9107f5f545a",
+    "quote": "les triangles semblables : une définition et une propriété caractéristique",
+    "page": 8,
+    "matchType": "b — objectif reformulé (« définir et caractériser des triangles semblables ») ; le calcul de longueurs figure p. 5 : « Il utilise la proportionnalité pour calculer des longueurs dans une configuration de Thalès, dans des triangles semblables, dans le cadre des homothéties. »",
+    "reason": "proposition Claude Code (2026-11-24), à approuver par le porteur de projet : correspondance objectif ↔ citation"
+   }
+  }
+ ],
+ "alternativeEvidence": [
+  {
+   "objectiveId": "M3-EG-03",
+   "seedId": "bo-2019-22-pdf",
+   "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+   "page": 292,
+   "quote": "Une définition et une caractérisation des triangles semblables sont données. Le théorème de Thalès et sa réciproque dans la configuration du papillon sont énoncés et utilisés (démonstration possible, utilisant une symétrie centrale pour se ramener à la configuration étudiée en quatrième).",
+   "why": "Repères annuels de progression 3e : place explicitement le papillon en 3e et les triangles emboîtés en 4e. Citation plus longue ; aussi valable pour M3-EG-04."
+  },
+  {
+   "objectiveId": "M3-EG-03",
+   "seedId": "c4-programme-2020-eduscol-pdf",
+   "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+   "page": 136,
+   "quote": "Le théorème de Thalès et sa réciproque (configurations des triangles emboîtés et du papillon).",
+   "why": "Programme du cycle 4 : ne précise pas l'année (cycle 3e-4e-5e)."
+  },
+  {
+   "objectiveId": "M3-EG-04",
+   "seedId": "bo-2019-22-pdf",
+   "sha256": "59c3cdd34dc2fbfb05573d913b695eae1bc98eea1c0eb51580cbb4ad42f36065",
+   "page": 292,
+   "quote": "Deux triangles semblables peuvent être définis par la proportionnalité des mesures de leurs côtés. Une caractérisation angulaire de cette définition peut être donnée et démontrée à partir d’un cas d’égalité des triangles et d’une caractérisation angulaire du parallélisme.",
+   "why": "Précise la définition (côtés proportionnels) et la propriété caractéristique (angulaire) retenues par la taxonomie (TH-T06, TH-T07)."
+  }
+ ],
+ "g1": {
+  "status": "PROPOSÉ — à valider par le porteur de projet",
+  "by": "Claude Code (session du 2026-11-24)",
+  "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+  "objectiveLevelsForFiche": {
+   "M3-EG-03": "exigible",
+   "M3-EG-04": "exigible",
+   "M4-EG-05": "consolidation",
+   "M4-EG-06": "consolidation"
+  },
+  "levelEvidence": "Niveau 3e : attendus de fin d'année de 3e (2019), p. 8 (connaissances : papillon, triangles semblables) ; repères annuels BO n° 22, p. 292 (3e : papillon ; « se ramener à la configuration étudiée en quatrième »). Niveau 4e des triangles emboîtés : BO n° 22, p. 201 : « le théorème de Thalès et sa réciproque dans la configuration des triangles emboîtés » (attendus 4e, à confirmer : voir points ouverts).",
+  "classification": [
+   {
+    "objectiveId": "M3-EG-03",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "configuration papillon",
+     "théorème de Thalès",
+     "réciproque du théorème de Thalès",
+     "alignement dans le même ordre"
+    ],
+    "competences": [
+     "Raisonner",
+     "Calculer"
+    ]
+   },
+   {
+    "objectiveId": "M3-EG-04",
+    "level": {
+     "3e": "exigible"
+    },
+    "notions": [
+     "triangles semblables",
+     "côtés homologues",
+     "proportionnalité des longueurs",
+     "caractérisation angulaire"
+    ],
+    "competences": [
+     "Raisonner",
+     "Calculer",
+     "Représenter"
+    ]
+   },
+   {
+    "objectiveId": "M4-EG-05",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "configuration des triangles emboîtés",
+     "calcul de longueurs"
+    ],
+    "competences": [
+     "Calculer"
+    ]
+   },
+   {
+    "objectiveId": "M4-EG-06",
+    "level": {
+     "4e": "exigible",
+     "3e": "consolidation"
+    },
+    "notions": [
+     "réciproque du théorème de Thalès",
+     "parallélisme"
+    ],
+    "competences": [
+     "Raisonner",
+     "Communiquer"
+    ]
+   }
+  ]
+ },
+ "outOfScope": [
+  "Contraposée du théorème de Thalès (prouver que deux droites ne sont pas parallèles) : le mot « contraposée » n'apparaît dans aucun des trois documents vérifiés (recherche du 2026-11-24) ; approfondissement explicitement signalé seulement (type TH-T05), comme PY-T07 pour Pythagore.",
+  "Homothéties (rapport positif ou négatif) : objectif M3-EG-06, chapitre math-3e-rotations-homotheties ; lien avec Thalès seulement mentionné.",
+  "Effet d'un agrandissement ou d'une réduction sur les aires et les volumes : M4-GM-04 (math-4e-agrandissement-reduction) ; hors de ce chapitre."
+ ],
+ "openPoints": [
+  "1. Source G2 : attendus 3e (2019, p. 8), plus précis sur l'année que le programme 2020 (p. 136, cycle entier). Alternative : repères BO n° 22 p. 292 (voir alternativeEvidence). Équations avait cité le programme 2020.",
+  "2. M3-EG-04 : une seule citation (connaissances) ; le calcul de longueurs est cité p. 5 dans le matchType. Faut-il une seconde preuve séparée ?",
+  "3. Page 201 du BO n° 22 attribuée aux attendus de 4e d'après son contexte (« Ce que sait faire l'élève », cas d'égalité, cosinus) : à vérifier dans le PDF.",
+  "4. Contraposée (TH-T05) en approfondissement : aucune source ne la cite ; même traitement que PY-T07. Alternative : l'exclure du chapitre comme EQ-T09.",
+  "5. Définition retenue des triangles semblables : côtés proportionnels (BO p. 292), caractérisation : deux angles deux à deux égaux. Les textes ne disent pas laquelle est « la » définition (« une définition ») ; choix à valider.",
+  "6. Titre du nœud m3-thales (« Théorème de Thalès » dans src/lib/content/curriculum.ts:168) différent du titre de la fiche (« Thalès (configuration papillon) et triangles semblables ») : renommage à décider, dans la PR du chapitre (comme équations).",
+  "7. Figures : aucun générateur de configuration de Thalès dans le moteur ; proposé : SVG écrit dans le fichier du chapitre (précédent Pythagore). Alternative : générateur thales() dans src/lib/engine/svg.ts (modification du moteur, PR séparée avant le chapitre). Les SVG d'exercices (figure) ne sont pas contrôlés par validate-chapter (seul lesson.illustrations l'est).",
+  "8. Effort du chapitre : décision 28 (effort low) propre à équations ; à reprendre ou non pour ce chapitre (champ chapterEffort de la fiche, non posé).",
+  "9. Champ « brevet » des types : laissé à compléter (G5) ; seule source lue : l'exemple de réussite des attendus 3e p. 9 (ACE et CBD semblables), utilisé pour TH-T07 et TH-T09."
+ ]
+}

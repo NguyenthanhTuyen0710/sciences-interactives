@@ -54,11 +54,24 @@ export const ReviewSchema = z
   });
 export type Review = z.infer<typeof ReviewSchema>;
 
-/** Analyse et contrôle la sortie ; renvoie les erreurs au lieu de lever. */
+/**
+ * Tri stable des constats par gravité décroissante (BLOQUANT, MAJEUR, MINEUR), avant contrôle (2026-11-24) : l'ordre
+ * n'a pas de sens propre et structured outputs ne peut pas l'imposer (criblage équations, run 105, rejeté pour ce
+ * seul motif). Rien n'est trié si un constat a une gravité inconnue : le schéma le refuse ensuite.
+ */
+function sortFindings(json: unknown): unknown {
+  if (!json || typeof json !== "object" || !Array.isArray((json as { findings?: unknown }).findings)) return json;
+  const findings = (json as { findings: unknown[] }).findings;
+  const rank = (f: unknown) => SEVERITIES.indexOf((f as { severity?: never } | null)?.severity as never);
+  if (findings.some((f) => rank(f) < 0)) return json;
+  return { ...json, findings: [...findings].sort((x, y) => rank(x) - rank(y)) };
+}
+
+/** Analyse et contrôle la sortie ; renvoie les erreurs au lieu de lever. Constats triés par gravité avant contrôle. */
 export function parseReview(text: string): { ok: true; review: Review } | { ok: false; errors: string[] } {
   let json: unknown;
   try { json = JSON.parse(text); } catch (e) { return { ok: false, errors: [`JSON illisible : ${(e as Error).message}`] }; }
-  const r = ReviewSchema.safeParse(json);
+  const r = ReviewSchema.safeParse(sortFindings(json));
   return r.success ? { ok: true, review: r.data } : { ok: false, errors: r.error.issues.map((i) => `${i.path.join(".") || "(racine)"} : ${i.message}`) };
 }
 
