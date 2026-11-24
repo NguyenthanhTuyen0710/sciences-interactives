@@ -9,9 +9,10 @@ import { math3ePuissancesCalculs } from "./data/math-3e-puissances-calculs";
 import { math3ePourcentagesEvolution } from "./data/math-3e-pourcentages-evolution";
 import { math3ePythagore } from "./data/math-3e-pythagore";
 import { math3eCalculLitteral } from "./data/math-3e-calcul-litteral";
+import { math3eEquations } from "./data/math-3e-equations";
 
 /** Chapitres complets (src/lib/chapters/data/). */
-export const ALL_CHAPTERS: ChapterContent[] = [math5eNombresRelatifs, math3eArithmetique, math3ePuissancesCalculs, math3ePourcentagesEvolution, math3ePythagore, math3eCalculLitteral];
+export const ALL_CHAPTERS: ChapterContent[] = [math5eNombresRelatifs, math3eArithmetique, math3ePuissancesCalculs, math3ePourcentagesEvolution, math3ePythagore, math3eCalculLitteral, math3eEquations];
 
 /** Un chapitre est visible publiquement s'il est publié (ou en prévisualisation : SHOW_DRAFTS=1). */
 export const isVisible = (c: ChapterContent) => c.publicationStatus === "published" || process.env.SHOW_DRAFTS === "1";

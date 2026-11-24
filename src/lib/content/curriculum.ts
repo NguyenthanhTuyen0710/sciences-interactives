@@ -164,7 +164,7 @@ export const CURRICULUM: Record<Subject, Level[]> = {
       ch("m3-puissances", "Fractions, puissances et racines carrées", NC),
       ch("m3-calcul-litteral", "Calcul littéral : développer, factoriser, identités", NC),
       ch("m3-pourcentages", "Ratios, pourcentages et évolutions", GD),
-      ch("m3-equations", "Équations et inéquations", NC),
+      ch("m3-equations", "Équations : premier degré, produit nul, x² = a", NC),
       ch("m3-thales", "Théorème de Thalès", EG),
       ch("m3-pythagore", "Théorème de Pythagore et réciproque", EG, [
         n("m3-pythagore-reciproque", "Démontrer qu'un triangle est rectangle", {
