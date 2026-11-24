@@ -36,7 +36,8 @@
    "byState": {
     "published": 2,
     "draft": 3,
-    "todo": 11
+    "researched": 1,
+    "todo": 10
    }
   },
   {
@@ -1500,12 +1501,12 @@
    "domain": "NC",
    "chapterId": "math-3e-equations",
    "title": "Équations produits et équations x² = a",
-   "state": "todo",
+   "state": "researched",
    "objectives": {
     "total": 3,
     "verified": 3
    },
-   "pipelineSpec": null,
+   "pipelineSpec": "math-3e-equations",
    "content": null,
    "missing": [
     "chapitre complet"
