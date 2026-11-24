@@ -19,7 +19,7 @@
     "Consolidation 4e : Thalès et réciproque dans la configuration des triangles emboîtés (attendus 4e) ; non obligatoire en 3e, réinvesti dans les problèmes.",
     "Contraposée du théorème de Thalès (démontrer que deux droites ne sont pas parallèles) : non citée dans les trois textes vérifiés ; approfondissement explicitement signalé seulement (comme PY-T07 pour Pythagore).",
     "Homothéties, agrandissement-réduction et effet sur les aires : chapitres math-3e-rotations-homotheties et math-4e-agrandissement-reduction ; hors de ce chapitre, sauf mention du lien avec la proportionnalité.",
-    "Figures : aucun générateur du moteur pour les configurations de Thalès (src/lib/engine/svg.ts n'a que triangle()) ; SVG écrit dans le fichier du chapitre, comme Pythagore (squaresSvg, ladderSvg), avec la mention « figure non à l'échelle » si les longueurs sont tirées au hasard."
+    "Figures : générateur geometry() de src/lib/engine/svg.ts (option A du relecteur, 2026-11-24 ; PR séparée, préalable au chapitre) — points nommés, segments ou droites, étiquettes de longueur, chevrons de parallélisme, arcs d'angles de même mesure, mise à l'échelle automatique ; figures calculées à partir des valeurs tirées (pas de SVG écrit à la main)."
   ],
   "exampleChapter": "src/lib/chapters/data/math-3e-pythagore.ts",
   "notion": {
@@ -60,5 +60,6 @@
     "M4-EG-06"
   ],
   "optionalObjectivesNote": "Proposition du 2026-11-24, à approuver avec le G1 : objectifs de consolidation 4e (configuration des triangles emboîtés), non exigibles en 3e → required: false (META) et hors porte G2, comme M4-NC-19…21 pour équations.",
-  "judgeFindingsForFixNote": "Comme équations (décision 22) : pas de champ judgeFindingsForFix au premier passage ; arrêt après le premier juge."
+  "judgeFindingsForFixNote": "Comme équations (décision 22) : pas de champ judgeFindingsForFix au premier passage ; arrêt après le premier juge.",
+  "chapterEffortNote": "Point 8, NON DÉCIDÉ (G2 modèle 3, 2026-11-24) : champ chapterEffort absent → effort par défaut (medium). Proposition « low » (comme équations, décision 28 : réflexion 0 %, 0,160 $) en attente du juge d'équations ; préférence du relecteur : medium."
 }
