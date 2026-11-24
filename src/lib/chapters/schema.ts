@@ -55,6 +55,14 @@ export interface ExerciseBody {
   solution: string[];
 }
 
+/**
+ * Contrôle par résolution indépendante (validate-chapter) : l'équation est relue dans le texte élève de `equation`
+ * (l'énoncé, ou une partie : consigne, gabarit aux trous remplis, option correcte d'un QCM), résolue, et ses solutions
+ * comparées à la réponse de la partie `answer` (numérique, trous numériques ou QCM d'options numériques).
+ * `positive` : ne garder que les solutions strictement positives (longueur, âge, nombre de séances…).
+ */
+export interface SolveCheck { equation: "statement" | number; answer: number; positive?: boolean }
+
 export interface ChapterExercise extends Partial<ExerciseBody> {
   id: string;
   title: string;
@@ -69,6 +77,8 @@ export interface ChapterExercise extends Partial<ExerciseBody> {
   hints: string[];
   /** Variation contrôlée des paramètres : remplace statement/parts/solution par un tirage. */
   vary?: (rng: Rng) => ExerciseBody;
+  /** Contrôles par résolution de l'énoncé, appliqués à chaque tirage par validate-chapter. */
+  solveCheck?: SolveCheck[];
 }
 
 const ExerciseSchema = z
@@ -85,6 +95,7 @@ const ExerciseSchema = z
     parts: z.array(z.object({ interaction: z.object({ kind: z.string() }).passthrough(), mistakes: z.array(z.object({ match: z.string(), feedback: rich })).optional() }).passthrough()).optional(),
     solution: z.array(rich).optional(),
     vary: z.function().optional(),
+    solveCheck: z.array(z.object({ equation: z.union([z.literal("statement"), z.number().int().min(0)]), answer: z.number().int().min(0), positive: z.boolean().optional() })).min(1).optional(),
   })
   .passthrough()
   .refine((e) => e.vary || (e.statement && e.parts?.length && e.solution?.length), "exercice sans énoncé/parties/solution ni générateur `vary`");
