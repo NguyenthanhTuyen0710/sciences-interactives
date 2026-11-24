@@ -1,11 +1,11 @@
 {
  "chapter": "math-3e-thales-semblables",
  "taskId": "SCI-3E-MATH-012",
- "status": "proposé",
- "lockedAt": null,
- "lockedBy": null,
- "lockHash": null,
- "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-24, sans API) à partir de l'inventaire (M3-EG-03, M3-EG-04, M4-EG-05, M4-EG-06) et des textes vérifiés : attendus 3e 2019 p. 5, 8, 9 ; programme cycle 4 2020 p. 136 ; BO n° 22 p. 201, 292. À approuver puis verrouiller par le porteur de projet (Nguyễn Thanh Tuyền). Les listes « exercises » restent vides : rattachement exercice ↔ type par le champ `taxonomyTypes` de chaque exercice, contrôlé par validate-chapter.",
+ "status": "verrouillé",
+ "lockedAt": "2026-11-24",
+ "lockedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet), approbation G1/G2 du 2026-11-24, modèle 1 (requiredCases de TS-T03 reformulés avec son accord)",
+ "lockHash": "cf473f34691178992a6938b6753a3efeeb56ab76c1a40ea11b858c089b66f170",
+ "note": "Taxonomie rédigée à la main (Claude Code, 2026-11-24, sans API) à partir de l'inventaire (M3-EG-03, M3-EG-04, M4-EG-05, M4-EG-06) et des textes vérifiés : attendus 3e 2019 p. 5, 8, 9 ; programme cycle 4 2020 p. 136 ; BO n° 22 p. 201, 292. Approuvée et verrouillée par Nguyễn Thanh Tuyền le 2026-11-24 (modèle 1). Les listes « exercises » restent vides : rattachement exercice ↔ type par le champ `taxonomyTypes` de chaque exercice, contrôlé par validate-chapter.",
  "sources": [
   "c4-attendus-3e-2019-pdf p. 8 : « le théorème de Thalès et sa réciproque dans la configuration papillon » ; « les triangles semblables : une définition et une propriété caractéristique » ; p. 5 : « Il utilise la proportionnalité pour calculer des longueurs dans une configuration de Thalès, dans des triangles semblables, dans le cadre des homothéties. » ; p. 9 : « En appliquant le théorème de Thalès, il effectue des calculs de longueurs. » ; « Démontrer que les triangles ACE et CBD sont semblables. »",
   "c4-programme-2020-eduscol-pdf p. 136 : « triangles semblables (une définition et une propriété caractéristique) » ; « Le théorème de Thalès et sa réciproque (configurations des triangles emboîtés et du papillon). »",
@@ -117,7 +117,7 @@
     "associer AM à AC"
    ],
    "requiredCases": {
-    "rule": "Au moins un exercice rattaché à TS-T03 demande une longueur du triangle de A vers (MN), au moins un une longueur du triangle de A vers (BC)."
+    "rule": "Au moins un exercice rattaché à TS-T03 demande une longueur du triangle AMN (AM, AN ou MN), au moins un une longueur du triangle ABC (AB, AC ou BC)."
    },
    "brevet": "« brevet » à compléter (G5) : aucune annale lue.",
    "exercises": []

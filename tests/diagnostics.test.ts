@@ -108,8 +108,8 @@ describe("taxonomie Pythagore verrouillée (Việc 2, 2026-11-15)", () => {
   const canon = (v: unknown): string => Array.isArray(v) ? `[${v.map(canon).join(", ")}]`
     : v && typeof v === "object" ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}: ${canon((v as Record<string, unknown>)[k])}`).join(", ")}}`
     : JSON.stringify(v);
-  // Pythagore (2026-11-15), calcul littéral (2026-11-18) et équations (2026-11-24).
-  for (const id of ["math-3e-pythagore", "math-3e-calcul-litteral", "math-3e-equations"]) {
+  // Pythagore (2026-11-15), calcul littéral (2026-11-18), équations et Thalès-semblables (2026-11-24).
+  for (const id of ["math-3e-pythagore", "math-3e-calcul-litteral", "math-3e-equations", "math-3e-thales-semblables"]) {
     it(`${id} : empreinte de verrouillage inchangée (seul le champ « brevet » peut évoluer)`, async () => {
       const { createHash } = await import("node:crypto");
       const t0 = JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${id}.json`, "utf8"));
