@@ -285,9 +285,11 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
   const COLLEGE_PROMPTS: Record<string, string> = {
     // chapter : modifié volontairement (propositions A et C, 2026-11-15 ; variable {{TAXONOMY}}, 2026-11-18). L'empreinte
     // est prise avec {{TAXONOMY}} vide (chapitre sans taxonomie verrouillée) : prompt résolu identique à celui d'avant.
-    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "54ec615f95f20d67",
+    // 2026-11-24 (décision 36) : consignes solveCheck et geometry() ajoutées → chapter 54ec615f… → e3f268b0… (maths),
+    // 0cce6338… → 5d154e96… (physique-chimie) ; system, dossier, fix et review inchangés.
+    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "e3f268b0cd3a8463",
     "mathematiques/fix": "ecc7a2b99610772e", "mathematiques/review": "f84f4e7803af6a9c",
-    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "0cce633843c2cc8b", // idem
+    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "5d154e96771c3005", // idem
     "physique-chimie/fix": "ecc7a2b99610772e", "physique-chimie/review": "216835bdc19e6453",
   };
   it("prompts résolus identiques", () => {
