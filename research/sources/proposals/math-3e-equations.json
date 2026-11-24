@@ -1,6 +1,6 @@
 {
  "chapter": "math-3e-equations",
- "status": "PROPOSÉ (décision 22 du 2026-11-23) — à approuver par Nguyễn Thanh Tuyền (relecteur G2) ; rien d'appliqué à l'inventaire, aucune approbation inscrite.",
+ "status": "APPROUVÉ par Nguyễn Thanh Tuyền le 2026-11-24 (G1, G2), modèle 1 : approuvé tel que proposé, sans correction (citation de M3-NC-12 conservée) ; appliqué par `run.ts apply` (attach_evidence) et classement G1 reporté dans l’inventaire.",
  "note": "Citations copiées du texte extrait (pdftotext) des documents vérifiés par le collecteur (SHA256 identiques à ceux de la fiche, cache local du 2026-11-18) et contrôlées mot pour mot (quoteFound, ≥ 20 caractères). Page = numéro de page du PDF. Rapprochement automatique : research/sources/verification/math-3e-equations.json (run.ts match, sans IA : 0 verified / 6 needs_manual_review, d'où les citations choisies ici). Objectifs de consolidation 4e (M4-NC-19…21) : niveau « consolidation » en 3e, non obligatoires (optionalObjectives), G2 non requis par la porte, comme M4-NC-16…18 pour calcul littéral.",
  "changes": [
   {
@@ -12,8 +12,10 @@
     "quote": "résoudre des problèmes se ramenant à des équations du premier degré",
     "page": 131,
     "matchType": "b — objectif reformulé à l’infinitif (« résoudre des équations du premier degré et des problèmes s’y ramenant »)",
-    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation"
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+   "approvedAt": "2026-11-24"
   },
   {
    "op": "attach_evidence",
@@ -24,8 +26,10 @@
     "quote": "Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits)",
     "page": 132,
     "matchType": "b — objectif reformulé ; « équations produits » ; l’annulation d’un produit figure dans les connaissances de la même page (« Annulation d’un produit (démonstration possible par disjonction de cas). »)",
-    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation"
-   }
+    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation"
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+   "approvedAt": "2026-11-24"
   },
   {
    "op": "attach_evidence",
@@ -36,13 +40,15 @@
     "quote": "en particulier des équations du type x2 = a",
     "page": 132,
     "matchType": "b — objectif reformulé ; « x2 » = x² (exposant perdu à l’extraction)",
-    "reason": "proposition Claude Code (2026-11-23), à approuver par le porteur de projet : correspondance objectif ↔ citation",
+    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
     "extractionNote": "Exposant perdu à l'extraction PDF : « x2 = a » se lit x² = a dans le PDF ; citation gardée telle que dans le texte extrait (contrôle mot pour mot). « sur des exemples simples » : attendus 3e 2019 p. 3 (« équations de la forme x = a sur des exemples simples », exposant également perdu)."
-   }
+   },
+   "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+   "approvedAt": "2026-11-24"
   }
  ],
  "g1": {
-  "status": "PROPOSÉ — à valider par le porteur de projet",
+  "status": "APPROUVÉ par Nguyễn Thanh Tuyền le 2026-11-24 ; reporté dans l’inventaire (classification « validé »)",
   "by": "Claude Code (session du 2026-11-23)",
   "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
   "objectiveLevelsForFiche": {
@@ -169,5 +175,12 @@
   ],
   "conclusion": "Inéquations HORS de la partie exigible : les connaissances et compétences associées de l'attendu « Utiliser le calcul littéral » n'énumèrent que des équations ; le mot « inéquation » n'apparaît nulle part dans le programme 2020 (texte intégral, tous cycles et disciplines), ni dans les attendus 3e 2019, ni dans le BO n° 22 du 29-05-2019 (recherche dans les textes extraits, 2026-11-23). « inégalité » n'y apparaît qu'au sens de l'inégalité triangulaire (géométrie) ou d'inégalités sociales.",
   "method": "Preuve par énumération (citations contrôlées mot pour mot par quoteFound) et recherche d'occurrences ; pas de mention explicite « hors programme » dans le texte officiel."
+ },
+ "approval": {
+  "by": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+  "at": "2026-11-24",
+  "form": "modèle 1 — approuvé tel que proposé, sans correction",
+  "ineqCheck": "Le relecteur a lui-même recherché « inéquation » dans research/curriculum/mathematiques/taxonomy/math-3e-equations.json : 3 occurrences, toutes dans EQ-T09 (approfondissement, hors périmètre exigible).",
+  "nodeRename": "Renommage du nœud m3-equations en « Équations : premier degré, produit nul, x² = a » autorisé, à appliquer dans la PR du chapitre (décision 24)."
  }
 }

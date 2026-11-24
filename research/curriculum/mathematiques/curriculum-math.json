@@ -1679,19 +1679,77 @@
                   "id": "M4-NC-19",
                   "text": "Désigner une inconnue par une lettre et mettre un problème en équation.",
                   "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser le calcul littéral",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "inconnue",
+                    "mise en équation"
+                  ],
+                  "competences": [
+                    "Modéliser"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M4-NC-20",
                   "text": "Tester si un nombre est solution d'une équation.",
                   "officialRef": "Attendus de fin d'année de 4e (2019) › Utiliser le calcul littéral",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "solution d'une équation",
+                    "test par substitution"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Raisonner"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M4-NC-21",
                   "text": "Résoudre algébriquement une équation du premier degré.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (4e) ; Attendus de fin d'année de 4e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "level": {
+                    "4e": "exigible",
+                    "3e": "consolidation"
+                  },
+                  "notions": [
+                    "résolution algébrique",
+                    "équations ax = b et a + x = b"
+                  ],
+                  "competences": [
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 }
               ],
               "prerequisites": [
@@ -2407,19 +2465,116 @@
                   "id": "M3-NC-12",
                   "text": "Résoudre des équations du premier degré et des problèmes s'y ramenant.",
                   "officialRef": "Attendus de fin d'année de 3e (2019) › Utiliser le calcul littéral",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-programme-2020-eduscol-pdf",
+                    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                    "quote": "résoudre des problèmes se ramenant à des équations du premier degré",
+                    "page": 131,
+                    "matchType": "b — objectif reformulé à l’infinitif (« résoudre des équations du premier degré et des problèmes s’y ramenant »)",
+                    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
+                    "accessedAt": "2026-11-24T06:39:23.591Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                    "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "approvedAt": "2026-11-24"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "équation du premier degré",
+                    "mise en équation d'un problème",
+                    "inconnue"
+                  ],
+                  "competences": [
+                    "Modéliser",
+                    "Calculer"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M3-NC-13",
                   "text": "Résoudre des équations produits nuls (après factorisation).",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (3e) ; Attendus de fin d'année de 3e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-programme-2020-eduscol-pdf",
+                    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                    "quote": "Résoudre algébriquement des équations du premier degré ou s’y ramenant (équations produits)",
+                    "page": 132,
+                    "matchType": "b — objectif reformulé ; « équations produits » ; l’annulation d’un produit figure dans les connaissances de la même page (« Annulation d’un produit (démonstration possible par disjonction de cas). »)",
+                    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
+                    "accessedAt": "2026-11-24T06:39:23.591Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                    "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "approvedAt": "2026-11-24"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "équation produit nul",
+                    "annulation d'un produit",
+                    "factorisation préalable"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Raisonner"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 },
                 {
                   "id": "M3-NC-14",
                   "text": "Résoudre des équations du type x² = a sur des exemples simples.",
                   "officialRef": "Repères annuels de progression cycle 4 (BO n°22 du 29-05-2019) › Équations (3e) ; Attendus de fin d'année de 3e (2019)",
-                  "verified": true
+                  "verified": true,
+                  "evidence": {
+                    "seedId": "c4-programme-2020-eduscol-pdf",
+                    "sha256": "de42e9816d7d012fd5d6b3349171cf43dd038c1e50fa0fe9e664bcc8521194b9",
+                    "quote": "en particulier des équations du type x2 = a",
+                    "page": 132,
+                    "matchType": "b — objectif reformulé ; « x2 » = x² (exposant perdu à l’extraction)",
+                    "reason": "proposition Claude Code (2026-11-23), approuvée par Nguyễn Thanh Tuyền le 2026-11-24 : correspondance objectif ↔ citation",
+                    "extractionNote": "Exposant perdu à l'extraction PDF : « x2 = a » se lit x² = a dans le PDF ; citation gardée telle que dans le texte extrait (contrôle mot pour mot). « sur des exemples simples » : attendus 3e 2019 p. 3 (« équations de la forme x = a sur des exemples simples », exposant également perdu).",
+                    "accessedAt": "2026-11-24T06:39:23.591Z",
+                    "url": "https://eduscol.education.gouv.fr/sites/default/files/document/programme-d-enseignement-du-cycle-4-67722.pdf",
+                    "approvedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "approvedAt": "2026-11-24"
+                  },
+                  "level": {
+                    "3e": "exigible"
+                  },
+                  "notions": [
+                    "équation x² = a",
+                    "racine carrée",
+                    "nombre de solutions selon le signe de a"
+                  ],
+                  "competences": [
+                    "Calculer",
+                    "Raisonner"
+                  ],
+                  "classification": {
+                    "status": "validé",
+                    "by": "Claude Code (session du 2026-11-23)",
+                    "toValidate": "porteur de projet",
+                    "competencesSource": "Programme du cycle 4 (2020), Éduscol (c4-programme-2020-eduscol-pdf) : liste des six compétences p. 129 (« chercher, modéliser, représenter, raisonner, calculer, communiquer. ») ; descripteurs p. 129-130",
+                    "validatedBy": "Nguyễn Thanh Tuyền (relecteur G2, porteur de projet)",
+                    "validatedAt": "2026-11-24"
+                  }
                 }
               ],
               "prerequisites": [
