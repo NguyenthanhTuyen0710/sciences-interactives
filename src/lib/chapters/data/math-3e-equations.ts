@@ -97,17 +97,11 @@ const META = {
 
 
 const nb = (value: number): Blank => ({ type: "number", answer: { value } });
-const sel = (options: string[], answer: number): Blank => ({ type: "select", options, answer });
 const tt = (template: string, blanks: Blank[], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "texte-trous", template, blanks } });
 const num = (value: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "numerique", answer: { value } }, mistakes: mistakes.filter((m) => parseNumber(m.match)?.value !== value) });
 const qcm = (options: string[], answer: number, mistakes: Mistake[] = [], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "qcm", options, answer: [answer] }, mistakes });
 const vf = (items: string[], answer: boolean[], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "vrai-faux", items, answer } });
 const steps = (list: [string, number][], prompt?: string): ChapterPart => ({ prompt, interaction: { kind: "etapes", steps: list.map(([p, v]) => ({ prompt: p, answer: { value: v } })) } });
-function shuffledOrder(rng: Rng, lines: string[]): ChapterPart {
-  let items = rng.shuffle(lines);
-  while (items.every((x, i) => x === lines[i])) items = rng.shuffle(lines);
-  return { interaction: { kind: "ordonner", items, answer: lines.map((l) => items.indexOf(l)), hint: "Première étape en haut" } };
-}
 const sgn = (rng: Rng, lo: number, hi: number) => rng.sign() * rng.int(lo, hi);
 /** « ax + b » en LaTeX. */
 function lin(a: number, b: number): string {
@@ -117,15 +111,7 @@ function lin(a: number, b: number): string {
 const sq = (n: number) => n * n;
 const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b));
 
-const O = {
-  "M3-NC-12": "Résoudre des équations du premier degré et des problèmes s'y ramenant.",
-  "M3-NC-13": "Résoudre des équations produits nuls (après factorisation).",
-  "M3-NC-14": "Résoudre des équations du type x² = a sur des exemples simples.",
-  "M4-NC-19": "Désigner une inconnue par une lettre et mettre un problème en équation.",
-  "M4-NC-20": "Tester si un nombre est solution d'une équation.",
-  "M4-NC-21": "Résoudre algébriquement une équation du premier degré.",
-} as const;
-type Obj = keyof typeof O;
+type Obj = "M3-NC-12" | "M3-NC-13" | "M3-NC-14" | "M4-NC-19" | "M4-NC-20" | "M4-NC-21";
 type TT = "EQ-T01" | "EQ-T02" | "EQ-T03" | "EQ-T04" | "EQ-T05" | "EQ-T06" | "EQ-T07" | "EQ-T08";
 const ex = (e: Omit<ChapterExercise, "objectives" | "taxonomyTypes"> & { objectives: Obj[]; taxonomyTypes: TT[] }): ChapterExercise => e;
 
@@ -427,7 +413,7 @@ const EXERCISES: ChapterExercise[] = [
       const n = rng.int(3, 15);
       return {
         statement: `Un carré a une aire de $${sq(n)}$ cm². On note $x$ la longueur de son côté (en cm).`,
-        parts: [tt(`$x^{2} = ${sq(n)}$ a pour solutions algébriques [[0]] et [[1]] (ordre croissant)`, [nb(-n), nb(n)]), num(n, [{ match: String(-n), feedback: "Une longueur ne peut pas être négative." }], "Longueur du côté (en cm)")],
+        parts: [tt(`$x^{2} = ${sq(n)}$ a pour solutions [[0]] et [[1]] (ordre croissant)`, [nb(-n), nb(n)]), num(n, [{ match: String(-n), feedback: "Une longueur ne peut pas être négative." }], "Longueur du côté (en cm)")],
         solution: [`$x^{2} = ${sq(n)}$ donne $x = ${n}$ ou $x = -${n}$.`, `Une longueur est positive : le côté mesure $${n}$ cm.`],
       };
     },
@@ -496,8 +482,8 @@ const EXERCISES: ChapterExercise[] = [
       const a = rng.int(2, 7), b = rng.int(1, 6);
       return {
         statement: `Résous $(x + ${a})(x - ${b}) = (x + ${a})(${b + 3})$.`,
-        parts: [tt(`1. $(x + ${a})\\big[(x - ${b}) - ${b + 3}\\big] = 0$, soit $(x + ${a})(x -$ [[0]] $) = 0$`, [nb(2 * b + 3)]), tt("2. Solutions (ordre croissant) : [[0]] et [[1]]", [nb(Math.min(-a, 2 * b + 3)), nb(Math.max(-a, 2 * b + 3))]), vf(["Diviser par $(x + " + a + ")$ aurait fait perdre une solution."], [true], "3. Vrai ou faux ?")],
-        solution: [`1. On passe tout à gauche et on met $(x + ${a})$ en facteur : $(x + ${a})(x - ${2 * b + 3}) = 0$.`, `2. $x = ${-a}$ ou $x = ${2 * b + 3}$.`, `3. Vrai : on perdrait $x = ${-a}$.`],
+        parts: [tt(`1. $(x + ${a})\\big[(x - ${b}) - ${b + 3}\\big] = 0$, soit $(x + ${a})(x -$ [[0]] $) = 0$`, [nb(2 * b + 3)]), tt("2. Solutions (ordre croissant) : [[0]] et [[1]]", [nb(Math.min(-a, 2 * b + 3)), nb(Math.max(-a, 2 * b + 3))]), vf(["Diviser par $(x + " + a + ")$ aurait fait perdre une solution.", `L'équation a une seule solution, $x = ${2 * b + 3}$.`], [true, false], "3. Vrai ou faux ?")],
+        solution: [`1. On passe tout à gauche et on met $(x + ${a})$ en facteur : $(x + ${a})(x - ${2 * b + 3}) = 0$.`, `2. $x = ${-a}$ ou $x = ${2 * b + 3}$.`, `3. Vrai : on perdrait $x = ${-a}$. Faux : l'équation a deux solutions, $${-a}$ et $${2 * b + 3}$.`],
       };
     },
     reasoning: "Ne jamais diviser par une expression contenant l'inconnue.",
@@ -521,11 +507,13 @@ const EXERCISES: ChapterExercise[] = [
   ex({
     id: "eq3-30", title: "Type Brevet — Programmes équivalents", niveau: 5, objectives: ["M3-NC-12", "M3-NC-13", "M4-NC-19"], taxonomyTypes: ["EQ-T04"], time: 360, solveCheck: [{ equation: 0, answer: 1 }],
     vary: (rng) => {
-      const k = rng.int(2, 5), s = rng.int(2, 9), c = rng.int(1, k - 1), v = k * s - c * s;
+      const k = rng.int(2, 5), c = rng.int(1, k - 1), s = rng.int(2, 9), d = rng.int(1, 6), v = k * (s + d) - c * s, r = k * (s + d);
+      const eqs = [`$${k}(x + ${d}) = ${lin(c, v)}$`, `$${k}x + ${d} = ${lin(c, v)}$`, `$${k}x + ${d} = ${c === 1 ? "" : c}(x + ${v})$`, `$${k}(x + ${d}) = ${lin(c, 0)}$`];
+      const opts = rng.shuffle(eqs);
       return {
-        statement: `Programme A : choisir un nombre, le multiplier par $${k}$. Programme B : choisir un nombre, le multiplier par $${c}$ puis ajouter $${v}$. Pour quel nombre $x$ les deux programmes donnent-ils le même résultat ?`,
-        parts: [tt(`1. Équation : $${k}x =$ [[0]] $x + ${v}$`, [nb(c)]), num(s, [], "2. Valeur de $x$"), steps([[`Résultat des deux programmes pour $x = ${s}$`, k * s]], "3. Vérifie.")],
-        solution: [`1. $${k}x = ${c}x + ${v}$.`, `2. $${k - c}x = ${v}$ donc $x = ${s}$.`, `3. Pour $x = ${s}$ : $${k * s}$ dans les deux cas.`],
+        statement: `Programme A : choisir un nombre, lui ajouter $${d}$, puis multiplier le résultat par $${k}$. Programme B : choisir un nombre, le multiplier par $${c}$, puis ajouter $${v}$. On note $x$ le nombre choisi. Trouve le nombre $x$ pour lequel les deux programmes donnent le même résultat.`,
+        parts: [qcm(opts, opts.indexOf(eqs[0]), [{ match: String(opts.indexOf(eqs[1])), feedback: `Le programme A multiplie **la somme** $x + ${d}$ par $${k}$ : il faut des parenthèses.` }], "1. Quelle équation traduit l'égalité des deux programmes ?"), num(s, [], "2. Valeur de $x$"), steps([[`Résultat des deux programmes pour $x = ${s}$`, r]], "3. Vérifie.")],
+        solution: [`1. Programme A : $${k}(x + ${d})$ ; programme B : $${lin(c, v)}$. Égalité : $${k}(x + ${d}) = ${lin(c, v)}$.`, `2. $${lin(k, k * d)} = ${lin(c, v)}$, donc $${k - c}x = ${v - k * d}$ et $x = ${s}$.`, `3. Pour $x = ${s}$ : A donne $${k} \\times ${s + d} = ${r}$ et B donne $${c} \\times ${s} + ${v} = ${r}$.`],
       };
     },
     reasoning: "On égale les deux programmes et on résout.",
