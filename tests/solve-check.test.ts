@@ -78,6 +78,19 @@ describe("contrôle par résolution : résolution d'une équation lue dans le te
     expect(equationsIn("Factorise avec $a^{2} - b^{2} = (a - b)(a + b)$ : $x^{2} - 9 = 0$").map((e) => e.tex)).toEqual(["x^{2} - 9 = 0"]);
     expect(equationsIn("$x + 3 = 5$ donne $x = 2$").length).toBe(2);
   });
+  it("Thalès (décision 37) : x au dénominateur, valeur interdite exclue, égalité triple, décimaux", () => {
+    const sol = (t: string) => equationsIn(t).map((e) => solveEquation(e.lhs, e.rhs));
+    const near = (v: unknown, w: number[]) => { expect(Array.isArray(v)).toBe(true); (v as number[]).forEach((x, i) => expect(x).toBeCloseTo(w[i], 9)); expect((v as number[]).length).toBe(w.length); };
+    near(sol("$\\dfrac{4}{x} = \\dfrac{5}{6}$")[0], [4.8]);
+    near(sol("$\\dfrac{x}{x + 2} = \\dfrac{3}{5}$")[0], [3]);
+    near(sol("$\\dfrac{x}{7{,}5} = \\dfrac{2{,}4}{3}$")[0], [6]);
+    expect(sol("$\\dfrac{x}{x - 2} = \\dfrac{2}{x - 2}$")[0]).toEqual([]);
+    const triple = equationsIn("$\\dfrac{3}{5} = \\dfrac{x}{7} = \\dfrac{4}{BC}$");
+    expect(triple.map((e) => e.tex)).toEqual(["\\dfrac{3}{5} = \\dfrac{x}{7}"]);
+    near(solveEquation(triple[0].lhs, triple[0].rhs), [4.2]);
+    expect(equationsIn("$\\dfrac{AM}{AB} = \\dfrac{AN}{AC} = \\dfrac{MN}{BC}$")).toEqual([]);
+    expect(solveEquation("sqrt(x)", "2")).toBeNull();
+  });
   it("signale un distracteur de QCM équivalent à l'équation correcte", () => {
     const body: ExerciseBody = { statement: "", parts: [qcm(["$2x + 4 = 10$", "$x + 2 = 5$", "$2x = 10$"], 0), num(3)], solution: [] };
     expect(solveCheckIssues(body, [{ equation: 0, answer: 1 }])).toEqual([expect.stringContaining("distracteur 1")]);

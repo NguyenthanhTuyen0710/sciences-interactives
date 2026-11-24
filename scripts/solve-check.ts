@@ -1,8 +1,9 @@
 // Contrôle par résolution indépendante (décisions 31 et 32) : validate-chapter vérifiait que la réponse attendue
 // par le code est acceptée par le correcteur, jamais qu'elle résout l'énoncé (eq3-27, eq3-02, eq3-30 sont passés).
 // Ici, l'équation est relue dans le texte que voit l'élève (LaTeX entre $…$, trous remplis par leurs réponses),
-// résolue sans les variables du générateur (polynôme de degré ≤ 2 en x), puis comparée à la réponse attendue.
-import { compile, parse, type MathNode } from "mathjs";
+// résolue sans les variables du générateur (polynôme de degré ≤ 2 en x, ou fraction rationnelle dont le numérateur
+// l'est : x au dénominateur, décision 37), puis comparée à la réponse attendue.
+import { compile, parse, rationalize, type MathNode } from "mathjs";
 import { normalizeExpr } from "../src/lib/engine/expr";
 import { nearlyEqual } from "../src/lib/engine/numbers";
 import type { Blank, Interaction } from "../src/lib/engine/types";
@@ -27,8 +28,9 @@ function symbolsOf(node: MathNode): string[] {
 
 /**
  * Équations en x contenues dans un texte : suites de segments $…$ et de trous [[i]] séparées seulement par des
- * espaces, avec un seul « = » et aucun autre symbole que x (une identité littérale comme a² − b² = (a − b)(a + b)
- * est ignorée). `fill` donne le texte d'un trou (sa réponse attendue).
+ * espaces ; une égalité à plusieurs « = » (égalité de rapports de Thalès) donne une équation par paire de membres
+ * consécutifs. Seules les paires sans autre symbole que x sont gardées (une identité littérale comme
+ * a² − b² = (a − b)(a + b) est ignorée). `fill` donne le texte d'un trou (sa réponse attendue).
  */
 export function equationsIn(text: string, fill: (i: number) => string = () => "?"): { tex: string; lhs: string; rhs: string }[] {
   const tokens = text.split(/(\$[^$]*\$|\[\[\d+\]\])/).filter((t) => t !== "");
@@ -45,19 +47,36 @@ export function equationsIn(text: string, fill: (i: number) => string = () => "?
   const out: { tex: string; lhs: string; rhs: string }[] = [];
   for (const tex of runs) {
     const sides = tex.split("=");
-    if (sides.length !== 2) continue;
-    const [lhs, rhs] = sides.map(texToExpr);
-    if (!lhs || !rhs) continue;
-    try {
-      const syms = [...symbolsOf(parse(lhs)), ...symbolsOf(parse(rhs))];
-      if (syms.includes(VAR) && syms.every((s) => s === VAR)) out.push({ tex, lhs, rhs });
-    } catch { /* non analysable : ignoré */ }
+    for (let k = 0; k + 1 < sides.length; k++) {
+      const [lhs, rhs] = [sides[k], sides[k + 1]].map(texToExpr);
+      if (!lhs || !rhs) continue;
+      try {
+        const syms = [...symbolsOf(parse(lhs)), ...symbolsOf(parse(rhs))];
+        if (syms.includes(VAR) && syms.every((s) => s === VAR)) out.push({ tex: sides.length === 2 ? tex : `${sides[k].trim()} = ${sides[k + 1].trim()}`, lhs, rhs });
+      } catch { /* non analysable : ignoré */ }
+    }
   }
   return out;
 }
 
-/** Ensemble des solutions réelles de lhs = rhs : « all » (identité), liste triée, ou null (pas un polynôme de degré ≤ 2). */
+/**
+ * Ensemble des solutions réelles de lhs = rhs : « all » (identité), liste triée, ou null (ni polynôme de degré ≤ 2,
+ * ni fraction rationnelle à numérateur de degré ≤ 2). x au dénominateur : solutions du numérateur, hors valeurs
+ * interdites (dénominateur nul).
+ */
 export function solveEquation(lhs: string, rhs: string): number[] | "all" | null {
+  const poly = solvePolynomial(lhs, rhs);
+  if (poly !== null) return poly;
+  let r: { numerator: MathNode; denominator: MathNode | null; variables: string[] };
+  try { r = rationalize(`(${lhs}) - (${rhs})`, {}, true) as unknown as typeof r; } catch { return null; }
+  if (!r.denominator || r.variables.some((v) => v !== VAR)) return null;
+  const sol = solvePolynomial(r.numerator.toString(), "0");
+  if (sol === null || sol === "all") return sol;
+  const den = compile(r.denominator.toString());
+  return sol.filter((v) => Math.abs(Number(den.evaluate({ x: v }))) > 1e-12);
+}
+
+function solvePolynomial(lhs: string, rhs: string): number[] | "all" | null {
   const L = compile(lhs), R = compile(rhs);
   const f = (x: number) => { try { return Number(L.evaluate({ x })) - Number(R.evaluate({ x })); } catch { return NaN; } };
   const c = f(0), p = f(1), m = f(-1);
