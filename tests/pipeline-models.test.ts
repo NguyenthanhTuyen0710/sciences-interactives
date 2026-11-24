@@ -471,6 +471,25 @@ describe("calcul littéral : dossier approuvé (décision du 2026-11-18)", () =>
   }, 60_000);
 });
 
+describe("requiredCases et taggingRules transmis au prompt du chapitre (décision 37, 2026-11-24)", () => {
+  const TAX = "research/curriculum/mathematiques/taxonomy/math-3e-equations.json";
+  const tax = JSON.parse(readFileSync(TAX, "utf8")) as { taggingRules: string[]; types: Record<string, unknown>[] };
+  const chapterLine = (out: string) => out.split("\n").find((l) => l.includes("\"model\":\"claude-sonnet-5-5\"") && l.includes("\"max_tokens\":96000")) ?? "";
+  const chars = (line: string) => Number(/(\d+) car\./.exec(line)?.[1]);
+  const example = { "src/lib/chapters/data/math-3e-calcul-litteral.ts": readFileSync("src/lib/chapters/data/math-3e-calcul-litteral.ts", "utf8") };
+  it("présents → prompt plus long ; absents → prompt de la forme antérieure (aucun ajout)", () => {
+    const withRules = dryRun(["math-3e-equations", "--batch"], example);
+    expect(withRules.status, withRules.out).toBe(0);
+    const { taggingRules: _r, ...rest } = tax;
+    const plain = { ...rest, types: tax.types.map(({ requiredCases: _c, ...t }) => t) };
+    const without = dryRun(["math-3e-equations", "--batch"], { ...example, [TAX]: JSON.stringify(plain) });
+    expect(without.status, without.out).toBe(0);
+    const added = `Tagging rules (mandatory):\n${tax.taggingRules.map((r) => `- ${r}`).join("\n")}\nEvery \`requiredCases\` rule of a type is satisfied by the exercises linked to that type.\n`;
+    const cases = tax.types.filter((t) => t.requiredCases).map((t) => `,\n  "requiredCases": ${JSON.stringify(t.requiredCases, null, 1).replace(/\n/g, "\n  ")}`).join("");
+    expect(chars(chapterLine(withRules.out)) - chars(chapterLine(without.out))).toBe(added.length + cases.length);
+  }, 90_000);
+});
+
 describe("équations : G2 approuvé, effort et types exclus du chapitre (décision 28, 2026-11-24)", () => {
   const fiche = JSON.parse(readFileSync("pipeline/chapters/math-3e-equations.json", "utf8")) as Record<string, unknown>;
   const chapterLine = (out: string) => out.split("\n").find((l) => l.includes("\"model\":\"claude-sonnet-5-5\"") && l.includes("\"max_tokens\":96000")) ?? "";
