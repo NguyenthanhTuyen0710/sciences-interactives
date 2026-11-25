@@ -210,3 +210,172 @@ export function applyChanges(inv: Inventory, changes: Change[], docOf: (seedId: 
   if (!errors.length) Object.assign(inv, draft);
   return { applied: errors.length ? 0 : applied, errors };
 }
+
+// ───────── Relevé de structure de mise en page (référence d'interface) ─────────
+// Hors chaîne de contenu : rien ici n'est lu par pipeline/run.ts, les prompts, les dossiers, le criblage ni le juge.
+// Une page = une requête, aucun lien suivi, aucune ressource (image, script, vidéo) demandée, aucun texte long conservé.
+export const UI_REFERENCE_HOST = "www.geniesdessciences.com";
+export const UI_MAX_PAGES = 10;
+export const UI_MIN_DELAY_S = 2;
+/** Longueur maximale d'un texte conservé (libellés de navigation uniquement). */
+export const UI_MAX_TEXT = 40;
+export const UI_MAX_NAV_ITEMS = 30;
+/** Dossier de sortie : publié en artefact du run, ignoré par Git. */
+export const UI_OUTPUT_DIR = "ui-reference-output";
+export const uiUserAgent = (base: string) => base.replace(/\)\s*$/, "; relevé de structure de mise en page, sans contenu)");
+// Chemins refusés d'office : espace réservé, achat, contenus livrés par courriel.
+const UI_FORBIDDEN = /^\/(api|merci|classeurs|fiches-pdf)(\/|$)|connexion|login|compte|panier|checkout|boutique|shop|pack|cours-particuliers|abonnement|paiement/i;
+
+/** Liste « /a,/b » (chemins ou URL https du seul hôte autorisé) → chemins normalisés ; aucune requête. */
+export function validateUiPages(input: string): { paths: string[]; errors: string[] } {
+  const errors: string[] = [], paths: string[] = [];
+  const items = input.split(",").map((s) => s.trim()).filter(Boolean);
+  if (!items.length) errors.push("aucune page demandée");
+  for (const it of items) {
+    let u: URL;
+    try { u = new URL(it, `https://${UI_REFERENCE_HOST}`); } catch { errors.push(`${it} : URL invalide`); continue; }
+    if (u.protocol !== "https:") { errors.push(`${it} : HTTPS obligatoire`); continue; }
+    if (u.host !== UI_REFERENCE_HOST) { errors.push(`${it} : hôte ${u.host} ≠ ${UI_REFERENCE_HOST}`); continue; }
+    const p = u.pathname + u.search;
+    if (UI_FORBIDDEN.test(p)) { errors.push(`${it} : chemin réservé, d'achat ou de contenu livré (refusé)`); continue; }
+    if (!paths.includes(p)) paths.push(p);
+  }
+  if (paths.length > UI_MAX_PAGES) errors.push(`${paths.length} pages demandées (maximum ${UI_MAX_PAGES})`);
+  return { paths, errors };
+}
+
+export interface UiBlock {
+  index: number; tag: string; depth: number; roles: string[];
+  headings: { h1: number; h2: number; h3: number }; links: number; images: number; videos: number; forms: number; cards: number; gradeLinks: number;
+  navItems?: string[]; navOmitted?: number; footerColumns?: number; linksPerColumn?: number[];
+}
+export interface UiPage { path: string; httpStatus: number; note?: string; blocks: UiBlock[]; headingOutline: { level: number; block: number | null }[]; totals: { h1: number; h2: number; h3: number; blocks: number } }
+
+const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
+const LANDMARKS = new Set(["header", "nav", "main", "section", "aside", "footer"]);
+const GRADE = /^(sixième|cinquième|quatrième|troisième|seconde|première|terminale|6e|5e|4e|3e|2nde|2de|1re|tle)\b/i;
+const squash = (s: string) => s.replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;|&rsquo;/g, "'").replace(/&[a-z]+;|&#\d+;/gi, "").replace(/\s+/g, " ").trim();
+
+interface Frame { tag: string; block: UiBlock | null; links: number; hasHeading: boolean; hasImg: boolean; hasGroup: boolean; inFooter: UiBlock | null; text: string | null }
+
+/** Structure d'une page HTML : blocs repères, niveaux de titres (comptés, sans texte), libellés de navigation courts. */
+export function extractUiStructure(html: string): Omit<UiPage, "path" | "httpStatus"> {
+  const src = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<(script|style|noscript|template|svg)\b[\s\S]*?<\/\1\s*>/gi, "");
+  const blocks: UiBlock[] = [], outline: { level: number; block: number | null }[] = [];
+  const stack: Frame[] = [];
+  const openBlocks = () => stack.filter((f) => f.block).map((f) => f.block!);
+  const current = () => openBlocks().at(-1) ?? null;
+  const inNav = () => stack.some((f) => f.tag === "nav");
+  const re = /<(\/?)([a-zA-Z][\w-]*)\b[^>]*?(\/?)>|([^<]+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(src))) {
+    if (m[4] !== undefined) { const a = [...stack].reverse().find((f) => f.tag === "a" && f.text !== null); if (a) a.text += m[4]; continue; }
+    const closing = m[1] === "/", tag = m[2].toLowerCase();
+    if (!closing) {
+      const all = openBlocks();
+      if (tag === "img" || tag === "picture") { all.forEach((b) => b.images++); stack.forEach((f) => (f.hasImg = true)); }
+      if (tag === "video" || tag === "iframe") all.forEach((b) => b.videos++);
+      if (tag === "form") all.forEach((b) => b.forms++);
+      if (/^h[1-3]$/.test(tag)) {
+        const lvl = Number(tag[1]) as 1 | 2 | 3;
+        all.forEach((b) => b.headings[`h${lvl}`]++);
+        outline.push({ level: lvl, block: current()?.index ?? null });
+        stack.forEach((f) => (f.hasHeading = true));
+      }
+      if (VOID.has(tag) || m[3] === "/") continue;
+      const footer = stack.at(-1)?.inFooter ?? null;
+      let block: UiBlock | null = null;
+      if (LANDMARKS.has(tag)) {
+        block = { index: blocks.length, tag, depth: openBlocks().length, roles: [], headings: { h1: 0, h2: 0, h3: 0 }, links: 0, images: 0, videos: 0, forms: 0, cards: 0, gradeLinks: 0 };
+        if (tag === "nav") { block.navItems = []; block.navOmitted = 0; }
+        if (tag === "footer") { block.footerColumns = 0; block.linksPerColumn = []; }
+        blocks.push(block);
+      }
+      stack.push({ tag, block, links: 0, hasHeading: false, hasImg: false, hasGroup: false, inFooter: tag === "footer" ? block : footer, text: tag === "a" ? "" : null });
+      continue;
+    }
+    const at = stack.map((f) => f.tag).lastIndexOf(tag);
+    if (at < 0) continue;
+    while (stack.length > at) {
+      const f = stack.pop()!;
+      if (f.tag === "a") {
+        const label = squash(f.text ?? "");
+        openBlocks().forEach((b) => { b.links++; if (GRADE.test(label)) b.gradeLinks++; });
+        stack.forEach((p) => p.links++);
+        if (inNav()) {
+          const nav = [...openBlocks()].reverse().find((b) => b.tag === "nav")!;
+          if (label && label.length <= UI_MAX_TEXT && nav.navItems!.length < UI_MAX_NAV_ITEMS) nav.navItems!.push(label);
+          else nav.navOmitted!++;
+        }
+      }
+      if ((f.tag === "li" || f.tag === "article") && f.links > 0 && (f.hasHeading || f.hasImg || f.tag === "article")) openBlocks().forEach((b) => b.cards++);
+      // Colonne de pied de page : plus petit groupe contenant au moins 2 liens.
+      if (f.inFooter && f.block !== f.inFooter && f.links >= 2 && !f.hasGroup) { f.inFooter.footerColumns!++; f.inFooter.linksPerColumn!.push(f.links); }
+      if (f.inFooter && (f.hasGroup || (f.links >= 2 && f.block !== f.inFooter))) { const parent = stack.at(-1); if (parent) parent.hasGroup = true; }
+    }
+  }
+  let heroSeen = false;
+  for (const b of blocks) {
+    if (b.tag === "header") b.roles.push("en-tête");
+    if (b.tag === "nav") b.roles.push("navigation");
+    if (b.tag === "footer") b.roles.push("pied de page");
+    if (!heroSeen && b.headings.h1 > 0 && !["header", "nav", "footer", "main"].includes(b.tag)) { b.roles.push("hero"); heroSeen = true; }
+    if (b.gradeLinks >= 3) b.roles.push("sélecteur de niveau");
+    if (b.cards >= 3) b.roles.push("grille de cartes");
+    if (b.forms > 0) b.roles.push("formulaire");
+    if (!b.roles.length) b.roles.push("inconnu");
+  }
+  const totals = { h1: outline.filter((o) => o.level === 1).length, h2: outline.filter((o) => o.level === 2).length, h3: outline.filter((o) => o.level === 3).length, blocks: blocks.length };
+  const page = { blocks, headingOutline: outline, totals };
+  assertNoLongText(page);
+  return page;
+}
+
+/** Garde-fou : aucune chaîne relevée ne dépasse UI_MAX_TEXT caractères. */
+export function assertNoLongText(value: unknown): void {
+  if (typeof value === "string") { if (value.length > UI_MAX_TEXT) throw new Error(`texte relevé trop long (${value.length} caractères)`); return; }
+  if (Array.isArray(value)) return value.forEach(assertNoLongText);
+  if (value && typeof value === "object") Object.values(value).forEach(assertNoLongText);
+}
+
+export interface UiHttp { status: number; headers: { get(name: string): string | null }; text(): Promise<string> }
+export interface UiDeps { fetch: (url: string, init: { headers: Record<string, string>; redirect: "manual" }) => Promise<UiHttp>; sleep: (ms: number) => Promise<void> }
+export interface UiReport { host: string; userAgent: string; generatedAt: string; robots: { httpStatus: number | null; delaySeconds: number | null; note: string }; requests: string[]; pages: UiPage[]; stopped: string | null }
+
+const UI_MAX_BYTES = 3_000_000;
+
+/** Relevé complet : validation, robots.txt (arrêt s'il interdit une page), puis une requête par page, délai ≥ 2 s. */
+export async function collectUiStructure(pagesInput: string, userAgent: string, deps: UiDeps): Promise<UiReport> {
+  const report: UiReport = { host: UI_REFERENCE_HOST, userAgent, generatedAt: new Date().toISOString(), robots: { httpStatus: null, delaySeconds: null, note: "non consulté" }, requests: [], pages: [], stopped: null };
+  const { paths, errors } = validateUiPages(pagesInput);
+  if (errors.length) { report.stopped = `pages refusées : ${errors.join(" ; ")}`; return report; }
+  const get = async (url: string) => { report.requests.push(url); return deps.fetch(url, { headers: { "User-Agent": userAgent }, redirect: "manual" }); };
+  let robotsTxt: string;
+  try {
+    const r = await get(`https://${UI_REFERENCE_HOST}/robots.txt`);
+    report.robots.httpStatus = r.status;
+    if (r.status === 200) robotsTxt = await r.text();
+    else if (r.status >= 400 && r.status < 500) robotsTxt = ""; // RFC 9309 : aucune restriction
+    else { report.stopped = `robots.txt indisponible (HTTP ${r.status})`; return report; }
+  } catch (e) { report.stopped = `robots.txt indisponible (${(e as Error).message})`; return report; }
+  const group = groupFor(parseRobots(robotsTxt), userAgent);
+  const refused = paths.map((p) => ({ p, r: robotsAllows(group, p) })).filter((x) => !x.r.allowed);
+  if (refused.length) { report.robots.note = "interdit"; report.stopped = `robots.txt interdit : ${refused.map((x) => `${x.p} (${x.r.rule})`).join(", ")}`; return report; }
+  const delay = Math.max(UI_MIN_DELAY_S, group.crawlDelay ?? 0);
+  report.robots.delaySeconds = delay;
+  report.robots.note = "autorisé";
+  for (const path of paths) {
+    await deps.sleep(delay * 1000);
+    const empty = { blocks: [], headingOutline: [], totals: { h1: 0, h2: 0, h3: 0, blocks: 0 } };
+    try {
+      const r = await get(`https://${UI_REFERENCE_HOST}${path}`);
+      const type = r.headers.get("content-type") ?? "";
+      if (r.status >= 300 && r.status < 400) { report.pages.push({ path, httpStatus: r.status, note: "redirection non suivie", ...empty }); continue; }
+      if (r.status !== 200 || !type.includes("text/html")) { report.pages.push({ path, httpStatus: r.status, note: r.status === 200 ? "contenu non HTML ignoré" : "page non lue", ...empty }); continue; }
+      const html = await r.text();
+      if (html.length > UI_MAX_BYTES) { report.pages.push({ path, httpStatus: r.status, note: "page trop volumineuse, ignorée", ...empty }); continue; }
+      report.pages.push({ path, httpStatus: r.status, ...extractUiStructure(html) });
+    } catch (e) { report.pages.push({ path, httpStatus: 0, note: `échec réseau (${(e as Error).name})`, ...empty }); }
+  }
+  return report;
+}

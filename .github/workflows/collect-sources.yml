@@ -2,6 +2,9 @@
 #   check  (défaut) : contrôles registre / G0 / G1 / préfixes / robots.txt ; aucun document téléchargé.
 #   fetch  : télécharge uniquement les seeds approuvés (G0 + G1), ≤ 20, délai ≥ 10 s par hôte.
 #   verify : recalcule la vérification à partir des documents stockés (sans réseau vers les sources).
+#   ui-structure : relevé de STRUCTURE de mise en page du site de référence d'interface (job séparé, sans registre,
+#            seeds, documents ni data-store) ; pages = ui_pages (≤ 10) ; arrêt si robots.txt interdit. Sortie : artefact
+#            ui-structure-<run>, jamais committée ni lue par la chaîne de contenu.
 # Droits : seuls docs-pull et docs-push (release brouillon « data-store ») ont contents: write. Seuls les documents
 # dont la conservation est approuvée (registry.json → g0.storage) y sont copiés. Les enregistrements
 # research/sources/records/*.json sont publiés en artefact, à relire puis committer à la main : aucun commit automatique.
@@ -11,14 +14,18 @@ on:
   workflow_dispatch:
     inputs:
       command:
-        description: "check (sans téléchargement) | fetch (seeds approuvés) | verify"
+        description: "check (sans téléchargement) | fetch (seeds approuvés) | verify | ui-structure (structure d'interface)"
         type: choice
-        options: [check, fetch, verify]
+        options: [check, fetch, verify, ui-structure]
         default: check
       only:
         description: "Limiter à un seed (identifiant de research/sources/seeds.json) ; vide = tous"
         type: string
         default: ""
+      ui_pages:
+        description: "ui-structure uniquement : chemins du site de référence, séparés par des virgules (≤ 10)"
+        type: string
+        default: "/"
 
 permissions:
   contents: read
@@ -29,7 +36,7 @@ concurrency:
 
 jobs:
   docs-pull:
-    if: inputs.command != 'check'
+    if: inputs.command != 'check' && inputs.command != 'ui-structure'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -50,7 +57,7 @@ jobs:
 
   collect:
     needs: docs-pull
-    if: always() && (inputs.command == 'check' || needs.docs-pull.result == 'success')
+    if: always() && inputs.command != 'ui-structure' && (inputs.command == 'check' || needs.docs-pull.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -164,3 +171,49 @@ jobs:
           mkdir -p research/sources/records
           cp from-collect/research/sources/records/*.json research/sources/records/ 2>/dev/null || true
           bash .github/scripts/data-store.sh push-docs
+
+  ui-structure:
+    if: inputs.command == 'ui-structure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Relevé de structure (sans contenu)
+        shell: bash
+        env:
+          UI_PAGES: ${{ inputs.ui_pages }}
+        run: |
+          mkdir -p ui-reference-output
+          npx tsx pipeline/sources/run.ts ui-structure --pages "$UI_PAGES" 2>&1 | tee ui-reference-output/run.log
+
+      - name: Résumé
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Relevé de structure d'interface"
+            echo '```'
+            cat ui-reference-output/run.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+            echo "Artefact uniquement : aucun commit, non lu par la chaîne de contenu."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier le relevé (artefact, sans commit)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ui-structure-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: ignore
+          path: ui-reference-output/
