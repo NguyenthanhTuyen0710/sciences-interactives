@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { getUser } from "@/lib/auth";
 import { CURRICULUM, SUBJECTS } from "@/lib/content/curriculum";
+import { levelTone } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: { default: "Sciences Interactives – Mathématiques et Physique-Chimie", template: "%s · Sciences Interactives" },
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <nav key={s} aria-label={`${SUBJECTS[s].label} par classe`}>
                 <p className="font-semibold text-slate-900">{SUBJECTS[s].label}</p>
                 <ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-                  {CURRICULUM[s].map((l) => <li key={l.id}><Link href={`/${SUBJECTS[s].slug}/${l.id}`} className={footLink}>{l.label}</Link></li>)}
+                  {CURRICULUM[s].map((l) => <li key={l.id}><Link href={`/${SUBJECTS[s].slug}/${l.id}`} className={`inline-flex items-center gap-1.5 ${footLink}`}><span aria-hidden className={`h-2 w-2 rounded-full ${levelTone(l.id).dot}`} />{l.label}</Link></li>)}
                 </ul>
               </nav>
             ))}

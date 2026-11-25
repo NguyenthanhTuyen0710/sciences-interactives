@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SUBJECTS, subjectFromSlug } from "@/lib/content/curriculum";
 import { getTree } from "@/lib/content/tree";
-import { Breadcrumbs, Empty } from "@/components/ui";
+import { Breadcrumbs, Empty, levelTone } from "@/components/ui";
 import { chapterByTreeId } from "@/lib/chapters";
 
 export const dynamic = "force-dynamic";
@@ -19,10 +19,10 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
   return (
     <div>
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { href: `/${matiere}`, label: S.label }, { label: level.label }]} />
-      <h1 className="mb-1 text-3xl font-black">{S.label} · {level.label}</h1>
+      <h1 className="mb-1 text-3xl font-black">{S.label} · <span className={levelTone(level.id).text}>{level.label}</span></h1>
       <p className="mb-6 text-slate-600">Chapitres organisés par thème du programme.</p>
       <div className="mb-6 flex flex-wrap gap-2">
-        {levels.map((l) => <Link key={l.id} href={`/${matiere}/${l.id}`} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${l.id === niveau ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white hover:bg-slate-50"}`}>{l.id}</Link>)}
+        {levels.map((l) => <Link key={l.id} href={`/${matiere}/${l.id}`} aria-current={l.id === niveau ? "page" : undefined} className={`rounded-lg border-2 px-3 py-1.5 text-sm font-semibold ${l.id === niveau ? levelTone(l.id).solid : `${levelTone(l.id).chip} border-transparent hover:shadow-md`}`}>{l.id}</Link>)}
       </div>
       {themes.map((t) => (
         <section key={t} className="mb-8">
@@ -32,7 +32,7 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
               const ex = metas.filter((m) => m.chapterId === c.id);
               const full = chapterByTreeId(c.id);
               return (
-                <Link key={c.id} href={`/${matiere}/${niveau}/${c.id}`} className="card block p-5 transition hover:border-indigo-300 hover:shadow-md">
+                <Link key={c.id} href={`/${matiere}/${niveau}/${c.id}`} className={`card block border-l-4 ${levelTone(niveau).accent} p-5 transition hover:shadow-md`}>
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-lg font-bold">{c.title}</h3>
                     <span className="chip shrink-0 bg-slate-100 text-slate-600">{ex.length} ex.</span>

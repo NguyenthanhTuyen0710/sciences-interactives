@@ -71,6 +71,27 @@
 .dark .border-violet-100, .dark .border-violet-200 { border-color: color-mix(in oklab, var(--color-violet-500) 40%, var(--surface)); }
 .dark .text-violet-600, .dark .hover\:text-violet-600:hover, .dark .text-violet-700, .dark .hover\:text-violet-700:hover, .dark .group:hover .group-hover\:text-violet-700 { color: var(--color-violet-300); }
 .dark .text-violet-800 { color: var(--color-violet-200); } .dark .text-violet-900 { color: var(--color-violet-100); }
+/* Tonalités des classes (teal, lime, orange, fuchsia ; sky, rose, violet déjà couverts). */
+.dark .bg-teal-50, .dark .hover\:bg-teal-50:hover { background-color: color-mix(in oklab, var(--color-teal-500) 14%, var(--surface)); }
+.dark .bg-teal-100, .dark .hover\:bg-teal-100:hover { background-color: color-mix(in oklab, var(--color-teal-500) 24%, var(--surface)); }
+.dark .bg-teal-200, .dark .hover\:bg-teal-200:hover { background-color: color-mix(in oklab, var(--color-teal-500) 34%, var(--surface)); }
+.dark .text-teal-600, .dark .text-teal-700 { color: var(--color-teal-300); }
+.dark .text-teal-800 { color: var(--color-teal-200); } .dark .text-teal-900 { color: var(--color-teal-100); }
+.dark .bg-lime-50, .dark .hover\:bg-lime-50:hover { background-color: color-mix(in oklab, var(--color-lime-500) 14%, var(--surface)); }
+.dark .bg-lime-100, .dark .hover\:bg-lime-100:hover { background-color: color-mix(in oklab, var(--color-lime-500) 24%, var(--surface)); }
+.dark .bg-lime-200, .dark .hover\:bg-lime-200:hover { background-color: color-mix(in oklab, var(--color-lime-500) 34%, var(--surface)); }
+.dark .text-lime-600, .dark .text-lime-700 { color: var(--color-lime-300); }
+.dark .text-lime-800 { color: var(--color-lime-200); } .dark .text-lime-900 { color: var(--color-lime-100); }
+.dark .bg-orange-50, .dark .hover\:bg-orange-50:hover { background-color: color-mix(in oklab, var(--color-orange-500) 14%, var(--surface)); }
+.dark .bg-orange-100, .dark .hover\:bg-orange-100:hover { background-color: color-mix(in oklab, var(--color-orange-500) 24%, var(--surface)); }
+.dark .bg-orange-200, .dark .hover\:bg-orange-200:hover { background-color: color-mix(in oklab, var(--color-orange-500) 34%, var(--surface)); }
+.dark .text-orange-600, .dark .text-orange-700 { color: var(--color-orange-300); }
+.dark .text-orange-800 { color: var(--color-orange-200); } .dark .text-orange-900 { color: var(--color-orange-100); }
+.dark .bg-fuchsia-50, .dark .hover\:bg-fuchsia-50:hover { background-color: color-mix(in oklab, var(--color-fuchsia-500) 14%, var(--surface)); }
+.dark .bg-fuchsia-100, .dark .hover\:bg-fuchsia-100:hover { background-color: color-mix(in oklab, var(--color-fuchsia-500) 24%, var(--surface)); }
+.dark .bg-fuchsia-200, .dark .hover\:bg-fuchsia-200:hover { background-color: color-mix(in oklab, var(--color-fuchsia-500) 34%, var(--surface)); }
+.dark .text-fuchsia-600, .dark .text-fuchsia-700 { color: var(--color-fuchsia-300); }
+.dark .text-fuchsia-800 { color: var(--color-fuchsia-200); } .dark .text-fuchsia-900 { color: var(--color-fuchsia-100); }
 /* Figures des chapitres et des exercices : tracés prévus pour un fond blanc. */
 .dark figure svg { background: #fff; border-radius: 0.5rem; }
 
