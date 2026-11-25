@@ -6,6 +6,7 @@ import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
 import type { ChapterPart, ExerciseBody, SolveCheck } from "../src/lib/chapters/schema";
 import type { Blank, Rng } from "../src/lib/engine/types";
 import { createRng } from "../src/lib/engine/rng";
+import { misplacedSolveCheck } from "../scripts/validate-chapter";
 
 // Constructeurs identiques à ceux du chapitre (math-3e-equations.ts), sans diagnostics.
 const nb = (value: number): Blank => ({ type: "number", answer: { value } });
@@ -126,5 +127,19 @@ describe("contrôle par résolution : les trois BLOQUANT d'équations sont repro
       for (let k = 0; k < (e.vary ? 300 : 1); k++) for (const p of solveCheckIssues(g.generate(createRng(`v${k}`), 1), e.solveCheck!)) bad.push(`${e.id} v${k} : ${p}`);
     }
     expect(bad.slice(0, 5)).toEqual([]);
+  });
+});
+
+describe("solveCheck mal placé (décision 38)", () => {
+  const base = { id: "x3-01", title: "Test", niveau: 2 as const, objectives: ["O"], time: 60, reasoning: "Raisonnement.", hints: ["Indice."] };
+  const body = { statement: "Résous $2x = 6$.", parts: [{ interaction: { kind: "numerique" as const, answer: { value: 3 } } }], solution: ["$x = 3$."] };
+  it("dans l'objet de vary : signalé ; sur l'exercice ou sans vary : rien", () => {
+    expect(misplacedSolveCheck({ ...base, vary: () => ({ ...body, solveCheck: [{ equation: "statement", answer: 0 }] }) as unknown as ExerciseBody })?.problem).toMatch(/solveCheck dans l'objet renvoyé par vary/);
+    expect(misplacedSolveCheck({ ...base, vary: () => body, solveCheck: [{ equation: "statement", answer: 0 }] })).toBeNull();
+    expect(misplacedSolveCheck({ ...base, ...body })).toBeNull();
+  });
+  it("aucun chapitre existant n'a de solveCheck dans l'objet de vary", () => {
+    const bad = ALL_CHAPTERS.flatMap((c) => c.exercises.map(misplacedSolveCheck).filter(Boolean));
+    expect(bad).toEqual([]);
   });
 });
