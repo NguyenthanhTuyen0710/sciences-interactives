@@ -41,8 +41,8 @@ export default async function SubjectPage({ params }: { params: Promise<{ matier
                   return (
                     <li key={c.id}>
                       <Link href={`/${matiere}/${l.id}/${c.id}`} className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-slate-50">
-                        <span className={k ? "text-slate-800" : "text-slate-400"}>{c.title}</span>
-                        <span className={`text-xs ${k ? "font-semibold text-slate-600" : "text-slate-300"}`}>{k || "—"}</span>
+                        <span className={k ? "text-slate-800" : "text-slate-500"}>{c.title}</span>
+                        <span className={`text-xs ${k ? "font-semibold text-slate-600" : "text-slate-500"}`}>{k || <><span aria-hidden>—</span><span className="sr-only">aucun exercice</span></>}</span>
                       </Link>
                     </li>
                   );

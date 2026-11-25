@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SUBJECTS, subjectFromSlug } from "@/lib/content/curriculum";
 import { getTree } from "@/lib/content/tree";
-import { Breadcrumbs, Empty, levelTone } from "@/components/ui";
-import { chapterByTreeId } from "@/lib/chapters";
+import { Breadcrumbs, Empty, StatusBadge, levelTone } from "@/components/ui";
+import { ALL_CHAPTERS, chapterByTreeId, isVisible } from "@/lib/chapters";
 
 export const dynamic = "force-dynamic";
 
@@ -31,18 +31,21 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
             {level.chapters.filter((c) => c.theme === t).map((c) => {
               const ex = metas.filter((m) => m.chapterId === c.id);
               const full = chapterByTreeId(c.id);
+              const pending = full ? null : ALL_CHAPTERS.find((x) => x.treeChapterId === c.id && !isVisible(x));
               return (
                 <Link key={c.id} href={`/${matiere}/${niveau}/${c.id}`} className={`card block border-l-4 ${levelTone(niveau).accent} p-5 transition hover:shadow-md`}>
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-lg font-bold">{c.title}</h3>
                     <span className="chip shrink-0 bg-slate-100 text-slate-600">{ex.length} ex.</span>
                   </div>
+                  {(full || pending) && <div className="mt-2"><StatusBadge status={full ? full.publicationStatus : pending!.publicationStatus} /></div>}
+                  {pending && <p className="mt-2 text-sm text-slate-600">Chapitre complet en relecture : pas encore ouvert.</p>}
                   {full ? (
                     <p className="mt-2 text-sm text-slate-600">Cours complet, exercices sur 5 niveaux et {full.games.length} activités interactives.</p>
                   ) : c.notions.length ? (
                     <ul className="mt-2 space-y-0.5 text-sm text-slate-600">{c.notions.map((n) => <li key={n.id}>• {n.title}</li>)}</ul>
                   ) : (
-                    <p className="mt-2 text-sm text-slate-400">Notions et exercices en cours de rédaction par l'équipe pédagogique.</p>
+                    <p className="mt-2 text-sm text-slate-600">Notions et exercices en cours de rédaction par l'équipe pédagogique.</p>
                   )}
                 </Link>
               );

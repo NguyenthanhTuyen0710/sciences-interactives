@@ -92,6 +92,14 @@
 .dark .bg-fuchsia-200, .dark .hover\:bg-fuchsia-200:hover { background-color: color-mix(in oklab, var(--color-fuchsia-500) 34%, var(--surface)); }
 .dark .text-fuchsia-600, .dark .text-fuchsia-700 { color: var(--color-fuchsia-300); }
 .dark .text-fuchsia-800 { color: var(--color-fuchsia-200); } .dark .text-fuchsia-900 { color: var(--color-fuchsia-100); }
+/* Bordures de classe (-600, ≥ 3:1 sur blanc) : -500 en sombre pour rester ≥ 3:1 sur la surface. */
+.dark .border-sky-600 { border-color: var(--color-sky-500); }
+.dark .border-teal-600 { border-color: var(--color-teal-500); }
+.dark .border-lime-600 { border-color: var(--color-lime-500); }
+.dark .border-orange-600 { border-color: var(--color-orange-500); }
+.dark .border-rose-600 { border-color: var(--color-rose-500); }
+.dark .border-fuchsia-600 { border-color: var(--color-fuchsia-500); }
+.dark .border-violet-600 { border-color: var(--color-violet-500); }
 /* Figures des chapitres et des exercices : tracés prévus pour un fond blanc. */
 .dark figure svg { background: #fff; border-radius: 0.5rem; }
 

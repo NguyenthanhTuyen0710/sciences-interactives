@@ -315,3 +315,23 @@ describe("QA tier 2 : chapitre ↔ taxonomie verrouillée (validate-chapter)", (
     expect(out.summary).toMatchObject({ taxonomy: "absente", ok: true });
   }, 120_000);
 });
+
+describe("catalogue des chapitres (interface)", () => {
+  it("résumé fidèle aux données : brouillon non cliquable, chiffres réels, libellé sans chapitre", async () => {
+    const { chapterSummary, levelCounts, countsLabel } = await import("../src/components/ui");
+    const all = ALL_CHAPTERS.map((c) => chapterSummary(c, c.publicationStatus === "published"));
+    for (const s of all) {
+      const c = ALL_CHAPTERS.find((x) => x.id === s.id)!;
+      expect(s.exercises).toBe(c.exercises.length);
+      expect(s.games).toBe(c.games.length);
+      expect(s.href === null).toBe(c.publicationStatus !== "published");
+      expect(JSON.stringify(s)).not.toMatch(/"answer"|"mistakes"/);
+    }
+    const k3 = levelCounts(all, "3e", null);
+    expect(k3.total).toBe(ALL_CHAPTERS.filter((c) => c.grade === "3e").length);
+    expect(k3.published + k3.unpublished).toBe(k3.total);
+    expect(countsLabel({ total: 0, published: 0, unpublished: 0, themes: 12 })).toBe("12 thèmes du programme, chapitres en préparation");
+    expect(countsLabel({ total: 6, published: 2, unpublished: 4, themes: 16 })).toBe("6 chapitres (2 publiés, 4 brouillons)");
+    expect(countsLabel({ total: 1, published: 1, unpublished: 0, themes: 7 })).toBe("1 chapitre (1 publié)");
+  });
+});

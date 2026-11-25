@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 // Cinq rubriques de contenu ; « Mon espace » et la connexion sont dans le groupe de droite.
 const NAV = [
-  { href: "/mathematiques", label: "Chapitres", match: ["/mathematiques", "/physique-chimie"] },
+  { href: "/chapitres", label: "Chapitres", match: ["/chapitres", "/mathematiques", "/physique-chimie"] },
   { href: "/exercices", label: "Exercices", match: ["/exercices", "/exercice/"] },
   { href: "/cours", label: "Cours et fiches", match: ["/cours", "/lecons"] },
   { href: "/revisions", label: "Révisions", match: ["/revisions"] },
