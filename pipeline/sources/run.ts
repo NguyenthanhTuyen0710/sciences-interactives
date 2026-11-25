@@ -6,6 +6,9 @@
 //   npx tsx pipeline/sources/run.ts match <chapitre>       rapproche les objectifs du chapitre des documents vérifiés (sans IA)
 //   npx tsx pipeline/sources/run.ts storable               liste les documents dont la conservation (data-store) est approuvée
 //   npx tsx pipeline/sources/run.ts apply <proposition.json>  applique à l'inventaire les changements APPROUVÉS et prouvés par citation
+//   npx tsx pipeline/sources/run.ts ui-structure [--pages "/,/x"]  relevé de STRUCTURE de mise en page du site de référence d'interface
+//        (lib.ts → UI_REFERENCE_HOST ; ≤ 10 pages, robots.txt, ≥ 2 s, une requête par page, aucun lien suivi, aucun texte long).
+//        Sortie : ui-reference-output/structure.json (artefact du run, ignoré par Git) ; jamais lue par la chaîne de contenu.
 //
 // Dans Git : research/sources/records/<seed>.json (URL, date d'accès, SHA256, statut). Documents et textes : .sources-cache/
 // (hors Git ; persistance assurée par le workflow collect-sources). Un document illisible ou refusé est enregistré comme tel,
@@ -14,7 +17,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyChanges, extractMetadata, gateSeed, type Change, type Inventory, groupFor, matchObjective, parseRobots, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
+import { applyChanges, collectUiStructure, extractMetadata, UI_OUTPUT_DIR, uiUserAgent, gateSeed, type Change, type Inventory, groupFor, matchObjective, parseRobots, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const P = (f: string) => join(ROOT, f);
@@ -175,8 +178,22 @@ function match(chapterId: string) {
   console.log(`${results.filter((r) => r.status === "verified").length} verified / ${results.filter((r) => r.status !== "verified").length} needs_manual_review → research/sources/verification/${spec.id}.json`);
 }
 
+// ───────── Relevé de structure de mise en page (hors registre, seeds et enregistrements) ─────────
+async function uiStructure(pages: string) {
+  const report = await collectUiStructure(pages, uiUserAgent(registry.userAgent), {
+    fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(30_000) }),
+    sleep: async (ms) => { await sleep(ms); },
+  });
+  writeFile(`${UI_OUTPUT_DIR}/structure.json`, JSON.stringify(report, null, 2) + "\n");
+  console.log(`robots.txt : HTTP ${report.robots.httpStatus ?? "—"}, ${report.robots.note}${report.robots.delaySeconds ? `, délai ${report.robots.delaySeconds} s` : ""}`);
+  for (const p of report.pages) console.log(`${p.path} : HTTP ${p.httpStatus}${p.note ? ` (${p.note})` : ""}, ${p.totals.blocks} blocs, h1/h2/h3 = ${p.totals.h1}/${p.totals.h2}/${p.totals.h3}`);
+  console.log(`${report.requests.length} requête(s) → ${UI_OUTPUT_DIR}/structure.json`);
+  if (report.stopped) fail(report.stopped);
+}
+
 // ───────── Programme ─────────
 async function main() {
+  if (cmd === "ui-structure") return uiStructure(opt("--pages") ?? "/");
   if (cmd === "apply") return apply(opt("apply") ?? args[1] ?? fail("fichier de proposition manquant"));
   if (cmd === "verify") {
     for (const s of seeds) {
