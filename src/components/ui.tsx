@@ -3,6 +3,24 @@ import type { ExerciseMeta } from "@/lib/engine/types";
 import { KIND_LABELS } from "@/lib/engine/labels";
 import { levelLabel } from "@/lib/content/curriculum";
 
+/** Tonalité de chaque classe (un code couleur par niveau, collège → lycée). Classes Tailwind écrites en entier. */
+export interface LevelTone { chip: string; solid: string; accent: string; dot: string; text: string }
+const LEVEL_TONES: Record<string, LevelTone> = {
+  "6e": { chip: "bg-sky-100 text-sky-800", solid: "border-sky-700 bg-sky-700 text-white", accent: "border-sky-500", dot: "bg-sky-500", text: "text-sky-700" },
+  "5e": { chip: "bg-teal-100 text-teal-800", solid: "border-teal-700 bg-teal-700 text-white", accent: "border-teal-500", dot: "bg-teal-500", text: "text-teal-700" },
+  "4e": { chip: "bg-lime-100 text-lime-800", solid: "border-lime-700 bg-lime-700 text-white", accent: "border-lime-500", dot: "bg-lime-500", text: "text-lime-700" },
+  "3e": { chip: "bg-orange-100 text-orange-800", solid: "border-orange-700 bg-orange-700 text-white", accent: "border-orange-500", dot: "bg-orange-500", text: "text-orange-700" },
+  "2nde": { chip: "bg-rose-100 text-rose-800", solid: "border-rose-700 bg-rose-700 text-white", accent: "border-rose-500", dot: "bg-rose-500", text: "text-rose-700" },
+  "1re": { chip: "bg-fuchsia-100 text-fuchsia-800", solid: "border-fuchsia-700 bg-fuchsia-700 text-white", accent: "border-fuchsia-500", dot: "bg-fuchsia-500", text: "text-fuchsia-700" },
+  Tle: { chip: "bg-violet-100 text-violet-800", solid: "border-violet-700 bg-violet-700 text-white", accent: "border-violet-500", dot: "bg-violet-500", text: "text-violet-700" },
+};
+const NEUTRAL: LevelTone = { chip: "bg-slate-100 text-slate-700", solid: "border-slate-700 bg-slate-700 text-white", accent: "border-slate-400", dot: "bg-slate-400", text: "text-slate-700" };
+export const levelTone = (level: string): LevelTone => LEVEL_TONES[level] ?? NEUTRAL;
+
+export function LevelBadge({ level }: { level: string }) {
+  return <span className={`chip ${levelTone(level).chip}`}>{levelLabel(level)}</span>;
+}
+
 export function Breadcrumbs({ items }: { items: { href?: string; label: string }[] }) {
   return (
     <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-1 text-sm text-slate-500">
@@ -27,7 +45,7 @@ export function ExerciseCard({ m, difficulty, note }: { m: ExerciseMeta; difficu
     <Link href={`/exercice/${m.id}${difficulty ? `?d=${difficulty}` : ""}`} className="card group flex flex-col gap-2 p-4 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md">
       <div className="flex flex-wrap items-center gap-1.5">
         <SubjectBadge subject={m.subject} />
-        <span className="chip bg-slate-100 text-slate-700">{levelLabel(m.level)}</span>
+        <LevelBadge level={m.level} />
         {m.id.startsWith("perso-") && <span className="chip bg-amber-100 text-amber-800">Enseignant</span>}
       </div>
       <h3 className="font-semibold text-slate-900 group-hover:text-indigo-700">{m.title}</h3>

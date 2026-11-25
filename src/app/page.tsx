@@ -6,7 +6,7 @@ import { LEVELS, SUBJECTS } from "@/lib/content/curriculum";
 import { db, schema } from "@/lib/db";
 import { userDashboard } from "@/lib/progress";
 import { dailyItems, todayKey } from "@/lib/series";
-import { Bar, ExerciseCard, Stat } from "@/components/ui";
+import { Bar, ExerciseCard, Stat, levelTone } from "@/components/ui";
 import RecentList from "@/components/RecentList";
 import { MathInline } from "@/components/MathText";
 
@@ -66,8 +66,8 @@ export default async function Home() {
         <h2 className="mb-3 text-lg font-bold">Choisir sa classe</h2>
         <div className="flex flex-wrap gap-2">
           {LEVELS.map((l) => (
-            <Link key={l.id} href={`/exercices?niveau=${l.id}`} className={`rounded-xl border-2 px-4 py-2 font-semibold transition hover:border-indigo-500 hover:text-indigo-700 ${user?.level === l.id ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-slate-200 bg-white text-slate-700"}`}>
-              {l.short} <span className="text-xs font-normal text-slate-400">{l.cycle}</span>
+            <Link key={l.id} href={`/exercices?niveau=${l.id}`} className={`rounded-xl border-2 px-4 py-2 font-semibold transition hover:-translate-y-0.5 hover:shadow-md ${user?.level === l.id ? levelTone(l.id).solid : `${levelTone(l.id).chip} ${levelTone(l.id).accent}`}`}>
+              {l.short} <span className="text-xs font-normal opacity-80">{l.cycle}</span>
             </Link>
           ))}
         </div>

@@ -1,19 +1,41 @@
 // Contrôle navigateur QA5 scripté (sans IA) : desktop + mobile, erreurs console, débordement horizontal,
 // erreurs KaTeX, activités montées, partie de calcul flash jouée au clavier.
 // Usage (serveur lancé, SHOW_DRAFTS=1 pour les brouillons) : PAGES=3e/m3-puissances npx tsx scripts/ui-check.ts
+// Pages quelconques (contrôles génériques + lien d'évitement) : PATHS=/,/exercices ; thèmes : THEMES=light,dark (défaut light).
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require("playwright") as typeof import("playwright");
 const OUT = process.env.OUT ?? "shots";
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 // PAGES=niveau/chapitre,… (défaut : chapitres 3e du batch 1)
-const pages = (process.env.PAGES ?? "3e/m3-arithmetique,3e/m3-puissances,3e/m3-pourcentages").split(",");
+const pages = process.env.PATHS && !process.env.PAGES ? [] : (process.env.PAGES ?? "3e/m3-arithmetique,3e/m3-puissances,3e/m3-pourcentages").split(",");
+const paths = (process.env.PATHS ?? "").split(",").filter(Boolean);
+const themes = (process.env.THEMES ?? "light").split(",") as ("light" | "dark")[];
 let fail = 0;
 const ok = (c: boolean, m: string) => { console.log(c ? "  ✔" : "  ✘", m); if (!c) fail++; };
 (async () => {
   const browser = await chromium.launch();
-  for (const [name, opts] of [["desktop", { viewport: { width: 1280, height: 900 } }], ["mobile", devices["iPhone 13"]]] as const) {
-    const ctx = await browser.newContext(opts);
+  for (const theme of themes) for (const [device, opts] of [["desktop", { viewport: { width: 1280, height: 900 } }], ["mobile", devices["iPhone 13"]]] as const) {
+    const name = theme === "light" ? device : `${device}-${theme}`;
+    const ctx = await browser.newContext({ ...opts, colorScheme: theme });
+    for (const p of paths) {
+      const page = await ctx.newPage();
+      const errors: string[] = [];
+      page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+      page.on("pageerror", (e) => errors.push(String(e)));
+      const res = await page.goto(`${BASE}${p}`, { waitUntil: "networkidle" });
+      console.log(`${name} ${p}`);
+      ok(res?.status() === 200, "HTTP 200");
+      ok(await page.evaluate((t) => document.documentElement.classList.contains("dark") === (t === "dark"), theme), `thème ${theme} appliqué`);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      ok(overflow <= 1, `pas de défilement horizontal (${overflow}px)`);
+      ok(await page.locator(".katex-error").count() === 0, "aucune erreur KaTeX");
+      await page.screenshot({ path: `${OUT}/${name}${p === "/" ? "-accueil" : p.replace(/[/?=&]+/g, "-")}.png`, fullPage: true });
+      await page.keyboard.press("Tab");
+      ok(await page.evaluate(() => document.activeElement?.getAttribute("href") === "#contenu"), "lien d'évitement en premier");
+      ok(errors.length === 0, `aucune erreur console${errors.length ? " : " + errors.slice(0, 2).join(" | ") : ""}`);
+      await page.close();
+    }
     for (const p of pages) {
       const page = await ctx.newPage();
       const errors: string[] = [];
