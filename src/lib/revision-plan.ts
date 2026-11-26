@@ -1,7 +1,7 @@
 // Plan de révision : répartit, du jour de la demande à la veille de l'évaluation, le travail réel des chapitres choisis
 // (cours, exercices par niveau, jeux, fiche de révision, mini-évaluation). Fonction pure : la date du jour est un paramètre ;
 // aucun état utilisateur n'est stocké (tout passe par l'URL). Seuls des identifiants et des titres sortent d'ici.
-import type { ChapterContent, ChapterExercise } from "./chapters/schema";
+import { chapterLevels, type ChapterContent, type ChapterExercise } from "./chapters/schema";
 import { todayKey } from "./series";
 
 /** Horizon maximal : au-delà, le plan commence 60 jours avant l'évaluation. */
@@ -33,6 +33,8 @@ export interface PlanTask {
   sections: ("cours" | "exercices" | "activites" | "revision" | "evaluation")[];
   exercises: PlanExercise[];
   game: string | null;
+  /** Niveaux d'exercices de l'étape (bases, entraînement, approfondissement). */
+  levels?: number[];
 }
 export interface PlanDay { date: string; tasks: PlanTask[] }
 export type PlanResult =
@@ -51,16 +53,18 @@ const byLevels = (c: ChapterContent, levels: number[]) => c.exercises.filter((e)
 function steps(c: ChapterContent): PlanTask[] {
   const base = { chapterId: c.id, chapterTitle: c.title };
   const game = (i: number) => (c.games.length ? c.games[i % c.games.length].title : null);
-  const lvl5 = byLevels(c, [5]);
+  // Bases : niveaux 1-2 ; entraînement : niveaux intermédiaires ; approfondissement : dernier niveau (5, ou 4 si maxNiveau = 4).
+  const all = chapterLevels(c), top = all[all.length - 1], mid = all.filter((l) => l >= 3 && l < top);
+  const lvl5 = byLevels(c, [top]);
   const brevet = lvl5.filter((e) => isTypeBrevet(e.title));
-  // Niveau 5 : au moins un « Type Brevet » s'il en existe, complété par les autres exercices (ou par d'autres « Type Brevet »).
+  // Dernier niveau : au moins un « Type Brevet » s'il en existe, complété par les autres exercices (ou par d'autres « Type Brevet »).
   const others = spread(lvl5.filter((e) => !isTypeBrevet(e.title)), PICKS - Math.min(brevet.length, 1));
   const deep = [...others, ...spread(brevet, PICKS - others.length)];
   return [
     { ...base, kind: "cours", sections: ["cours"], exercises: [], game: null },
-    { ...base, kind: "bases", sections: ["exercices", "activites"], exercises: spread(byLevels(c, [1, 2]), PICKS).map(asPlan), game: game(0) },
-    { ...base, kind: "entrainement", sections: ["exercices", "activites"], exercises: spread(byLevels(c, [3, 4]), PICKS).map(asPlan), game: game(1) },
-    { ...base, kind: "approfondissement", sections: ["exercices", "revision"], exercises: deep.map(asPlan), game: null },
+    { ...base, kind: "bases", sections: ["exercices", "activites"], exercises: spread(byLevels(c, [1, 2]), PICKS).map(asPlan), game: game(0), levels: [1, 2] },
+    { ...base, kind: "entrainement", sections: ["exercices", "activites"], exercises: spread(byLevels(c, mid), PICKS).map(asPlan), game: game(1), levels: mid },
+    { ...base, kind: "approfondissement", sections: ["exercices", "revision"], exercises: deep.map(asPlan), game: null, levels: [top] },
   ];
 }
 const bilan = (c: ChapterContent): PlanTask => ({ chapterId: c.id, chapterTitle: c.title, kind: "bilan", sections: ["revision", "evaluation"], exercises: [], game: null });

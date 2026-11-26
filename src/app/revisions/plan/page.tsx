@@ -13,12 +13,14 @@ export const metadata = { title: "Plan de révision" };
 const SUBJECT_IDS: Subject[] = ["maths", "pc"];
 const STEP: Record<StepKind, { title: string; text: string }> = {
   cours: { title: "Cours", text: "Lis le cours et refais les exemples résolus sans regarder la solution." },
-  bases: { title: "Exercices de base (niveaux 1 et 2)", text: "Commence par ces exercices, puis joue pour fixer les automatismes." },
-  entrainement: { title: "Entraînement (niveaux 3 et 4)", text: "Des exercices plus complets, puis un deuxième jeu." },
-  approfondissement: { title: "Approfondissement (niveau 5)", text: "Les exercices les plus exigeants, puis relis la fiche de révision." },
+  bases: { title: "Exercices de base", text: "Commence par ces exercices, puis joue pour fixer les automatismes." },
+  entrainement: { title: "Entraînement", text: "Des exercices plus complets, puis un deuxième jeu." },
+  approfondissement: { title: "Approfondissement", text: "Les exercices les plus exigeants, puis relis la fiche de révision." },
   bilan: { title: "Bilan de la veille", text: "Relis la fiche de révision, fais la mini-évaluation, puis refais un exercice des jours précédents qui t'a posé problème." },
   express: { title: "Révision express", text: "Relis la fiche, fais la mini-évaluation et ces deux exercices." },
 };
+/** « (niveau 5) », « (niveaux 3 et 4) » ; rien sans niveaux. */
+const levelsLabel = (l?: number[]) => !l?.length ? "" : l.length === 1 ? ` (niveau ${l[0]})` : ` (niveaux ${l.slice(0, -1).join(", ")} et ${l[l.length - 1]})`;
 const SECTION_LABEL = { cours: "Cours", exercices: "Exercices", activites: "Activités", revision: "Fiche de révision", evaluation: "Mini-évaluation" } as const;
 const fmt = (iso: string, opts: Intl.DateTimeFormatOptions) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("fr-FR", { timeZone: "UTC", ...opts });
 const longDate = (iso: string) => fmt(iso, { weekday: "long", day: "numeric", month: "long" });
@@ -145,7 +147,7 @@ function Task({ t, href }: { t: PlanTask; href: string }) {
   const link = "font-medium text-indigo-600 hover:underline";
   return (
     <li className="border-l-4 border-slate-300 pl-3">
-      <p className="font-semibold text-slate-900">{STEP[t.kind].title} · <Link href={href} className={link}>{t.chapterTitle}</Link></p>
+      <p className="font-semibold text-slate-900">{STEP[t.kind].title}{levelsLabel(t.levels)} · <Link href={href} className={link}>{t.chapterTitle}</Link></p>
       <p className="text-sm text-slate-600">{STEP[t.kind].text}</p>
       <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm">
         {t.sections.map((s) => <Link key={s} href={`${href}#${s}`} className={link}>{SECTION_LABEL[s]}</Link>)}

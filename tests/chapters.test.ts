@@ -185,6 +185,27 @@ describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master gén
     expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, extra] })).toContain("objectif X-99 sans exercice");
     expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, { ...extra, required: false }] })).not.toContain("objectif X-99 sans exercice");
   });
+  it("maxNiveau 4 (décision 39) : niveaux 1 à 4 exigés, niveau 5 refusé ; absent = 5 niveaux", async () => {
+    const { ChapterSchema, chapterLevels, doneIssues } = await import("../src/lib/chapters/schema");
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const four = { ...base, maxNiveau: 4 as const, exercises: base.exercises.map((e) => (e.niveau === 5 ? { ...e, niveau: 4 as const } : e)) };
+    expect(chapterLevels(base)).toEqual([1, 2, 3, 4, 5]);
+    expect(chapterLevels(four)).toEqual([1, 2, 3, 4]);
+    expect(doneIssues(four)).not.toContain("aucun exercice de niveau 5");
+    expect(doneIssues({ ...base, exercises: four.exercises })).toContain("aucun exercice de niveau 5");
+    const bad = ChapterSchema.safeParse({ ...base, maxNiveau: 4 });
+    expect(bad.success).toBe(false);
+    expect(bad.error?.issues.some((i) => i.message.includes("> maxNiveau 4"))).toBe(true);
+    const plan = await import("../src/lib/revision-plan");
+    const r = plan.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: [four.id], available: [four] });
+    if (!r.ok) throw new Error("plan attendu");
+    const tasks = r.days.flatMap((d) => d.tasks);
+    expect(tasks.find((t) => t.kind === "entrainement")!.levels).toEqual([3]);
+    expect(tasks.find((t) => t.kind === "approfondissement")!.levels).toEqual([4]);
+    for (const t of tasks) for (const e of t.exercises) if (t.levels) expect(t.levels).toContain(e.niveau);
+    const ui = await import("../src/components/ui");
+    expect(ui.chapterProgress(four, four.exercises.map((e) => ({ exerciseId: e.id, score: 1 }))).milestones).toEqual(["Premier exercice réussi", "Un exercice réussi à chaque niveau", "Niveau 4 réussi"]);
+  });
   it("master-curriculum.json = fusion exacte des curriculum-*.json (généré par npm run dashboard, jamais à la main)", () => {
     const read = (f: string) => JSON.parse(readFileSync(f, "utf8"));
     const master = read("research/curriculum/master-curriculum.json");

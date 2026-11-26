@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
-import { ChapterSchema, doneIssues, type ChapterContent, type ChapterExercise } from "../src/lib/chapters/schema";
+import { ChapterSchema, chapterLevels, doneIssues, type ChapterContent, type ChapterExercise } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise } from "../src/lib/engine/check";
 import { chapterTexts, diagnosticIssues, instanceTexts, specialValues, unitIssues, vouvoiementIssues } from "../src/lib/engine/diagnostics";
@@ -214,7 +214,7 @@ async function main() {
   const taxonomy = existsSync(taxFile) ? (JSON.parse(readFileSync(taxFile, "utf8")) as Taxonomy) : null;
   if (taxonomy) for (const t of taxonomyIssues(c, taxonomy)) add(t.where, t.problem);
 
-  const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
+  const perLevel = chapterLevels(c).map((l) => c.exercises.filter((e) => e.niveau === l).length);
   const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, taxonomy: taxonomy ? taxonomy.status : "absente", solveChecked, issues: issues.length, ok: issues.length === 0 };
   if (asJson) console.log(JSON.stringify({ summary, issues, special }));
   else {
