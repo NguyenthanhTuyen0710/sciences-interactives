@@ -4,6 +4,7 @@ import { SUBJECTS, subjectFromSlug } from "@/lib/content/curriculum";
 import { getTree } from "@/lib/content/tree";
 import { Breadcrumbs, Empty, StatusBadge, levelTone } from "@/components/ui";
 import { ALL_CHAPTERS, chapterByTreeId, isVisible } from "@/lib/chapters";
+import { chapterLevels } from "@/lib/chapters/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function LevelPage({ params }: { params: Promise<{ matiere:
                   {(full || pending) && <div className="mt-2"><StatusBadge status={full ? full.publicationStatus : pending!.publicationStatus} /></div>}
                   {pending && <p className="mt-2 text-sm text-slate-600">Chapitre complet en relecture : pas encore ouvert.</p>}
                   {full ? (
-                    <p className="mt-2 text-sm text-slate-600">Cours complet, exercices sur 5 niveaux et {full.games.length} activités interactives.</p>
+                    <p className="mt-2 text-sm text-slate-600">Cours complet, exercices sur {chapterLevels(full).length} niveaux et {full.games.length} activités interactives.</p>
                   ) : c.notions.length ? (
                     <ul className="mt-2 space-y-0.5 text-sm text-slate-600">{c.notions.map((n) => <li key={n.id}>• {n.title}</li>)}</ul>
                   ) : (

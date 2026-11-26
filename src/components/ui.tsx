@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ExerciseMeta, Subject } from "@/lib/engine/types";
 import type { ChapterContent } from "@/lib/chapters/schema";
+import { chapterLevels } from "../lib/chapters/schema";
 // Chemins relatifs pour les modules d'exécution : ce fichier est aussi importé par les tests (vitest, sans alias « @ »).
 import { KIND_LABELS } from "../lib/engine/labels";
 import { CURRICULUM, SUBJECTS, levelLabel } from "../lib/content/curriculum";
@@ -133,10 +134,11 @@ export function chapterProgress(c: ChapterContent, attempts: { exerciseId: strin
   const mine = attempts.filter((a) => ids.has(a.exerciseId));
   const ok = new Set(mine.filter((a) => a.score >= 0.999).map((a) => a.exerciseId));
   const solved = c.exercises.filter((e) => ok.has(e.id));
+  const top = chapterLevels(c).length;
   const milestones = [
     solved.length > 0 && "Premier exercice réussi",
-    new Set(solved.map((e) => e.niveau)).size === 5 && "Un exercice réussi à chaque niveau",
-    solved.some((e) => e.niveau === 5) && "Niveau 5 réussi",
+    new Set(solved.map((e) => e.niveau)).size === top && "Un exercice réussi à chaque niveau",
+    solved.some((e) => e.niveau === top) && `Niveau ${top} réussi`,
     !!isExam && solved.some((e) => isExam(e.title)) && "Exercice type examen réussi",
   ].filter((x): x is string => !!x);
   return { done: solved.length, total: c.exercises.length, tried: new Set(mine.map((a) => a.exerciseId)).size, milestones };
