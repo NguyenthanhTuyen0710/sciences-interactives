@@ -371,3 +371,109 @@ describe("catalogue des chapitres (interface)", () => {
     expect(ids("math-3e-pythagore")).toContain("PY-T09");
   });
 });
+
+describe("plan de révision", async () => {
+  const P = await import("../src/lib/revision-plan");
+  const published = ALL_CHAPTERS.filter((c) => c.publicationStatus === "published");
+  const drafts = ALL_CHAPTERS.filter((c) => c.publicationStatus !== "published");
+  const KINDS = ["cours", "bases", "entrainement", "approfondissement"] as const;
+  const LEVELS_OF: Record<string, number[]> = { bases: [1, 2], entrainement: [3, 4], approfondissement: [5] };
+
+  it("« aujourd'hui » = date de Paris au moment de la demande (minuit, changements d'heure)", () => {
+    expect(P.parisToday(new Date("2027-03-27T22:59:00Z"))).toBe("2027-03-27"); // 23:59 heure d'hiver
+    expect(P.parisToday(new Date("2027-03-27T23:30:00Z"))).toBe("2027-03-28"); // 00:30, nuit du passage à l'heure d'été
+    expect(P.parisToday(new Date("2027-06-30T21:59:00Z"))).toBe("2027-06-30"); // 23:59 heure d'été
+    expect(P.parisToday(new Date("2027-06-30T22:01:00Z"))).toBe("2027-07-01");
+    expect(P.parisToday(new Date("2027-10-30T22:30:00Z"))).toBe("2027-10-31"); // nuit du retour à l'heure d'hiver
+    expect(P.isIsoDate("2027-02-30")).toBe(false);
+    expect(P.isIsoDate("2027-2-3")).toBe(false);
+    expect(P.isIsoDate("2028-02-29")).toBe(true);
+    expect(P.daysBetween("2027-03-27", "2027-03-29")).toBe(2);
+  });
+
+  it("la page est rendue à chaque demande (pas de page figée au build)", () => {
+    expect(readFileSync("src/app/revisions/plan/page.tsx", "utf8")).toMatch(/export const dynamic = "force-dynamic"/);
+  });
+
+  it("refus : date invalide, passée, aucun chapitre disponible ; brouillons et inconnus ignorés", () => {
+    const base = { today: "2027-05-10", available: published };
+    expect(P.buildPlan({ ...base, examDate: "2027-13-01", requested: [published[0].id] })).toMatchObject({ ok: false, reason: "date-invalide" });
+    expect(P.buildPlan({ ...base, examDate: "2027-05-09", requested: [published[0].id] })).toMatchObject({ ok: false, reason: "date-passee" });
+    const r = P.buildPlan({ ...base, examDate: "2027-05-20", requested: [drafts[0].id, "chapitre-inconnu"] });
+    expect(r).toMatchObject({ ok: false, reason: "aucun-chapitre", ignored: [drafts[0].id, "chapitre-inconnu"] });
+    const ok = P.buildPlan({ ...base, examDate: "2027-05-20", requested: [published[0].id, drafts[0].id] });
+    expect(ok.ok && ok.days.flatMap((d) => d.tasks).every((t) => t.chapterId === published[0].id)).toBe(true);
+    expect(ok.ignored).toEqual([drafts[0].id]);
+  });
+
+  it("évaluation aujourd'hui ou demain : plan express sur une seule journée", () => {
+    for (const examDate of ["2027-05-10", "2027-05-11"]) {
+      const r = P.buildPlan({ today: "2027-05-10", examDate, requested: published.map((c) => c.id), available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      expect(r.mode).toBe("express");
+      expect(r.days).toHaveLength(1);
+      expect(r.days[0].date).toBe("2027-05-10");
+      expect(r.days[0].tasks.map((t) => t.kind)).toEqual(published.map(() => "express"));
+    }
+  });
+
+  it("répartition : chaque étape une fois, dans l'ordre, entre aujourd'hui et la veille ; bilan la veille ; horizon de 60 jours", () => {
+    for (const k of [1, 2, published.length]) for (const n of [2, 3, 5, 8, 13, 30, 60, 61, 120]) {
+      const chosen = published.slice(0, k);
+      const examDate = P.addDays("2027-01-15", n);
+      const r = P.buildPlan({ today: "2027-01-15", examDate, requested: chosen.map((c) => c.id), available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      expect(r.mode).toBe("normal");
+      expect(r.capped).toBe(n > P.PLAN_MAX_DAYS);
+      expect(r.start).toBe(n > P.PLAN_MAX_DAYS ? P.addDays(examDate, -P.PLAN_MAX_DAYS) : "2027-01-15");
+      const dates = r.days.map((d) => d.date);
+      expect([...dates].sort()).toEqual(dates);
+      expect(new Set(dates).size).toBe(dates.length);
+      expect(dates[0] >= r.start && dates.at(-1) === P.addDays(examDate, -1)).toBe(true);
+      expect(r.days.every((d) => d.tasks.length > 0)).toBe(true);
+      expect(r.days.at(-1)!.tasks.map((t) => t.kind)).toEqual(chosen.map(() => "bilan"));
+      const work = r.days.slice(0, -1).flatMap((d, i) => d.tasks.map((t) => ({ ...t, i })));
+      expect(work).toHaveLength(4 * k);
+      for (const c of chosen) {
+        const mine = work.filter((t) => t.chapterId === c.id);
+        expect(mine.map((t) => t.kind)).toEqual([...KINDS]);
+        for (let j = 1; j < mine.length; j++) expect(mine[j].i).toBeGreaterThanOrEqual(mine[j - 1].i);
+      }
+    }
+  });
+
+  it("contenu réel du chapitre (exercices des bons niveaux, jeux existants) et aucune correction transmise", () => {
+    const r = P.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: published.map((c) => c.id), available: published });
+    if (!r.ok) throw new Error("plan attendu");
+    for (const t of r.days.flatMap((d) => d.tasks)) {
+      const c = published.find((x) => x.id === t.chapterId)!;
+      for (const e of t.exercises) {
+        const src = c.exercises.find((x) => x.id === e.id)!;
+        expect(src).toBeDefined();
+        expect(e.title).toBe(src.title);
+        if (LEVELS_OF[t.kind]) expect(LEVELS_OF[t.kind]).toContain(e.niveau);
+      }
+      if (t.game) expect(c.games.map((g) => g.title)).toContain(t.game);
+    }
+    const out = JSON.stringify(r);
+    expect(out).not.toMatch(/"answer"|"mistakes"|"solution"|"hints"|"reasoning"|"statement"|"steps"/);
+  });
+
+  it("Type Brevet : préfixe reconnu sur tout titre qui cite le Brevet, et proposé en approfondissement", () => {
+    const titles = ALL_CHAPTERS.flatMap((c) => c.exercises.map((e) => e.title));
+    const cite = titles.filter((t) => /brevet/i.test(t));
+    expect(cite.length).toBeGreaterThan(0);
+    for (const t of cite) expect(P.isTypeBrevet(t), `titre non reconnu : « ${t} »`).toBe(true);
+    expect(P.isTypeBrevet("Le Brevet blanc")).toBe(false);
+    const with3e = published.filter((c) => c.grade === "3e" && c.exercises.some((e) => P.isTypeBrevet(e.title)));
+    expect(with3e.length).toBeGreaterThan(0);
+    for (const c of with3e) {
+      const r = P.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: [c.id], available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      const deep = r.days.flatMap((d) => d.tasks).find((t) => t.kind === "approfondissement")!;
+      expect(deep.exercises.some((e) => e.brevet)).toBe(true);
+      expect(deep.exercises).toHaveLength(Math.min(3, c.exercises.filter((e) => e.niveau === 5).length));
+      expect(new Set(deep.exercises.map((e) => e.id)).size).toBe(deep.exercises.length);
+    }
+  });
+});

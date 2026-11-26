@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#contenu" className="skip-link">Aller au contenu</a>
         <Header user={user ? { name: user.name, role: user.role } : null} />
         <main id="contenu" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 outline-none sm:py-8">{children}</main>
-        <footer className="mt-12 border-t border-slate-200 bg-white">
+        <footer className="mt-12 border-t print:hidden border-slate-200 bg-white">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1.3fr]">
             <div>
               <p className="font-bold text-slate-900">Sciences Interactives</p>
