@@ -66,7 +66,7 @@ export default async function AdminHome() {
               <thead className="text-left text-xs text-slate-500"><tr><th className="py-1">Élève</th><th>Classe</th><th>Tent.</th><th>Moy.</th><th>Dernière activité</th></tr></thead>
               <tbody>{stats.perStudent.map((s) => (
                 <tr key={s.id} className="border-t border-slate-100"><td className="py-1.5 font-medium">{s.name}</td><td>{s.level ?? "—"}</td><td>{s.n}</td>
-                  <td className={s.avg >= 0.75 ? "text-emerald-600" : s.avg >= 0.5 ? "text-amber-600" : "text-rose-600"}>{s.n ? `${Math.round(s.avg * 100)} %` : "—"}</td>
+                  <td className={s.avg >= 0.75 ? "text-emerald-700" : s.avg >= 0.5 ? "text-amber-700" : "text-rose-700"}>{s.n ? `${Math.round(s.avg * 100)} %` : "—"}</td>
                   <td className="text-slate-500">{s.last ? new Date(s.last).toLocaleDateString("fr-FR") : "—"}</td></tr>
               ))}</tbody>
             </table>

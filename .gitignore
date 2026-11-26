@@ -46,3 +46,6 @@ next-env.d.ts
 /pipeline/.store/
 /pipeline-output/
 /sources-output/
+
+# relevé de structure d’interface (artefact du workflow collect-sources, jamais committé)
+/ui-reference-output/

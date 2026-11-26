@@ -5,7 +5,7 @@
 //   (`-- sync` reste accepté, sans effet supplémentaire).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { ALL_CHAPTERS } from "../src/lib/chapters";
-import { doneIssues, REVIEW_KEYS } from "../src/lib/chapters/schema";
+import { chapterLevels, doneIssues, REVIEW_KEYS } from "../src/lib/chapters/schema";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const P = (f: string) => ROOT + f;
@@ -80,7 +80,7 @@ function render() {
     out.push(`### ${c.taskId} — ${c.title} (${c.grade}, ${c.subject})`, "",
       `- Publication : **${c.publicationStatus}**`,
       `- Objectifs officiels : ${objs.length} · couverts par le cours : ${objs.length} · par des exercices : ${byEx.length} · par des jeux : ${byGame.length}`,
-      `- Exercices : ${c.exercises.length} (niveaux ${[1, 2, 3, 4, 5].map((l) => `${l}:${c.exercises.filter((e) => e.niveau === l).length}`).join(" ")}) · activités : ${c.games.length}`,
+      `- Exercices : ${c.exercises.length} (niveaux ${chapterLevels(c).map((l) => `${l}:${c.exercises.filter((e) => e.niveau === l).length}`).join(" ")}) · activités : ${c.games.length}`,
       `- Revues QA : ${REVIEW_KEYS.map((k) => `${k} = ${c.reviewStatus[k]}`).join(" · ")}`,
       `- Écarts à la Definition of Done : ${issues.length ? issues.join(" ; ") : "aucun"}`, "");
   }
@@ -151,7 +151,7 @@ async function matrix() {
       pipelineSpec: specs.find((sp) => sp.id === c?.id || sp.id === ch.id || sp.officialChapterIds.includes(ch.id))?.id ?? null,
       content: c && hit ? {
         id: c.id, taskId: c.taskId, file: hit.file, sha256: hit.sha256, registered: registered.has(c.id), publication: c.publicationStatus,
-        exercises: c.exercises.length, perLevel: [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length),
+        exercises: c.exercises.length, perLevel: chapterLevels(c).map((l) => c.exercises.filter((e) => e.niveau === l).length),
         games: c.games.length, review: c.reviewStatus, qaPassed, apiCostUsd: costOf(c.id),
       } : null,
       missing,

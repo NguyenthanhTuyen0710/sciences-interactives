@@ -185,6 +185,27 @@ describe("M3 étape B (lycée) : collège inchangé, schéma lycée, master gén
     expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, extra] })).toContain("objectif X-99 sans exercice");
     expect(doneIssues({ ...base, officialObjectives: [...base.officialObjectives, { ...extra, required: false }] })).not.toContain("objectif X-99 sans exercice");
   });
+  it("maxNiveau 4 (décision 39) : niveaux 1 à 4 exigés, niveau 5 refusé ; absent = 5 niveaux", async () => {
+    const { ChapterSchema, chapterLevels, doneIssues } = await import("../src/lib/chapters/schema");
+    const base = ALL_CHAPTERS.find((c) => c.id === "math-3e-arithmetique")!;
+    const four = { ...base, maxNiveau: 4 as const, exercises: base.exercises.map((e) => (e.niveau === 5 ? { ...e, niveau: 4 as const } : e)) };
+    expect(chapterLevels(base)).toEqual([1, 2, 3, 4, 5]);
+    expect(chapterLevels(four)).toEqual([1, 2, 3, 4]);
+    expect(doneIssues(four)).not.toContain("aucun exercice de niveau 5");
+    expect(doneIssues({ ...base, exercises: four.exercises })).toContain("aucun exercice de niveau 5");
+    const bad = ChapterSchema.safeParse({ ...base, maxNiveau: 4 });
+    expect(bad.success).toBe(false);
+    expect(bad.error?.issues.some((i) => i.message.includes("> maxNiveau 4"))).toBe(true);
+    const plan = await import("../src/lib/revision-plan");
+    const r = plan.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: [four.id], available: [four] });
+    if (!r.ok) throw new Error("plan attendu");
+    const tasks = r.days.flatMap((d) => d.tasks);
+    expect(tasks.find((t) => t.kind === "entrainement")!.levels).toEqual([3]);
+    expect(tasks.find((t) => t.kind === "approfondissement")!.levels).toEqual([4]);
+    for (const t of tasks) for (const e of t.exercises) if (t.levels) expect(t.levels).toContain(e.niveau);
+    const ui = await import("../src/components/ui");
+    expect(ui.chapterProgress(four, four.exercises.map((e) => ({ exerciseId: e.id, score: 1 }))).milestones).toEqual(["Premier exercice réussi", "Un exercice réussi à chaque niveau", "Niveau 4 réussi"]);
+  });
   it("master-curriculum.json = fusion exacte des curriculum-*.json (généré par npm run dashboard, jamais à la main)", () => {
     const read = (f: string) => JSON.parse(readFileSync(f, "utf8"));
     const master = read("research/curriculum/master-curriculum.json");
@@ -314,4 +335,219 @@ describe("QA tier 2 : chapitre ↔ taxonomie verrouillée (validate-chapter)", (
     const out = JSON.parse(r.stdout.trim().split("\n").pop() ?? "{}") as { summary: { taxonomy: string; ok: boolean } };
     expect(out.summary).toMatchObject({ taxonomy: "absente", ok: true });
   }, 120_000);
+});
+
+describe("catalogue des chapitres (interface)", () => {
+  it("résumé fidèle aux données : brouillon non cliquable, chiffres réels, libellé sans chapitre", async () => {
+    const { chapterSummary, levelCounts, countsLabel } = await import("../src/components/ui");
+    const all = ALL_CHAPTERS.map((c) => chapterSummary(c, c.publicationStatus === "published"));
+    for (const s of all) {
+      const c = ALL_CHAPTERS.find((x) => x.id === s.id)!;
+      expect(s.exercises).toBe(c.exercises.length);
+      expect(s.games).toBe(c.games.length);
+      expect(s.href === null).toBe(c.publicationStatus !== "published");
+      expect(JSON.stringify(s)).not.toMatch(/"answer"|"mistakes"/);
+    }
+    const k3 = levelCounts(all, "3e", null);
+    expect(k3.total).toBe(ALL_CHAPTERS.filter((c) => c.grade === "3e").length);
+    expect(k3.published + k3.unpublished).toBe(k3.total);
+    expect(countsLabel({ total: 0, published: 0, unpublished: 0, themes: 12 })).toBe("12 thèmes du programme, chapitres en préparation");
+    expect(countsLabel({ total: 6, published: 2, unpublished: 4, themes: 16 })).toBe("6 chapitres (2 publiés, 4 brouillons)");
+    expect(countsLabel({ total: 1, published: 1, unpublished: 0, themes: 7 })).toBe("1 chapitre (1 publié)");
+  });
+
+  it("types d'exercices (page Exercices) : id + titre seulement, type sans exercice caché, méthodes sans étapes", async () => {
+    const { chapterTypes } = await import("../src/components/ui");
+    const TAX = ["math-3e-calcul-litteral", "math-3e-equations", "math-3e-pythagore"];
+    for (const c of ALL_CHAPTERS) {
+      const raw = TAX.includes(c.id) ? JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${c.id}.json`, "utf8")) : null;
+      const t = chapterTypes(c, raw);
+      expect(t.kind).toBe(raw ? "taxonomy" : "methods");
+      expect(t.items.length).toBeGreaterThan(0);
+      for (const it of t.items) expect(Object.keys(it).sort()).toEqual(["id", "title"]);
+      const out = JSON.stringify(t);
+      // Aucun contenu d'exercice ni de méthode : réponses, diagnostics, étapes, exemples résolus, erreurs fréquentes.
+      expect(out).not.toMatch(/"answer"|"mistakes"|"steps"|"method"|"commonMistakes"|"solution"/);
+      const secret = [
+        ...c.lesson.methods.flatMap((m) => m.steps), ...c.lesson.workedExamples.flatMap((w) => [w.answer, ...w.steps]),
+        ...c.lesson.commonMistakes.flatMap((m) => [m.mistake, m.correction]), ...c.exercises.flatMap((e) => [...(e.solution ?? []), e.reasoning, ...e.hints]),
+        ...(raw ? raw.types.flatMap((x: { method?: unknown; commonMistakes?: unknown }) => [JSON.stringify(x.method ?? ""), JSON.stringify(x.commonMistakes ?? "")]) : []),
+      ].filter((x) => x.length > 12);
+      for (const x of secret) expect(out.includes(x)).toBe(false);
+      if (raw) {
+        // Règle « un type n'apparaît que s'il a au moins un exercice dans le chapitre ».
+        const ids = new Set(c.exercises.map((e) => e.id));
+        const tagged = new Set(c.exercises.flatMap((e) => e.taxonomyTypes ?? []));
+        for (const x of raw.types as { id: string; exercises?: string[] }[]) {
+          const has = tagged.has(x.id) || (x.exercises ?? []).some((e) => ids.has(e));
+          expect(t.items.some((i) => i.id === x.id)).toBe(has);
+        }
+      } else {
+        expect(t.items.map((i) => i.title)).toEqual(c.lesson.methods.map((m) => m.title));
+      }
+    }
+    const ids = (id: string) => chapterTypes(ALL_CHAPTERS.find((c) => c.id === id)!, JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${id}.json`, "utf8"))).items.map((i) => i.id);
+    expect(ids("math-3e-equations")).not.toContain("EQ-T09");
+    expect(ids("math-3e-calcul-litteral")).not.toContain("CL-T10");
+    expect(ids("math-3e-pythagore")).toContain("PY-T09");
+  });
+});
+
+describe("plan de révision", async () => {
+  const P = await import("../src/lib/revision-plan");
+  const published = ALL_CHAPTERS.filter((c) => c.publicationStatus === "published");
+  const drafts = ALL_CHAPTERS.filter((c) => c.publicationStatus !== "published");
+  const KINDS = ["cours", "bases", "entrainement", "approfondissement"] as const;
+  const LEVELS_OF: Record<string, number[]> = { bases: [1, 2], entrainement: [3, 4], approfondissement: [5] };
+
+  it("« aujourd'hui » = date de Paris au moment de la demande (minuit, changements d'heure)", () => {
+    expect(P.parisToday(new Date("2027-03-27T22:59:00Z"))).toBe("2027-03-27"); // 23:59 heure d'hiver
+    expect(P.parisToday(new Date("2027-03-27T23:30:00Z"))).toBe("2027-03-28"); // 00:30, nuit du passage à l'heure d'été
+    expect(P.parisToday(new Date("2027-06-30T21:59:00Z"))).toBe("2027-06-30"); // 23:59 heure d'été
+    expect(P.parisToday(new Date("2027-06-30T22:01:00Z"))).toBe("2027-07-01");
+    expect(P.parisToday(new Date("2027-10-30T22:30:00Z"))).toBe("2027-10-31"); // nuit du retour à l'heure d'hiver
+    expect(P.isIsoDate("2027-02-30")).toBe(false);
+    expect(P.isIsoDate("2027-2-3")).toBe(false);
+    expect(P.isIsoDate("2028-02-29")).toBe(true);
+    expect(P.daysBetween("2027-03-27", "2027-03-29")).toBe(2);
+  });
+
+  it("la page est rendue à chaque demande (pas de page figée au build)", () => {
+    expect(readFileSync("src/app/revisions/plan/page.tsx", "utf8")).toMatch(/export const dynamic = "force-dynamic"/);
+  });
+
+  it("refus : date invalide, passée, aucun chapitre disponible ; brouillons et inconnus ignorés", () => {
+    const base = { today: "2027-05-10", available: published };
+    expect(P.buildPlan({ ...base, examDate: "2027-13-01", requested: [published[0].id] })).toMatchObject({ ok: false, reason: "date-invalide" });
+    expect(P.buildPlan({ ...base, examDate: "2027-05-09", requested: [published[0].id] })).toMatchObject({ ok: false, reason: "date-passee" });
+    const r = P.buildPlan({ ...base, examDate: "2027-05-20", requested: [drafts[0].id, "chapitre-inconnu"] });
+    expect(r).toMatchObject({ ok: false, reason: "aucun-chapitre", ignored: [drafts[0].id, "chapitre-inconnu"] });
+    const ok = P.buildPlan({ ...base, examDate: "2027-05-20", requested: [published[0].id, drafts[0].id] });
+    expect(ok.ok && ok.days.flatMap((d) => d.tasks).every((t) => t.chapterId === published[0].id)).toBe(true);
+    expect(ok.ignored).toEqual([drafts[0].id]);
+  });
+
+  it("évaluation aujourd'hui ou demain : plan express sur une seule journée", () => {
+    for (const examDate of ["2027-05-10", "2027-05-11"]) {
+      const r = P.buildPlan({ today: "2027-05-10", examDate, requested: published.map((c) => c.id), available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      expect(r.mode).toBe("express");
+      expect(r.days).toHaveLength(1);
+      expect(r.days[0].date).toBe("2027-05-10");
+      expect(r.days[0].tasks.map((t) => t.kind)).toEqual(published.map(() => "express"));
+    }
+  });
+
+  it("répartition : chaque étape une fois, dans l'ordre, entre aujourd'hui et la veille ; bilan la veille ; horizon de 60 jours", () => {
+    for (const k of [1, 2, published.length]) for (const n of [2, 3, 5, 8, 13, 30, 60, 61, 120]) {
+      const chosen = published.slice(0, k);
+      const examDate = P.addDays("2027-01-15", n);
+      const r = P.buildPlan({ today: "2027-01-15", examDate, requested: chosen.map((c) => c.id), available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      expect(r.mode).toBe("normal");
+      expect(r.capped).toBe(n > P.PLAN_MAX_DAYS);
+      expect(r.start).toBe(n > P.PLAN_MAX_DAYS ? P.addDays(examDate, -P.PLAN_MAX_DAYS) : "2027-01-15");
+      const dates = r.days.map((d) => d.date);
+      expect([...dates].sort()).toEqual(dates);
+      expect(new Set(dates).size).toBe(dates.length);
+      expect(dates[0] >= r.start && dates.at(-1) === P.addDays(examDate, -1)).toBe(true);
+      expect(r.days.every((d) => d.tasks.length > 0)).toBe(true);
+      expect(r.days.at(-1)!.tasks.map((t) => t.kind)).toEqual(chosen.map(() => "bilan"));
+      const work = r.days.slice(0, -1).flatMap((d, i) => d.tasks.map((t) => ({ ...t, i })));
+      expect(work).toHaveLength(4 * k);
+      for (const c of chosen) {
+        const mine = work.filter((t) => t.chapterId === c.id);
+        expect(mine.map((t) => t.kind)).toEqual([...KINDS]);
+        for (let j = 1; j < mine.length; j++) expect(mine[j].i).toBeGreaterThanOrEqual(mine[j - 1].i);
+      }
+    }
+  });
+
+  it("contenu réel du chapitre (exercices des bons niveaux, jeux existants) et aucune correction transmise", () => {
+    const r = P.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: published.map((c) => c.id), available: published });
+    if (!r.ok) throw new Error("plan attendu");
+    for (const t of r.days.flatMap((d) => d.tasks)) {
+      const c = published.find((x) => x.id === t.chapterId)!;
+      for (const e of t.exercises) {
+        const src = c.exercises.find((x) => x.id === e.id)!;
+        expect(src).toBeDefined();
+        expect(e.title).toBe(src.title);
+        if (LEVELS_OF[t.kind]) expect(LEVELS_OF[t.kind]).toContain(e.niveau);
+      }
+      if (t.game) expect(c.games.map((g) => g.title)).toContain(t.game);
+    }
+    const out = JSON.stringify(r);
+    expect(out).not.toMatch(/"answer"|"mistakes"|"solution"|"hints"|"reasoning"|"statement"|"steps"/);
+  });
+
+  it("Type Brevet : préfixe reconnu sur tout titre qui cite le Brevet, et proposé en approfondissement", () => {
+    const titles = ALL_CHAPTERS.flatMap((c) => c.exercises.map((e) => e.title));
+    const cite = titles.filter((t) => /brevet/i.test(t));
+    expect(cite.length).toBeGreaterThan(0);
+    for (const t of cite) expect(P.isTypeBrevet(t), `titre non reconnu : « ${t} »`).toBe(true);
+    expect(P.isTypeBrevet("Le Brevet blanc")).toBe(false);
+    const with3e = published.filter((c) => c.grade === "3e" && c.exercises.some((e) => P.isTypeBrevet(e.title)));
+    expect(with3e.length).toBeGreaterThan(0);
+    for (const c of with3e) {
+      const r = P.buildPlan({ today: "2027-01-15", examDate: "2027-02-15", requested: [c.id], available: published });
+      if (!r.ok) throw new Error("plan attendu");
+      const deep = r.days.flatMap((d) => d.tasks).find((t) => t.kind === "approfondissement")!;
+      expect(deep.exercises.some((e) => e.brevet)).toBe(true);
+      expect(deep.exercises).toHaveLength(Math.min(3, c.exercises.filter((e) => e.niveau === 5).length));
+      expect(new Set(deep.exercises.map((e) => e.id)).size).toBe(deep.exercises.length);
+    }
+  });
+});
+
+describe("pages Brevet et Bac (interface)", async () => {
+  const ui = await import("../src/components/ui");
+  const { isTypeBrevet } = await import("../src/lib/revision-plan");
+
+  it("liens d'exercices : identifiant, titre et niveau seulement, aucune correction", () => {
+    for (const c of ALL_CHAPTERS) {
+      const links = ui.exerciseLinks(c, isTypeBrevet);
+      expect(links.length).toBe(c.exercises.filter((e) => isTypeBrevet(e.title)).length);
+      for (const l of links) expect(Object.keys(l).sort()).toEqual(["id", "niveau", "title"]);
+      const out = JSON.stringify(links);
+      expect(out).not.toMatch(/"answer"|"mistakes"|"solution"|"hints"|"reasoning"|"statement"|"commonMistakes"/);
+      for (const e of c.exercises) for (const x of [...(e.solution ?? []), e.reasoning, ...e.hints].filter((t) => t.length > 12)) expect(out.includes(x)).toBe(false);
+    }
+    const published3e = ALL_CHAPTERS.filter((c) => c.grade === "3e" && c.publicationStatus === "published");
+    expect(published3e.flatMap((c) => ui.exerciseLinks(c, isTypeBrevet)).length).toBeGreaterThan(0);
+  });
+
+  it("progression : seulement les tentatives réelles du chapitre ; jalons calculés, jamais inventés", () => {
+    const c = ALL_CHAPTERS.find((x) => x.id === "math-3e-arithmetique")!;
+    expect(ui.chapterProgress(c, [], isTypeBrevet)).toEqual({ done: 0, total: c.exercises.length, tried: 0, milestones: [] });
+    const lvl1 = c.exercises.find((e) => e.niveau === 1)!;
+    const brevet = c.exercises.find((e) => isTypeBrevet(e.title))!;
+    const p = ui.chapterProgress(c, [
+      { exerciseId: lvl1.id, score: 1 }, { exerciseId: lvl1.id, score: 0.5 }, { exerciseId: brevet.id, score: 0.4 }, { exerciseId: "autre-chapitre-01", score: 1 },
+    ], isTypeBrevet);
+    expect(p).toEqual({ done: 1, total: c.exercises.length, tried: 2, milestones: ["Premier exercice réussi"] });
+    const all = c.exercises.map((e) => ({ exerciseId: e.id, score: 1 }));
+    expect(ui.chapterProgress(c, all, isTypeBrevet).milestones).toEqual(["Premier exercice réussi", "Un exercice réussi à chaque niveau", "Niveau 5 réussi", "Exercice type examen réussi"]);
+  });
+});
+
+describe("page Contact : coordonnées codées", async () => {
+  const { obfuscate } = await import("../src/components/ui");
+  const { revealText } = await import("../src/components/ClientBits");
+  const src = readFileSync("src/app/contact/page.tsx", "utf8");
+  const email = src.match(/email: "([^"]+)"/)![1];
+  const phone = src.match(/phone: "([^"]+)"/)![1];
+
+  it("codage réversible ; aucun morceau ne laisse lire l'adresse ou le numéro", () => {
+    for (const v of [email, phone, "élève@exemple.fr"]) {
+      const parts = obfuscate(v);
+      expect(parts).toHaveLength(3);
+      expect(revealText(parts)).toBe(v);
+      const joined = parts.join("");
+      for (const frag of [v, v.split("@")[0], "@", "gmail", v.replace(/\D/g, "").slice(-6)]) if (frag.length >= 3 || frag === "@") expect(joined.includes(frag)).toBe(false);
+    }
+  });
+
+  it("aucun formulaire ni cookie dans la page", () => {
+    expect(src).not.toMatch(/<form|cookies\(|document\.cookie|localStorage/);
+  });
 });

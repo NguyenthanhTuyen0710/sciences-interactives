@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { applyChanges, normalize, extractMetadata, gateSeed, type Change, type Inventory, type SourceRecord, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
+import { applyChanges, assertNoLongText, collectUiStructure, extractUiStructure, UI_MAX_TEXT, UI_OUTPUT_DIR, UI_REFERENCE_HOST, uiUserAgent, validateUiPages, type UiDeps, normalize, extractMetadata, gateSeed, type Change, type Inventory, type SourceRecord, groupFor, matchObjective, parseRobots, quoteFound, robotsAllows, verify, type Seed, type SourceEntry } from "../pipeline/sources/lib";
 import { ledgerIssues, ops, reconcileBatch, spendBlockers, spentUsd, type LedgerEntry } from "../pipeline/ledger";
 import { SourceSchema } from "../src/lib/chapters/schema";
 import registry from "../research/sources/registry.json";
 import seedsFile from "../research/sources/seeds.json";
 import inventory from "../research/curriculum/mathematiques/curriculum-math.json";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const UA = "SciencesInteractivesBot/0.1 (+https://example.org)";
 
@@ -223,5 +224,120 @@ describe("G2 : attach_evidence passe un objectif à verified seulement si la cit
     const r = applyChanges(i, [ok, { ...ok, objectiveId: "O2", approvedBy: "" }], docOf);
     expect(r.errors).toHaveLength(1);
     expect(obj(i).verified).toBe(false);
+  });
+});
+
+describe("relevé de structure d'interface (hors chaîne de contenu)", () => {
+  const LONG = "Ce paragraphe de présentation est volontairement long pour vérifier qu'aucun texte n'est conservé par le relevé.";
+  const QUOTE = "Témoignage fictif d'un élève, à ne jamais recopier dans la sortie du relevé.";
+  const HTML = `<!doctype html><html><head><title>Titre de page à ignorer</title><script>var secret = "${LONG}";</script></head><body>
+<a href="#contenu">Aller au contenu</a>
+<header><a href="/"><img src="/logo.png" alt="logo"></a>
+  <nav aria-label="principale"><ul><li><a href="/cours">Le cours</a></li><li><a href="/exos">Exercices</a></li>
+  <li><a href="/x">${LONG}</a></li><li><a href="https://ailleurs.example/">Externe</a></li></ul></nav></header>
+<main id="contenu">
+  <section><h1>Grand titre du hero à ne pas conserver</h1><p>${LONG}</p>
+    <a href="/3e">Troisième 12 chapitres</a><a href="/2nde">Seconde</a><a href="/1re">Première</a><a href="/tle">Terminale</a>
+    <img src="/mascotte.webp" alt=""><video src="/intro.mp4"></video></section>
+  <section><h2>Derniers chapitres</h2><ul>
+    <li><a href="/c1"><img src="/c1.jpg"><h3>Chapitre un</h3></a></li><li><a href="/c2"><img src="/c2.jpg"><h3>Chapitre deux</h3></a></li><li><a href="/c3"><img src="/c3.jpg"><h3>Chapitre trois</h3></a></li></ul></section>
+  <section><h2>Avis</h2><blockquote>${QUOTE}</blockquote><form><input type="email" name="email"><button>Envoyer</button></form></section>
+</main>
+<footer><div><p>Marque</p></div><div><h3>Par classe</h3><ul><li><a href="/a">A</a></li><li><a href="/b">B</a></li></ul></div>
+<div><h3>Contenus</h3><ul><li><a href="/c">C</a></li><li><a href="/d">D</a></li><li><a href="/e">E</a></li></ul></div></footer>
+</body></html>`;
+
+  it("ne conserve aucun texte long, aucun titre, aucune adresse d'image", () => {
+    const out = extractUiStructure(HTML);
+    const json = JSON.stringify(out);
+    for (const s of [LONG, QUOTE, "Grand titre", "Derniers chapitres", "Chapitre un", "Titre de page", "secret", ".png", ".jpg", ".webp", ".mp4", "ailleurs.example", "email"]) expect(json).not.toContain(s);
+    const strings: string[] = [];
+    const walk = (v: unknown): void => { if (typeof v === "string") strings.push(v); else if (v && typeof v === "object") Object.values(v).forEach(walk); };
+    walk(out);
+    expect(strings.every((s) => s.length <= UI_MAX_TEXT)).toBe(true);
+    expect(() => assertNoLongText({ a: ["x".repeat(UI_MAX_TEXT + 1)] })).toThrow();
+  });
+
+  it("relève l'ordre des blocs, les niveaux de titres, la navigation, les rôles et les colonnes du pied de page", () => {
+    const out = extractUiStructure(HTML);
+    expect(out.blocks.map((b) => b.tag)).toEqual(["header", "nav", "main", "section", "section", "section", "footer"]);
+    expect(out.totals).toEqual({ h1: 1, h2: 2, h3: 5, blocks: 7 });
+    const nav = out.blocks.find((b) => b.tag === "nav")!;
+    expect(nav.navItems).toEqual(["Le cours", "Exercices", "Externe"]);
+    expect(nav.navOmitted).toBe(1);
+    const [hero, cards, avis] = out.blocks.filter((b) => b.tag === "section");
+    expect(hero.roles).toEqual(["hero", "sélecteur de niveau"]);
+    expect([hero.images, hero.videos]).toEqual([1, 1]);
+    expect(cards.roles).toEqual(["grille de cartes"]);
+    expect(cards.cards).toBe(3);
+    expect(avis.roles).toEqual(["formulaire"]);
+    const footer = out.blocks.find((b) => b.tag === "footer")!;
+    expect([footer.footerColumns, footer.linksPerColumn]).toEqual([2, [2, 3]]);
+  });
+
+  it("refuse avant toute requête : autre hôte, HTTP, chemins réservés ou d'achat, plus de 10 pages", () => {
+    expect(validateUiPages("/, /cours, https://" + UI_REFERENCE_HOST + "/fiches").paths).toEqual(["/", "/cours", "/fiches"]);
+    for (const bad of ["https://ailleurs.example/", "http://" + UI_REFERENCE_HOST + "/", "/api/x", "/merci", "/classeurs/a", "/fiches-pdf/b", "/connexion", "/boutique", "/packs-exercices", "/cours-particuliers", ""]) expect(validateUiPages(bad).errors.length, bad).toBeGreaterThan(0);
+    expect(validateUiPages(Array.from({ length: 11 }, (_, i) => `/p${i}`).join(",")).errors[0]).toMatch(/maximum 10/);
+  });
+
+  const fakeDeps = (robots: string, pageStatus = 200) => {
+    const calls: string[] = [], sleeps: number[] = [];
+    const deps: UiDeps = {
+      fetch: async (url, init) => {
+        calls.push(url);
+        expect(init.redirect).toBe("manual");
+        expect(init.headers["User-Agent"]).toMatch(/relevé de structure de mise en page, sans contenu\)$/);
+        const isRobots = url.endsWith("/robots.txt");
+        return { status: isRobots ? 200 : pageStatus, headers: { get: (n: string) => (n === "content-type" ? (isRobots ? "text/plain" : "text/html; charset=utf-8") : n === "location" ? "https://ailleurs.example/" : null) }, text: async () => (isRobots ? robots : HTML) };
+      },
+      sleep: async (ms) => { sleeps.push(ms); },
+    };
+    return { deps, calls, sleeps };
+  };
+  const UA_UI = uiUserAgent("SciencesInteractivesBot/0.1 (+https://example.org)");
+
+  it("une requête par page autorisée, robots.txt d'abord, délai ≥ 2 s, aucune image ni lien suivi", async () => {
+    const { deps, calls, sleeps } = fakeDeps("User-agent: *\nAllow: /\nDisallow: /api/\n");
+    const r = await collectUiStructure("/,/cours", UA_UI, deps);
+    expect(r.stopped).toBeNull();
+    expect(calls).toEqual([`https://${UI_REFERENCE_HOST}/robots.txt`, `https://${UI_REFERENCE_HOST}/`, `https://${UI_REFERENCE_HOST}/cours`]);
+    expect(calls.every((u) => new URL(u).host === UI_REFERENCE_HOST && !/\.(png|jpe?g|webp|gif|svg|mp4)$/.test(u))).toBe(true);
+    expect(sleeps).toEqual([2000, 2000]);
+    expect(r.pages.map((p) => p.totals.blocks)).toEqual([7, 7]);
+  });
+
+  it("respecte un Crawl-delay plus long et ne suit pas les redirections", async () => {
+    const { deps, calls, sleeps } = fakeDeps("User-agent: *\nCrawl-delay: 5\n", 301);
+    const r = await collectUiStructure("/", UA_UI, deps);
+    expect(sleeps).toEqual([5000]);
+    expect(calls).toHaveLength(2);
+    expect(r.pages[0]).toMatchObject({ httpStatus: 301, note: "redirection non suivie", blocks: [] });
+  });
+
+  it("s'arrête si robots.txt interdit une page : aucune page demandée", async () => {
+    const { deps, calls } = fakeDeps("User-agent: *\nDisallow: /\n");
+    const r = await collectUiStructure("/,/cours", UA_UI, deps);
+    expect(r.stopped).toMatch(/robots\.txt interdit/);
+    expect(calls).toEqual([`https://${UI_REFERENCE_HOST}/robots.txt`]);
+    expect(r.pages).toEqual([]);
+  });
+
+  it("pages refusées : aucune requête, pas même robots.txt", async () => {
+    const { deps, calls } = fakeDeps("");
+    const r = await collectUiStructure("https://ailleurs.example/", UA_UI, deps);
+    expect(r.stopped).toMatch(/pages refusées/);
+    expect(calls).toEqual([]);
+  });
+
+  it("reste hors de la chaîne de contenu et hors de Git", () => {
+    const root = join(__dirname, "..");
+    const readers = ["pipeline/run.ts", "scripts/validate-chapter.ts", ...readdirSync(join(root, "pipeline/prompts")).map((f) => `pipeline/prompts/${f}`)];
+    for (const f of readers) {
+      const txt = readFileSync(join(root, f), "utf8");
+      for (const needle of [UI_OUTPUT_DIR, "ui-structure", "UiStructure", "sources/lib"]) expect(txt.includes(needle), `${f} : ${needle}`).toBe(false);
+    }
+    expect(UI_OUTPUT_DIR.startsWith("research") || UI_OUTPUT_DIR.startsWith("project")).toBe(false);
+    expect(readFileSync(join(root, ".gitignore"), "utf8")).toContain(`/${UI_OUTPUT_DIR}/`);
   });
 });

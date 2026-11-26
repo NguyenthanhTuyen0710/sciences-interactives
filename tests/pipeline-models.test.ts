@@ -225,6 +225,18 @@ describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
     expect(promptSections(n, sectionKeys("physique-chimie", "5e"))).toBe("C(p)");
     expect(promptSections(n, sectionKeys("mathematiques", "1re"))).toBe("L");
   });
+  it("maxNiveau 4 (décision 39) : bloc {{#niveaux4}} à la place de {{#niveaux5}} ; défaut 5 inchangé", () => {
+    expect(sectionKeys("mathematiques", "3e")).toContain("niveaux5");
+    expect(sectionKeys("mathematiques", "3e", 4)).toEqual(["maths", "college", "niveaux4"]);
+    const sys = readFileSync("pipeline/prompts/system.md", "utf8");
+    const four = promptSections(sys, sectionKeys("mathematiques", "3e", 4)), five = promptSections(sys, sectionKeys("mathematiques", "3e"));
+    expect(four).toContain("levels 1–4 only");
+    expect(four).toContain("`maxNiveau: 4`");
+    expect(four).not.toContain("levels 1–5");
+    expect(five).toContain("levels 1–5 (1 découverte");
+    expect(five).not.toContain("maxNiveau");
+    expect(four).not.toMatch(/\{\{[#/]/);
+  });
   it("chaque prompt contient un bloc PC et aucune clé inconnue", () => {
     for (const f of ["system", "dossier", "chapter", "review"]) {
       const t = readFileSync(`pipeline/prompts/${f}.md`, "utf8");
@@ -287,9 +299,11 @@ describe("prompts du collège : empreintes inchangées par l'étape B (blocs lyc
     // est prise avec {{TAXONOMY}} vide (chapitre sans taxonomie verrouillée) : prompt résolu identique à celui d'avant.
     // 2026-11-24 (décision 36) : consignes solveCheck et geometry() ajoutées → chapter 54ec615f… → e3f268b0… (maths),
     // 0cce6338… → 5d154e96… (physique-chimie) ; system, dossier, fix et review inchangés.
-    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "e3f268b0cd3a8463",
+    // 2026-11-24 (décision 38) : position de solveCheck précisée → chapter e3f268b0… → 54a2c156… (maths),
+    // 5d154e96… → fa40d240… (physique-chimie).
+    "mathematiques/system": "2fdf1cdcf55b1430", "mathematiques/dossier": "9ed40b191a3c9c20", "mathematiques/chapter": "54a2c1561a321c39",
     "mathematiques/fix": "ecc7a2b99610772e", "mathematiques/review": "f84f4e7803af6a9c",
-    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "5d154e96771c3005", // idem
+    "physique-chimie/system": "c42697dd748044e1", "physique-chimie/dossier": "1eaaa1b02eda782d", "physique-chimie/chapter": "fa40d240713bcb79", // idem
     "physique-chimie/fix": "ecc7a2b99610772e", "physique-chimie/review": "216835bdc19e6453",
   };
   it("prompts résolus identiques", () => {

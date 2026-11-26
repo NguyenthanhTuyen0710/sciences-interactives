@@ -3,7 +3,7 @@ import Link from "next/link";
 import MathText, { MathInline, frTypo } from "../MathText";
 import MiniQuiz from "./MiniQuiz";
 import ChapterGameView from "../games/Games";
-import type { ChapterContent } from "@/lib/chapters/schema";
+import { chapterLevels, type ChapterContent } from "@/lib/chapters/schema";
 import { NIVEAUX } from "@/lib/engine/labels";
 
 const H2 = ({ id, children }: { id: string; children: React.ReactNode }) => <h2 id={id} className="scroll-mt-32 text-2xl font-black text-slate-900">{children}</h2>;
@@ -57,8 +57,8 @@ export default function ChapterView({ c }: { c: ChapterContent }) {
 
       <section aria-labelledby="exercices" className="space-y-4">
         <H2 id="exercices">Exercices</H2>
-        <p className="text-sm text-slate-600">Cinq niveaux de difficulté. Chaque exercice est corrigé avec une explication détaillée ; des indices progressifs sont disponibles.</p>
-        {[1, 2, 3, 4, 5].map((lvl) => {
+        <p className="text-sm text-slate-600">{chapterLevels(c).length === 4 ? "Quatre" : "Cinq"} niveaux de difficulté. Chaque exercice est corrigé avec une explication détaillée ; des indices progressifs sont disponibles.</p>
+        {chapterLevels(c).map((lvl) => {
           const list = c.exercises.filter((e) => e.niveau === lvl);
           if (!list.length) return null;
           return (

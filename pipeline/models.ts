@@ -125,12 +125,13 @@ export const SUBJECTS = {
 } as const;
 export type SubjectSlug = keyof typeof SUBJECTS;
 
-/** Clés de blocs des prompts : matière (`maths`, `pc`) et cycle (`college`, `lycee`). */
-export const SECTION_KEYS = ["maths", "pc", "college", "lycee"] as const;
+/** Clés de blocs des prompts : matière (`maths`, `pc`), cycle (`college`, `lycee`) et nombre de niveaux d'exercices (`niveaux4`, `niveaux5`). */
+export const SECTION_KEYS = ["maths", "pc", "college", "lycee", "niveaux4", "niveaux5"] as const;
 const LYCEE = ["2nde", "1re", "Tle"];
 export const isLycee = (grade: string) => LYCEE.includes(grade);
-/** Blocs actifs pour un chapitre : sa matière et son cycle. */
-export const sectionKeys = (subject: SubjectSlug, grade: string): string[] => [SUBJECTS[subject].key, isLycee(grade) ? "lycee" : "college"];
+/** Blocs actifs pour un chapitre : sa matière, son cycle et son nombre de niveaux (`maxNiveau` de la fiche, 5 par défaut ; décision 39). */
+export const sectionKeys = (subject: SubjectSlug, grade: string, maxNiveau: 4 | 5 = 5): string[] =>
+  [SUBJECTS[subject].key, isLycee(grade) ? "lycee" : "college", maxNiveau === 4 ? "niveaux4" : "niveaux5"];
 
 /** Garde les blocs `{{#clé}}…{{/clé}}` actifs (imbrication de clés différentes permise), retire les autres ; clé inconnue = erreur. */
 export function promptSections(tpl: string, active: string[]): string {

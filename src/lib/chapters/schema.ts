@@ -136,7 +136,11 @@ export const ChapterSchema = z.object({
   curriculumChapterIds: z.array(z.string()).optional(),
   /** Justification documentée si moins de 30 exercices. */
   exerciseCountJustification: z.string().optional(),
+  /** Niveau d'exercice le plus élevé : 4 pour les chapitres de maths 3e produits depuis la décision 39 (« Type Brevet » au niveau 4) ; absent = 5. */
+  maxNiveau: z.union([z.literal(4), z.literal(5)]).optional(),
 }).superRefine((c, ctx) => {
+  const max = c.maxNiveau ?? 5;
+  c.exercises.forEach((e, i) => { if (e.niveau > max) ctx.addIssue({ code: "custom", path: ["exercises", i, "niveau"], message: `${e.id} : niveau ${e.niveau} > maxNiveau ${max}` }); });
   const lycee = (LYCEE_GRADES as readonly string[]).includes(c.grade);
   if (lycee && !c.parcours) ctx.addIssue({ code: "custom", path: ["parcours"], message: "parcours obligatoire au lycée" });
   if (!lycee && c.parcours) ctx.addIssue({ code: "custom", path: ["parcours"], message: "pas de parcours au collège" });
@@ -145,12 +149,15 @@ export const ChapterSchema = z.object({
 
 export type ChapterContent = Omit<z.infer<typeof ChapterSchema>, "exercises"> & { exercises: ChapterExercise[] };
 
+/** Niveaux d'exercices du chapitre : 1 à `maxNiveau` (5 par défaut). */
+export const chapterLevels = (c: { maxNiveau?: 4 | 5 }): number[] => Array.from({ length: c.maxNiveau ?? 5 }, (_, i) => i + 1);
+
 /** Règles de la « Definition of Done » vérifiables automatiquement. */
 export function doneIssues(c: ChapterContent): string[] {
   const issues: string[] = [];
   if (c.exercises.length < 30 && !c.exerciseCountJustification) issues.push(`${c.exercises.length} exercices (< 30) sans justification`);
   if (c.games.length < 3) issues.push(`${c.games.length} activités interactives (< 3)`);
-  for (const lvl of [1, 2, 3, 4, 5]) if (!c.exercises.some((e) => e.niveau === lvl)) issues.push(`aucun exercice de niveau ${lvl}`);
+  for (const lvl of chapterLevels(c)) if (!c.exercises.some((e) => e.niveau === lvl)) issues.push(`aucun exercice de niveau ${lvl}`);
   const objIds = new Set(c.officialObjectives.map((o) => o.id));
   // Objectifs non exigés (required: false) : utilisables par les exercices, hors critère d'achèvement.
   for (const o of c.officialObjectives.filter((x) => x.required !== false).map((x) => x.id)) {

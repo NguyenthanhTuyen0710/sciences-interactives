@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { SUBJECTS, subjectFromSlug } from "@/lib/content/curriculum";
 import { getTree } from "@/lib/content/tree";
 import { getUser } from "@/lib/auth";
-import { Breadcrumbs } from "@/components/ui";
+import { Breadcrumbs, levelTone } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +30,9 @@ export default async function SubjectPage({ params }: { params: Promise<{ matier
           const n = metas.filter((m) => m.level === l.id).length;
           const mine = user?.level === l.id;
           return (
-            <section key={l.id} className={`card p-5 ${mine ? (subject === "maths" ? "ring-2 ring-indigo-400" : "ring-2 ring-emerald-400") : ""}`}>
+            <section key={l.id} className={`card border-t-4 ${levelTone(l.id).accent} p-5 ${mine ? (subject === "maths" ? "ring-2 ring-indigo-400" : "ring-2 ring-emerald-400") : ""}`}>
               <div className="mb-3 flex items-center justify-between">
-                <Link href={`/${matiere}/${l.id}`} className="text-xl font-bold hover:underline">{l.label}</Link>
+                <Link href={`/${matiere}/${l.id}`} className={`flex items-center gap-2 text-xl font-bold hover:underline ${levelTone(l.id).text}`}><span aria-hidden className={`h-3 w-3 rounded-full ${levelTone(l.id).dot}`} />{l.label}</Link>
                 <span className={`chip ${subject === "maths" ? "bg-indigo-50 text-indigo-700" : "bg-emerald-50 text-emerald-700"}`}>{n} exercice{n > 1 ? "s" : ""}</span>
               </div>
               <ul className="space-y-1 text-sm">
@@ -41,8 +41,8 @@ export default async function SubjectPage({ params }: { params: Promise<{ matier
                   return (
                     <li key={c.id}>
                       <Link href={`/${matiere}/${l.id}/${c.id}`} className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-slate-50">
-                        <span className={k ? "text-slate-800" : "text-slate-400"}>{c.title}</span>
-                        <span className={`text-xs ${k ? "font-semibold text-slate-600" : "text-slate-300"}`}>{k || "—"}</span>
+                        <span className={k ? "text-slate-800" : "text-slate-500"}>{c.title}</span>
+                        <span className={`text-xs ${k ? "font-semibold text-slate-600" : "text-slate-500"}`}>{k || <><span aria-hidden>—</span><span className="sr-only">aucun exercice</span></>}</span>
                       </Link>
                     </li>
                   );

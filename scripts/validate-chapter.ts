@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { ALL_CHAPTERS, exerciseGenerator } from "../src/lib/chapters";
-import { ChapterSchema, doneIssues, type ChapterContent, type ChapterExercise } from "../src/lib/chapters/schema";
+import { ChapterSchema, chapterLevels, doneIssues, type ChapterContent, type ChapterExercise } from "../src/lib/chapters/schema";
 import { createRng } from "../src/lib/engine/rng";
 import { checkExercise } from "../src/lib/engine/check";
 import { chapterTexts, diagnosticIssues, instanceTexts, specialValues, unitIssues, vouvoiementIssues } from "../src/lib/engine/diagnostics";
@@ -64,6 +64,16 @@ const FINAL_TITLE = /^Type (Brevet|épreuve anticipée|bac) —/;
  * verrouillée dont toutes les listes `exercises` sont vides (chapitre généré après verrouillage) : `taxonomyTypes`
  * est obligatoire pour chaque exercice (décision du 2026-11-18).
  */
+/**
+ * `solveCheck` déclaré dans l'objet renvoyé par `vary` au lieu de l'exercice : ignoré par le contrôle par résolution
+ * et non signalé par tsc (décision 38 : th3-10 et th3-11, run 120). Un tirage suffit : la clé est structurelle.
+ */
+export function misplacedSolveCheck(e: ChapterExercise): Issue | null {
+  if (!e.vary) return null;
+  const body = e.vary(createRng("v0")) as unknown as Record<string, unknown>;
+  return "solveCheck" in body ? { where: e.id, problem: "solveCheck dans l'objet renvoyé par vary : ignoré ; le déclarer sur l'exercice, à côté de vary" } : null;
+}
+
 export function taxonomyIssues(c: ChapterContent, tax: Taxonomy): Issue[] {
   const out: Issue[] = [];
   if (tax.status !== "verrouillé") out.push({ where: "taxonomie", problem: `taxonomie non verrouillée (statut « ${tax.status} »)` });
@@ -141,6 +151,8 @@ async function main() {
   let solveChecked = 0;
   for (const e of c.exercises) {
     if (e.solveCheck) solveChecked++;
+    const misplaced = misplacedSolveCheck(e);
+    if (misplaced) add(misplaced.where, misplaced.problem);
     const solveSeen = new Set<string>();
     const g = exerciseGenerator(c, e);
     const n = e.vary ? seeds : 1;
@@ -202,7 +214,7 @@ async function main() {
   const taxonomy = existsSync(taxFile) ? (JSON.parse(readFileSync(taxFile, "utf8")) as Taxonomy) : null;
   if (taxonomy) for (const t of taxonomyIssues(c, taxonomy)) add(t.where, t.problem);
 
-  const perLevel = [1, 2, 3, 4, 5].map((l) => c.exercises.filter((e) => e.niveau === l).length);
+  const perLevel = chapterLevels(c).map((l) => c.exercises.filter((e) => e.niveau === l).length);
   const summary = { chapter: c.id, exercises: c.exercises.length, perLevel, vary: c.exercises.filter((e) => e.vary).length, games: c.games.length, instances, sourcesPendingVerification: pendingSources, taxonomy: taxonomy ? taxonomy.status : "absente", solveChecked, issues: issues.length, ok: issues.length === 0 };
   if (asJson) console.log(JSON.stringify({ summary, issues, special }));
   else {
