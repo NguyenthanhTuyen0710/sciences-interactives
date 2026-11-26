@@ -19,7 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { appendLedger, effectiveLimitUsd, JUDGE_FIX_SUFFIX, judgeFixRoundUsed, ops, readLedger, reconcileBatch, retryPlan, RETRY_SUFFIX, spendBlockers, spentUsd } from "./ledger";
 import { judgeFixPlan, outputProblem, parseReview, REVIEW_JSON_SCHEMA, reviewMarkdown, type Review } from "./review-format";
-import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, H1_STEPS, isExperimentStep, latestReport, reportFile, runTag, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, sectionKeys, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
+import { addUsage, costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, g2Missing, H1_STEPS, isExperimentStep, latestReport, reportFile, runTag, truncationRisk, type InventoryObjective, longPromptWarning, maxTokensFor, MODELS, rateFor, STEP_CONFIG, SUBJECTS, promptSections, promptSpec, sectionKeys, SPEC_EFFORTS, stepEffort, type SpecEffort, isLycee, inputHash, injectMeta, isPipelineDraft, metaBlock, thinkingParam, type ByModel, type PipelineStep, type Prices, type SubjectSlug } from "./models";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -46,7 +46,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true; chapterEffort?: "low" | "medium" | "high"; excludedTaxonomyTypes?: string[]; maxNiveau?: 4 | 5 }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true; chapterEffort?: SpecEffort; reviewEffort?: SpecEffort; excludedTaxonomyTypes?: string[]; maxNiveau?: 4 | 5 }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -116,9 +116,11 @@ if ([SUBMIT, !!COLLECT, RECONCILE].filter(Boolean).length > 1) fail("--submit, -
 if (COLLECT !== undefined && !/^msgbatch_[A-Za-z0-9]+$/.test(COLLECT)) fail("identifiant de batch invalide (attendu : msgbatch_…)");
 if (EXERCISES !== undefined && !(Number.isInteger(EXERCISES) && EXERCISES >= 1 && EXERCISES <= 60)) fail("--exercises doit être un entier entre 1 et 60");
 const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
-/** Effort d'une étape : `chapterEffort` de la fiche pour l'étape « chapitre » (décision 28 : réflexion limitée, Sonnet 5.5 refuse budget_tokens et disabled), STEP_CONFIG sinon. */
-const effortFor = (step: Step) => step === "chapter" && spec.chapterEffort ? spec.chapterEffort : STEP_CONFIG[step].effort;
-if (spec.chapterEffort && !["low", "medium", "high"].includes(spec.chapterEffort)) fail(`chapterEffort invalide : ${spec.chapterEffort}`);
+/** Effort d'une étape : `chapterEffort` (décision 28) et `reviewEffort` (juge approfondi) de la fiche, STEP_CONFIG sinon (stepEffort). */
+const effortFor = (step: Step) => stepEffort(step, spec);
+for (const k of ["chapterEffort", "reviewEffort"] as const) {
+  if (spec[k] !== undefined && !(SPEC_EFFORTS as readonly string[]).includes(spec[k])) fail(`${k} invalide : ${spec[k]}`);
+}
 if (spec.maxNiveau !== undefined && spec.maxNiveau !== 4 && spec.maxNiveau !== 5) fail(`maxNiveau invalide : ${spec.maxNiveau}`);
 const prices = readJson<Prices>("pipeline/prices.json");
 const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline/budget.json");
@@ -208,7 +210,7 @@ function objectives(): string {
   const marked = groups.map((g) => ({ ...g, objectives: (g.objectives as { id: string }[]).map((o) => (optional.has(o.id) ? { ...o, required: false } : o)) }));
   return JSON.stringify(marked, null, 1);
 }
-const SPEC = JSON.stringify(spec, null, 1);
+const SPEC = promptSpec(spec); // sans reviewEffort : prompts identiques avec ou sans ce réglage
 /**
  * Taxonomie verrouillée du chapitre pour le prompt (décision du 2026-11-18) : vide sans taxonomie verrouillée, si bien
  * que le prompt des autres chapitres reste identique octet pour octet (même empreinte anti-doublon).
