@@ -63,5 +63,7 @@
   "optionalObjectivesNote": "Proposition du 2026-11-24, approuvée avec le G1 par Nguyễn Thanh Tuyền le 2026-11-24 (modèle 1) : objectifs de consolidation 4e (configuration des triangles emboîtés), non exigibles en 3e → required: false (META) et hors porte G2, comme M4-NC-19…21 pour équations.",
   "judgeFindingsForFixNote": "Comme équations (décision 22) : pas de champ judgeFindingsForFix au premier passage ; arrêt après le premier juge.",
   "chapterEffortNote": "Point 8 tranché par Nguyễn Thanh Tuyền le 2026-11-24 : medium (équations en low, décisions 32-33 : 3 BLOQUANT et 3 MAJEUR réels corrigés à la main ; coût réel medium 0,336-0,376 $ contre 0,160 $ en low).",
-  "chapterEffort": "medium"
+  "chapterEffort": "medium",
+  "maxNiveauNote": "Décision 39 (2026-11-26, Nguyễn Thanh Tuyền) : maths 3e à 4 niveaux pour ce chapitre et les chapitres 3e nouveaux ; « Type Brevet » au niveau 4 ; chapitres 3e existants inchangés.",
+  "maxNiveau": 4
 }

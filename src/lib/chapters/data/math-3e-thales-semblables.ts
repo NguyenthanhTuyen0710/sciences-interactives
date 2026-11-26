@@ -750,9 +750,9 @@ const EXERCISES: ChapterExercise[] = [
     reasoning: "Approfondissement facultatif : on raisonne par l'absurde (contraposée du théorème de Thalès) ; l'égalité aurait lieu si les droites étaient parallèles.",
     hints: ["Calcule les deux produits en croix.", "Que donnerait le théorème de Thalès si les droites étaient parallèles ?"],
   }),
-  // ── Niveau 5 : Type Brevet ──
+  // ── Niveau 4 : Type Brevet (décision 39 : maths 3e à 4 niveaux) ──
   ex({
-    id: "th3-27", title: "Type Brevet — Un portique à deux étages", niveau: 5, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
+    id: "th3-27", title: "Type Brevet — Un portique à deux étages", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
     vary: (rng) => {
       const [x, y, z] = rng.pick(TRIPLES2);
       const [a, c] = rng.next() < 0.5 ? [x, y] : [y, x];
@@ -776,7 +776,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Dans quel triangle connaît-on un angle droit ?", "Une fois $BC$ trouvé, écris les trois rapports de Thalès.", "Utilise le produit en croix pour chaque inconnue."],
   }),
   ex({
-    id: "th3-28", title: "Type Brevet — Deux plans semblables", niveau: 5, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T09"], time: 420,
+    id: "th3-28", title: "Type Brevet — Deux plans semblables", niveau: 4, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T09"], time: 420,
     vary: (rng) => {
       const [a, b, c] = rng.pick(EVEN_BASES);
       const k = rng.pick([1.5, 2, 2.5, 3]);
@@ -796,7 +796,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quelles correspondances les angles égaux imposent-ils ?", "Calcule le coefficient avec les côtés $[DE]$ et $[AB]$.", "Le périmètre est multiplié par le même coefficient."],
   }),
   ex({
-    id: "th3-30", title: "Type Brevet — Le toit et sa poutre", niveau: 5, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
+    id: "th3-30", title: "Type Brevet — Le toit et sa poutre", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
     vary: (rng) => {
       const [x, y, z] = rng.pick(TRIPLES2);
       const [a, c] = rng.next() < 0.5 ? [x, y] : [y, x];
@@ -823,6 +823,7 @@ function k0() { return "Les côtés d'un triangle semblable s'obtiennent en mult
 // ───────────────────────── Chapitre ─────────────────────────
 export const math3eThalesSemblables: ChapterContent = {
   ...META,
+  maxNiveau: 4, // décision 39 : niveaux 1 à 4, « Type Brevet » au niveau 4
   prerequisites: [
     { text: "Utiliser la proportionnalité et les égalités de quotients pour calculer une quatrième proportionnelle (produit en croix)." },
     { text: "Calculer avec des nombres décimaux et des fractions ; simplifier une fraction ; arrondir au dixième." },
