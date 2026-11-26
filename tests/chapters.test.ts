@@ -334,4 +334,40 @@ describe("catalogue des chapitres (interface)", () => {
     expect(countsLabel({ total: 6, published: 2, unpublished: 4, themes: 16 })).toBe("6 chapitres (2 publiés, 4 brouillons)");
     expect(countsLabel({ total: 1, published: 1, unpublished: 0, themes: 7 })).toBe("1 chapitre (1 publié)");
   });
+
+  it("types d'exercices (page Exercices) : id + titre seulement, type sans exercice caché, méthodes sans étapes", async () => {
+    const { chapterTypes } = await import("../src/components/ui");
+    const TAX = ["math-3e-calcul-litteral", "math-3e-equations", "math-3e-pythagore"];
+    for (const c of ALL_CHAPTERS) {
+      const raw = TAX.includes(c.id) ? JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${c.id}.json`, "utf8")) : null;
+      const t = chapterTypes(c, raw);
+      expect(t.kind).toBe(raw ? "taxonomy" : "methods");
+      expect(t.items.length).toBeGreaterThan(0);
+      for (const it of t.items) expect(Object.keys(it).sort()).toEqual(["id", "title"]);
+      const out = JSON.stringify(t);
+      // Aucun contenu d'exercice ni de méthode : réponses, diagnostics, étapes, exemples résolus, erreurs fréquentes.
+      expect(out).not.toMatch(/"answer"|"mistakes"|"steps"|"method"|"commonMistakes"|"solution"/);
+      const secret = [
+        ...c.lesson.methods.flatMap((m) => m.steps), ...c.lesson.workedExamples.flatMap((w) => [w.answer, ...w.steps]),
+        ...c.lesson.commonMistakes.flatMap((m) => [m.mistake, m.correction]), ...c.exercises.flatMap((e) => [...(e.solution ?? []), e.reasoning, ...e.hints]),
+        ...(raw ? raw.types.flatMap((x: { method?: unknown; commonMistakes?: unknown }) => [JSON.stringify(x.method ?? ""), JSON.stringify(x.commonMistakes ?? "")]) : []),
+      ].filter((x) => x.length > 12);
+      for (const x of secret) expect(out.includes(x)).toBe(false);
+      if (raw) {
+        // Règle « un type n'apparaît que s'il a au moins un exercice dans le chapitre ».
+        const ids = new Set(c.exercises.map((e) => e.id));
+        const tagged = new Set(c.exercises.flatMap((e) => e.taxonomyTypes ?? []));
+        for (const x of raw.types as { id: string; exercises?: string[] }[]) {
+          const has = tagged.has(x.id) || (x.exercises ?? []).some((e) => ids.has(e));
+          expect(t.items.some((i) => i.id === x.id)).toBe(has);
+        }
+      } else {
+        expect(t.items.map((i) => i.title)).toEqual(c.lesson.methods.map((m) => m.title));
+      }
+    }
+    const ids = (id: string) => chapterTypes(ALL_CHAPTERS.find((c) => c.id === id)!, JSON.parse(readFileSync(`research/curriculum/mathematiques/taxonomy/${id}.json`, "utf8"))).items.map((i) => i.id);
+    expect(ids("math-3e-equations")).not.toContain("EQ-T09");
+    expect(ids("math-3e-calcul-litteral")).not.toContain("CL-T10");
+    expect(ids("math-3e-pythagore")).toContain("PY-T09");
+  });
 });

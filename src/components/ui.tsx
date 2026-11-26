@@ -103,6 +103,24 @@ export function levelCounts(chapters: ChapterSummary[], level: string, subject: 
   return { total: list.length, published: list.filter((c) => c.status === "published").length, unpublished: list.filter((c) => c.status !== "published").length, themes };
 }
 
+/** Taxonomie verrouillée d'un chapitre (research/…/taxonomy), lue côté serveur ; seuls `id` et `title` en sortent. */
+export interface TaxonomyRef { types: { id: string; title: string; exercises?: string[] }[] }
+export interface ChapterTypes { kind: "taxonomy" | "methods"; items: { id: string; title: string }[] }
+
+/**
+ * Libellés « types d'exercices » d'un chapitre, sans aucun contenu d'exercice.
+ * Avec taxonomie : un type n'apparaît que si au moins un exercice du chapitre y est rattaché
+ * (champ `taxonomyTypes` de l'exercice, ou liste `exercises` du type) ; un type sans exercice reste caché.
+ * Sans taxonomie : titres des méthodes du cours (les étapes ne sont jamais reprises).
+ */
+export function chapterTypes(c: ChapterContent, tax: TaxonomyRef | null): ChapterTypes {
+  if (!tax) return { kind: "methods", items: c.lesson.methods.map((m, i) => ({ id: `methode-${i + 1}`, title: m.title })) };
+  const ids = new Set(c.exercises.map((e) => e.id));
+  const tagged = new Set(c.exercises.flatMap((e) => e.taxonomyTypes ?? []));
+  const items = tax.types.filter((t) => tagged.has(t.id) || (t.exercises ?? []).some((x) => ids.has(x))).map((t) => ({ id: t.id, title: t.title }));
+  return { kind: "taxonomy", items };
+}
+
 export const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
 
 /** « 6 chapitres (2 publiés, 4 brouillons) » ou, sans chapitre complet, « 12 thèmes du programme, chapitres en préparation ». */
@@ -119,7 +137,12 @@ export function StatusBadge({ status }: { status: ChapterSummary["status"] }) {
 }
 
 /** Carte de chapitre : lien seulement s'il est ouvert ; un brouillon reste visible mais non cliquable. */
-export function ChapterCard({ c }: { c: ChapterSummary }) {
+/**
+ * `types` : libellés déjà rendus (titres pouvant contenir du LaTeX) et leur intitulé ; `anchor` : section visée du chapitre ;
+ * `action` : appel affiché en bas de la carte (la carte entière reste un seul lien).
+ */
+export function ChapterCard({ c, types, anchor, action }: { c: ChapterSummary; types?: { label: string; items: React.ReactNode[] }; anchor?: string; action?: string }) {
+  const MAX_TYPES = 3;
   const body = (
     <>
       <div className="flex flex-wrap items-center gap-1.5">
@@ -129,16 +152,26 @@ export function ChapterCard({ c }: { c: ChapterSummary }) {
       </div>
       <h3 className={`text-lg font-bold ${c.href ? "text-slate-900 group-hover:text-indigo-700" : "text-slate-700"}`}>{c.title}</h3>
       {c.theme && <p className="text-sm text-slate-600">{c.theme}</p>}
+      {types && types.items.length > 0 && (
+        <div className="text-xs">
+          <p className="mb-1 font-semibold text-slate-600">{types.label}</p>
+          <ul className="flex flex-wrap gap-1.5" aria-label={types.label}>
+            {types.items.slice(0, MAX_TYPES).map((t, i) => <li key={i} className="chip bg-slate-100 text-left text-slate-700">{t}</li>)}
+            {types.items.length > MAX_TYPES && <li className="chip bg-slate-100 text-slate-700">+{types.items.length - MAX_TYPES} {types.items.length - MAX_TYPES > 1 ? "autres" : "autre"}</li>}
+          </ul>
+        </div>
+      )}
       <ul className="mt-auto flex flex-wrap gap-1.5 pt-1 text-xs" aria-label="Contenu du chapitre">
         <li className="chip bg-slate-100 text-slate-700">Cours</li>
         <li className="chip bg-slate-100 text-slate-700">{plural(c.exercises, "exercice", "exercices")}</li>
         <li className="chip bg-slate-100 text-slate-700">{plural(c.games, "jeu", "jeux")}</li>
       </ul>
       {!c.href && <p className="text-xs font-medium text-slate-600">En relecture : pas encore ouvert.</p>}
+      {c.href && action && <span className="mt-1 self-start rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white group-hover:bg-indigo-700">{action} →</span>}
     </>
   );
   const base = `card flex h-full flex-col gap-2 border-l-4 ${levelTone(c.level).accent} p-4`;
   return c.href
-    ? <Link href={c.href} className={`group ${base} transition hover:-translate-y-0.5 hover:shadow-md`}>{body}</Link>
+    ? <Link href={anchor ? `${c.href}#${anchor}` : c.href} className={`group ${base} transition hover:-translate-y-0.5 hover:shadow-md`}>{body}</Link>
     : <div className={`${base} border-dashed`}>{body}</div>;
 }
