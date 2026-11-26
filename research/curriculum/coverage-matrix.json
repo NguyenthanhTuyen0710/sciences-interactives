@@ -1302,16 +1302,15 @@
     "id": "math-3e-thales-semblables",
     "taskId": "SCI-3E-MATH-012",
     "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
-    "sha256": "f260fdcfd37615fa4f1d2ed43d5bb05f9ebc79eeb08da5e59d52493872f01f46",
-    "registered": false,
+    "sha256": "7f30aede83bc6a16ae83e132125c715b8a0d4e0ca9d6dce899123f793165f511",
+    "registered": true,
     "publication": "draft",
     "exercises": 30,
     "perLevel": [
      3,
      9,
      9,
-     6,
-     3
+     9
     ],
     "games": 3,
     "review": {
@@ -1763,16 +1762,15 @@
     "id": "math-3e-thales-semblables",
     "taskId": "SCI-3E-MATH-012",
     "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
-    "sha256": "f260fdcfd37615fa4f1d2ed43d5bb05f9ebc79eeb08da5e59d52493872f01f46",
-    "registered": false,
+    "sha256": "7f30aede83bc6a16ae83e132125c715b8a0d4e0ca9d6dce899123f793165f511",
+    "registered": true,
     "publication": "draft",
     "exercises": 30,
     "perLevel": [
      3,
      9,
      9,
-     6,
-     3
+     9
     ],
     "games": 3,
     "review": {

@@ -57,13 +57,13 @@ Sources des colonnes : inventaires `research/curriculum/*/curriculum-*.json` (re
 | math-4e-equations | draft | 3 (3) | `math-3e-equations` | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-4e-proportionnalite | published | 4 (4) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | objectif M4-OGDF-07 non repris dans le chapitre ; objectif M4-OGDF-09 non repris dans le chapitre |
 | math-4e-pythagore | draft | 2 (2) | `math-3e-pythagore` | 21 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
-| math-4e-thales | draft | 2 (2) | `math-3e-thales-semblables` (hors registre) | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
+| math-4e-thales | draft | 2 (2) | `math-3e-thales-semblables` | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-arithmetique | published | 3 (3) | `math-3e-arithmetique` | 36 / 3 | pass | — | — |
 | math-3e-puissances-calculs | draft | 4 (4) | `math-3e-puissances-calculs` | 35 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-calcul-litteral | draft | 4 (4) | `math-3e-calcul-litteral` | 37 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-equations | draft | 3 (3) | `math-3e-equations` | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-pourcentages-evolution | published | 1 (1) | `math-3e-pourcentages-evolution` | 33 / 3 | pass | — | — |
-| math-3e-thales-semblables | draft | 2 (2) | `math-3e-thales-semblables` (hors registre) | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
+| math-3e-thales-semblables | draft | 2 (2) | `math-3e-thales-semblables` | 30 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-3e-automatismes | draft | 3 (3) | `math-3e-pythagore` | 21 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |
 | math-1re-spe-second-degre | researched | 6 (6) | — | — | — | — | chapitre complet |
 | pc-5e-circuits-electriques | draft | 3 (3) | `pc-4e-electricite` (hors registre) | 36 / 3 | en attente | — | revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending |

@@ -1,6 +1,6 @@
 # Tableau de bord de progression
 
-_Généré par `npm run dashboard` le 2026-11-24 10:41 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
+_Généré par `npm run dashboard` le 2026-11-26 08:02 UTC à partir de `project/ledger.json`, des inventaires de `research/curriculum/` et des données de `src/lib/chapters/data/`. Ne pas éditer._
 
 Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de chapitre présentes) · **Validé** (Definition of Done automatique sans écart, six revues QA `pass`) · **Publié** (`publicationStatus = published`).
 
@@ -10,8 +10,8 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 |---|---|---|---|---|---|---|---|---|
 | mathematiques | 6e | Arrêté du 10 avril 2025, BO n°16 du 17 avril 2025 (annexe) | 22 | 69 (69) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | mathematiques | 5e | Arrêté du 18 février 2026, BO n°10 du 5 mars 2026 | 21 | 80 (80) | 3 (14 %) | 3 (14 %) | 3 (14 %) | 3 (14 %) |
-| mathematiques | 4e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 21 | 56 (56) | 0 (0 %) | 5 (24 %) | 2 (10 %) | 2 (10 %) |
-| mathematiques | 3e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 16 | 44 (44) | 3 (19 %) | 6 (38 %) | 2 (13 %) | 2 (13 %) |
+| mathematiques | 4e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 21 | 56 (56) | 0 (0 %) | 6 (29 %) | 2 (10 %) | 2 (10 %) |
+| mathematiques | 3e | Arrêté du 9 novembre 2015 modifié, programme publié au BO n°31 du 30 juillet 2020 ; repères et attendus : BO n°22 du 29 mai 2019 | 16 | 44 (44) | 3 (19 %) | 7 (44 %) | 2 (13 %) | 2 (13 %) |
 | mathematiques | 1re | Arrêté du 26-2-2026, JO du 27-3-2026, BO n° 14 du 2 avril 2026 (remplace l'annexe de l'arrêté du 17-1-2019) | 1 | 6 (6) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 6e | Arrêté du 15 juin 2023 (JO du 21/06/2023) modifiant l'arrêté du 9 novembre 2015 ; BO n°25 du 22 juin 2023 | 8 | 38 (38) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
 | physique-chimie | 5e | Arrêté du 9 novembre 2015 modifié par l'arrêté du 17 juillet 2020 (JO du 28/07/2020) ; BO n°31 du 30 juillet 2020, annexe 3 (physique-chimie) | 9 | 24 (24) | 0 (0 %) | 0 (0 %) | 0 (0 %) | 0 (0 %) |
@@ -73,6 +73,14 @@ Jalons distincts : **Recherche** (dossier validé) · **Généré** (données de
 - Publication : **draft**
 - Objectifs officiels : 6 · couverts par le cours : 6 · par des exercices : 6 · par des jeux : 3
 - Exercices : 30 (niveaux 1:5 2:8 3:7 4:7 5:3) · activités : 3
+- Revues QA : curriculum = pending · accuracy = pending · exercises = pending · games = pending · technical = pending · language = pending
+- Écarts à la Definition of Done : revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending ; revue games : pending ; revue technical : pending ; revue language : pending
+
+### SCI-3E-MATH-012 — Thalès (configuration papillon) et triangles semblables (3e, mathematiques)
+
+- Publication : **draft**
+- Objectifs officiels : 4 · couverts par le cours : 4 · par des exercices : 4 · par des jeux : 2
+- Exercices : 30 (niveaux 1:3 2:9 3:9 4:9) · activités : 3
 - Revues QA : curriculum = pending · accuracy = pending · exercises = pending · games = pending · technical = pending · language = pending
 - Écarts à la Definition of Done : revue curriculum : pending ; revue accuracy : pending ; revue exercises : pending ; revue games : pending ; revue technical : pending ; revue language : pending
 
