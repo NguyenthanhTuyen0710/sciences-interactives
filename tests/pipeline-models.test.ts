@@ -1,7 +1,7 @@
 // Paliers de modèles (pipeline/models.ts), tarifs (pipeline/prices.json) et répartition par modèle du registre.
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { costUsd, exerciseBlocks, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, g2Missing, verificationMethod, requiredMaxTokens, truncationRisk, latestReport, reportFile, runTag, type Prices } from "../pipeline/models";
+import { readdirSync, readFileSync } from "node:fs";
+import { costUsd, exerciseBlocks, promptSpec, stepEffort, fixModel, FORBIDDEN_MODEL, longPromptWarning, MODEL_POLICY, MODELS, inputHash, rateFor, STEP_CONFIG, promptSections, sectionKeys, SUBJECTS, injectMeta, isPipelineDraft, metaBlock, META_START, maxTokensFor, OPUS_CHAPTER_MAX_TOKENS, thinkingParam, g2Missing, verificationMethod, requiredMaxTokens, truncationRisk, latestReport, reportFile, runTag, type Prices } from "../pipeline/models";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -523,4 +523,40 @@ describe("équations : G2 approuvé, effort et types exclus du chapitre (décisi
     expect(bad.status).not.toBe(0);
     expect(bad.out).toContain("chapterEffort invalide : max");
   }, 90_000);
+});
+
+describe("reviewEffort : effort du juge approfondi réglé par la fiche (2026-11-26)", () => {
+  const fiches = readdirSync("pipeline/chapters").filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(`pipeline/chapters/${f}`, "utf8")) as Record<string, unknown>);
+  it("(a) non déclaré : effort du juge = STEP_CONFIG (low) et SPEC identique à la fiche, pour toutes les fiches", () => {
+    expect(fiches.length).toBeGreaterThan(0);
+    for (const f of fiches) {
+      expect(f.reviewEffort).toBeUndefined();
+      expect(stepEffort("review", f)).toBe(STEP_CONFIG.review.effort);
+      expect(promptSpec(f)).toBe(JSON.stringify(f, null, 1));
+    }
+    expect(STEP_CONFIG.review.effort).toBe("low");
+  });
+  it("(b) medium : seul l'effort du juge change ; SPEC, autres étapes et empreintes inchangés", () => {
+    const f = { ...fiches[0], chapterEffort: "low" as const };
+    const m = { ...f, reviewEffort: "medium" as const, reviewEffortNote: "note" };
+    expect(stepEffort("review", m)).toBe("medium");
+    for (const st of ["dossier", "chapter", "fix", "screen"] as const) expect(stepEffort(st, m)).toBe(stepEffort(st, f));
+    expect(promptSpec(m)).toBe(promptSpec(f));
+  });
+  it("dry-run : en-tête review=…/medium, empreinte du chapitre identique ; valeur inconnue refusée", () => {
+    const fiche = JSON.parse(readFileSync("pipeline/chapters/math-3e-equations.json", "utf8")) as Record<string, unknown>;
+    const example = { "src/lib/chapters/data/math-3e-calcul-litteral.ts": readFileSync("src/lib/chapters/data/math-3e-calcul-litteral.ts", "utf8") };
+    const hash = (out: string) => /estimation chapter.*empreinte (\w+)/.exec(out)?.[1];
+    const base = dryRun(["math-3e-equations", "--batch"], example);
+    const med = dryRun(["math-3e-equations", "--batch"], { ...example, "pipeline/chapters/math-3e-equations.json": JSON.stringify({ ...fiche, reviewEffort: "medium" }, null, 2) });
+    expect(base.status, base.out).toBe(0);
+    expect(med.status, med.out).toBe(0);
+    expect(base.out).toContain(`review=${MODELS.sonnet}/low`);
+    expect(med.out).toContain(`review=${MODELS.sonnet}/medium`);
+    expect(hash(base.out)).toBeTruthy();
+    expect(hash(med.out)).toBe(hash(base.out));
+    const bad = dryRun(["math-3e-equations", "--batch"], { ...example, "pipeline/chapters/math-3e-equations.json": JSON.stringify({ ...fiche, reviewEffort: "max" }) });
+    expect(bad.status).not.toBe(0);
+    expect(bad.out).toContain("reviewEffort invalide : max");
+  }, 120_000);
 });
