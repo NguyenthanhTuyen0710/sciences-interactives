@@ -2,6 +2,8 @@
 // erreurs KaTeX, activités montées, partie de calcul flash jouée au clavier.
 // Usage (serveur lancé, SHOW_DRAFTS=1 pour les brouillons) : PAGES=3e/m3-puissances npx tsx scripts/ui-check.ts
 // Pages quelconques (contrôles génériques + lien d'évitement) : PATHS=/,/exercices ; thèmes : THEMES=light,dark (défaut light).
+// Pages connectées : AS=hugo@demo.fr,prof@demo.fr (un passage par compte, via POST /api/auth/login ; mot de passe PASSWORD,
+// défaut : celui des comptes de démo du seed). Ex. : AS=prof@demo.fr PATHS=/admin,/mon-espace npx tsx scripts/ui-check.ts
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require("playwright") as typeof import("playwright");
@@ -11,13 +13,21 @@ const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const pages = process.env.PATHS && !process.env.PAGES ? [] : (process.env.PAGES ?? "3e/m3-arithmetique,3e/m3-puissances,3e/m3-pourcentages").split(",");
 const paths = (process.env.PATHS ?? "").split(",").filter(Boolean);
 const themes = (process.env.THEMES ?? "light").split(",") as ("light" | "dark")[];
+const accounts: (string | null)[] = (process.env.AS ?? "").split(",").filter(Boolean);
+const PASSWORD = process.env.PASSWORD ?? "demo1234";
 let fail = 0;
 const ok = (c: boolean, m: string) => { console.log(c ? "  ✔" : "  ✘", m); if (!c) fail++; };
 (async () => {
   const browser = await chromium.launch();
-  for (const theme of themes) for (const [device, opts] of [["desktop", { viewport: { width: 1280, height: 900 } }], ["mobile", devices["iPhone 13"]]] as const) {
-    const name = theme === "light" ? device : `${device}-${theme}`;
+  for (const theme of themes) for (const [device, opts] of [["desktop", { viewport: { width: 1280, height: 900 } }], ["mobile", devices["iPhone 13"]]] as const) for (const as of accounts.length ? accounts : [null]) {
+    const name = (theme === "light" ? device : `${device}-${theme}`) + (as ? `-${as.split("@")[0]}` : "");
     const ctx = await browser.newContext({ ...opts, colorScheme: theme });
+    if (as) {
+      const login = await ctx.request.post(`${BASE}/api/auth/login`, { data: { email: as, password: PASSWORD } });
+      const me = (await (await ctx.request.get(`${BASE}/api/me`)).json()) as { user: { email: string; role: string } | null };
+      console.log(`${name} connexion`);
+      ok(login.ok() && me.user?.email === as, `connecté : ${as} (${me.user?.role ?? `HTTP ${login.status()}`})`);
+    }
     for (const p of paths) {
       const page = await ctx.newPage();
       const errors: string[] = [];
@@ -26,6 +36,8 @@ const ok = (c: boolean, m: string) => { console.log(c ? "  ✔" : "  ✘", m); i
       const res = await page.goto(`${BASE}${p}`, { waitUntil: "networkidle" });
       console.log(`${name} ${p}`);
       ok(res?.status() === 200, "HTTP 200");
+      // Connecté : aucun lien vers /connexion (en-tête « Connexion », message « Se connecter » des pages réservées).
+      if (as) ok(await page.locator('a[href="/connexion"]').count() === 0, "page vue connectée (aucun lien de connexion)");
       ok(await page.evaluate((t) => document.documentElement.classList.contains("dark") === (t === "dark"), theme), `thème ${theme} appliqué`);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       ok(overflow <= 1, `pas de défilement horizontal (${overflow}px)`);

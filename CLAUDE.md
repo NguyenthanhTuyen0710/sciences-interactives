@@ -26,6 +26,7 @@ Plateforme Next.js 15 / TypeScript / PostgreSQL (Drizzle) d'exercices de maths e
 | Types / lint | `npx tsc --noEmit` · `npm run lint` |
 | Build | `npm run build` |
 | Navigateur desktop + mobile (serveur lancé) | `PAGES=3e/m3-xxx npx tsx scripts/ui-check.ts` |
+| Pages connectées (un passage par compte ; un élève sur `/admin` échoue, c'est voulu) | `AS=hugo@demo.fr PATHS=/mon-espace npx tsx scripts/ui-check.ts` · `AS=prof@demo.fr PATHS=/admin,/mon-espace …` |
 | e2e d'un chapitre (serveur lancé) | `ONLY=prefixe- SHOW_DRAFTS=1 npx tsx scripts/e2e.ts` |
 
 Environnement local : `service postgresql start`, puis `npm run build && npx next start` (tuer `next-server` avant un nouveau lancement).
