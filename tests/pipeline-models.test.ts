@@ -225,6 +225,18 @@ describe("matières (M3) : blocs de prompt et fiche physique-chimie", () => {
     expect(promptSections(n, sectionKeys("physique-chimie", "5e"))).toBe("C(p)");
     expect(promptSections(n, sectionKeys("mathematiques", "1re"))).toBe("L");
   });
+  it("maxNiveau 4 (décision 39) : bloc {{#niveaux4}} à la place de {{#niveaux5}} ; défaut 5 inchangé", () => {
+    expect(sectionKeys("mathematiques", "3e")).toContain("niveaux5");
+    expect(sectionKeys("mathematiques", "3e", 4)).toEqual(["maths", "college", "niveaux4"]);
+    const sys = readFileSync("pipeline/prompts/system.md", "utf8");
+    const four = promptSections(sys, sectionKeys("mathematiques", "3e", 4)), five = promptSections(sys, sectionKeys("mathematiques", "3e"));
+    expect(four).toContain("levels 1–4 only");
+    expect(four).toContain("`maxNiveau: 4`");
+    expect(four).not.toContain("levels 1–5");
+    expect(five).toContain("levels 1–5 (1 découverte");
+    expect(five).not.toContain("maxNiveau");
+    expect(four).not.toMatch(/\{\{[#/]/);
+  });
   it("chaque prompt contient un bloc PC et aucune clé inconnue", () => {
     for (const f of ["system", "dossier", "chapter", "review"]) {
       const t = readFileSync(`pipeline/prompts/${f}.md`, "utf8");
