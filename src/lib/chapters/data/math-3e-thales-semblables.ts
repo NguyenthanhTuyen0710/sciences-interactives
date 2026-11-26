@@ -637,7 +637,7 @@ const EXERCISES: ChapterExercise[] = [
   }),
   // ── Niveau 4 ──
   ex({
-    id: "th3-21", title: "Comparer des rapports sous forme de fractions", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T04"], time: 270,
+    id: "th3-21", title: "Comparer des rapports sous forme de fractions", niveau: 3, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T04"], time: 270,
     vary: (rng) => {
       const { p, q, a, m, c, n } = ratioSet(rng);
       return {
@@ -664,7 +664,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Cherche des angles alternes-internes.", "Combien d'angles égaux faut-il pour conclure ?"],
   }),
   ex({
-    id: "th3-23", title: "Justifier la semblance sur la figure", niveau: 4, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T07"], time: 180,
+    id: "th3-23", title: "Justifier la semblance sur la figure", niveau: 3, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T07"], time: 180,
     vary: (rng) => {
       const a = rng.int(3, 5), c = rng.int(3, 5), r = rng.pick([1.5, 2, 2.5]);
       return {
