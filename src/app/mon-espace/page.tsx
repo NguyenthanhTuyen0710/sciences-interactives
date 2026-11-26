@@ -46,7 +46,7 @@ export default async function MySpace() {
             {d.days.map((x) => (
               <div key={x.day} className="flex h-full flex-1 flex-col items-center gap-1" title={`${x.day} : ${x.count} exercice(s), score moyen ${Math.round(x.avg * 100)} %`}>
                 <div className="flex w-full flex-1 items-end"><div className={`w-full rounded-t ${x.count ? (x.avg >= 0.75 ? "bg-emerald-500" : x.avg >= 0.5 ? "bg-amber-400" : "bg-rose-400") : "bg-slate-100"}`} style={{ height: `${Math.max(3, Math.round((x.count / maxDay) * 100))}px` }} /></div>
-                <span className="text-[10px] text-slate-400">{x.day.slice(8)}</span>
+                <span className="text-[10px] text-slate-500">{x.day.slice(8)}</span>
               </div>
             ))}
           </div>
@@ -96,7 +96,7 @@ export default async function MySpace() {
           <h2 className="mb-3 text-lg font-bold">🩺 Points faibles</h2>
           {d.weak.length ? (
             <ul className="space-y-2">{d.weak.map((w) => (
-              <li key={w.notionId} className="flex items-center justify-between rounded-xl bg-rose-50 p-3 text-sm"><span><span className="font-semibold">{w.title}</span> <span className="text-slate-500">({w.chapter})</span></span><span className="font-bold text-rose-700">{Math.round(w.recentAvg * 100)} %</span></li>
+              <li key={w.notionId} className="flex items-center justify-between rounded-xl bg-rose-50 p-3 text-sm"><span><span className="font-semibold">{w.title}</span> <span className="text-slate-600">({w.chapter})</span></span><span className="font-bold text-rose-700">{Math.round(w.recentAvg * 100)} %</span></li>
             ))}</ul>
           ) : <Empty>Aucun point faible détecté.</Empty>}
         </section>
@@ -110,9 +110,9 @@ export default async function MySpace() {
                   {d.history.map((h, i) => (
                     <tr key={i} className="border-t border-slate-100">
                       <td className="py-1.5 text-slate-500">{h.createdAt.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })} {h.createdAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" })}</td>
-                      <td><Link href={`/exercice/${h.exerciseId}`} className="hover:text-indigo-600">{h.title}</Link>{h.mode !== "libre" && <span className="ml-1 text-xs text-slate-400">({h.mode})</span>}</td>
+                      <td><Link href={`/exercice/${h.exerciseId}`} className="hover:text-indigo-600">{h.title}</Link>{h.mode !== "libre" && <span className="ml-1 text-xs text-slate-500">({h.mode})</span>}</td>
                       <td className="text-slate-500">{h.difficulty}</td>
-                      <td className={`text-right font-semibold ${h.score === 1 ? "text-emerald-600" : h.score >= 0.5 ? "text-amber-600" : "text-rose-600"}`}>{Math.round(h.score * 100)} %</td>
+                      <td className={`text-right font-semibold ${h.score === 1 ? "text-emerald-700" : h.score >= 0.5 ? "text-amber-700" : "text-rose-700"}`}>{Math.round(h.score * 100)} %</td>
                     </tr>
                   ))}
                 </tbody>
