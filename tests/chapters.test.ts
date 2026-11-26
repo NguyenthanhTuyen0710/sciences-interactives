@@ -508,3 +508,25 @@ describe("pages Brevet et Bac (interface)", async () => {
     expect(ui.chapterProgress(c, all, isTypeBrevet).milestones).toEqual(["Premier exercice réussi", "Un exercice réussi à chaque niveau", "Niveau 5 réussi", "Exercice type examen réussi"]);
   });
 });
+
+describe("page Contact : coordonnées codées", async () => {
+  const { obfuscate } = await import("../src/components/ui");
+  const { revealText } = await import("../src/components/ClientBits");
+  const src = readFileSync("src/app/contact/page.tsx", "utf8");
+  const email = src.match(/email: "([^"]+)"/)![1];
+  const phone = src.match(/phone: "([^"]+)"/)![1];
+
+  it("codage réversible ; aucun morceau ne laisse lire l'adresse ou le numéro", () => {
+    for (const v of [email, phone, "élève@exemple.fr"]) {
+      const parts = obfuscate(v);
+      expect(parts).toHaveLength(3);
+      expect(revealText(parts)).toBe(v);
+      const joined = parts.join("");
+      for (const frag of [v, v.split("@")[0], "@", "gmail", v.replace(/\D/g, "").slice(-6)]) if (frag.length >= 3 || frag === "@") expect(joined.includes(frag)).toBe(false);
+    }
+  });
+
+  it("aucun formulaire ni cookie dans la page", () => {
+    expect(src).not.toMatch(/<form|cookies\(|document\.cookie|localStorage/);
+  });
+});

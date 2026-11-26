@@ -12,6 +12,7 @@ const NAV = [
   { href: "/revisions", label: "Révisions", match: ["/revisions"] },
   { href: "/brevet", label: "Brevet", match: ["/brevet"] },
   { href: "/bac", label: "Bac", match: ["/bac"] },
+  { href: "/contact", label: "Contact", match: ["/contact"] },
 ];
 
 type Theme = "light" | "dark";

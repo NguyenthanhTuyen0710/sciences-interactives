@@ -29,6 +29,7 @@ const CONTENTS = [
   { href: "/bac", label: "Bac" },
   { href: "/examens", label: "Sujets d'entraînement" },
   { href: "/lecons/pythagore", label: "Leçon animée interactive" },
+  { href: "/contact", label: "Contact" },
 ];
 const footLink = "hover:text-indigo-600 hover:underline";
 
