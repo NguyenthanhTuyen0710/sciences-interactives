@@ -160,6 +160,13 @@ export function ProgressNote({ p }: { p: ChapterProgress }) {
   );
 }
 
+/** Code une coordonnée (e-mail, téléphone) pour qu'elle n'apparaisse pas en clair dans le HTML : texte à l'envers, base64, en 3 morceaux. Décodage : revealText (ClientBits). */
+export function obfuscate(value: string): string[] {
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode([...value].reverse().join(""))));
+  const n = Math.ceil(b64.length / 3);
+  return [b64.slice(0, n), b64.slice(n, 2 * n), b64.slice(2 * n)];
+}
+
 export const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
 
 /** « 6 chapitres (2 publiés, 4 brouillons) » ou, sans chapitre complet, « 12 thèmes du programme, chapitres en préparation ». */
