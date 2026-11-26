@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Nunito } from "next/font/google";
 import Link from "next/link";
 import "katex/dist/katex.min.css";
 import "./globals.css";
@@ -7,13 +8,18 @@ import { getUser } from "@/lib/auth";
 import { CURRICULUM, SUBJECTS } from "@/lib/content/curriculum";
 import { levelTone } from "@/components/ui";
 
+// Texte courant : Nunito, sans-serif aux terminaisons arrondies (SIL Open Font License 1.1, googlefonts/nunito),
+// auto-hébergée par next/font ; police variable (graisses 200-1000). Seul le latin est préchargé ; les autres sous-ensembles
+// (vietnamien pour les noms propres) restent déclarés et ne sont téléchargés que si la page en contient les caractères.
+const body = Nunito({ subsets: ["latin"], display: "swap", variable: "--font-body" });
+
 export const metadata: Metadata = {
   title: { default: "Sciences Interactives – Mathématiques et Physique-Chimie", template: "%s · Sciences Interactives" },
   description: "Plateforme d'apprentissage interactive : exercices corrigés et générés aléatoirement en mathématiques et physique-chimie, de la 6e à la Terminale.",
 };
 export const viewport: Viewport = {
   width: "device-width", initialScale: 1,
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#4f46e5" }, { media: "(prefers-color-scheme: dark)", color: "#0b1120" }],
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#4f46e5" }, { media: "(prefers-color-scheme: dark)", color: "#0b130f" }],
 };
 
 // Thème posé avant le premier rendu (pas de flash) : choix mémorisé, sinon préférence du système.
@@ -36,12 +42,14 @@ const footLink = "hover:text-indigo-600 hover:underline";
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning className={body.variable}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="min-h-screen font-sans">
         <a href="#contenu" className="skip-link">Aller au contenu</a>
+        {/* Fine bande de couleur en haut de page : corail, safran, sarcelle, indigo (palette du site). */}
+        <div aria-hidden className="h-1.5 bg-[linear-gradient(90deg,#f4845f_0%,#f5b841_33%,#2a9d8f_66%,#4f46e5_100%)] print:hidden" />
         <Header user={user ? { name: user.name, role: user.role } : null} />
         <main id="contenu" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 outline-none sm:py-8">{children}</main>
         <footer className="mt-12 border-t print:hidden border-slate-200 bg-white">
