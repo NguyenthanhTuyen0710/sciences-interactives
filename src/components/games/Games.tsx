@@ -138,7 +138,8 @@ function DroiteGraduee({ game }: { game: ChapterGame }) {
       {done ? <Finished score={score} total={rounds} onRestart={restart} /> : (
         <div className="space-y-3">
           <p className="font-medium" aria-live="polite">Manche {n + 1}/{rounds} — {round.type === "placer" ? <>Place le point <strong>M</strong> d'abscisse <strong>{frRel(round.target)}</strong>.</> : <>Lis l'abscisse du point <strong>M</strong>.</>}</p>
-          <svg ref={svgRef} viewBox={`0 0 ${W} 104`} className={`w-full touch-manipulation select-none rounded-lg bg-white ring-1 ring-slate-200 ${FOCUS}`}
+          {/* Fond blanc fixe (aussi en sombre) : tracés et graduations prévus pour un fond blanc, comme les figures. */}
+          <svg ref={svgRef} viewBox={`0 0 ${W} 104`} className={`w-full touch-manipulation select-none rounded-lg bg-[#fff] ring-1 ring-slate-200 ${FOCUS}`}
             role={round.type === "placer" ? "slider" : "img"} tabIndex={round.type === "placer" ? 0 : -1} onKeyDown={onKey} onClick={onClick}
             aria-label={round.type === "placer" ? "Droite graduée : utilise les flèches gauche et droite pour déplacer le point, Entrée pour valider" : "Droite graduée avec le point M"}
             aria-valuemin={lv.min} aria-valuemax={lv.max} aria-valuenow={cursor ?? undefined} aria-valuetext={cursor === null ? "aucun point placé" : `abscisse ${frRel(cursor)}`}>
