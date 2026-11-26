@@ -379,7 +379,7 @@ const EXERCISES: ChapterExercise[] = [
         solution: ["Chaque côté de $DEF$ s'obtient en multipliant le côté homologue de $ABC$ par $k$.", `$DE = ${T(k)} \\times ${a} = ${T(r2(k * a))}$ cm.`, `$EF = ${T(k)} \\times ${b} = ${T(r2(k * b))}$ cm.`, `$DF = ${T(k)} \\times ${c} = ${T(r2(k * c))}$ cm.`],
       };
     },
-    reasoning: k0(),
+    reasoning: "Les côtés de $DEF$ sont proportionnels à ceux de $ABC$ : chaque côté de $DEF$ s'obtient en multipliant le côté homologue de $ABC$ par $k$ ; il faut donc d'abord associer les côtés homologues.",
     hints: ["Quel côté de $DEF$ est homologue de $[AB]$ ?", "Multiplie par le coefficient."],
   }),
   ex({
@@ -528,12 +528,12 @@ const EXERCISES: ChapterExercise[] = [
     vary: (rng) => {
       const { a, m, c, n } = thalesData(rng);
       return {
-        statement: `Deux droites $(BM)$ et $(CN)$ se coupent en $A$, avec $A$ entre $B$ et $M$ et entre $C$ et $N$. On sait que $AB$ mesure $${T(a)}$ cm, $AM$ mesure $${T(m)}$ cm, $AC$ mesure $${T(c)}$ cm et $AN$ mesure $${T(n)}$ cm. On veut démontrer que $(BC)$ et $(MN)$ sont parallèles.`,
+        statement: `Deux droites $(BM)$ et $(CN)$ se coupent en $A$, avec $A$ entre $B$ et $M$ et entre $C$ et $N$. On donne $AB = ${T(a)}$ cm, $AM = ${T(m)}$ cm, $AC = ${T(c)}$ cm et $AN = ${T(n)}$ cm. On veut démontrer que $(BC)$ et $(MN)$ sont parallèles.`,
         figure: { kind: "svg", svg: papSvg({ a, m, c, n, lab: [lb(a), lb(m), lb(c), lb(n)], title: "Configuration papillon dont on cherche à démontrer le parallélisme" }), caption: `Configuration papillon. ${NE}` },
         parts: [
           num(r2(m * c), [], "1. Calcule $AM \\times AC$.", "cm²"),
           num(r2(n * a), [], "2. Calcule $AN \\times AB$.", "cm²"),
-          shuffledQcm(rng, CONCL_PAP(), 0, CONCL_DIAG, "3. Quelle conclusion est correcte ?"),
+          shuffledQcm(rng, CONCL_PAP(), 0, CONCL_DIAG, "3. Choisis la conclusion correctement justifiée : elle doit citer la propriété utilisée et vérifier ses conditions."),
         ],
         solution: [`$AM \\times AC = ${T(m)} \\times ${T(c)} = ${T(r2(m * c))}$ et $AN \\times AB = ${T(n)} \\times ${T(a)} = ${T(r2(n * a))}$.`, "Les deux produits sont égaux : $\\dfrac{AM}{AB} = \\dfrac{AN}{AC}$ (produit en croix).", "Les points $B$, $A$, $M$ et $C$, $A$, $N$ sont alignés dans le même ordre : d'après la réciproque du théorème de Thalès, $(BC) // (MN)$."],
       };
@@ -776,7 +776,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Dans quel triangle connaît-on un angle droit ?", "Une fois $BC$ trouvé, écris les trois rapports de Thalès.", "Utilise le produit en croix pour chaque inconnue."],
   }),
   ex({
-    id: "th3-28", title: "Type Brevet — Deux plans semblables", niveau: 4, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T09"], time: 420,
+    id: "th3-28", title: "Type Brevet — Triangles de mêmes angles : coefficient et périmètre", niveau: 4, objectives: ["M3-EG-04"], taxonomyTypes: ["TS-T09"], time: 420,
     vary: (rng) => {
       const [a, b, c] = rng.pick(EVEN_BASES);
       const k = rng.pick([1.5, 2, 2.5, 3]);
@@ -796,7 +796,7 @@ const EXERCISES: ChapterExercise[] = [
     hints: ["Quelles correspondances les angles égaux imposent-ils ?", "Calcule le coefficient avec les côtés $[DE]$ et $[AB]$.", "Le périmètre est multiplié par le même coefficient."],
   }),
   ex({
-    id: "th3-30", title: "Type Brevet — Le toit et sa poutre", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
+    id: "th3-30", title: "Type Brevet — Pythagore, Thalès, puis une aire", niveau: 4, objectives: ["M3-EG-03"], taxonomyTypes: ["TS-T09"], time: 420,
     vary: (rng) => {
       const [x, y, z] = rng.pick(TRIPLES2);
       const [a, c] = rng.next() < 0.5 ? [x, y] : [y, x];
@@ -818,7 +818,6 @@ const EXERCISES: ChapterExercise[] = [
   }),
 ];
 
-function k0() { return "Les côtés d'un triangle semblable s'obtiennent en multipliant chaque côté par le coefficient, à condition de multiplier des côtés homologues."; }
 
 // ───────────────────────── Chapitre ─────────────────────────
 export const math3eThalesSemblables: ChapterContent = {
@@ -913,19 +912,19 @@ export const math3eThalesSemblables: ChapterContent = {
         ]],
         ["Longueurs de Thalès", [
           ["Papillon, $(BC)//(MN)$, $AB = 4$, $AM = 6$, $AC = 10$ : $AN =$", "15", "$AN = \\dfrac{10 \\times 6}{4} = 15$."],
-          ["Papillon, $AB = 5$, $AM = 10$, $AC = 3$ : $AN =$", "6", "$AN = \\dfrac{3 \\times 10}{5} = 6$."],
-          ["Papillon, $AB = 6$, $AM = 3$, $AC = 8$ : $AN =$", "4", "$AN = \\dfrac{8 \\times 3}{6} = 4$."],
-          ["Papillon, $AB = 3$, $AM = 9$, $AN = 12$ : $AC =$", "4", "$AC = \\dfrac{12 \\times 3}{9} = 4$."],
-          ["Papillon, $AB = 8$, $AM = 6$, $BC = 12$ : $MN =$", "9", "$MN = \\dfrac{12 \\times 6}{8} = 9$."],
-          ["Papillon, $AB = 10$, $AM = 4$, $BC = 15$ : $MN =$", "6", "$MN = \\dfrac{15 \\times 4}{10} = 6$."],
+          ["Papillon, $(BC)//(MN)$, $AB = 5$, $AM = 10$, $AC = 3$ : $AN =$", "6", "$AN = \\dfrac{3 \\times 10}{5} = 6$."],
+          ["Papillon, $(BC)//(MN)$, $AB = 6$, $AM = 3$, $AC = 8$ : $AN =$", "4", "$AN = \\dfrac{8 \\times 3}{6} = 4$."],
+          ["Papillon, $(BC)//(MN)$, $AB = 3$, $AM = 9$, $AN = 12$ : $AC =$", "4", "$AC = \\dfrac{12 \\times 3}{9} = 4$."],
+          ["Papillon, $(BC)//(MN)$, $AB = 8$, $AM = 6$, $BC = 12$ : $MN =$", "9", "$MN = \\dfrac{12 \\times 6}{8} = 9$."],
+          ["Papillon, $(BC)//(MN)$, $AB = 10$, $AM = 4$, $BC = 15$ : $MN =$", "6", "$MN = \\dfrac{15 \\times 4}{10} = 6$."],
         ]],
         ["Triangles semblables", [
-          ["Coefficient de $(3\\,;\\,4\\,;\\,5)$ à $(9\\,;\\,12\\,;\\,15)$", "3", "$9 \\div 3 = 3$."],
-          ["Triangle $(4\\,;\\,6\\,;\\,8)$ agrandi avec $k = 2$ : plus grand côté", "16", "$8 \\times 2 = 16$."],
-          ["Triangle $(6\\,;\\,9\\,;\\,12)$ réduit avec $k = \\dfrac{1}{3}$ : plus petit côté", "2", "$6 \\div 3 = 2$."],
-          ["Angles de $50°$ et $60°$ : troisième angle (en °)", "70", "$180 - 110 = 70$."],
-          ["Angles de $35°$ et $85°$ : troisième angle (en °)", "60", "$180 - 120 = 60$."],
-          ["Triangle $(5\\,;\\,12\\,;\\,13)$ agrandi avec $k = 4$ : plus grand côté", "52", "$13 \\times 4 = 52$."],
+          ["Triangle $(3\\,;\\,4\\,;\\,5)$ agrandi en $(9\\,;\\,12\\,;\\,15)$ : coefficient $k =$", "3", "$9 \\div 3 = 3$."],
+          ["Triangle $(4\\,;\\,6\\,;\\,8)$ agrandi avec $k = 2$ : longueur du plus grand côté $=$", "16", "$8 \\times 2 = 16$."],
+          ["Triangle $(6\\,;\\,9\\,;\\,12)$ réduit avec $k = \\dfrac{1}{3}$ : longueur du plus petit côté $=$", "2", "$6 \\div 3 = 2$."],
+          ["Triangle $ABC$ avec $\\widehat{A} = 50°$ et $\\widehat{B} = 60°$ : $\\widehat{C} =$ (en °)", "70", "$180 - 110 = 70$."],
+          ["Triangle $ABC$ avec $\\widehat{A} = 35°$ et $\\widehat{B} = 85°$ : $\\widehat{C} =$ (en °)", "60", "$180 - 120 = 60$."],
+          ["Triangle $(5\\,;\\,12\\,;\\,13)$ agrandi avec $k = 4$ : longueur du plus grand côté $=$", "52", "$13 \\times 4 = 52$."],
         ]],
       ]),
     },
