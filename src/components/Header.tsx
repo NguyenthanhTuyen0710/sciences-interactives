@@ -12,8 +12,9 @@ const NAV = [
   { href: "/revisions", label: "Révisions", match: ["/revisions"] },
   { href: "/brevet", label: "Brevet", match: ["/brevet"] },
   { href: "/bac", label: "Bac", match: ["/bac"] },
-  { href: "/contact", label: "Contact", match: ["/contact"] },
 ];
+/** « Contact » mène à la page du professeur : pastille corail pleine (couleur du bouton principal de l'accueil), placée en fin de menu. */
+const CONTACT = { href: "/contact", label: "Contact" };
 
 type Theme = "light" | "dark";
 const THEME_KEY = "theme";
@@ -73,6 +74,10 @@ export default function Header({ user }: { user: { name: string; role: string } 
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
   // À partir de xl : marge réduite (la largeur utile plafonne à 1280 px, max-w-7xl) pour que la navigation tienne dans les trois états de connexion.
+  // Corail #f4845f + texte #2a0d05 : 7,18:1 (survol #f79474 : 8,15:1) ; sombre #f59c80 : 8,59:1 (survol #f8ae94 : 9,91:1).
+  // Page en cours : anneau foncé décalé + soulignement (en plus d'aria-current). Focus clavier : contour global, écarté de l'anneau.
+  const ctaClass = (on: boolean) => `inline-flex items-center justify-center whitespace-nowrap rounded-full border-b-[3px] border-[#b4472c] bg-[#f4845f] px-3 py-1.5 text-sm font-bold text-[#2a0d05] shadow-sm transition hover:bg-[#f79474] focus-visible:outline-offset-[5px] dark:border-[#c2593b] dark:bg-[#f59c80] dark:text-[#2a0d05] dark:hover:bg-[#f8ae94] ${on ? "underline decoration-2 underline-offset-4 ring-2 ring-[#2a0d05] ring-offset-2 ring-offset-[color:var(--surface)] dark:ring-[#f59c80]" : ""}`;
+  const onContact = path.startsWith(CONTACT.href);
   const navClass = (on: boolean) => `whitespace-nowrap rounded-lg px-3 py-2 xl:px-2 text-sm font-medium transition ${on ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"}`;
   return (
     <header className="sticky top-0 z-40 print:hidden border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -84,6 +89,7 @@ export default function Header({ user }: { user: { name: string; role: string } 
         </Link>
         <nav className="ml-2 hidden items-center gap-0.5 xl:flex" aria-label="Navigation principale">
           {NAV.map((n) => <Link key={n.href} href={n.href} aria-current={active(n.match) ? "page" : undefined} className={navClass(active(n.match))}>{n.label}</Link>)}
+          <Link href={CONTACT.href} aria-current={onContact ? "page" : undefined} className={`ml-1 ${ctaClass(onContact)}`}>{CONTACT.label}</Link>
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
           <form action="/exercices" className="hidden xl:block" role="search">
@@ -107,6 +113,7 @@ export default function Header({ user }: { user: { name: string; role: string } 
           <Link href="/mon-espace" className={navClass(path.startsWith("/mon-espace"))}>Mon espace</Link>
           {teacher && <Link href="/admin" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100">Espace enseignant</Link>}
           {user && <button type="button" onClick={logout} className="rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100">Déconnexion</button>}
+          <Link href={CONTACT.href} aria-current={onContact ? "page" : undefined} className={`col-span-2 mt-1 !py-2.5 ${ctaClass(onContact)}`}>{CONTACT.label}</Link>
         </nav>
       </div>
     </header>
