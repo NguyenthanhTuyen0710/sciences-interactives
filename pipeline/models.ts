@@ -18,6 +18,9 @@ export const FORBIDDEN_MODEL = /fable|mythos/i;
 
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 export type PipelineStep = "dossier" | "chapter" | "fix" | "screen" | "review" | "h1-low" | "h1-medium";
+/** Efforts acceptés dans une fiche (`chapterEffort`, `reviewEffort`) ; toute autre valeur est refusée par run.ts. */
+export const SPEC_EFFORTS = ["low", "medium", "high"] as const;
+export type SpecEffort = (typeof SPEC_EFFORTS)[number];
 /** Étapes de l'essai H1 (décision du 2026-11-18) : hors chaîne de production, sorties en artefact seulement. */
 export const H1_STEPS = ["h1-low", "h1-medium"] as const;
 export const isExperimentStep = (s: PipelineStep) => (H1_STEPS as readonly string[]).includes(s);
@@ -44,6 +47,25 @@ export const STEP_CONFIG: Record<PipelineStep, { model: string; effort: Effort; 
   "h1-low": { model: MODELS.opus, effort: "low", maxTokens: 13500, system: "light" },
   "h1-medium": { model: MODELS.opus, effort: "medium", maxTokens: 13500, system: "light" },
 };
+/**
+ * Effort d'une étape : `chapterEffort` de la fiche pour « chapter » (décision 28), `reviewEffort` pour « review »
+ * (juge approfondi), STEP_CONFIG sinon. L'effort n'entre pas dans l'empreinte (inputHash = texte du prompt).
+ */
+export function stepEffort(step: PipelineStep, spec: { chapterEffort?: SpecEffort; reviewEffort?: SpecEffort }): Effort {
+  if (step === "chapter" && spec.chapterEffort) return spec.chapterEffort;
+  if (step === "review" && spec.reviewEffort) return spec.reviewEffort;
+  return STEP_CONFIG[step].effort;
+}
+
+/**
+ * Fiche transmise aux prompts (variable SPEC) : sans `reviewEffort` ni `reviewEffortNote`, qui règlent seulement l'appel
+ * du juge ; texte identique à la fiche sinon (même ordre des clés), donc prompts et empreintes inchangés.
+ */
+export function promptSpec(spec: object): string {
+  const { reviewEffort: _e, reviewEffortNote: _n, ...rest } = spec as Record<string, unknown>;
+  return JSON.stringify(rest, null, 1);
+}
+
 
 /**
  * Chapitre lycée avec démonstrations (Opus) : la réflexion d'Opus 5.5 ne peut être ni désactivée ni plafonnée
