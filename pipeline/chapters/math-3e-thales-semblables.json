@@ -65,5 +65,7 @@
   "chapterEffortNote": "Point 8 tranché par Nguyễn Thanh Tuyền le 2026-11-24 : medium (équations en low, décisions 32-33 : 3 BLOQUANT et 3 MAJEUR réels corrigés à la main ; coût réel medium 0,336-0,376 $ contre 0,160 $ en low).",
   "chapterEffort": "medium",
   "maxNiveauNote": "Décision 39 (2026-11-26, Nguyễn Thanh Tuyền) : maths 3e à 4 niveaux pour ce chapitre et les chapitres 3e nouveaux ; « Type Brevet » au niveau 4 ; chapitres 3e existants inchangés.",
-  "maxNiveau": 4
+  "maxNiveau": 4,
+  "reviewEffortNote": "Décision du 2026-11-26 (Nguyễn Thanh Tuyền), suite de la décision 39 : juge approfondi en effort medium ; en effort low, le juge des équations (run 110) a laissé passer eq3-02 et eq3-19 (décision 32). max_tokens du juge inchangé (12 000) ; sorties réelles des juges précédents : 869 à 3 826 tokens (runs 68, 92, 110, 114).",
+  "reviewEffort": "medium"
 }
