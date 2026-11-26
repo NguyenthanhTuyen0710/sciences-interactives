@@ -9,6 +9,7 @@ import { userDashboard } from "@/lib/progress";
 import { dailyItems, todayKey } from "@/lib/series";
 import { Bar, ChapterCard, ExerciseCard, chapterSummary, countsLabel, levelCounts, levelTone, plural } from "@/components/ui";
 import RecentList from "@/components/RecentList";
+import { Fraunces } from "next/font/google";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,8 @@ export const dynamic = "force-dynamic";
 const SHOW_DISCOVERY = false;
 const HERO_LEVELS = ["3e", "2nde", "1re", "Tle"];
 const LATEST_COUNT = 6;
+// Titre du bandeau : Fraunces (SIL Open Font License 1.1), auto-hébergée au build par next/font (aucun appel à Google côté navigateur).
+const display = Fraunces({ subsets: ["latin"], weight: ["700"], display: "swap" });
 
 export default async function Home() {
   const [user, metas] = await Promise.all([getUser(), allMetas()]);
@@ -31,20 +34,31 @@ export default async function Home() {
 
   return (
     <div className="space-y-12">
-      {/* Accroche et choix de la classe */}
-      <section aria-labelledby="accroche" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-700 px-5 py-10 text-white sm:px-10 sm:py-14">
-        <div className="max-w-3xl">
-          <h1 id="accroche" className="text-3xl font-black leading-tight sm:text-5xl">Comprendre en faisant, à ton rythme.</h1>
-          <p className="mt-4 text-indigo-100 sm:text-lg">Des cours clairs, des exercices corrigés tout de suite, la plupart avec des valeurs renouvelées à chaque essai, et des jeux pour fixer les réflexes, en mathématiques et en physique-chimie.</p>
+      {/* Accroche et choix de la classe : fond crème clair (sombre : vert très foncé), motifs maths / chimie en marge */}
+      <section aria-labelledby="accroche" className="relative overflow-hidden rounded-3xl border border-[#eee3cc] bg-[#fffaf0] px-5 pb-10 pt-20 text-[#14281d] shadow-sm [background-image:radial-gradient(ellipse_at_0%_0%,#ffefc4_0%,transparent_55%),radial-gradient(ellipse_at_100%_0%,#dcedfb_0%,transparent_55%)] sm:px-10 sm:pb-14 lg:pt-14 dark:border-[#20352a] dark:bg-[#0e1913] dark:text-[#eef7f1] dark:[background-image:radial-gradient(ellipse_at_0%_0%,#262712_0%,transparent_55%),radial-gradient(ellipse_at_100%_0%,#10283a_0%,transparent_55%)]">
+        <HeroMotifs />
+        <div className="relative max-w-2xl">
+          <h1 id="accroche" className={`${display.className} text-4xl leading-tight sm:text-5xl`}>
+            Comprendre{" "}
+            <span className="relative inline-block pb-3 text-[#1e6b46] dark:text-[#8fdcb1]">
+              en faisant
+              <svg aria-hidden focusable="false" viewBox="0 0 200 12" preserveAspectRatio="none" className="absolute bottom-0 left-0 h-3 w-full text-[#e0603f] dark:text-[#f59c80]">
+                <path d="M3 8 C 40 3, 70 11, 105 6 S 170 2, 197 7" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+              </svg>
+            </span>
+            , à ton rythme.
+          </h1>
+          <p className="mt-5 text-[#3a4a40] sm:text-lg dark:text-[#c4d4c9]">Des cours clairs, des exercices corrigés tout de suite, la plupart avec des valeurs renouvelées à chaque essai, et des jeux pour fixer les réflexes, en mathématiques et en physique-chimie.</p>
         </div>
-        <nav aria-label="Choisir ta classe" className="mt-8">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-indigo-100">Choisis ta classe</p>
+        <nav aria-label="Choisir ta classe" className="relative mt-8">
+          <p className="mb-3 text-sm font-bold uppercase tracking-wider text-[#1e6b46] dark:text-[#8fdcb1]">Choisis ta classe</p>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {HERO_LEVELS.map((id) => {
               const l = LEVELS.find((x) => x.id === id)!;
+              const tone = levelTone(id);
               return (
                 <li key={id}>
-                  <Link href={`/chapitres?niveau=${id}`} className={`flex h-full flex-col gap-1 rounded-2xl border-2 p-4 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl ${levelTone(id).solid}`}>
+                  <Link href={`/chapitres?niveau=${id}`} className={`flex h-full flex-col gap-1 rounded-2xl border-2 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${tone.chip} ${tone.accent}`}>
                     <span className="text-2xl font-black">{l.short}</span>
                     <span className="text-sm font-medium">{countsLabel(levelCounts(chapters, id, null))}</span>
                   </Link>
@@ -52,12 +66,15 @@ export default async function Home() {
               );
             })}
           </ul>
-          <p className="mt-4 text-sm text-indigo-100">
+          <p className="mt-4 text-sm text-[#3a4a40] dark:text-[#c4d4c9]">
             Collège :{" "}
-            {others.map((l, i) => <span key={l.id}>{i > 0 && " · "}<Link href={`/chapitres?niveau=${l.id}`} className="font-semibold text-white underline-offset-2 hover:underline">{l.short}</Link></span>)}
+            {others.map((l, i) => <span key={l.id}>{i > 0 && " · "}<Link href={`/chapitres?niveau=${l.id}`} className="font-bold text-[#1e6b46] underline underline-offset-2 dark:text-[#8fdcb1]">{l.short}</Link></span>)}
           </p>
         </nav>
-        <p className="mt-6 text-sm font-medium text-white">Gratuit et sans publicité. Un compte sert seulement à garder ta progression.</p>
+        <div className="relative mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Link href="/chapitres" className="inline-flex items-center rounded-xl border-b-4 border-[#b4472c] bg-[#f4845f] px-5 py-2.5 font-bold text-[#2a0d05] transition hover:bg-[#f6957a] active:translate-y-0.5 active:border-b-2">Explorer les chapitres</Link>
+          <p className="text-sm font-medium text-[#3a4a40] dark:text-[#c4d4c9]">Gratuit et sans publicité. Un compte sert seulement à garder ta progression.</p>
+        </div>
       </section>
 
       {/* Les trois formats, sur un chapitre réel */}
@@ -165,5 +182,88 @@ async function Discovery({ level, byId, recs }: { level: string | null; byId: Ma
         </div>
       </section>
     </>
+  );
+}
+
+// ───────── Motifs du bandeau (SVG en ligne, décoratifs, sans animation) ─────────
+// Géométrie calculée, pas dessinée à main levée : benzène de Kekulé (hexagone régulier, 3 doubles liaisons alternées),
+// eau coudée (angle H–O–H = 104,5°), lithium selon Bohr (Z = 3 : 2 électrons puis 1), parabole y = x² (Bézier quadratique
+// exacte), triangle rectangle avec son angle droit marqué au bon sommet.
+const P = (x: number, y: number) => `${x.toFixed(2)} ${y.toFixed(2)}`;
+
+function Benzene({ x, y, r = 20 }: { x: number; y: number; r?: number }) {
+  const v = Array.from({ length: 6 }, (_, i) => { const a = (Math.PI / 180) * (60 * i - 90); return [x + r * Math.cos(a), y + r * Math.sin(a)] as const; });
+  const inner = v.map(([vx, vy]) => [x + (vx - x) * 0.74, y + (vy - y) * 0.74] as const);
+  const lerp = (a: readonly [number, number], b: readonly [number, number], t: number) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t] as const;
+  return (
+    <g>
+      <path d={`M ${v.map(([a, b]) => P(a, b)).join(" L ")} Z`} />
+      {[0, 2, 4].map((i) => { const a = lerp(inner[i], inner[(i + 1) % 6], 0.18), b = lerp(inner[i], inner[(i + 1) % 6], 0.82); return <path key={i} d={`M ${P(a[0], a[1])} L ${P(b[0], b[1])}`} />; })}
+    </g>
+  );
+}
+
+function Water({ x, y, l = 18 }: { x: number; y: number; l?: number }) {
+  const half = (104.5 / 2) * (Math.PI / 180), gap = 6;
+  const h = [-1, 1].map((sgn) => [x + sgn * l * Math.sin(half), y + l * Math.cos(half)] as const);
+  return (
+    <g>
+      {h.map(([hx, hy], i) => { const ux = (hx - x) / l, uy = (hy - y) / l; return <path key={i} d={`M ${P(x + ux * gap, y + uy * gap)} L ${P(hx - ux * 4.5, hy - uy * 4.5)}`} />; })}
+      <text x={x} y={y + 3.5} textAnchor="middle" fontSize="10" fill="currentColor" stroke="none">O</text>
+      {h.map(([hx, hy], i) => <text key={i} x={hx} y={hy + 3.5} textAnchor="middle" fontSize="9" fill="currentColor" stroke="none">H</text>)}
+      <text x={x} y={y + 34} textAnchor="middle" fontSize="10" fill="currentColor" stroke="none">H<tspan fontSize="7" dy="2.5">2</tspan><tspan dy="-2.5">O</tspan></text>
+    </g>
+  );
+}
+
+function Lithium({ x, y }: { x: number; y: number }) {
+  const e = (r: number, deg: number) => <circle cx={x + r * Math.cos((deg * Math.PI) / 180)} cy={y + r * Math.sin((deg * Math.PI) / 180)} r="2" fill="currentColor" stroke="none" />;
+  return (
+    <g>
+      <circle cx={x} cy={y} r="4.5" fill="currentColor" stroke="none" />
+      <circle cx={x} cy={y} r="12" /><circle cx={x} cy={y} r="21" />
+      {e(12, 0)}{e(12, 180)}{e(21, -50)}
+      <text x={x} y={y + 36} textAnchor="middle" fontSize="10" fill="currentColor" stroke="none">Li</text>
+    </g>
+  );
+}
+
+function Parabola({ x, y, u = 6 }: { x: number; y: number; u?: number }) {
+  return (
+    <g>
+      <path d={`M ${P(x - 3.5 * u, y)} L ${P(x + 3.5 * u, y)} M ${P(x + 3.5 * u - 3, y - 2.5)} L ${P(x + 3.5 * u, y)} L ${P(x + 3.5 * u - 3, y + 2.5)}`} />
+      <path d={`M ${P(x, y + 0.8 * u)} L ${P(x, y - 5 * u)} M ${P(x - 2.5, y - 5 * u + 3)} L ${P(x, y - 5 * u)} L ${P(x + 2.5, y - 5 * u + 3)}`} />
+      <path d={`M ${P(x - 2 * u, y - 4 * u)} Q ${P(x, y + 4 * u)} ${P(x + 2 * u, y - 4 * u)}`} />
+    </g>
+  );
+}
+
+function RightTriangle({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <path d={`M ${P(x, y)} L ${P(x + 34, y)} L ${P(x, y - 24)} Z`} />
+      <path d={`M ${P(x + 6, y)} L ${P(x + 6, y - 6)} L ${P(x, y - 6)}`} />
+    </g>
+  );
+}
+
+const Glyph = ({ x, y, c }: { x: number; y: number; c: string }) => <text x={x} y={y} fontSize="22" fontFamily="Georgia, serif" fill="currentColor" stroke="none">{c}</text>;
+
+/** Décor : petite bande en haut à droite sous 1024 px (3 motifs) ; grappe chimie en haut à droite dès 1024 px ; grappe maths en bas à droite dès 1280 px. Jamais sous le texte ni les boutons. */
+function HeroMotifs() {
+  const common = { "aria-hidden": true, focusable: "false" as const, fill: "none", stroke: "currentColor", strokeWidth: 1.4, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, opacity: 0.4 };
+  return (
+    <div aria-hidden className="pointer-events-none select-none text-[#2a6f4c] dark:text-[#a3e0bf]">
+      <svg data-motif {...common} viewBox="0 0 150 52" className="absolute right-4 top-3 h-12 w-auto lg:hidden">
+        <Benzene x={22} y={24} r={17} /><Water x={78} y={14} l={15} /><Glyph x={120} y={34} c="π" />
+      </svg>
+      <svg data-motif {...common} viewBox="0 0 250 150" className="absolute right-6 top-6 hidden w-56 lg:block xl:w-72">
+        <Benzene x={40} y={52} /><Lithium x={128} y={50} /><Water x={206} y={44} />
+        <Glyph x={60} y={130} c="Σ" /><Glyph x={150} y={132} c="√" />
+      </svg>
+      <svg data-motif {...common} viewBox="0 0 250 84" className="absolute bottom-5 right-6 hidden w-64 xl:block">
+        <Parabola x={44} y={72} u={8} /><RightTriangle x={112} y={72} /><Glyph x={182} y={72} c="π" />
+      </svg>
+    </div>
   );
 }
