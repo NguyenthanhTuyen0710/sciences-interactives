@@ -20,8 +20,7 @@ export const viewport: Viewport = {
 const THEME_SCRIPT = `try{var t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
 
 const CONTENTS = [
-  { href: "/mathematiques", label: "Chapitres de mathématiques" },
-  { href: "/physique-chimie", label: "Chapitres de physique-chimie" },
+  { href: "/chapitres", label: "Tous les chapitres" },
   { href: "/exercices", label: "Exercices interactifs" },
   { href: "/cours", label: "Cours et fiches" },
   { href: "/revisions", label: "Révisions" },
