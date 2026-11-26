@@ -15,6 +15,11 @@ export default async function RevisionsPage() {
       <Breadcrumbs items={[{ href: "/", label: "Accueil" }, { label: "Révisions" }]} />
       <h1 className="mb-6 text-3xl font-black">Réviser efficacement</h1>
       <div className="grid gap-6 lg:grid-cols-2">
+        <section className="card p-5 lg:col-span-2">
+          <h2 className="text-xl font-bold">🗓 Plan de révision</h2>
+          <p className="mb-4 text-sm text-slate-600">Donne la date de ton évaluation et les chapitres à revoir : tu obtiens un programme jour par jour, à garder en favori ou à imprimer.</p>
+          <Link href="/revisions/plan" className="btn-primary">Construire mon plan</Link>
+        </section>
         <section className="card p-5">
           <h2 className="text-xl font-bold">⏱ Défi chronométré</h2>
           <p className="mb-4 text-sm text-slate-600">5 exercices tirés au hasard dans ton niveau, 10 minutes chrono, note sur 20.</p>
