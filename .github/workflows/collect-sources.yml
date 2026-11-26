@@ -5,6 +5,9 @@
 #   ui-structure : relevé de STRUCTURE de mise en page du site de référence d'interface (job séparé, sans registre,
 #            seeds, documents ni data-store) ; pages = ui_pages (≤ 10) ; arrêt si robots.txt interdit. Sortie : artefact
 #            ui-structure-<run>, jamais committée ni lue par la chaîne de contenu.
+#   toc    : relevé du SOMMAIRE d'une source de référence (pipeline/sources/toc.ts) : titres et chemins 3e → Tle,
+#            maths / physique-chimie, brevet, bac. Exige enabled + G0 approuvé. Sortie : artefact toc-<run>
+#            (research/sources/toc/<source>.json + .md), à relire puis committer à la main.
 # Droits : seuls docs-pull et docs-push (release brouillon « data-store ») ont contents: write. Seuls les documents
 # dont la conservation est approuvée (registry.json → g0.storage) y sont copiés. Les enregistrements
 # research/sources/records/*.json sont publiés en artefact, à relire puis committer à la main : aucun commit automatique.
@@ -14,9 +17,9 @@ on:
   workflow_dispatch:
     inputs:
       command:
-        description: "check (sans téléchargement) | fetch (seeds approuvés) | verify | ui-structure (structure d'interface)"
+        description: "check (sans téléchargement) | fetch (seeds approuvés) | verify | ui-structure (structure d'interface) | toc (sommaire)"
         type: choice
-        options: [check, fetch, verify, ui-structure]
+        options: [check, fetch, verify, ui-structure, toc]
         default: check
       only:
         description: "Limiter à un seed (identifiant de research/sources/seeds.json) ; vide = tous"
@@ -26,6 +29,18 @@ on:
         description: "ui-structure uniquement : chemins du site de référence, séparés par des virgules (≤ 10)"
         type: string
         default: "/"
+      toc_source:
+        description: "toc uniquement : identifiant de la source (registry.json)"
+        type: string
+        default: "geniesdessciences"
+      toc_start:
+        description: "toc uniquement : pages de départ, séparées par des virgules"
+        type: string
+        default: "/"
+      toc_max_pages:
+        description: "toc uniquement : nombre maximal de pages (≤ 1500)"
+        type: string
+        default: "400"
 
 permissions:
   contents: read
@@ -36,7 +51,7 @@ concurrency:
 
 jobs:
   docs-pull:
-    if: inputs.command != 'check' && inputs.command != 'ui-structure'
+    if: inputs.command != 'check' && inputs.command != 'ui-structure' && inputs.command != 'toc'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -57,7 +72,7 @@ jobs:
 
   collect:
     needs: docs-pull
-    if: always() && inputs.command != 'ui-structure' && (inputs.command == 'check' || needs.docs-pull.result == 'success')
+    if: always() && inputs.command != 'ui-structure' && inputs.command != 'toc' && (inputs.command == 'check' || needs.docs-pull.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -217,3 +232,51 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
           path: ui-reference-output/
+
+  toc:
+    if: inputs.command == 'toc'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Relevé du sommaire (titres et chemins)
+        shell: bash
+        env:
+          TOC_SOURCE: ${{ inputs.toc_source }}
+          TOC_START: ${{ inputs.toc_start }}
+          TOC_MAX_PAGES: ${{ inputs.toc_max_pages }}
+        run: |
+          mkdir -p research/sources/toc
+          npx tsx pipeline/sources/run.ts toc --source "$TOC_SOURCE" --start "$TOC_START" --max-pages "$TOC_MAX_PAGES" 2>&1 | tee research/sources/toc/run.log
+
+      - name: Résumé
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Relevé du sommaire"
+            echo '```'
+            cat research/sources/toc/run.log 2>/dev/null || echo "(pas de journal)"
+            echo '```'
+            echo "Artefact uniquement : à relire puis committer à la main."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier le relevé (artefact, sans commit)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: toc-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: ignore
+          path: research/sources/toc/

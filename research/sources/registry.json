@@ -111,6 +111,28 @@
       }
     },
     {
+      "id": "geniesdessciences",
+      "name": "Génies des sciences",
+      "kind": "http",
+      "host": "www.geniesdessciences.com",
+      "allowedPathPrefixes": [],
+      "role": "reference",
+      "enabled": false,
+      "crawlDelaySeconds": 2,
+      "g0": {
+        "status": "pending",
+        "storage": "pending",
+        "checkedAt": "2026-11-26",
+        "robots": "NON LU : hôte refusé par le proxy réseau de la session du 2026-11-26.",
+        "terms": "NON LU (même cause).",
+        "access": "Non vérifié depuis la session cloud ; déjà utilisé comme référence d'interface (ui-structure, ≤ 10 pages).",
+        "license": "non vérifiée",
+        "decisionNeeded": "Pour lancer `run.ts toc` : relire robots.txt et les conditions d'utilisation, puis passer enabled à true et g0.status à \"approved\" (avec g0.decision). Le relevé ne garde que titres et chemins ; toute collecte de contenu ultérieure exige une décision distincte sur les droits."
+      },
+      "purpose": "Sommaire de référence (classes 3e → Tle, maths et physique-chimie, rubriques brevet et bac) pour planifier les chapitres ; ne définit jamais le contenu du programme.",
+      "restrictions": "Commande toc uniquement (titres h1-h3 ≤ 120 caractères, chemins, liens du périmètre) ; espaces réservés et pages d'achat refusés (UI_FORBIDDEN)."
+    },
+    {
       "id": "notion",
       "name": "Notion du porteur de projet",
       "kind": "connector",

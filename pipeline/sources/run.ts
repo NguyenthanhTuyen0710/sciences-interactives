@@ -9,6 +9,10 @@
 //   npx tsx pipeline/sources/run.ts ui-structure [--pages "/,/x"]  relevé de STRUCTURE de mise en page du site de référence d'interface
 //        (lib.ts → UI_REFERENCE_HOST ; ≤ 10 pages, robots.txt, ≥ 2 s, une requête par page, aucun lien suivi, aucun texte long).
 //        Sortie : ui-reference-output/structure.json (artefact du run, ignoré par Git) ; jamais lue par la chaîne de contenu.
+//   npx tsx pipeline/sources/run.ts toc [--source geniesdessciences] [--start "/,/x"] [--max-pages 400] [--max-depth 5]
+//        relevé du SOMMAIRE (3e → Tle, maths / physique-chimie, brevet, bac) : titres et chemins uniquement (toc.ts).
+//        Exige enabled + G0 approuvé dans registry.json ; robots.txt, délai ≥ 2 s, un seul hôte.
+//        Sortie : research/sources/toc/<source>.json (+ .md), à relire puis committer à la main.
 //
 // Dans Git : research/sources/records/<seed>.json (URL, date d'accès, SHA256, statut). Documents et textes : .sources-cache/
 // (hors Git ; persistance assurée par le workflow collect-sources). Un document illisible ou refusé est enregistré comme tel,
@@ -17,6 +21,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildIndex, collectToc, renderMarkdown, TOC_DEFAULT_MAX_DEPTH, TOC_DEFAULT_MAX_PAGES } from "./toc";
 import { applyChanges, collectUiStructure, extractMetadata, UI_OUTPUT_DIR, uiUserAgent, gateSeed, type Change, type Inventory, groupFor, matchObjective, parseRobots, robotsAllows, sha256, verify, type Registry, type Seed, type SourceRecord } from "./lib";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -191,8 +196,33 @@ async function uiStructure(pages: string) {
   if (report.stopped) fail(report.stopped);
 }
 
+// ───────── Relevé du sommaire d'un site de référence (toc.ts) ─────────
+async function toc() {
+  const id = opt("--source") ?? "geniesdessciences";
+  const source = registry.sources.find((x) => x.id === id);
+  const opts = {
+    start: (opt("--start") ?? "/").split(",").map((s) => s.trim()).filter(Boolean),
+    maxPages: Number(opt("--max-pages") ?? TOC_DEFAULT_MAX_PAGES),
+    maxDepth: Number(opt("--max-depth") ?? TOC_DEFAULT_MAX_DEPTH),
+    userAgent: registry.userAgent,
+  };
+  const report = await collectToc(source, opts, {
+    fetch: (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(30_000) }),
+    sleep: async (ms) => { await sleep(ms); },
+  });
+  if (!report.pages.length) fail(report.stopped ?? "aucune page relevée");
+  const index = buildIndex(report);
+  const out = `research/sources/toc/${id}`;
+  writeFile(`${out}.json`, JSON.stringify({ ...report, index }, null, 2) + "\n");
+  writeFile(`${out}.md`, renderMarkdown(report, index) + "\n");
+  for (const [top, subs] of Object.entries(index)) console.log(`${top} : ${Object.entries(subs).map(([s, e]) => `${s} ${e.length}`).join(", ")}`);
+  console.log(`${report.pages.length} page(s), ${report.skipped.length} ignorée(s) par robots.txt, ${report.requests} requête(s) → ${out}.json / .md`);
+  if (report.stopped) console.log(`Arrêt : ${report.stopped}`);
+}
+
 // ───────── Programme ─────────
 async function main() {
+  if (cmd === "toc") return toc();
   if (cmd === "ui-structure") return uiStructure(opt("--pages") ?? "/");
   if (cmd === "apply") return apply(opt("apply") ?? args[1] ?? fail("fichier de proposition manquant"));
   if (cmd === "verify") {

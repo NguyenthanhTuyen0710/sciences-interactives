@@ -1,6 +1,6 @@
 # Sources — collecte et vérification
 
-Liste fermée, contrôlée par des décisions humaines. Le collecteur (`pipeline/sources/run.ts`) n'explore aucun site.
+Liste fermée, contrôlée par des décisions humaines. Le collecteur (`pipeline/sources/run.ts`) n'explore aucun site, sauf la commande `toc` (sommaire borné : titres et chemins, source approuvée G0).
 
 | Fichier | Rôle |
 |---|---|
@@ -9,6 +9,7 @@ Liste fermée, contrôlée par des décisions humaines. Le collecteur (`pipeline
 | `G1-table.md` | Tableau des documents proposés (titre lu, accès, droits, proposition). |
 | `seeds.json` | Documents précis à télécharger, métadonnées déclarées (matière, niveaux, référence officielle, statut d'application) et attendus de vérification. **`g1` = décision humaine**. |
 | `verification/<chapitre>.json` | Rapprochement objectifs ↔ documents vérifiés (`run.ts match <chapitre>`, sans IA) : `verified` uniquement pour une citation mot pour mot, sinon `needs_manual_review` avec passage candidat. |
+| `toc/<source>.json` (+ `.md`) | Sommaire d'une source de référence (`run.ts toc`, `pipeline/sources/toc.ts`) : pages 3e → Tle, maths / physique-chimie, brevet, bac ; titre, h1-h3 (≤ 120 caractères), chemin, classement automatique et `index` niveau/examen → matière → pages. Aucun contenu. Exige `enabled` + G0 approuvé ; committé à la main après relecture. Sert à planifier une collecte, ne l'autorise pas. |
 | `records/<seed>.json` | Une ligne de preuve par document : URL, URL finale, date d'accès, HTTP, SHA256, lisibilité, indices extraits, statut de vérification. Committé à la main après relecture. |
 
 ## Portes de décision

@@ -224,7 +224,7 @@ export const UI_MAX_NAV_ITEMS = 30;
 export const UI_OUTPUT_DIR = "ui-reference-output";
 export const uiUserAgent = (base: string) => base.replace(/\)\s*$/, "; relevé de structure de mise en page, sans contenu)");
 // Chemins refusés d'office : espace réservé, achat, contenus livrés par courriel.
-const UI_FORBIDDEN = /^\/(api|merci|classeurs|fiches-pdf)(\/|$)|connexion|login|compte|panier|checkout|boutique|shop|pack|cours-particuliers|abonnement|paiement/i;
+export const UI_FORBIDDEN = /^\/(api|merci|classeurs|fiches-pdf)(\/|$)|connexion|login|compte|panier|checkout|boutique|shop|pack|cours-particuliers|abonnement|paiement/i;
 
 /** Liste « /a,/b » (chemins ou URL https du seul hôte autorisé) → chemins normalisés ; aucune requête. */
 export function validateUiPages(input: string): { paths: string[]; errors: string[] } {
@@ -254,7 +254,7 @@ export interface UiPage { path: string; httpStatus: number; note?: string; block
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
 const LANDMARKS = new Set(["header", "nav", "main", "section", "aside", "footer"]);
 const GRADE = /^(sixième|cinquième|quatrième|troisième|seconde|première|terminale|6e|5e|4e|3e|2nde|2de|1re|tle)\b/i;
-const squash = (s: string) => s.replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;|&rsquo;/g, "'").replace(/&[a-z]+;|&#\d+;/gi, "").replace(/\s+/g, " ").trim();
+export const squash = (s: string) => s.replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;|&rsquo;/g, "'").replace(/&[a-z]+;|&#\d+;/gi, "").replace(/\s+/g, " ").trim();
 
 interface Frame { tag: string; block: UiBlock | null; links: number; hasHeading: boolean; hasImg: boolean; hasGroup: boolean; inFooter: UiBlock | null; text: string | null }
 
