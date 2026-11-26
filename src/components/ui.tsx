@@ -121,6 +121,45 @@ export function chapterTypes(c: ChapterContent, tax: TaxonomyRef | null): Chapte
   return { kind: "taxonomy", items };
 }
 
+/** Liens vers des exercices d'un chapitre, filtrés par titre : identifiant, titre et niveau seulement (aucun contenu). */
+export function exerciseLinks(c: ChapterContent, keep: (title: string) => boolean) {
+  return c.exercises.filter((e) => keep(e.title)).map((e) => ({ id: e.id, title: e.title, niveau: e.niveau }));
+}
+
+/** Progression réelle d'un élève sur un chapitre, d'après ses tentatives (exercice réussi = score 1). */
+export interface ChapterProgress { done: number; total: number; tried: number; milestones: string[] }
+export function chapterProgress(c: ChapterContent, attempts: { exerciseId: string; score: number }[], isExam?: (title: string) => boolean): ChapterProgress {
+  const ids = new Set(c.exercises.map((e) => e.id));
+  const mine = attempts.filter((a) => ids.has(a.exerciseId));
+  const ok = new Set(mine.filter((a) => a.score >= 0.999).map((a) => a.exerciseId));
+  const solved = c.exercises.filter((e) => ok.has(e.id));
+  const milestones = [
+    solved.length > 0 && "Premier exercice réussi",
+    new Set(solved.map((e) => e.niveau)).size === 5 && "Un exercice réussi à chaque niveau",
+    solved.some((e) => e.niveau === 5) && "Niveau 5 réussi",
+    !!isExam && solved.some((e) => isExam(e.title)) && "Exercice type examen réussi",
+  ].filter((x): x is string => !!x);
+  return { done: solved.length, total: c.exercises.length, tried: new Set(mine.map((a) => a.exerciseId)).size, milestones };
+}
+
+/** Barre de progression et petits jalons, affichés seulement pour un élève connecté ayant déjà travaillé le chapitre. */
+export function ProgressNote({ p }: { p: ChapterProgress }) {
+  const pct = Math.round((100 * p.done) / Math.max(1, p.total));
+  return (
+    <div className="mt-2 rounded-xl bg-slate-100 p-3 text-xs text-slate-700">
+      <p className="mb-1 font-semibold">Ta progression : {plural(p.done, "exercice réussi", "exercices réussis")} sur {p.total}</p>
+      <div className="h-2 overflow-hidden rounded-full bg-slate-300" role="progressbar" aria-label="Exercices réussis" aria-valuemin={0} aria-valuemax={p.total} aria-valuenow={p.done}>
+        <div className="h-full rounded-full bg-emerald-600" style={{ width: `${pct}%` }} />
+      </div>
+      {p.milestones.length > 0 && (
+        <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Jalons atteints">
+          {p.milestones.map((m) => <li key={m} className="chip bg-emerald-100 text-emerald-800">✓ {m}</li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
 
 /** « 6 chapitres (2 publiés, 4 brouillons) » ou, sans chapitre complet, « 12 thèmes du programme, chapitres en préparation ». */

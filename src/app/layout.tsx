@@ -24,7 +24,10 @@ const CONTENTS = [
   { href: "/exercices", label: "Exercices interactifs" },
   { href: "/cours", label: "Cours et fiches" },
   { href: "/revisions", label: "Révisions" },
-  { href: "/examens", label: "Examens" },
+  { href: "/revisions/plan", label: "Plan de révision" },
+  { href: "/brevet", label: "Brevet" },
+  { href: "/bac", label: "Bac" },
+  { href: "/examens", label: "Sujets d'entraînement" },
   { href: "/lecons/pythagore", label: "Leçon animée interactive" },
 ];
 const footLink = "hover:text-indigo-600 hover:underline";

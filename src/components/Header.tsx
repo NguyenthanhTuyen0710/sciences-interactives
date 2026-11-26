@@ -3,13 +3,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-// Cinq rubriques de contenu ; « Mon espace » et la connexion sont dans le groupe de droite.
+// Rubriques de contenu ; « Mon espace » et la connexion sont dans le groupe de droite.
+// Navigation horizontale à partir de xl (1280 px) ; en dessous, menu ☰ (mesuré dans les trois états de connexion).
 const NAV = [
   { href: "/chapitres", label: "Chapitres", match: ["/chapitres", "/mathematiques", "/physique-chimie"] },
   { href: "/exercices", label: "Exercices", match: ["/exercices", "/exercice/"] },
   { href: "/cours", label: "Cours et fiches", match: ["/cours", "/lecons"] },
   { href: "/revisions", label: "Révisions", match: ["/revisions"] },
-  { href: "/examens", label: "Examens", match: ["/examens"] },
+  { href: "/brevet", label: "Brevet", match: ["/brevet"] },
+  { href: "/bac", label: "Bac", match: ["/bac"] },
 ];
 
 type Theme = "light" | "dark";
@@ -69,16 +71,17 @@ export default function Header({ user }: { user: { name: string; role: string } 
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-  // À partir de lg : marge réduite (la largeur utile plafonne à 1280 px, max-w-7xl) pour que la navigation tienne dans les trois états de connexion.
-  const navClass = (on: boolean) => `whitespace-nowrap rounded-lg px-3 py-2 lg:px-2 text-sm font-medium transition ${on ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"}`;
+  // À partir de xl : marge réduite (la largeur utile plafonne à 1280 px, max-w-7xl) pour que la navigation tienne dans les trois états de connexion.
+  const navClass = (on: boolean) => `whitespace-nowrap rounded-lg px-3 py-2 xl:px-2 text-sm font-medium transition ${on ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"}`;
   return (
     <header className="sticky top-0 z-40 print:hidden border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 font-black tracking-tight text-slate-900" aria-label="Sciences Interactives, accueil">
           <span aria-hidden className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-600 to-emerald-500 text-lg text-white">π</span>
-          <span className="hidden sm:inline lg:hidden">Sciences<span className="text-indigo-600">Interactives</span></span>
+          {/* Logo texte masqué à partir de xl pour un compte enseignant seulement (deux boutons de plus à droite). */}
+          <span className={`hidden sm:inline ${teacher ? "xl:hidden" : ""}`}>Sciences<span className="text-indigo-600">Interactives</span></span>
         </Link>
-        <nav className="ml-2 hidden items-center gap-0.5 lg:flex" aria-label="Navigation principale">
+        <nav className="ml-2 hidden items-center gap-0.5 xl:flex" aria-label="Navigation principale">
           {NAV.map((n) => <Link key={n.href} href={n.href} aria-current={active(n.match) ? "page" : undefined} className={navClass(active(n.match))}>{n.label}</Link>)}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
@@ -87,16 +90,16 @@ export default function Header({ user }: { user: { name: string; role: string } 
           </form>
           <ThemeToggle />
           <Link href="/mon-espace" aria-current={path.startsWith("/mon-espace") ? "page" : undefined} className={`hidden sm:inline-flex ${navClass(path.startsWith("/mon-espace"))}`}>Mon espace</Link>
-          {teacher && <Link href="/admin" className="hidden rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white lg:inline-block">Espace enseignant</Link>}
+          {teacher && <Link href="/admin" className="hidden rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white xl:inline-block">Espace enseignant</Link>}
           {user
-            ? <button type="button" onClick={logout} className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 lg:inline-block">Déconnexion</button>
+            ? <button type="button" onClick={logout} className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 xl:inline-block">Déconnexion</button>
             : <Link href="/connexion" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700">Connexion</Link>}
-          <button ref={menuButton} type="button" className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="menu-mobile" onClick={() => setOpen(!open)}>
+          <button ref={menuButton} type="button" className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 xl:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="menu-mobile" onClick={() => setOpen(!open)}>
             <svg aria-hidden width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={open ? "M6 6l12 12M18 6L6 18" : "M4 7h16M4 12h16M4 17h16"} /></svg>
           </button>
         </div>
       </div>
-      <div id="menu-mobile" hidden={!open} className="border-t border-slate-200 bg-white px-4 py-3 lg:hidden">
+      <div id="menu-mobile" hidden={!open} className="border-t border-slate-200 bg-white px-4 py-3 xl:hidden">
         <form action="/exercices" className="mb-3" role="search"><input name="q" type="search" placeholder="Rechercher un exercice, une notion…" aria-label="Rechercher un exercice ou une notion" className="input" /></form>
         <nav aria-label="Navigation mobile" className="grid grid-cols-2 gap-1">
           {NAV.map((n) => <Link key={n.href} href={n.href} aria-current={active(n.match) ? "page" : undefined} className={navClass(active(n.match))}>{n.label}</Link>)}

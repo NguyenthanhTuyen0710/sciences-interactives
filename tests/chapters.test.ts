@@ -477,3 +477,34 @@ describe("plan de révision", async () => {
     }
   });
 });
+
+describe("pages Brevet et Bac (interface)", async () => {
+  const ui = await import("../src/components/ui");
+  const { isTypeBrevet } = await import("../src/lib/revision-plan");
+
+  it("liens d'exercices : identifiant, titre et niveau seulement, aucune correction", () => {
+    for (const c of ALL_CHAPTERS) {
+      const links = ui.exerciseLinks(c, isTypeBrevet);
+      expect(links.length).toBe(c.exercises.filter((e) => isTypeBrevet(e.title)).length);
+      for (const l of links) expect(Object.keys(l).sort()).toEqual(["id", "niveau", "title"]);
+      const out = JSON.stringify(links);
+      expect(out).not.toMatch(/"answer"|"mistakes"|"solution"|"hints"|"reasoning"|"statement"|"commonMistakes"/);
+      for (const e of c.exercises) for (const x of [...(e.solution ?? []), e.reasoning, ...e.hints].filter((t) => t.length > 12)) expect(out.includes(x)).toBe(false);
+    }
+    const published3e = ALL_CHAPTERS.filter((c) => c.grade === "3e" && c.publicationStatus === "published");
+    expect(published3e.flatMap((c) => ui.exerciseLinks(c, isTypeBrevet)).length).toBeGreaterThan(0);
+  });
+
+  it("progression : seulement les tentatives réelles du chapitre ; jalons calculés, jamais inventés", () => {
+    const c = ALL_CHAPTERS.find((x) => x.id === "math-3e-arithmetique")!;
+    expect(ui.chapterProgress(c, [], isTypeBrevet)).toEqual({ done: 0, total: c.exercises.length, tried: 0, milestones: [] });
+    const lvl1 = c.exercises.find((e) => e.niveau === 1)!;
+    const brevet = c.exercises.find((e) => isTypeBrevet(e.title))!;
+    const p = ui.chapterProgress(c, [
+      { exerciseId: lvl1.id, score: 1 }, { exerciseId: lvl1.id, score: 0.5 }, { exerciseId: brevet.id, score: 0.4 }, { exerciseId: "autre-chapitre-01", score: 1 },
+    ], isTypeBrevet);
+    expect(p).toEqual({ done: 1, total: c.exercises.length, tried: 2, milestones: ["Premier exercice réussi"] });
+    const all = c.exercises.map((e) => ({ exerciseId: e.id, score: 1 }));
+    expect(ui.chapterProgress(c, all, isTypeBrevet).milestones).toEqual(["Premier exercice réussi", "Un exercice réussi à chaque niveau", "Niveau 5 réussi", "Exercice type examen réussi"]);
+  });
+});
