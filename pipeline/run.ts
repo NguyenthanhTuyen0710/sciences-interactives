@@ -46,7 +46,7 @@ const CHARS_PER_TOKEN = 2;
 type Step = PipelineStep;
 
 
-interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true; chapterEffort?: "low" | "medium" | "high"; excludedTaxonomyTypes?: string[] }
+interface Spec { id: string; taskId: string; grade: string; subject: SubjectSlug; objectiveIds?: string[]; parcours?: string; demonstrations?: string[]; treeChapterId: string; title: string; exportName: string; exercisePrefix: string; officialChapterIds: string[]; consolidationChapterIds: string[]; scopeNotes: string[]; exampleChapter: string; objectiveLevels?: Record<string, string>; optionalObjectives?: string[]; judgeFindingsForFix?: number[] | true; chapterEffort?: "low" | "medium" | "high"; excludedTaxonomyTypes?: string[]; maxNiveau?: 4 | 5 }
 interface StepState { status: "done" | "batch-pending"; hash: string; batchId?: string; at: string; note?: string }
 interface State { chapter: string; steps: Partial<Record<Step, StepState>>; fixRounds: number }
 
@@ -119,6 +119,7 @@ const spec = readJson<Spec>(`pipeline/chapters/${chapterId}.json`);
 /** Effort d'une étape : `chapterEffort` de la fiche pour l'étape « chapitre » (décision 28 : réflexion limitée, Sonnet 5.5 refuse budget_tokens et disabled), STEP_CONFIG sinon. */
 const effortFor = (step: Step) => step === "chapter" && spec.chapterEffort ? spec.chapterEffort : STEP_CONFIG[step].effort;
 if (spec.chapterEffort && !["low", "medium", "high"].includes(spec.chapterEffort)) fail(`chapterEffort invalide : ${spec.chapterEffort}`);
+if (spec.maxNiveau !== undefined && spec.maxNiveau !== 4 && spec.maxNiveau !== 5) fail(`maxNiveau invalide : ${spec.maxNiveau}`);
 const prices = readJson<Prices>("pipeline/prices.json");
 const budget = readJson<{ limitUsd: number; creditVerified: boolean }>("pipeline/budget.json");
 // Dossier : modèle forcé pour la comparaison du pilote (--dossier-model haiku|sonnet) ; sinon STEP_CONFIG.
@@ -178,8 +179,8 @@ const usageOf = (u: Anthropic.Usage) => ({ input: u.input_tokens, cacheWrite: u.
 const actualCost = (u: Anthropic.Usage, batch: boolean, model: string) => costUsd(prices, model, usageOf(u), batch);
 
 // ───────── Prompts ─────────
-// Blocs {{#maths}} / {{#pc}} / {{#college}} / {{#lycee}} résolus d'abord (matière et niveau de la fiche), puis les variables.
-const fill = (tpl: string, v: Record<string, string>) => promptSections(tpl, sectionKeys(spec.subject, spec.grade)).replace(/\{\{(\w+)\}\}/g, (_, k: string) => { if (!(k in v)) throw new Error(`variable de gabarit manquante : ${k}`); return v[k]; });
+// Blocs {{#maths}} / {{#pc}} / {{#college}} / {{#lycee}} / {{#niveaux4}} / {{#niveaux5}} résolus d'abord (matière, niveau et maxNiveau de la fiche), puis les variables.
+const fill = (tpl: string, v: Record<string, string>) => promptSections(tpl, sectionKeys(spec.subject, spec.grade, spec.maxNiveau)).replace(/\{\{(\w+)\}\}/g, (_, k: string) => { if (!(k in v)) throw new Error(`variable de gabarit manquante : ${k}`); return v[k]; });
 const SYSTEM = fill(read("pipeline/prompts/system.md"), {
   SCHEMA: read("src/lib/chapters/schema.ts"), TYPES: read("src/lib/engine/types.ts"), EXAMPLE_PATH: spec.exampleChapter, EXAMPLE: read(spec.exampleChapter),
 });
