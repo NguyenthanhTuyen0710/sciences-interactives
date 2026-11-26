@@ -527,12 +527,16 @@ describe("équations : G2 approuvé, effort et types exclus du chapitre (décisi
 
 describe("reviewEffort : effort du juge approfondi réglé par la fiche (2026-11-26)", () => {
   const fiches = readdirSync("pipeline/chapters").filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(`pipeline/chapters/${f}`, "utf8")) as Record<string, unknown>);
-  it("(a) non déclaré : effort du juge = STEP_CONFIG (low) et SPEC identique à la fiche, pour toutes les fiches", () => {
-    expect(fiches.length).toBeGreaterThan(0);
-    for (const f of fiches) {
-      expect(f.reviewEffort).toBeUndefined();
+  it("(a) non déclaré : effort du juge = STEP_CONFIG (low) et SPEC identique à la fiche ; déclaré : SPEC = fiche sans reviewEffort(Note)", () => {
+    const plain = fiches.filter((f) => f.reviewEffort === undefined);
+    expect(plain.length).toBeGreaterThan(0);
+    for (const f of plain) {
       expect(stepEffort("review", f)).toBe(STEP_CONFIG.review.effort);
       expect(promptSpec(f)).toBe(JSON.stringify(f, null, 1));
+    }
+    for (const f of fiches.filter((x) => x.reviewEffort !== undefined)) {
+      const { reviewEffort: _e, reviewEffortNote: _n, ...rest } = f;
+      expect(promptSpec(f)).toBe(JSON.stringify(rest, null, 1));
     }
     expect(STEP_CONFIG.review.effort).toBe("low");
   });

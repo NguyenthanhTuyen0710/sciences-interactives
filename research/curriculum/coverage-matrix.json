@@ -24,9 +24,9 @@
    "grade": "4e",
    "chapters": 21,
    "byState": {
-    "todo": 16,
+    "todo": 15,
     "published": 2,
-    "draft": 3
+    "draft": 4
    }
   },
   {
@@ -35,8 +35,8 @@
    "chapters": 16,
    "byState": {
     "published": 2,
-    "draft": 4,
-    "todo": 10
+    "draft": 5,
+    "todo": 9
    }
   },
   {
@@ -1012,7 +1012,7 @@
     "id": "math-3e-calcul-litteral",
     "taskId": "SCI-3E-MATH-003",
     "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
-    "sha256": "135dd51356ba8a23d43fab0059a8075427fdb4ac8c6d2bb7b78b2102193951e7",
+    "sha256": "6dcf15b71b0810d3363f11f2f05e4c62b4e659b8b59861216af40a0d4ad910e3",
     "registered": true,
     "publication": "draft",
     "exercises": 37,
@@ -1060,7 +1060,7 @@
     "id": "math-3e-equations",
     "taskId": "SCI-3E-MATH-004",
     "file": "src/lib/chapters/data/math-3e-equations.ts",
-    "sha256": "5a654bc41ac82e1216cef5c8651a5a7d256736b092ad7bba0a1cf7e864dd3e63",
+    "sha256": "54e84abc8e056fa365422c9dfa14d8da530efd90ef797b5a21518903a28190a3",
     "registered": true,
     "publication": "draft",
     "exercises": 30,
@@ -1292,15 +1292,45 @@
    "domain": "EG",
    "chapterId": "math-4e-thales",
    "title": "Théorème de Thalès (triangles emboîtés)",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 2,
     "verified": 2
    },
-   "pipelineSpec": null,
-   "content": null,
+   "pipelineSpec": "math-3e-thales-semblables",
+   "content": {
+    "id": "math-3e-thales-semblables",
+    "taskId": "SCI-3E-MATH-012",
+    "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
+    "sha256": "7f30aede83bc6a16ae83e132125c715b8a0d4e0ca9d6dce899123f793165f511",
+    "registered": true,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     3,
+     9,
+     9,
+     9
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
@@ -1493,7 +1523,7 @@
     "id": "math-3e-calcul-litteral",
     "taskId": "SCI-3E-MATH-003",
     "file": "src/lib/chapters/data/math-3e-calcul-litteral.ts",
-    "sha256": "135dd51356ba8a23d43fab0059a8075427fdb4ac8c6d2bb7b78b2102193951e7",
+    "sha256": "6dcf15b71b0810d3363f11f2f05e4c62b4e659b8b59861216af40a0d4ad910e3",
     "registered": true,
     "publication": "draft",
     "exercises": 37,
@@ -1541,7 +1571,7 @@
     "id": "math-3e-equations",
     "taskId": "SCI-3E-MATH-004",
     "file": "src/lib/chapters/data/math-3e-equations.ts",
-    "sha256": "5a654bc41ac82e1216cef5c8651a5a7d256736b092ad7bba0a1cf7e864dd3e63",
+    "sha256": "54e84abc8e056fa365422c9dfa14d8da530efd90ef797b5a21518903a28190a3",
     "registered": true,
     "publication": "draft",
     "exercises": 30,
@@ -1722,15 +1752,45 @@
    "domain": "EG",
    "chapterId": "math-3e-thales-semblables",
    "title": "Thalès (configuration papillon) et triangles semblables",
-   "state": "todo",
+   "state": "draft",
    "objectives": {
     "total": 2,
     "verified": 2
    },
    "pipelineSpec": "math-3e-thales-semblables",
-   "content": null,
+   "content": {
+    "id": "math-3e-thales-semblables",
+    "taskId": "SCI-3E-MATH-012",
+    "file": "src/lib/chapters/data/math-3e-thales-semblables.ts",
+    "sha256": "7f30aede83bc6a16ae83e132125c715b8a0d4e0ca9d6dce899123f793165f511",
+    "registered": true,
+    "publication": "draft",
+    "exercises": 30,
+    "perLevel": [
+     3,
+     9,
+     9,
+     9
+    ],
+    "games": 3,
+    "review": {
+     "curriculum": "pending",
+     "accuracy": "pending",
+     "exercises": "pending",
+     "games": "pending",
+     "technical": "pending",
+     "language": "pending"
+    },
+    "qaPassed": false,
+    "apiCostUsd": null
+   },
    "missing": [
-    "chapitre complet"
+    "revue curriculum : pending",
+    "revue accuracy : pending",
+    "revue exercises : pending",
+    "revue games : pending",
+    "revue technical : pending",
+    "revue language : pending"
    ]
   },
   {
