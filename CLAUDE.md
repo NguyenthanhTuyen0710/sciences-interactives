@@ -36,5 +36,14 @@ Environnement local : `service postgresql start`, puis `npm run build && npx nex
 - Au plus 2 agents en parallèle ; pas de fork pour produire du contenu (il emporte tout le contexte).
 - Pipeline API de contenu : `pipeline/README.md` (budget plafonné, reprise, aucune clé dans le dépôt).
 
+## Production (VinaHost : CloudLinux LVE, cPanel, LiteSpeed lsnode)
+- Détails : `docs/ops/production.md` (environnement, références mesurées), `docs/ops/runbook.md` (déploiement, retour arrière), `docs/ops/incident-2026-11-27.md`.
+- Quotas partagés avec WordPress/PHP : NPROC 165 (**threads inclus**), 2 Go de RAM, 56 CPU visibles. Référence mesurée : 13 threads par instance, dont 2 Tokio.
+- Point d'entrée : `ops/server.js` (copie versionnée du `server.js` de production, sans secret). Ne jamais retirer `TOKIO_WORKER_THREADS=2` (cPanel) ni la garde placée avant tout `require()`.
+- Interdits sans approbation : `cluster`, `worker_threads`, `child_process`, tâches de fond, pool PostgreSQL non borné, concurrence calculée sur le nombre de CPU visibles, dépendance native non revue (`node ops/review-deps.mjs`), build lourd sur l'hébergement (build en CI).
+- Production : `AUTH_SECRET` et `TEACHER_INVITE_CODE` obligatoires, jamais une valeur publiée dans le dépôt (l'application s'arrête sinon). `ALLOW_DEMO_SECRETS=1` : démonstration seulement. Aucune valeur secrète dans le dépôt, les journaux ou les rapports.
+- Processus : SIGTERM sur PID vérifié uniquement ; jamais `kill -9`, `pkill` large ni arrêt automatique. Un redémarrage cPanel n'est jamais présumé réussi : `ops/preflight.sh` avant, `ops/verify.sh` après (instances multiples possibles : contrôler les processus, pas leur nombre).
+- Ressources : `ops/probe.sh` (base locale ou CI uniquement) ; workflow `runtime-resources.yml`, séparé de `pr-checks.yml`.
+
 ## Git
 Branche de travail indiquée par la session ; commits en français ; ne jamais committer `.env`.
