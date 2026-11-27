@@ -29,7 +29,7 @@ Plateforme Next.js 15 / TypeScript / PostgreSQL (Drizzle) d'exercices de maths e
 | Pages connectées (un passage par compte ; un élève sur `/admin` échoue, c'est voulu) | `AS=hugo@demo.fr PATHS=/mon-espace npx tsx scripts/ui-check.ts` · `AS=prof@demo.fr PATHS=/admin,/mon-espace …` |
 | e2e d'un chapitre (serveur lancé) | `ONLY=prefixe- SHOW_DRAFTS=1 npx tsx scripts/e2e.ts` |
 
-Environnement local : `service postgresql start`, puis `npm run build && npx next start` (tuer `next-server` avant un nouveau lancement).
+Environnement local : `service postgresql start`, puis `npm run build && ALLOW_DEMO_SECRETS=1 npx next start` (tuer `next-server` avant un nouveau lancement). `next start` tourne en production : sans `AUTH_SECRET` et `TEACHER_INVITE_CODE` propres il s'arrête ; `ALLOW_DEMO_SECRETS=1` est réservé au poste local.
 
 ## Agents et modèles
 - Production de chapitre : agent `chapter-author` (Sonnet). Relecture : `chapter-reviewer` (Sonnet), **une fois**, après `validate-chapter`. Extraction / classement : `extractor` (Haiku). Opus seulement pour l'architecture ou un bug complexe.
