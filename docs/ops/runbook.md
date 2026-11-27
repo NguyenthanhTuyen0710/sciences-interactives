@@ -10,19 +10,27 @@ Ce document est la **seule** procédure de déploiement et de retour arrière. I
 - Un redémarrage cPanel n'est jamais présumé réussi : il est vérifié par les processus réels.
 - Aucune valeur secrète n'est affichée, copiée dans un message, un fichier ou l'historique du shell. Les mots de passe se saisissent avec `read -s`.
 - Rien n'est construit ni installé sur l'hébergement (`npm ci`, `npm install` et build interdits).
-- **Non prouvé** : que le renommage de fichiers dans la racine, application arrêtée, se comporte comme prévu sous LiteSpeed/cPanel. Cette procédure ne le suppose pas : elle le vérifie à chaque étape et prévoit un retour arrière. La répétition de l'annexe A est recommandée avant le premier déploiement réel.
+- **Vérifié le 2026-11-27 sur une application jetable** (serveur `http` pur, sans `node_modules`) : arrêt et démarrage cPanel, échange et retour arrière par renommage dans la racine. **Non vérifié sur la production** (Next.js, lien `node_modules`, document root de production) : cette procédure vérifie donc chaque étape et prévoit un retour arrière. Résultats : `docs/ops/repetition-annexe-a.md`.
+- **STOP APP n'est jamais présumé effectif** : il est prouvé par quatre preuves (étape 13). Pendant l'attente du STOP, **aucune requête HTTP en boucle**. Un PID absent à un instant donné ne prouve rien (l'application démarre à la demande) ; un PID présent n'est pas forcément un échec (l'étape 14 décide).
+- L'identité d'un processus se vérifie par UID, `cwd`, `exe`, `cmdline` et `starttime` **relus dans la même commande, juste avant tout SIGTERM** (étape 14).
+- **Aucun fichier n'est créé ni supprimé dans le document root de production sans décision du propriétaire** (étape 12 bis).
 - Tout se fait dans **une seule session SSH** (les variables et fonctions définies à l'étape 3 y sont réutilisées).
 
 ## Phase 0 — Conditions préalables
 
 | Condition | Vérification |
 |---|---|
-| PR #72 fusionnée dans `main` par le propriétaire | page de la PR : « Merged » |
-| Aucun autre changement en attente sur `main` à déployer en même temps | `git log` de `main` |
+| PR #72 fusionnée dans `main` par le propriétaire | fait : commit de fusion `0673e09` |
+| `main` = commit de l'artefact, ou en avance sur lui par des changements de **documentation seulement** (`docs/`, `CLAUDE.md`) ; aucun autre changement en attente | étape 2 (usage de l'artefact) |
 | Fenêtre de déploiement choisie (faible trafic), propriétaire disponible 2 h, surveillance prévue 48 h | décision du propriétaire |
 | Contact VinaHost prêt (sortie des commandes de l'étape 15 à fournir) | — |
 | Décision sur les comptes de test (étape 7) | propriétaire |
-| Répétition de l'annexe A faite, ou décision explicite de s'en passer | propriétaire |
+| Répétition de l'annexe A : **faite le 2026-11-27** ; ses limites (section « Non vérifié » de `docs/ops/repetition-annexe-a.md`) sont lues et acceptées | propriétaire |
+| Outils PostgreSQL vérifiés (`pg_dump`, `pg_restore`, `psql`, version client ≥ serveur), étape 8 | commandes de l'étape 8 |
+| Restauration de la sauvegarde testée dans une **base jetable**, ou décision explicite de s'en passer | étape 8 |
+| Document root de production examiné en lecture seule ; décision A/B sur la page de maintenance | étape 12 bis, propriétaire |
+| Emplacement du journal de l'application relevé | étape 18 |
+| Artefact encore valide (conservé 7 jours ; l'artefact officiel actuel expire le **2026-12-04** ; au-delà : relancer l'étape 1 et recontrôler le SHA-256) | page *Actions* |
 
 **Arrêt si** une condition manque.
 
@@ -34,22 +42,25 @@ Aucun workflow ne se lance sur `push` vers `main` (pas de déploiement automatiq
 2. Attendre la fin des 2 jobs (« Binaires natifs sur glibc 2.34 », « Ressources du runtime et artefact de déploiement »).
 
 Attendu : 2 jobs verts ; artefact `sciences-interactives-<SHA de main>` (≈ 3,3 Mo, conservé 7 jours).
-**Arrêt si** un job est rouge, ou si `main` a avancé depuis le lancement (relancer).
+**Arrêt si** un job est rouge, ou si `main` a avancé depuis le lancement avec autre chose que de la documentation (étape 2 : relancer l'étape 1).
 
 ## Étape 2 — Télécharger et contrôler l'artefact (poste local)
 
-Télécharger l'artefact GitHub (zip), le décompresser : il contient `sciences-interactives-<sha12>.tar.gz` et `.sha256`.
+Télécharger l'artefact GitHub (zip), le décompresser dans un dossier vide : il contient `sciences-interactives-<sha12>.tar.gz` et `.sha256`. Le commit de référence `SHA` est celui **lu dans `RELEASE.json` de l'artefact**, pas forcément la pointe actuelle de `main`.
 
 ```bash
-SHA=$(git rev-parse origin/main); S12=${SHA:0:12}; echo "$SHA"
+sha256sum -c sciences-interactives-*.tar.gz.sha256 && tar -xzOf sciences-interactives-*.tar.gz RELEASE.json | grep -E '"(commit|node|platform|next)"'
 ```
 
 ```bash
-sha256sum -c sciences-interactives-$S12.tar.gz.sha256 && tar -xzOf sciences-interactives-$S12.tar.gz RELEASE.json | grep -E '"(commit|node|platform|next)"'
+SHA=<commit lu dans RELEASE.json>; S12=${SHA:0:12}; git fetch origin main && git merge-base --is-ancestor "$SHA" origin/main && echo "le commit de l'artefact est un ancêtre de main"; echo "fichiers modifiés depuis l'artefact hors documentation : $(git diff --name-only "$SHA" origin/main | grep -cvE '^(docs/|CLAUDE\.md$)')"
 ```
 
-Attendu : `OK` ; `commit` = `$SHA` ; `node` v22.23.5 ; `platform` linux-x64.
-**Arrêt si** la somme est fausse ou si le commit n'est pas celui de `main`.
+Attendu : `OK` ; `commit` = `$SHA` ; `node` v22.23.5 ; `platform` linux-x64 ; « ancêtre de main » ; `0` fichier hors documentation.
+**Arrêt si** la somme est fausse, si le commit n'est pas un ancêtre de `main`, ou si au moins un fichier hors `docs/` et `CLAUDE.md` a changé depuis l'artefact (reconstruire l'artefact depuis la pointe de `main`, étape 1).
+
+**Usage de l'artefact lorsque `main` n'a reçu que de la documentation.** `docs/` et `CLAUDE.md` n'entrent ni dans le build ni dans l'artefact (`.next`, `package.json`, `package-lock.json`, `next.config.ts`, `server.js` = `ops/server.js`, `RELEASE.json`) : un artefact construit avant un commit de documentation reste le bon artefact et son SHA-256 reste la référence. Les scripts `ops/` se récupèrent au commit `SHA` (étape 4), pas à la pointe de `main`. Tout autre changement (`ops/`, `src/`, `package*`, `next.config.ts`, `.github/`, tests) impose un nouvel artefact.
+Artefact officiel actuel (au 2026-11-27, exécution manuelle de *Runtime Resources* sur `main`) : commit `0673e09963cc7fed6ff20b4bb180071feec1075e`, `sciences-interactives-0673e09963cc.tar.gz` de 3 418 730 octets, SHA-256 `eea2212c7b057b3e3a97ec934563073c29cc70633d5317f27b2db303baaa1bcd` (recoupé par le propriétaire sur son poste), expire le **2026-12-04** sur GitHub Actions.
 
 ## Étape 3 — Variables de session et bibliothèque de contrôle (hôte)
 
@@ -65,6 +76,16 @@ app_pids() { for p in $(pgrep -u "$(id -un)"); do [ "$(readlink /proc/$p/cwd 2>/
 
 Attendu : un PID. Si « aucun » : ouvrir une page du site (lsnode démarre à la demande) puis relancer la commande.
 **Arrêt si** plusieurs instances apparaissent sans explication : noter leurs âges (`ps -o pid,ppid,etimes,rss,nlwp -p <pid>`) et poursuivre seulement si elles sont toutes récentes et connues ; sinon contacter VinaHost.
+Le compte héberge d'autres applications Node.js (par exemple `bayde24h-smart-pnr`) : `app_pids` ne retient que les processus dont le répertoire courant est `$APP`.
+
+Document root du domaine et fonction d'identité des processus (lecture seule, utilisées aux étapes 12 bis, 13 et 14) :
+
+```bash
+DOCROOT=$HOME/public_html/starluxvn.com; HT="$DOCROOT/.htaccess"; ME=$(id -u); AR=$(readlink -f "$APP")
+ident() { local p=$1 s rest; [ -r "/proc/$p/stat" ] || return 1; s=$(cat "/proc/$p/stat" 2>/dev/null) || return 1; rest=${s##*) }; set -- $rest; printf '%s|%s|%s|%s|%s' "$(stat -c %u "/proc/$p" 2>/dev/null)" "$(readlink "/proc/$p/cwd" 2>/dev/null)" "$(readlink "/proc/$p/exe" 2>/dev/null)" "${20}" "$(tr '\0' ' ' < "/proc/$p/cmdline" 2>/dev/null)"; }; echo "document root : $DOCROOT ; lignes Passenger : $(grep -c -i 'Passenger' "$HT")"
+```
+
+Attendu : un nombre de lignes Passenger **supérieur à 0** (application activée ; 7 lors de la répétition). Aucun contenu du fichier n'est affiché.
 
 ## Étape 4 — Récupérer `ops/` du même commit (hôte, lecture seule)
 
@@ -124,6 +145,15 @@ Lire `DATABASE_URL` depuis le processus (sans l'afficher) et la convertir en var
 DBURL=$(tr '\0' '\n' < /proc/$PID/environ | sed -n 's/^DATABASE_URL=//p'); [ -n "$DBURL" ] && echo "DATABASE_URL lue (non affichée)"; eval "$(DBURL="$DBURL" "$NODE" -e 'const u=new URL(process.env.DBURL);const q=s=>"\x27"+String(s).replace(/\x27/g,"\x27\\\x27\x27")+"\x27";console.log("export PGHOST="+q(u.hostname)+" PGPORT="+q(u.port||5432)+" PGUSER="+q(decodeURIComponent(u.username))+" PGPASSWORD="+q(decodeURIComponent(u.password))+" PGDATABASE="+q(u.pathname.slice(1)))')"; unset DBURL; echo "base : $PGDATABASE sur $PGHOST:$PGPORT"
 ```
 
+Outils et versions (lecture seule ; non encore vérifiés sur cet hébergement) :
+
+```bash
+command -v pg_dump pg_restore psql; for t in pg_dump pg_restore psql; do $t --version 2>&1 | head -1; done; psql -At -c "show server_version"; psql -At -c "select current_database(), pg_size_pretty(pg_database_size(current_database()))"
+```
+
+Attendu : les trois chemins et trois versions ; **version majeure de `pg_dump` ≥ version majeure du serveur** (sinon `pg_dump` refuse : « server version mismatch »).
+**Arrêt si** un outil manque ou si le client est plus ancien que le serveur : ne pas improviser, voir le repli de la fin de cette étape.
+
 ```bash
 command -v pg_dump pg_restore psql && mkdir -p ~/si-backups && chmod 700 ~/si-backups && B=~/si-backups/si-$(date +%Y%m%d-%H%M)-avant-$S12.dump && pg_dump --format=custom --no-owner --no-privileges --file "$B" && ls -l "$B" && sha256sum "$B" > "$B.sha256" && echo "sauvegarde : $B"
 ```
@@ -140,6 +170,30 @@ psql -At -c "select 'users',count(*) from users union all select 'attempts',coun
 
 Attendu : le premier `grep -c` affiche `6` ; « archive lisible en entier » ; un fichier non vide ; les comptages sont notés (comparés après le déploiement : aucune ligne ne doit avoir changé à cause du déploiement).
 **Arrêt si** `pg_dump` est introuvable, ou si une vérification échoue : ne pas déployer. Solution de repli : export par cPanel (phpPgAdmin ou sauvegarde de base) puis le même contrôle de taille et de lisibilité ; la procédure ne continue qu'avec une sauvegarde vérifiée.
+
+**Ce que prouve chaque contrôle.** `pg_restore --list` et `pg_restore --file=/dev/null` prouvent que l'archive est valide, lisible en entier et contient les six tables de données. Ils ne prouvent **pas** que les données se rechargent dans PostgreSQL (contraintes, types, droits). Seule une restauration dans une base jetable le prouve.
+
+**Test de restauration (recommandé ; sinon décision explicite du propriétaire)**, dans une base **distincte de la production** :
+
+1. cPanel → *PostgreSQL Databases* : créer une base et un utilisateur jetables (noms différents de la production, mot de passe propre). La création de bases n'est pas présumée possible.
+2. Cible, saisie du mot de passe (`read -s`) et **vérification indépendante de la cible réellement jointe**. La comparaison de noms ne suffit pas : on se connecte à la cible et on contrôle la base, l'utilisateur et le fait qu'elle est vide ; on vérifie aussi que l'utilisateur jetable **ne peut pas** se connecter à la base de production.
+
+```bash
+TEST_DB=<base_jetable>; TEST_USER=<utilisateur_jetable>; read -rs -p "Mot de passe de la base jetable : " TEST_PW; echo; CIBLE_OK=""
+CHK=$(PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -F '|' -c "select current_database(), current_user, (select count(*) from pg_tables where schemaname='public')" 2>/dev/null)
+PROD_ACCES=$(PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -c "select 1" 2>/dev/null)
+[ -n "$TEST_DB" ] && [ -n "$TEST_USER" ] && [ "$TEST_DB" != "$PGDATABASE" ] && [ "$TEST_USER" != "$PGUSER" ] && [ "$CHK" = "$TEST_DB|$TEST_USER|0" ] && [ -z "$PROD_ACCES" ] && CIBLE_OK=1 && echo "cible vérifiée : base jetable vide, utilisateur distinct, sans accès à la base de production" || echo "ARRET : cible non vérifiée (relevé='$CHK', accès à la production='$PROD_ACCES')"
+```
+
+(La dernière requête s'adresse à la base de production avec les identifiants jetables : elle doit **échouer**, donc ne rien renvoyer. `$PGDATABASE`, `$PGHOST` et `$PGPORT` viennent de l'étape 8 ; ne pas les modifier.)
+3. Restauration, **uniquement** si `CIBLE_OK=1`, sans `--clean` ni `--create` (rien n'est supprimé ni recréé), puis comparaison des comptages :
+
+```bash
+[ "$CIBLE_OK" = 1 ] && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" pg_restore --no-owner --no-privileges --exit-on-error -d "$TEST_DB" "$B" && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -c "select 'users',count(*) from users union all select 'attempts',count(*) from attempts union all select 'custom_exercises',count(*) from custom_exercises union all select 'custom_chapters',count(*) from custom_chapters union all select 'collections',count(*) from collections union all select 'media',count(*) from media" | diff - ~/si-backups/comptages-avant-$S12.txt && echo "restauration identique"
+```
+
+4. Supprimer la base et l'utilisateur jetables dans cPanel, puis `unset TEST_PW TEST_DB TEST_USER CIBLE_OK`.
+Un écart léger est normal si des utilisateurs ont travaillé entre la sauvegarde et le comptage : l'expliquer ligne par ligne. **Arrêt si** `CIBLE_OK` n'est pas `1` (cible identique à la production, non vide, mauvais utilisateur, ou utilisateur jetable ayant accès à la production) ou si la restauration échoue. En cas d'échec de la restauration : ne rien tenter sur la base de production.
 
 ## Étape 9 — Transférer l'artefact et l'installer en préparation
 
@@ -196,61 +250,153 @@ T0=$(date +%s); OLD_PIDS=$(app_pids | tr '\n' ' '); echo "T0=$T0 ; anciens PID :
 
 Conserver cette sortie (elle sert à VinaHost en cas de problème).
 
-## Étape 13 — STOP APP et vérification de l'arrêt
+## Étape 12 bis — Document root de production et page de maintenance (décision du propriétaire)
 
-cPanel → *Setup Node.js App* → l'application → **STOP APP**. Puis :
+**Constat de la répétition** (domaine de test, `docs/ops/repetition-annexe-a.md`) : application arrêtée, le serveur sert le document root du domaine, c'est-à-dire une **liste de répertoire** (« Index of / », avec `cgi-bin/` et `php.ini`). Le contenu du document root de production n'a **pas** été examiné ; la page `/` de `starluxvn.com` peut donc afficher une liste entre l'arrêt et la remise en route. Ne pas extrapoler le résultat du domaine de test.
+
+Examen en lecture seule (noms uniquement ; **ne jamais afficher le contenu** d'un fichier de configuration, ni `wp-config.php`) :
 
 ```bash
-for i in 1 2 3 4 5 6; do N=$(app_pids | wc -l); echo "essai $i : $N processus de l'application"; [ "$N" = 0 ] && break; sleep 10; done
+ls -la "$DOCROOT" | head -40; echo "lignes Passenger : $(grep -c -i 'Passenger' "$HT") ; fichiers index.* : $(ls -A "$DOCROOT" | grep -ciE '^index\.(html?|php)$')"
 ```
 
-Attendu : `0 processus` en moins de 60 s. Contrôle complémentaire : `ps -u "$(id -un)" -o pid,ppid,etimes,args | grep -c "[s]ciences-interactives"` doit afficher `0`.
-**Arrêt si** un processus subsiste : ne pas toucher aux fichiers, passer à l'étape 14.
+Le propriétaire choisit **avant l'étape 13** :
 
-## Étape 14 — Si STOP APP est sans effet
+| Option | Effet | Condition |
+|---|---|---|
+| **A** — aucune page | une liste de répertoire peut apparaître pendant l'arrêt (durée : de STOP à START ; non mesurée en production) | la liste ne contient rien de sensible |
+| **B** — page de maintenance statique | la page remplace la liste pendant l'arrêt | ajoute **un fichier dans un dossier de production** : approbation explicite ; aucun `index.*` préexistant |
 
-Un processus actif garderait sa version en mémoire et son répertoire courant : ne jamais déplacer de fichiers tant qu'il vit.
+Particularités de l'option B (vérifiées sur le domaine de test) : la page est posée **après** un arrêt prouvé et retirée **après** START (ordre sans liste de répertoire observé sur 20 requêtes à 0,3 s, **non garanti**) ; si elle reste en place **après** START, elle **masque l'application** ; elle répond en HTTP 200 (pas 503) ; le fichier est reconnu par un marqueur et un contenu exact, jamais par son seul nom. Ne **jamais** écraser ni supprimer un `index.*` existant. Le dossier étant sous `public_html`, vérifier avant la fenêtre s'il est aussi joignable depuis un autre domaine du compte.
 
-1. Identifier chaque processus restant (même utilisateur, même dossier, binaire `node`/`lsnode`, **démarré avant `T0`**) :
+Contenu de la page (fonction à définir dans la session, utilisée aux étapes 13 et 16) :
+
+```bash
+MP() { printf '%s\n' '<!doctype html>' '<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Maintenance en cours</title></head>' '<body><!-- si-maintenance --><main><h1>Maintenance en cours</h1><p>Le site est en cours de mise à jour. Reviens dans quelques minutes.</p></main></body></html>'; }; echo "index.* avant la fenêtre : $(ls -A "$DOCROOT" | grep -ciE '^index\.(html?|php)$')"
+```
+
+## Étape 13 — STOP APP et preuves de l'arrêt
+
+**Constats de la répétition** : STOP a été lent (de quelques secondes à plus de 4 min), a **échoué une fois** sans cause établie (l'interface restait sur STOP APP/RESTART, `restart.txt` inchangé), et a **laissé un processus vivant plus de 5 min** une autre fois. L'application démarre à la demande : un PID absent à un instant donné ne prouve rien.
+
+1. cPanel : actualiser la page (F5) pour éviter un affichage périmé, puis **STOP APP**, **une seule fois**. **Aucune requête HTTP en boucle** pendant l'attente (le seul échec de STOP a eu lieu pendant une interrogation toutes les 2 s ; lien de cause non établi).
+2. **P1 — bouton** : après F5, cPanel affiche **START APP** (et non STOP APP/RESTART).
+3. **P2 et P3 — configuration et processus** (attente d'au plus 300 s, sans HTTP) :
+
+```bash
+sleep 60; echo "P2 lignes Passenger : $(grep -c -i 'Passenger' "$HT") (attendu 0) ; .htaccess modifié : $(stat -c %y "$HT" | cut -c1-19)"; for i in $(seq 1 24); do N=$(app_pids | wc -l); echo "P3 $(date -u +%T) : $N processus"; [ "$N" = 0 ] && break; sleep 10; done
+```
+
+4. **P4 — réponse qui n'est plus celle de l'application** (une seule requête, après P1–P3 ; en option B, après la pose de la page ci-dessous) :
+
+```bash
+curl -sS -o "$R/p4.html" -w 'HTTP %{http_code}\n' --max-time 20 https://starluxvn.com/; sed 's/<[^>]*>/ /g' "$R/p4.html" | tr -s ' \n' | head -c 200; echo; sleep 4; echo "processus après la requête : $(app_pids | wc -l)"
+```
+
+Attendu : P1 vrai ; P2 = `0` ; P3 = `0 processus` ; P4 = « Index of / » (option A), `si-maintenance` (option B) ou HTTP 403/404/503, et `0` processus ensuite. **Toute page du site** = l'application répond encore.
+5. **Option B seulement**, une fois P1–P3 vrais : poser la page.
+
+```bash
+{ [ ! -e "$DOCROOT/index.html" ] && [ ! -e "$DOCROOT/index.htm" ] && [ ! -e "$DOCROOT/index.php" ] && MP > "$DOCROOT/index.html" && chmod 644 "$DOCROOT/index.html" && echo "page de maintenance posée"; } || echo "ARRET : un index.* existe déjà ou l'écriture est impossible : ne rien créer"
+```
+
+puis répéter P4 : attendu `si-maintenance`.
+
+**Arrêt si** :
+- P1 ou P2 faux après 300 s : **le STOP n'a pas été appliqué**. Ne toucher à aucun fichier. Une seule nouvelle tentative de STOP APP, puis recontrôle ; si P1/P2 restent faux : lever le verrou (`bash "$OPS/ops/deploy-lock.sh" release --app-dir "$APP"`), garder les sorties, contacter VinaHost. Le déploiement est annulé.
+- P1 et P2 vrais mais un processus subsiste après 300 s : étape 14.
+- P4 montre une page du site : l'application répond ; recommencer à l'étape 13.
+
+## Étape 14 — Processus subsistant après STOP (SIGTERM contrôlé)
+
+Un processus actif garderait l'ancienne version en mémoire et son répertoire courant : **ne jamais déplacer de fichiers tant qu'il vit**. Ce chemin ne s'applique que si P1 et P2 sont vrais (le STOP est appliqué) et qu'au moins 300 s se sont écoulées depuis la modification de `.htaccess`.
+
+1. Identifier chaque processus restant :
 
 ```bash
 for p in $(app_pids); do ps -o pid,ppid,etimes,rss,nlwp,args -p $p; done
 ```
 
-2. Un PID à la fois, SIGTERM, puis attendre :
+Le PPID n'est pas un critère (il vaut 1 en fonctionnement normal sous LiteSpeed ; le parent est absent de la vue CageFS).
+2. Définir la fonction de contrôle (identité relue dans la même commande, juste avant `kill`) :
 
 ```bash
-kill -TERM <PID> && sleep 10 && ps -p <PID> -o pid,etimes,args
+sigterm_verifie() {
+  local p=$1 I1 I2 OWN CWD EXE ST CMD START CLK BT CONF_TS G st OLDIFS
+  [ "$(grep -c -i 'Passenger' "$HT")" = 0 ] || { echo "ARRET : lignes Passenger encore présentes, STOP non appliqué"; return 1; }
+  CONF_TS=$(stat -c %Y "$HT"); [ $(( $(date +%s) - CONF_TS )) -ge 300 ] || { echo "ARRET : moins de 300 s depuis le STOP"; return 1; }
+  I1=$(ident "$p") || { echo "PID $p déjà disparu"; return 0; }
+  OLDIFS=$IFS; IFS='|'; set -- $I1; IFS=$OLDIFS; OWN=$1; CWD=$2; EXE=$3; ST=$4; CMD=$5
+  CLK=$(getconf CLK_TCK); BT=$(awk '/^btime/{print $2}' /proc/stat); START=$(( BT + ST / CLK ))
+  echo "PID $p : uid=$OWN cwd=$CWD exe=$EXE démarré≈$(date -u -d @"$START" +%T) cmdline=[$CMD]"
+  { [ "$OWN" = "$ME" ] && [ "$CWD" = "$AR" ]; } || { echo "ARRET : UID ou répertoire courant différents"; return 1; }
+  case "$EXE" in */node|*/lsnode) ;; *) echo "ARRET : exécutable inattendu"; return 1;; esac
+  case "$CMD" in *"$APP"*) ;; *) echo "ARRET : la ligne de commande ne contient pas la racine de l'application"; return 1;; esac
+  [ "$START" -le "$CONF_TS" ] || { echo "ARRET : processus démarré APRÈS le STOP (l'application a redémarré) : pas de kill"; return 1; }
+  I2=$(ident "$p") || { echo "PID $p disparu avant l'envoi"; return 0; }
+  [ "$I1" = "$I2" ] || { echo "ARRET : identité modifiée entre la vérification et l'envoi (PID réutilisé ?), annulation"; return 1; }
+  kill -TERM "$p" || { echo "ARRET : kill -TERM refusé"; return 1; }
+  for G in $(seq 1 30); do st=$(ps -o stat= -p "$p" 2>/dev/null | tr -d ' '); if [ -z "$st" ] || [ "${st:0:1}" = Z ]; then echo "PID $p terminé après ${G} s"; return 0; fi; sleep 1; done
+  echo "ARRET : PID $p vivant 30 s après SIGTERM : aucune escalade"; return 1
+}
 ```
 
-3. Relancer la boucle de l'étape 13.
-**Arrêt si** un processus survit à SIGTERM : ne pas escalader (jamais `kill -9`, jamais `pkill`). Lever le verrou (`bash "$OPS/ops/deploy-lock.sh" release --app-dir "$APP"`), garder la sortie des commandes précédentes et contacter VinaHost. Le déploiement est annulé ; rien n'a été modifié dans la racine.
-
-## Étape 15 — Mettre en place la nouvelle version (application arrêtée, 0 processus)
+3. Un PID à la fois, puis recontrôle :
 
 ```bash
-mkdir -p "$R/rollback" "$R/failed" && cd "$APP" && for it in .next package.json package-lock.json next.config.ts server.js RELEASE.json; do [ -e "$APP/$it" ] && { mv -- "$APP/$it" "$R/rollback/$it" || { echo "ECHEC rangement $it"; break; }; }; mv -- "$R/staging/$it" "$APP/$it" || { echo "ECHEC mise en place $it"; break; }; done; echo "terminé"
+for p in $(app_pids); do sigterm_verifie "$p" || break; done; echo "processus restants : $(app_pids | wc -l)"
+```
+
+Attendu : « terminé après N s », `processus restants : 0`, puis relancer P3 et P4 de l'étape 13. Si un message commence par « ARRET » : ne pas continuer, ne rien forcer. Un « ARRET : processus démarré APRÈS le STOP » est un échec du STOP, pas un ancien processus.
+**Arrêt si** un processus survit à SIGTERM ou si un contrôle d'identité échoue : ne pas escalader (jamais `kill -9`, jamais `pkill`). Lever le verrou, garder la sortie des commandes précédentes et contacter VinaHost. Le déploiement est annulé ; rien n'a été modifié dans la racine. Limite connue : une fenêtre de quelques millisecondes subsiste entre la dernière lecture d'identité et `kill` (non supprimable en shell).
+
+## Étape 15 — Mettre en place la nouvelle version (application arrêtée, preuves P1 à P4 vraies)
+
+Si plus de 10 minutes se sont écoulées depuis les preuves, les rejouer. La commande refuse de commencer si la configuration n'est pas arrêtée, si un processus existe ou si `rollback/` ou `failed/` ne sont pas vides :
+
+```bash
+[ "$(grep -c -i 'Passenger' "$HT")" = 0 ] && [ "$(app_pids | wc -l)" = 0 ] && mkdir -p "$R/rollback" "$R/failed" && [ -z "$(ls -A "$R/rollback")" ] && [ -z "$(ls -A "$R/failed")" ] && { cd "$APP" && for it in .next package.json package-lock.json next.config.ts server.js RELEASE.json; do [ -e "$APP/$it" ] && { mv -- "$APP/$it" "$R/rollback/$it" || { echo "ECHEC rangement $it"; break; }; }; mv -- "$R/staging/$it" "$APP/$it" || { echo "ECHEC mise en place $it"; break; }; done; echo "terminé"; } || echo "ARRET : garde non satisfaite (STOP non appliqué, processus présent, ou rollback/failed non vides)"
 ```
 
 Contrôle :
 
 ```bash
-cd "$APP" && ls -A "$R/staging" | wc -l; grep '"commit"' RELEASE.json; cmp server.js "$OPS/ops/server.js" && echo "server.js = ops/server.js"; readlink node_modules; ls -d public/uploads 2>&1 | head -1; ls -A "$R/rollback"
+cd "$APP" && ls -A "$R/staging" | wc -l; grep '"commit"' RELEASE.json; cmp server.js "$OPS/ops/server.js" && echo "server.js = ops/server.js"; readlink node_modules; ls -d public/uploads 2>&1 | head -1; ls -A "$R/rollback"; echo "processus : $(app_pids | wc -l)"
 ```
 
-Attendu : `0` élément restant dans le staging ; commit = `$SHA` ; `server.js = ops/server.js` ; `node_modules` pointe vers `/home/tkuyhwlk/nodevenv/sciences-interactives/22/lib/node_modules` ; `public/uploads` inchangé (inexistant tant qu'aucune image n'est téléversée) ; le rollback contient `.next`, `package.json`, `package-lock.json`, `next.config.ts`, `server.js` (sans `RELEASE.json` : la version précédente n'en avait pas).
-**Arrêt si** le message `ECHEC` apparaît ou si le contrôle diffère : exécuter immédiatement le retour arrière (section dédiée), **sans démarrer l'application**.
+Attendu : `0` élément restant dans le staging ; commit = `$SHA` ; `server.js = ops/server.js` ; `node_modules` pointe vers `/home/tkuyhwlk/nodevenv/sciences-interactives/22/lib/node_modules` ; `public/uploads` inchangé (inexistant tant qu'aucune image n'est téléversée) ; le rollback contient `.next`, `package.json`, `package-lock.json`, `next.config.ts`, `server.js` (sans `RELEASE.json` : la version précédente n'en avait pas) ; `processus : 0` (la mise en place n'a pas relancé l'application : constat de la répétition).
+**Arrêt si** le message `ECHEC` ou `ARRET` apparaît, ou si le contrôle diffère : exécuter immédiatement le retour arrière (section dédiée), **sans démarrer l'application**. Le lien `node_modules` n'a pas été exercé lors de la répétition (l'application jetable n'en avait pas) : le contrôle `readlink` est donc obligatoire.
 
 ## Étape 16 — START APP
 
-cPanel → **START APP**. Puis ouvrir `https://starluxvn.com/` dans un navigateur (démarre l'application à la demande) et :
+1. cPanel : actualiser (F5), **START APP** une seule fois. Puis :
+
+```bash
+sleep 5; echo "lignes Passenger : $(grep -c -i 'Passenger' "$HT") (attendu > 0 : START appliqué) ; processus : $(app_pids | tr '\n' ' ')"
+```
+
+**Arrêt si** 0 ligne Passenger : le START n'est pas appliqué (ne pas poser ni retirer de page, retour arrière). **Zéro processus n'est pas un échec** : l'application démarre à la demande ; la preuve est la réponse HTTP (étape 17).
+2. **Option B seulement** : retirer la page **après** START, uniquement si elle est celle posée par la procédure (marqueur, propriétaire, contenu identique octet pour octet) :
+
+```bash
+MP > "$R/maintenance-attendue.html"; { [ -f "$DOCROOT/index.html" ] && [ ! -L "$DOCROOT/index.html" ] && [ "$(stat -c %u "$DOCROOT/index.html")" = "$ME" ] && grep -q 'si-maintenance' "$DOCROOT/index.html" && cmp -s "$R/maintenance-attendue.html" "$DOCROOT/index.html"; } && rm -- "$DOCROOT/index.html" && echo "page de maintenance retirée" || echo "ARRET : le fichier n'est pas celui posé par la procédure : ne rien supprimer"
+```
+
+Tant que la page est en place, l'application n'est **pas joignable** (la page la masque) : aucun contrôle HTTP de l'application n'est possible. Le retirer sans attendre.
+3. Ouvrir `https://starluxvn.com/` dans un navigateur (démarre l'application à la demande), puis :
 
 ```bash
 sleep 5; echo "processus : $(app_pids | tr '\n' ' ')"; for p in $(app_pids); do ps -o pid,ppid,etimes,rss,nlwp -p $p; done
 ```
 
-Attendu : un nouveau PID (âge < quelques minutes), 13 threads. Aucun ancien PID.
-**Arrêt si** la page répond en erreur ou si aucun processus n'apparaît en 2 minutes : retour arrière (une erreur de configuration nomme la variable fautive dans le journal, jamais sa valeur).
+Contrôle du **contenu** de la réponse (un HTTP 200 seul ne prouve pas que l'application répond : la page de maintenance, la liste de répertoire et l'application répondent tous 200 sur `/`) :
+
+```bash
+curl -sS -o "$R/p16.html" -w 'HTTP %{http_code}\n' --max-time 20 https://starluxvn.com/; echo "marqueur de maintenance : $(grep -c 'si-maintenance' "$R/p16.html") ; liste de répertoire : $(grep -c 'Index of /' "$R/p16.html")"; sleep 3; echo "processus : $(app_pids | tr '\n' ' ')"
+```
+
+Attendu : `0` et `0`, au moins un PID de l'application démarré après l'étape 15 (comparer `etimes` à `$(( $(date +%s) - T0 ))`), 13 threads, aucun ancien PID. La preuve que l'application répond est l'ensemble « contenu qui n'est ni la page de maintenance ni la liste » + « PID de l'application » + `ops/verify.sh` complet (étape 17). L'absence de liste de répertoire entre le retrait de la page et la remise en route a été observée sur le domaine de test (20 requêtes à 0,3 s) ; ce n'est **pas une garantie** sur la production.
+**Arrêt si** la page répond en erreur ou si aucun processus n'apparaît en 2 minutes après le retrait de la page : retour arrière (une erreur de configuration nomme la variable fautive dans le journal, jamais sa valeur). Si le retrait échoue, **ne pas laisser la page** : elle masque l'application ; traiter l'échec avant toute autre action.
 
 ## Étape 17 — Vérification complète (obligatoire)
 
@@ -258,7 +404,7 @@ Attendu : un nouveau PID (âge < quelques minutes), 13 threads. Aucun ancien PID
 cd "$OPS" && bash ops/verify.sh --base-url https://starluxvn.com --app-dir "$APP" --deployed-at $T0 --old-pids "$OLD_PIDS"
 ```
 
-Attendu : `0 échec(s)`, `0 contrôle(s) non effectué(s)` (comptes de test fournis) ; accueil 200 (donc PostgreSQL joignable) ; connexion élève et enseignant ; `/admin` refusé sans connexion et aux élèves ; exercice servi sans clé de correction ; correction serveur ; Tokio ≤ 3 (2 attendu), threads ≈ 13 ; aucun enfant ; anciens PID disparus ; NPROC sous 60 %.
+Attendu : `0 échec(s)`, `0 contrôle(s) non effectué(s)` (comptes de test fournis) ; accueil 200 (un 200 seul ne suffit pas : la réussite complète du script est la preuve, y compris l'exercice servi sans clé de correction) ; connexion élève et enseignant ; `/admin` refusé sans connexion et aux élèves ; exercice servi sans clé de correction ; correction serveur ; Tokio ≤ 3 (2 attendu), threads ≈ 13 ; aucun enfant ; anciens PID disparus ; NPROC sous 60 %.
 Contrôle de la configuration et des dépendances après bascule :
 
 ```bash
@@ -279,17 +425,17 @@ psql -At -c "select 'users',count(*) from users union all select 'attempts',coun
 - Parcours élève : une série d'exercices, correction affichée.
 - Espace enseignant : tableau de bord (compte de test).
 - **WordPress / WP Toolkit** : ouvrir WP Toolkit et le site WordPress BAYDE24H : ils doivent fonctionner (c'était la victime de l'incident du 2026-11-27).
-- Journal de l'application : repérer son emplacement (non vérifié sur cet hébergement : `ls -la "$APP"/*.log ~/logs 2>/dev/null`, ou l'écran de l'application dans cPanel) et chercher « Configuration de production invalide » ou des erreurs de démarrage.
+- Journal de l'application : repérer son emplacement (non vérifié pour la production ; l'application jetable avait un `stderr.log` vide dans sa racine : `ls -la "$APP"/*.log ~/logs 2>/dev/null`, ou l'écran de l'application dans cPanel) et chercher « Configuration de production invalide » ou des erreurs de démarrage. Ne jamais afficher une variable d'environnement.
 
 **Arrêt si** un échec : retour arrière.
 
 ## Étape 19 — Clôture du déploiement
 
 ```bash
-bash "$OPS/ops/deploy-lock.sh" release --app-dir "$APP"; unset VERIFY_STUDENT_PASSWORD VERIFY_TEACHER_PASSWORD PGPASSWORD; ls -A "$R"
+bash "$OPS/ops/deploy-lock.sh" release --app-dir "$APP"; unset VERIFY_STUDENT_PASSWORD VERIFY_TEACHER_PASSWORD PGPASSWORD; ls -A "$R"; echo "index.* dans le document root : $(ls -A "$DOCROOT" | grep -ciE '^index\.(html?|php)$') (valeur relevée à l'étape 12 bis) ; lignes Passenger : $(grep -c -i 'Passenger' "$HT")"
 ```
 
-Attendu : « verrou levé » ; `.release` contient `rollback/`, `artifact.tar.gz`(`.sha256`) (et `staging/` vide). **Ne pas nettoyer maintenant** : le rollback et l'artefact restent jusqu'à la fin de la surveillance. Conserver la sauvegarde `~/si-backups` (décision du propriétaire sur sa durée ; elle compte dans le quota).
+Attendu : « verrou levé » ; le nombre de fichiers `index.*` est celui d'avant la fenêtre (aucune page de maintenance résiduelle) ; `.release` contient `rollback/`, `artifact.tar.gz`(`.sha256`) (et `staging/` vide). **Ne pas nettoyer maintenant** : le rollback et l'artefact restent jusqu'à la fin de la surveillance. Conserver la sauvegarde `~/si-backups` (décision du propriétaire sur sa durée ; elle compte dans le quota).
 
 ## Retour arrière
 
@@ -297,15 +443,15 @@ Attendu : « verrou levé » ; `.release` contient `rollback/`, `artifact.tar.gz
 
 R1. Verrou : `bash "$OPS/ops/deploy-lock.sh" acquire rollback --app-dir "$APP"`.
 R2. Noter `T1=$(date +%s)` et `OLD_PIDS=$(app_pids | tr '\n' ' ')`.
-R3. **STOP APP** (cPanel) et vérifier l'arrêt complet (étape 13) ; si un processus subsiste, étape 14.
-R4. Échange inverse :
+R3. **STOP APP** (cPanel, une seule fois, sans requête en boucle) et les quatre preuves P1 à P4 de l'étape 13 ; si un processus subsiste, étape 14. Option B : si une page de maintenance a été posée et retirée avant l'échec, la reposer seulement après P1 à P3 (mêmes contrôles).
+R4. Échange inverse (refuse de commencer si le STOP n'est pas prouvé, si un processus existe ou si `failed/` n'est pas vide) :
 
 ```bash
-mkdir -p "$R/failed" && cd "$APP" && for it in .next package.json package-lock.json next.config.ts server.js RELEASE.json; do [ -e "$APP/$it" ] && mv -- "$APP/$it" "$R/failed/$it"; [ -e "$R/rollback/$it" ] && mv -- "$R/rollback/$it" "$APP/$it"; done; echo "terminé"; ls -A "$APP" | head -30; readlink node_modules
+[ "$(grep -c -i 'Passenger' "$HT")" = 0 ] && [ "$(app_pids | wc -l)" = 0 ] && mkdir -p "$R/failed" && [ -z "$(ls -A "$R/failed")" ] && { cd "$APP" && for it in .next package.json package-lock.json next.config.ts server.js RELEASE.json; do if [ -e "$APP/$it" ]; then mv -- "$APP/$it" "$R/failed/$it" || { echo "ECHEC mise de côté $it"; break; }; fi; if [ -e "$R/rollback/$it" ]; then mv -- "$R/rollback/$it" "$APP/$it" || { echo "ECHEC restauration $it"; break; }; fi; done; echo "terminé"; ls -A "$APP" | head -30; readlink node_modules; } || echo "ARRET : garde non satisfaite (STOP non appliqué, processus présent, ou failed/ non vide)"
 ```
 
-Attendu : la version précédente est en place (sans `RELEASE.json` pour le premier déploiement) ; la version en échec est dans `.release/failed` ; le lien `node_modules` est inchangé ; `public/uploads` intact.
-R5. **START APP**, puis `ops/verify.sh --deployed-at $T1 --old-pids "$OLD_PIDS"` : 0 échec.
+Attendu : la version précédente est en place (sans `RELEASE.json` pour le premier déploiement ; la répétition a vérifié que ce fichier n'est pas laissé dans la racine) ; la version en échec est dans `.release/failed` ; le lien `node_modules` est inchangé ; `public/uploads` intact. En cas de message `ECHEC` ou `ARRET` : ne pas démarrer, consigner l'état de chaque fichier (`ls -A "$APP" "$R/rollback" "$R/failed"`) et contacter VinaHost.
+R5. **START APP** (étape 16 : lignes Passenger > 0 ; option B : retrait de la page après START avec contrôle d'identité), puis `ops/verify.sh --deployed-at $T1 --old-pids "$OLD_PIDS"` : 0 échec.
 R6. Lever le verrou (`release`), consigner la cause (journal, sortie de `verify.sh`) ; garder `.release/failed` pour l'analyse.
 La base de données n'est pas modifiée par ce déploiement : la sauvegarde n'est restaurée que si une anomalie de données est constatée, hors périmètre de cette procédure.
 
@@ -326,7 +472,8 @@ cd "$OPS" && bash ops/verify.sh --base-url https://starluxvn.com --app-dir "$APP
 | NPROC du compte | ≈ 20/165 | > 99 (60 %) | enquêter ; > 140 (85 %) : envisager le retour arrière |
 | Threads de l'application | 13 | > 20 | enquêter (Tokio ≤ 3) |
 | RSS de l'application | ≈ 250–350 Mo | > 450 Mo durable | enquêter, retour arrière si croissant |
-| Instances | une (ou plusieurs récentes) | une instance plus ancienne que `T0` | étape 14 |
+| Instances | une (ou plusieurs récentes) ; zéro à un instant donné est normal (démarrage à la demande) | une instance plus ancienne que `T0` | étape 14 (identité vérifiée avant tout SIGTERM) |
+| Page de maintenance ou liste de répertoire à `/` | aucune | présence d'« Index of / » ou de `si-maintenance` alors que l'application est démarrée | contrôle d'identité puis retrait (étape 16), enquêter |
 | Erreurs HTTP 5xx / démarrage | aucune | toute occurrence | journal, retour arrière |
 | WordPress / WP Toolkit | fonctionnels | « Unable to fork » | retour arrière + VinaHost |
 
@@ -346,26 +493,37 @@ bash "$OPS/ops/cleanup.sh" --app-dir "$APP" --apply --verified
 
 `--verified` atteste que `ops/verify.sh` vient de réussir. `.release/rollback` est **conservé** (seul rollback gardé) ; le lien `node_modules`, `public/uploads`, WordPress, les bases et tout autre chemin ne sont jamais touchés. Supprimer ensuite le dossier `$OPS` si désiré (`rm -r "$OPS"` : décision du propriétaire) et gérer la durée de conservation de `~/si-backups`.
 
-## Annexe A — Répétition sur une application jetable (recommandée avant le premier déploiement)
+Règle pour toute suppression de dossier ou de fichier d'exploitation (acquise lors du nettoyage de la répétition, annexe A) : chemin réel égal au chemin attendu, ni lien symbolique ni point de montage, bon propriétaire, contenu limité à des noms connus, aucun processus dont le répertoire courant s'y trouve, suppression ciblée (`rm -r --one-file-system --`, jamais `rm -rf` ni `*`). Avant de supprimer des journaux : archive créée, **somme SHA-256 recoupée sur un autre poste**, contenu comparé fichier par fichier, journal de l'étape en cours copié hors du dossier. **Cette procédure ne supprime jamais** les archives et journaux conservés sur l'hébergement (`si-rehearsal-*`) ni les sauvegardes PostgreSQL (`~/si-backups`) : leur suppression est une décision séparée du propriétaire, après recoupement de leur copie sur son poste.
 
-But : observer, **sans toucher à la production**, le comportement de cPanel/LiteSpeed lors d'un arrêt, d'un renommage de fichiers dans la racine de l'application et d'un redémarrage.
+## Annexe A — Répétition sur une application jetable (réalisée le 2026-11-27)
 
-1. cPanel → *Setup Node.js App* → créer une application jetable (Node 22, racine `~/si-repetition`, démarrage `server.js`). C'est une modification de configuration cPanel décidée par le propriétaire ; la supprimer à la fin.
-2. Déposer un `server.js` minimal qui répond le contenu du fichier `.next/hello.txt` (« version A »), démarrer l'application et vérifier la réponse.
-3. STOP APP ; vérifier avec une commande équivalente à `app_pids` (racine `~/si-repetition`) que tous les processus ont disparu ; noter les noms de processus (`ps -o pid,ppid,args`), l'emplacement des journaux, le délai d'arrêt.
-4. Remplacer `.next/hello.txt` par « version B » par renommage (`mv`), START APP, vérifier la réponse ; refaire le retour arrière et vérifier « version A ».
-5. Noter tout comportement inattendu (processus qui survit, cache de répertoire, erreurs de journal) : à traiter avant le déploiement réel. Supprimer l'application jetable.
+La répétition a été faite par le propriétaire sur VinaHost avec une application jetable (`si-repetition`, sous-domaine `si-test.starluxvn.com`, Node 22.23.5, `TOKIO_WORKER_THREADS=2` dès la création, serveur `http` pur) puis supprimée. Les résultats sont ceux que le propriétaire a transmis (l'assistant n'a pas d'accès à l'hébergement) ; l'étiquette de provenance de chaque étape est dans `docs/ops/repetition-annexe-a.md` (détail, chronologie, constats et limites). Constats qui structurent cette procédure :
 
-Si la répétition n'est pas faite, le premier déploiement réel en tient lieu, avec le retour arrière prêt.
+- STOP lent, parfois sans effet, parfois avec un processus qui survit : étapes 13 et 14 (quatre preuves, 300 s, SIGTERM contrôlé).
+- L'application démarre à la demande ; le PPID n'est pas un critère : règles de l'en-tête et étape 14.
+- Liste de répertoire quand l'application est arrêtée ; une page statique masque l'application après START : étape 12 bis, étapes 13 et 16.
+- Wildcard DNS sur `starluxvn.com` : un sous-domaine supprimé résout toujours vers le serveur ; aucune action DNS n'est prévue.
+
+**À refaire** (sur une nouvelle application jetable, avec une copie de ces étapes) si l'un des éléments suivants change : version de Node, mécanisme cPanel/LiteSpeed annoncé par l'hébergeur, forme du `server.js` d'entrée, ou si un STOP/START inattendu se produit en production. Chaque réalisation se termine par le nettoyage sûr décrit à la section « Nettoyage ».
 
 ## Annexe B — Ce qui est vérifié et ce qui ne l'est pas
 
-| Élément | État |
-|---|---|
-| Artefact (contenu, SHA-256, dépendances, binaires natifs, démarrage, API, authentification, correction, ressources) | **Vérifié** en local et en CI (smoke test, glibc 2.34 en conteneur) |
-| Échange de versions et retour arrière par renommage, verrou, uploads et lien préservés | **Vérifié** sur un faux répertoire et en CI (sans LiteSpeed) |
-| Preflight, `check-config`, `disk-check`, lien `node_modules`, dimensionnement | **Vérifié par le propriétaire** sur VinaHost avec les `ops` du commit `3f566f4` |
-| Comportement de LiteSpeed/cPanel au renommage de fichiers dans la racine, à STOP/START | **Non vérifié** (annexe A) |
-| Sauvegarde `pg_dump` sur l'hébergement (outil disponible, version compatible) | **Non vérifié** (étape 8) |
-| Emplacement des journaux de l'application | **Non vérifié** |
-| Cause de l'échec de STOP APP/RESTART du 2026-11-27 | **Non établie** |
+Sources : **CI** = GitHub Actions ; **Local** = simulation par l'assistant, non exécutée sur l'hébergement ; **VinaHost (valeurs)** = valeurs transmises par le propriétaire, non rejouées par l'assistant ; **VinaHost (confirmé)** = succès confirmé par le propriétaire sans les valeurs ; **Aucune** = non vérifié.
+
+| Élément | Source | État |
+|---|---|---|
+| Artefact officiel de `main` : contenu, SHA-256, dépendances, binaires natifs (glibc 2.34 en conteneur), démarrage, API, authentification, correction, ressources | CI ; SHA-256 recoupé par le propriétaire sur son poste | Vérifié |
+| Échange de versions et retour arrière par renommage, verrou, uploads et lien préservés | Local et CI (faux répertoire, sans LiteSpeed) | Vérifié hors hébergement |
+| Échange et retour arrière par renommage dans la racine, STOP/START cPanel, `RELEASE.json` absent après retour arrière (application jetable sans `node_modules`) | VinaHost (valeurs) | Constaté |
+| STOP lent, sans effet ou laissant un processus ; `.htaccess` sans lignes Passenger après STOP ; démarrage à la demande ; liste de répertoire ; masquage de l'application par une page statique ; ordre START puis retrait de la page ; wildcard DNS | VinaHost (valeurs) | Constaté |
+| SIGTERM après contrôle d'identité par l'heure de démarrage en secondes (A8.5.1c) | VinaHost (confirmé) | Confirmé |
+| Fonction `sigterm_verifie` du runbook (identité par `starttime`, garde 300 s, refus si le processus a démarré après le STOP) | Local seulement ; A10.2 (version `starttime`) confirmé sans savoir si un processus restait à terminer | **Non exercée sur l'hébergement** |
+| Fonctions de la page de maintenance et gardes du runbook (étapes 12 bis, 15, 16), garde PostgreSQL de l'étape 8 | Local seulement (la garde PostgreSQL contre une base locale jetable) | **Non exercées sur l'hébergement** |
+| Nettoyage contrôlé de la répétition (A10.5 valeurs ; A10.1, A10.2 confirmés) | VinaHost (valeurs / confirmé) | Constaté |
+| Preflight, `check-config`, `disk-check`, lien `node_modules`, dimensionnement | VinaHost (valeurs), `ops` du commit `3f566f4` | Constaté |
+| STOP/START de l'application de production, échange avec le lien `node_modules` CloudLinux en place, `public/uploads` | Aucune | **Non vérifié** |
+| Document root de production application arrêtée (liste de répertoire, wildcard DNS), page de maintenance en production | Aucune | **Non vérifié** (étape 12 bis) |
+| Cause du STOP resté sans effet pendant la répétition (A8.1) et de l'échec de STOP/RESTART de l'incident | Aucune | **Non établies** |
+| Sauvegarde et restauration PostgreSQL : outils, versions, sauvegarde réelle, restauration dans une base jetable | Aucune | **Non vérifié** (étape 8) |
+| Emplacement du journal de l'application de production | Aucune | **Non vérifié** (étape 18) |
+| Trafic réel pendant l'échange ; durée de la liste de répertoire sans page ; code HTTP de la page statique (200) | Aucune | **Non mesuré** |
