@@ -32,14 +32,25 @@ node_candidates() {
   for g in /opt/alt/alt-nodejs*/root/usr/bin/node "$HOME"/nodevenv/*/*/bin/node; do [ -e "$g" ] && echo "$g"; done
   return 0
 }
-# find_node [VERSION_ATTENDUE] : affiche le premier Node exécutable, en préférant celui dont la version est exactement VERSION_ATTENDUE.
+# find_node [VERSION_ATTENDUE] : affiche l'exécutable Node à utiliser.
+#  1. $NODE_BIN (option --node) : utilisé tel quel s'il est exécutable et répond à `-v`, SANS aucune détection ; sinon échec (pas de repli silencieux).
+#  2. Sinon détection : première candidate exécutable, de préférence celle dont la version est exactement VERSION_ATTENDUE.
+# Aucune substitution de processus ni /dev/fd : CageFS ne les fournit pas toujours (échec « /dev/fd/63: No such file or directory » constaté sur VinaHost).
 find_node() {
-  local want=${1:-} c first=""
-  while read -r c; do
+  local want=${1:-} c first="" list old_ifs=$IFS
+  if [ -n "${NODE_BIN:-}" ]; then
+    if [ -x "$NODE_BIN" ] && "$NODE_BIN" -v >/dev/null 2>&1; then echo "$NODE_BIN"; return 0; fi
+    return 1
+  fi
+  list=$(node_candidates)
+  set -f; IFS='
+'
+  for c in $list; do
     [ -x "$c" ] || continue
     [ -n "$first" ] || first=$c
-    if [ -n "$want" ] && [ "$("$c" -v 2>/dev/null)" = "v$want" ]; then echo "$c"; return 0; fi
-  done < <(node_candidates)
+    if [ -n "$want" ] && [ "$("$c" -v 2>/dev/null)" = "v$want" ]; then IFS=$old_ifs; set +f; echo "$c"; return 0; fi
+  done
+  IFS=$old_ifs; set +f
   [ -n "$first" ] && { echo "$first"; return 0; }
   return 1
 }

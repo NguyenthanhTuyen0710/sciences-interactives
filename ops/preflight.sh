@@ -28,7 +28,8 @@ USED=$(ps -eL -u "$ME" --no-headers 2>/dev/null | wc -l); FREE=$((NPROC_LIMIT-US
 
 echo "== 1. Node.js"
 NODE=$(find_node "$EXPECTED_NODE") || NODE=""
-if [ -z "$NODE" ]; then fail "aucun exécutable Node trouvé (PATH, /opt/alt/alt-nodejs*, ~/nodevenv) : utiliser --node"
+if [ -z "$NODE" ] && [ -n "${NODE_BIN:-}" ]; then fail "--node « $NODE_BIN » : introuvable, non exécutable ou ne répond pas à -v"
+elif [ -z "$NODE" ]; then fail "aucun exécutable Node trouvé (PATH, /opt/alt/alt-nodejs*, ~/nodevenv) : utiliser --node"
 else
   info "exécutable : $NODE (node dans le PATH : $(command -v node 2>/dev/null || echo absent — normal sur cPanel))"
   NODE_V=$("$NODE" -v 2>/dev/null | sed 's/^v//')

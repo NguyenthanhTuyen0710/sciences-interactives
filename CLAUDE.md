@@ -46,6 +46,7 @@ Environnement local : `service postgresql start`, puis `npm run build && npx nex
 - Déploiement : la racine de l'application n'est **jamais renommée** ; une version = `.next` (sans cache de build), `package.json`, `package-lock.json`, `next.config.ts`, `server.js`, `RELEASE.json`, échangée par renommage dans `.release/{staging,rollback}`. `node_modules` (lien CloudLinux vers nodevenv, avec `typescript` : sans lui `next start` lance `npm install`), `public/` et `public/uploads` ne font jamais partie d'une version. Flux A (dépendances conformes au lock, `ops/check-deps.mjs`) ; flux B (dépendances modifiées) bloqué sans approbation. Artefact : `ops/build-artifact.sh` + `ops/smoke-artifact.sh` (CI). Un seul déploiement à la fois : `ops/deploy-lock.sh`.
 - Disque : quota cPanel 7 168 Mo (jamais `df`) ; `ops/disk-check.sh` avant déploiement (≥ 1 024 Mo libres au pic et après) ; `ops/cleanup.sh` (simulation par défaut, verrou, liste fermée sous `.release/`) ne supprime rien hors de `sciences-interactives/.release`.
 - Secrets : mêmes règles au démarrage (`src/lib/config.ts`) et au preflight (`ops/check-config.mjs`), valeurs publiques listées dans `ops/config-rules.json` ; verdict par nom de variable, jamais de valeur.
+- Scripts `ops/*.sh` : compatibles CageFS, donc ni `<(…)`, ni `>(…)`, ni `/dev/fd`, `/dev/stdin`, `/proc/self/fd` ; `--node` valide est utilisé tel quel (`ops/test-portability.sh`).
 - Ressources : `ops/probe.sh` (base locale ou CI uniquement) ; workflow `runtime-resources.yml`, séparé de `pr-checks.yml`.
 
 ## Git
