@@ -80,10 +80,12 @@ LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte don
 
 | Quand | Outil | Rôle |
 |---|---|---|
+| Avant déploiement | `ops/disk-check.sh` | quota cPanel, pic d'occupation staging/bascule/retour arrière, liens CloudLinux (lecture seule) |
 | Avant déploiement | `ops/preflight.sh` | Node, artefact, `server.js`, variables, marge NPROC/mémoire, processus existants (lecture seule) |
 | Après déploiement | `ops/verify.sh` | processus réels, santé HTTP, PostgreSQL, authentification, rôles, correction serveur (lecture seule) |
 | CI et local | `ops/probe.sh` | non-régression des ressources, base locale/jetable uniquement |
 | Avant déploiement et en CI | `ops/check-native.mjs` | binaires natifs : architecture, glibc exigée, bibliothèques dynamiques, chargement réel (aucun binutils requis) |
+| Après déploiement vérifié | `ops/cleanup.sh` | suppression des restes transitoires de `sciences-interactives` uniquement (simulation par défaut) |
 | Pull request | `.github/workflows/runtime-resources.yml` | contrôles statiques, revue des dépendances, sonde |
 
 ## Compatibilité de l'artefact (glibc 2.34, Linux x86_64, Node 22.23.5)
@@ -114,6 +116,34 @@ Tailles mesurées (production, `npm ci --omit=dev`) : `node_modules` ≈ 548 Mo,
 | C. Artefact sans `node_modules`, installé sur l'hébergement | transfert léger | `npm ci` sur l'hébergement : consomme threads et mémoire du quota, donc contraire à la règle « aucun build lourd sur l'hébergement » |
 
 Le mécanisme de transfert de l'artefact (copie, `SHA256SUMS`, élagage des variantes musl) reste **à décider** ; rien n'est déployé automatiquement.
+
+## Espace disque (quota cPanel)
+
+Le plafond est le **quota du compte**, pas la partition du serveur : `df -h` n'est jamais utilisé. Relevé cPanel → Disk Usage du 2026-11-27 (hébergement partagé avec WordPress BAYDE24H) :
+
+| Élément | Mo |
+|---|---|
+| Quota | 7 168 |
+| Total disk space used | 2 969,08 |
+| Quota usage | 2 880,77 |
+| Disponible (valeur prudente = quota − plus haute occupation) | 4 198,92 |
+| `public_html` | 1 418,26 |
+| `nodevenv` | 753,62 |
+| `sciences-interactives` | 323,78 |
+| Sous-dossiers cachés | 317,11 |
+| PostgreSQL | 8,11 |
+
+Politique : au plus **un** staging et **un** rollback ; au moins **1 024 Mo** libres au pic de la préparation et après déploiement (rollback en place) ; `node_modules` reste un lien CloudLinux vers `nodevenv` ; rien n'est supprimé hors de `sciences-interactives`. Contrôle : `ops/disk-check.sh` (quota lu par `quota` si possible, sinon fourni avec `--quota-mb` / `--used-mb` relevés dans cPanel ; refus si le quota est inconnu). Nettoyage : `ops/cleanup.sh`.
+
+Modèle de calcul du pic (en Mo) :
+
+- préparation et bascule : occupation + artefact + version décompressée + `public/uploads` copié + nouveau `node_modules` (0 si le lock est inchangé) + marge (100) ; l'ancien rollback et l'artefact existent encore ;
+- après nettoyage : occupation + version + uploads + nouveau `node_modules` − ancien rollback − rollback.prev + marge ;
+- retour arrière : échange de noms, donc le même état que « après nettoyage ».
+
+Exemple (version mesurée localement : archive 3,1 Mo, 11 Mo décompressée sans `.next/cache` ni `node_modules` ; uploads de production inconnus) : pic ≈ 2 969,08 + 3,1 + 11 + 100 ≈ 3 083 Mo, soit ≈ 4 085 Mo libres avant déduction des uploads. Avec un nouveau `node_modules` de 548 Mo : ≈ 3 537 Mo libres. Le disque n'est donc pas la contrainte tant que l'artefact reste léger. Il le deviendrait si l'on copiait telle quelle l'arborescence actuelle : `sciences-interactives` fait 323,78 Mo (très probablement `.next/cache`, 343 Mo mesurés localement après un build ; à confirmer avec `du -sm` sur l'hébergement), un cache de build que le runtime n'utilise pas.
+
+`nodevenv` (753,62 Mo) contient déjà un `node_modules` : un second exemplaire complet de 548 Mo n'y tient qu'en conservant le quota ci-dessus ; la décision sur les dépendances (installation par cPanel ou artefact) reste à prendre.
 
 ## Risques et limites connus
 
