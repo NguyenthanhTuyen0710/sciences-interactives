@@ -5,9 +5,10 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
 import { db, schema } from "./db";
+import { authSecret } from "./config";
 
 const COOKIE = "session";
-const secret = () => new TextEncoder().encode(process.env.AUTH_SECRET || "dev-secret-change-me-0123456789");
+const secret = () => new TextEncoder().encode(authSecret());
 
 export type Role = "eleve" | "enseignant" | "admin";
 export interface SessionUser { id: string; name: string; email: string; role: Role; level: string | null; subjects: string[] }

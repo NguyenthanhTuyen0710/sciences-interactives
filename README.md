@@ -32,7 +32,9 @@ npm run build && npm start
 ```
 
 Comptes de démonstration (mot de passe `demo1234`) : `eleve@demo.fr` (élève de 4e), `hugo@demo.fr` (élève de 3e), `prof@demo.fr` (enseignante), `admin@demo.fr`.
-Inscription enseignant : code d'invitation défini par `TEACHER_INVITE_CODE` (défaut `PROF-2026`).
+Inscription enseignant : code d'invitation défini par `TEACHER_INVITE_CODE` (défaut `PROF-2026` en développement uniquement).
+
+**Production** : `AUTH_SECRET` et `TEACHER_INVITE_CODE` sont obligatoires et ne doivent pas reprendre une valeur publiée dans ce dépôt ; sinon `next start` / `ops/server.js` s'arrête au démarrage (code 1) en nommant la variable fautive. Pour essayer `npm start` en local avec les valeurs de démonstration, définir `ALLOW_DEMO_SECRETS=1` (jamais en production). Exploitation : `docs/ops/`.
 
 ## Tests
 
