@@ -1,0 +1,106 @@
+# Contrôles des ressources du runtime de production (threads, Tokio, mémoire, connexions PostgreSQL, démarrage).
+# Indépendant de pr-checks.yml ; déclenché seulement lorsque le runtime, la configuration de démarrage ou les dépendances changent.
+# Aucun secret : base PostgreSQL jetable du service CI, secrets éphémères générés par ops/probe.sh.
+name: Runtime Resources
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ops/**"
+      - "src/lib/db/**"
+      - "src/lib/auth.ts"
+      - "src/lib/config.ts"
+      - "src/instrumentation.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.ts"
+      - ".github/workflows/runtime-resources.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-resources-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Contrôles statiques
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.5
+
+      - name: Scripts shell (syntaxe et shellcheck)
+        run: |
+          for f in ops/*.sh; do bash -n "$f"; done
+          shellcheck -x -S warning ops/*.sh
+
+      - name: Démarrage de production (garde Tokio avant tout require, aucune concurrence non bornée)
+        run: |
+          node --check ops/server.js
+          guard=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'TOKIO_WORKER_THREADS' | head -1 | cut -d: -f1)
+          req=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'require(' | head -1 | cut -d: -f1)
+          [ -n "$guard" ] && [ -n "$req" ] && [ "$guard" -lt "$req" ] || { echo "::error::la garde TOKIO_WORKER_THREADS doit précéder le premier require() dans ops/server.js"; exit 1; }
+          if grep -nE "require\(['\"](cluster|worker_threads|child_process)['\"]\)|from ['\"](node:)?(cluster|worker_threads|child_process)['\"]" ops/server.js; then
+            echo "::error::cluster, worker_threads et child_process sont interdits dans le point d'entrée de production"; exit 1
+          fi
+          if grep -rnE "from ['\"](node:)?(cluster|worker_threads|child_process)['\"]|require\(['\"](node:)?(cluster|worker_threads|child_process)['\"]\)" src; then
+            echo "::error::cluster, worker_threads et child_process sont interdits dans src/ (revue obligatoire)"; exit 1
+          fi
+
+      - name: Revue des dépendances ajoutées ou modifiées
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          node ops/review-deps.mjs "origin/${{ github.base_ref }}" | tee deps-review.md
+          { cat deps-review.md; } >> "$GITHUB_STEP_SUMMARY"
+
+  runtime:
+    name: Test de ressources du runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.5
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Build (Next.js)
+        run: npm run build
+
+      - name: Migrations et données de démonstration (base CI jetable)
+        run: npm run setup
+
+      - name: Sonde de ressources (3 passages par scénario)
+        run: |
+          set -o pipefail
+          RUNS=3 ops/probe.sh 2>&1 | tee probe.log
+          { echo '### Sonde de ressources'; echo '```'; cat probe.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
