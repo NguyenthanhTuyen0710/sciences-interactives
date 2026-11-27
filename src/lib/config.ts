@@ -2,25 +2,23 @@
 // Ne change ni l'authentification, ni les sessions, ni les rôles : ce module n'ajoute qu'une validation de configuration.
 // Hors production, les valeurs de repli historiques restent utilisées (développement, tests).
 // ALLOW_DEMO_SECRETS=1 est réservé aux démonstrations (docker-compose.yml) ; ops/preflight.sh le refuse en production.
+import rules from "../../ops/config-rules.json";
 
 const DEV_AUTH_SECRET = "dev-secret-change-me-0123456789";
 const DEV_INVITE_CODE = "PROF-2026";
 
-// Valeurs publiées dans ce dépôt (code, .env.example, fichiers de démonstration) : jamais valables en production.
+// Valeurs publiées dans ce dépôt : jamais valables en production. Source unique partagée avec ops/check-config.mjs (preflight).
 const UNSAFE: Record<"AUTH_SECRET" | "TEACHER_INVITE_CODE", ReadonlySet<string>> = {
-  AUTH_SECRET: new Set([
-    DEV_AUTH_SECRET,
-    "remplacer-par-une-longue-chaine-aleatoire",
-    "demo-secret-a-changer-en-production-0123456789",
-    "demo-secret-codespaces-0123456789abcdef",
-  ]),
-  TEACHER_INVITE_CODE: new Set([DEV_INVITE_CODE]),
+  AUTH_SECRET: new Set(rules.unsafe.AUTH_SECRET),
+  TEACHER_INVITE_CODE: new Set(rules.unsafe.TEACHER_INVITE_CODE),
 };
 
 type Env = Record<string, string | undefined>;
 type Name = keyof typeof UNSAFE;
 
-const enforced = (env: Env) => env.NODE_ENV === "production" && env.ALLOW_DEMO_SECRETS !== "1";
+/** Mode démonstration explicite (docker-compose.yml) : ignore les valeurs par défaut. Interdit en production réelle (ops/preflight.sh le refuse). */
+export const demoModeActive = (env: Env = process.env) => env.NODE_ENV === "production" && env[rules.demoFlag] === "1";
+const enforced = (env: Env) => env.NODE_ENV === "production" && env[rules.demoFlag] !== "1";
 
 /** Problèmes de configuration, décrits par NOM de variable uniquement (jamais par valeur). */
 export function configProblems(env: Env = process.env, names: Name[] = ["AUTH_SECRET", "TEACHER_INVITE_CODE"]): string[] {

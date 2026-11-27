@@ -1,0 +1,13 @@
+{
+  "_commentaire": "Valeurs PUBLIÉES dans ce dépôt (code, .env.example, fichiers de démonstration) : jamais valables en production. Source unique lue par src/lib/config.ts (démarrage) et ops/check-config.mjs (preflight). Ne jamais y mettre une valeur réelle.",
+  "unsafe": {
+    "AUTH_SECRET": [
+      "dev-secret-change-me-0123456789",
+      "remplacer-par-une-longue-chaine-aleatoire",
+      "demo-secret-a-changer-en-production-0123456789",
+      "demo-secret-codespaces-0123456789abcdef"
+    ],
+    "TEACHER_INVITE_CODE": ["PROF-2026"]
+  },
+  "demoFlag": "ALLOW_DEMO_SECRETS"
+}
