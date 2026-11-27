@@ -22,6 +22,7 @@ services:
       AUTH_SECRET: demo-secret-a-changer-en-production-0123456789
       TEACHER_INVITE_CODE: PROF-2026
       INSECURE_COOKIES: "1"   # démo en http ; à retirer derrière HTTPS
+      ALLOW_DEMO_SECRETS: "1" # démo uniquement : sans cela, la production refuse de démarrer avec AUTH_SECRET / TEACHER_INVITE_CODE publics
     ports:
       - "3000:3000"
     volumes:

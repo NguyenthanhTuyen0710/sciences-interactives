@@ -49,3 +49,6 @@ next-env.d.ts
 
 # relevé de structure d’interface (artefact du workflow collect-sources, jamais committé)
 /ui-reference-output/
+
+# uploads écrits à l'exécution (images des exercices) : jamais versionnés
+/public/uploads/

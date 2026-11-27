@@ -1,0 +1,118 @@
+# Contrôles du runtime de production : binaires natifs sur glibc 2.34, ressources (threads, Tokio, mémoire, connexions PostgreSQL) et artefact de déploiement.
+# Indépendant de pr-checks.yml. Filtré par chemins (coûteux) ; lancement manuel possible (workflow_dispatch) ; les contrôles statiques, eux, sont dans runtime-static.yml.
+# Aucun secret : base PostgreSQL jetable du service CI, secrets éphémères générés par les scripts.
+name: Runtime Resources
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ops/**"
+      - "src/app/**"
+      - "src/lib/db/**"
+      - "src/lib/auth.ts"
+      - "src/lib/config.ts"
+      - "src/instrumentation*.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.ts"
+      - ".github/workflows/runtime-resources.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-resources-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-glibc234:
+    name: Binaires natifs sur glibc 2.34 (AlmaLinux 9, comme l'hébergement)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container: almalinux:9
+    steps:
+      - name: Outils minimaux du conteneur
+        run: dnf install -y tar gzip
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.5
+
+      - name: Système du conteneur
+        run: |
+          ldd --version | head -1
+          node -v
+          uname -m
+
+      - name: Dépendances de production uniquement (sans scripts d'installation)
+        run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+
+      - name: Binaires natifs (glibc, bibliothèques dynamiques, chargement réel)
+        run: |
+          set -o pipefail
+          node ops/check-native.mjs node_modules --max-glibc 2.34 --load 2>&1 | tee native.log
+          { echo '### Binaires natifs (glibc 2.34)'; echo '```'; cat native.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  runtime:
+    name: Ressources du runtime et artefact de déploiement
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.5
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci --no-audit --no-fund
+
+      - name: Build (Next.js)
+        run: npm run build
+
+      - name: Migrations et données de démonstration (base CI jetable)
+        run: npm run setup
+
+      - name: Sonde de ressources sur l'arborescence du dépôt (3 passages par scénario)
+        run: |
+          set -o pipefail
+          RUNS=3 ops/probe.sh 2>&1 | tee probe.log
+          { echo '### Sonde de ressources'; echo '```'; cat probe.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Artefact de déploiement (sans node_modules, sans cache de build)
+        run: ops/build-artifact.sh --out artifact
+
+      - name: Test de fumée de l'artefact décompressé dans un dossier isolé
+        run: |
+          set -o pipefail
+          ops/smoke-artifact.sh --artifact artifact/sciences-interactives-*.tar.gz --node-modules node_modules --expect-commit "$GITHUB_SHA" 2>&1 | tee smoke.log
+          { echo '### Test de fumée de l'"'"'artefact'; echo '```'; cat smoke.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Conserver l'artefact vérifié (7 jours ; aucun déploiement automatique)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sciences-interactives-${{ github.sha }}
+          path: |
+            artifact/*.tar.gz
+            artifact/*.sha256
+          retention-days: 7
+          if-no-files-found: error

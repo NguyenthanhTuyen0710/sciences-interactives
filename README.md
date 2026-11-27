@@ -28,17 +28,19 @@ npm run setup                     # = db:migrate + db:seed
 # 3. Lancer
 npm run dev                       # développement : http://localhost:3000
 # ou en production :
-npm run build && npm start
+npm run build && ALLOW_DEMO_SECRETS=1 npm start   # ALLOW_DEMO_SECRETS=1 : essai local seulement (voir ci-dessous)
 ```
 
 Comptes de démonstration (mot de passe `demo1234`) : `eleve@demo.fr` (élève de 4e), `hugo@demo.fr` (élève de 3e), `prof@demo.fr` (enseignante), `admin@demo.fr`.
-Inscription enseignant : code d'invitation défini par `TEACHER_INVITE_CODE` (défaut `PROF-2026`).
+Inscription enseignant : code d'invitation défini par `TEACHER_INVITE_CODE` (défaut `PROF-2026` en développement uniquement).
+
+**Production** : `AUTH_SECRET` et `TEACHER_INVITE_CODE` sont obligatoires et ne doivent pas reprendre une valeur publiée dans ce dépôt ; sinon `next start` / `ops/server.js` s'arrête au démarrage (code 1) en nommant la variable fautive. Pour essayer `npm start` en local avec les valeurs de démonstration, définir `ALLOW_DEMO_SECRETS=1` (jamais en production). Exploitation : `docs/ops/`.
 
 ## Tests
 
 ```bash
 npm test                          # 59 tests unitaires : 50 générateurs × 3 difficultés × 60 tirages + moteur de correction
-npm start &                       # puis, serveur lancé :
+ALLOW_DEMO_SECRETS=1 npm start &   # (essai local) puis, serveur lancé :
 npm run test:e2e                  # Playwright : chaque exercice est rempli via l'interface avec la bonne réponse → 100 %
 ```
 

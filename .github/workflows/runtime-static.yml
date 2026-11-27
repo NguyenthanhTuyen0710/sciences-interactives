@@ -1,0 +1,61 @@
+# Contrôles statiques du runtime de production, sur TOUTE pull request vers main (quelques secondes) :
+# scripts shell, tests des scripts d'espace disque, garde Tokio, interdiction de cluster/worker_threads/child_process, revue des dépendances.
+# Séparé de runtime-resources.yml (qui est filtré par chemins et plus coûteux) pour qu'aucune modification de src/ n'échappe à ces règles.
+name: Runtime Static
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-static-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Contrôles statiques
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.5
+
+      - name: Scripts shell (syntaxe et shellcheck)
+        run: |
+          for f in ops/*.sh; do bash -n "$f"; done
+          shellcheck -x -S warning ops/*.sh
+
+      - name: Tests des scripts d'espace disque, de verrou et de nettoyage (faux $HOME jetable)
+        run: ops/test-disk.sh
+
+      - name: "Portabilité CageFS (détection de Node, aucune dépendance à /dev/fd, /dev minimal simulé)"
+        run: ops/test-portability.sh
+
+      - name: Démarrage de production (garde Tokio avant tout require, aucune concurrence non bornée)
+        run: |
+          node --check ops/server.js
+          guard=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'TOKIO_WORKER_THREADS' | head -1 | cut -d: -f1)
+          req=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'require(' | head -1 | cut -d: -f1)
+          [ -n "$guard" ] && [ -n "$req" ] && [ "$guard" -lt "$req" ] || { echo "::error::la garde TOKIO_WORKER_THREADS doit précéder le premier require() dans ops/server.js"; exit 1; }
+          if grep -nE "require\(['\"](cluster|worker_threads|child_process)['\"]\)|from ['\"](node:)?(cluster|worker_threads|child_process)['\"]" ops/server.js; then
+            echo "::error::cluster, worker_threads et child_process sont interdits dans le point d'entrée de production"; exit 1
+          fi
+          if grep -rnE "from ['\"](node:)?(cluster|worker_threads|child_process)['\"]|require\(['\"](node:)?(cluster|worker_threads|child_process)['\"]\)" src; then
+            echo "::error::cluster, worker_threads et child_process sont interdits dans src/ (revue obligatoire)"; exit 1
+          fi
+
+      - name: Revue des dépendances ajoutées ou modifiées
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          node ops/review-deps.mjs "origin/${{ github.base_ref }}" | tee deps-review.md
+          { cat deps-review.md; } >> "$GITHUB_STEP_SUMMARY"

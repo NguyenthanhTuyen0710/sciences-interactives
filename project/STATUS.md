@@ -28,5 +28,5 @@ _Mis à jour à chaque fin de session. **Reprise sans historique : lire d'abord 
 
 ## Environnement local (non versionné)
 - PostgreSQL : `service postgresql start` ; base `eduplateforme`, utilisateur `edu`/`edu` ; `.env` local ; `npm run setup`.
-- Prévisualisation des brouillons : `npm run build && SHOW_DRAFTS=1 npx next start -p 3000`.
+- Prévisualisation des brouillons : `npm run build && ALLOW_DEMO_SECRETS=1 SHOW_DRAFTS=1 npx next start -p 3000`.
 - e2e : `SHOW_DRAFTS=1 BASE_URL=http://localhost:3000 npx tsx scripts/e2e.ts`.
