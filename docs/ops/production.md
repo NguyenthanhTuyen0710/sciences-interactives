@@ -8,7 +8,8 @@ Dernière mise à jour : 2026-11-27. Les valeurs de l'hébergement viennent de V
 |---|---|
 | Domaine | starluxvn.com |
 | Application | Next.js 15, `NODE_ENV=production`, Node.js 22.23.5, PostgreSQL local |
-| Système (vérifié) | Linux x86_64, GNU libc **2.34** |
+| Système (vérifié) | Linux x86_64, GNU libc **2.34**, GLIBCXX maximum 3.4.29 (`/lib64/libstdc++.so.6`), `/lib64/libgcc_s.so.1` |
+| Racine de l'application | `/home/tkuyhwlk/sciences-interactives` ; `node_modules` = lien vers `/home/tkuyhwlk/nodevenv/sciences-interactives/22/lib/node_modules` (≈ 754 Mo, dépendances de développement comprises) |
 | Exécutable Node | `/opt/alt/alt-nodejs22/root/usr/bin/node` — **absent du PATH du shell par défaut** : les scripts `ops/` le détectent (`--node` ou `NODE_BIN` pour le forcer) |
 | Fichier de démarrage | `server.js` à la racine de l'application, version suivie : `ops/server.js` |
 | Quota CPU | 150 % ; 56 CPU logiques visibles (affinité 0-55) |
@@ -84,6 +85,10 @@ LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte don
 | Avant déploiement | `ops/preflight.sh` | Node, artefact, `server.js`, variables, marge NPROC/mémoire, processus existants (lecture seule) |
 | Après déploiement | `ops/verify.sh` | processus réels, santé HTTP, PostgreSQL, authentification, rôles, correction serveur (lecture seule) |
 | CI et local | `ops/probe.sh` | non-régression des ressources, base locale/jetable uniquement |
+| Avant déploiement | `ops/check-config.mjs` | secrets de production : mêmes règles que le démarrage, verdict PASS/FAIL par nom de variable, jamais de valeur |
+| Avant déploiement | `ops/check-deps.mjs` | versions réellement installées dans `node_modules` comparées au lock de la version à déployer (flux A ou B) |
+| CI | `ops/build-artifact.sh`, `ops/smoke-artifact.sh` | construction de l'artefact et test de fumée dans un dossier isolé (intégrité, dépendances, démarrage, authentification, API, correction, ressources, bascule et retour arrière) |
+| Déploiement | `ops/deploy-lock.sh` | un seul déploiement, retour arrière ou nettoyage à la fois |
 | Avant déploiement et en CI | `ops/check-native.mjs` | binaires natifs : architecture, glibc exigée, bibliothèques dynamiques, chargement réel (aucun binutils requis) |
 | Après déploiement vérifié | `ops/cleanup.sh` | suppression des restes transitoires de `sciences-interactives` uniquement (simulation par défaut) |
 | Pull request | `.github/workflows/runtime-resources.yml` | contrôles statiques, revue des dépendances, sonde |
@@ -92,34 +97,37 @@ LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte don
 
 Principe : `.next` (JavaScript) ne dépend pas de la plateforme de build. Seuls les binaires natifs de `node_modules` en dépendent ; ce sont des paquets npm **précompilés** (pas compilés sur le runner) : ce qui compte est la glibc qu'ils exigent, pas celle d'`ubuntu-latest` (2.39).
 
-Binaires natifs de l'arborescence de production (`npm ci --omit=dev`), mesurés par `ops/check-native.mjs` (en-têtes ELF) :
+Binaires natifs (`ops/check-native.mjs`, lecture des en-têtes ELF ; arbre de production et arbre complet, 20 ELF, donnent le même verdict) :
 
 | Binaire | glibc exigée | Autres exigences | Utilisé par l'application |
 |---|---|---|---|
-| `@next/swc-linux-x64-gnu` | ≥ 2.17 | libgcc ≥ 4.2.0 | oui (runtime Next.js, source des threads Tokio) |
-| `@img/sharp-linux-x64` (`.node`) | ≥ 2.17 | GLIBCXX ≥ 3.4.21 | non (`next/image` n'est pas utilisé) ; chargé uniquement si une image est optimisée |
+| `@next/swc-linux-x64-gnu` | ≥ 2.17 | libgcc ≥ 4.2.0 | oui (chargé au démarrage pour lire `next.config.ts` : source des threads Tokio) |
+| `@img/sharp-linux-x64` (`.node`) | ≥ 2.17 | GLIBCXX ≥ 3.4.21 | non (`next/image` n'est pas utilisé) |
 | `@img/sharp-libvips-linux-x64` | ≥ 2.28 | GLIBCXX ≥ 3.4.22 | non (dépendance de sharp) |
-| variantes `musl` (swc, sharp, libvips) | — | — | non : ignorées, inutilisables avec la glibc |
+| variantes `musl` | — | — | non : ignorées |
 
-Tous ≤ 2.28 < 2.34 : compatibles avec VinaHost. Chargement réel (`process.dlopen`) réussi pour swc et sharp sur la machine de test (glibc 2.39). La preuve sur une vraie glibc 2.34 est le job `native-glibc234` du workflow (conteneur AlmaLinux 9, glibc 2.34). L'autorité finale reste `ops/preflight.sh` lancé sur l'hébergement avec le `node_modules` réel.
+Tous ≤ 2.28 < 2.34, et GLIBCXX ≤ 3.4.22 ≤ 3.4.29 : compatibles avec VinaHost. Preuves : analyse ELF locale et en CI ; **chargement réel dans un conteneur AlmaLinux 9 (glibc 2.34) en CI** (job `native-glibc234`). Sur l'hébergement : `ops/preflight.sh` recharge les addons réels du `node_modules` (nodevenv) et compare à la glibc, à `libstdc++` et à `libgcc_s` de l'hôte.
 
-Nécessaire sur l'hôte : `libstdc++.so.6` (GLIBCXX ≥ 3.4.22) et `libgcc_s.so.1` ; `ops/check-native.mjs` compare avec les bibliothèques présentes et signale l'absence.
+**Constat important** : `next.config.ts` est lu au démarrage de `next start`, et sa lecture charge SWC. Si le package `typescript` est absent de `node_modules`, Next lance **`npm install typescript`** au démarrage (observé en test) : sur l'hébergement partagé cela créerait des processus et écrirait des centaines de Mo. Le `node_modules` de l'hébergement (754 Mo, dépendances de développement comprises) contient `typescript` : c'est une condition à conserver. `ops/preflight.sh` et `ops/smoke-artifact.sh` la contrôlent. (Mesure : sans `next.config.ts`, le serveur démarre à 11 threads, 0 Tokio et ≈ 172 Mo de RSS au lieu de 13 threads, 2 Tokio et ≈ 263 Mo. Convertir la configuration en JavaScript est une option pour plus tard ; elle modifie la configuration Next.js et n'est pas proposée sans approbation.)
 
-Tailles mesurées (production, `npm ci --omit=dev`) : `node_modules` ≈ 548 Mo, dont 137 Mo pour la variante musl de SWC et 19 Mo pour libvips musl, inutilisées.
+## Flux de déploiement
 
-### Options de build (proposition, non mise en œuvre)
+L'artefact est construit en CI (`ops/build-artifact.sh`) : `.next` sans cache de build, `package.json`, `package-lock.json`, `next.config.ts`, `server.js`, `RELEASE.json` (commit, date, Node, plateforme, version de Next.js, SHA-256 du lock) + fichier `.sha256`. Jamais : `node_modules`, `public/` (donc `public/uploads`), sources, tests, `.git`. Mesuré : 3,1 Mo compressé, 11,0 Mo décompressé. Le job CI `runtime` le teste (`ops/smoke-artifact.sh`) puis le conserve 7 jours comme artefact GitHub ; **aucun déploiement automatique**.
 
-| Option | Avantage | Inconvénient |
+La racine de l'application n'est **jamais renommée** : cPanel/LiteSpeed enregistrent ce chemin, et un processus resté vivant garderait son répertoire courant dans le dossier renommé (cas observé le 2026-11-27 : STOP sans effet). Une version = `{.next, package.json, package-lock.json, next.config.ts, server.js, RELEASE.json}` ; on échange ces éléments par renommage **dans** la racine, application arrêtée et arrêt vérifié, avec `.release/staging` et `.release/rollback`. Le lien `node_modules`, `public/` et `public/uploads` ne sont jamais touchés.
+
+| | Flux A : dépendances inchangées | Flux B : dépendances modifiées |
 |---|---|---|
-| A. Build sur `ubuntu-latest`, vérification sur AlmaLinux 9 (retenue pour l'instant) | rapide ; déjà utilisée par `pr-checks.yml` ; aucun risque glibc tant que `check-native` passe | la preuve de chargement est séparée du build |
-| B. Tout le build dans un conteneur AlmaLinux 9 | même glibc que l'hébergement, y compris pour la sonde | plus lent ; image à maintenir ; apporte peu puisque `.next` est indépendant de la plateforme |
-| C. Artefact sans `node_modules`, installé sur l'hébergement | transfert léger | `npm ci` sur l'hébergement : consomme threads et mémoire du quota, donc contraire à la règle « aucun build lourd sur l'hébergement » |
+| Déclencheur | `ops/check-deps.mjs` : les **versions réellement installées** dans le `node_modules` de l'hébergement correspondent au `package-lock.json` de l'artefact (pas seulement son hash) | écart constaté : paquet absent ou version différente |
+| Contrôles | Node = `RELEASE.json`, `typescript` présent, `check-native.mjs --load` sur l'hôte, `disk-check`, `verify` | idem + approbation manuelle |
+| Dépendances | `nodevenv` réutilisé tel quel ; lien préservé | **déploiement bloqué** ; `preflight.sh` échoue (« flux B ») |
+| Automatisation | possible **après** l'acceptation de PR #72 | non mise en œuvre |
 
-Le mécanisme de transfert de l'artefact (copie, `SHA256SUMS`, élagage des variantes musl) reste **à décider** ; rien n'est déployé automatiquement.
+Flux B, pistes à étudier (rien n'est prouvé) : construire le `node_modules` en CI dans un conteneur AlmaLinux 9 avec Node 22.23.5 (comme le Node.js Selector CloudLinux), le transférer comme second dossier à côté de l'actuel dans `nodevenv/.../lib` (`node_modules.staging`), puis échanger les **dossiers cibles** (le lien lui-même reste intact) avec `node_modules.rollback` conservé : le retour arrière couvre alors dépendances **et** application, d'où la mesure disque `--node-modules-mb 754`. À vérifier avant tout usage : que le Node.js Selector ne régénère ni ne valide `nodevenv` autrement, et le comportement de LiteSpeed au changement de dossier cible. Pas de `npm ci` ni de build lourd sur l'hébergement.
 
 ## Espace disque (quota cPanel)
 
-Le plafond est le **quota du compte**, pas la partition du serveur : `df -h` n'est jamais utilisé. Relevé cPanel → Disk Usage du 2026-11-27 (hébergement partagé avec WordPress BAYDE24H) :
+Le plafond est le **quota du compte**, pas la partition du serveur : `df -h` n'est jamais utilisé. La commande `quota` n'existe pas sur l'hébergement (« command not found ») : le quota et l'occupation sont donc fournis à `ops/disk-check.sh` avec `--quota-mb` et `--used-mb`, relevés dans cPanel → Disk Usage. Relevé du 2026-11-27 (hébergement partagé avec WordPress BAYDE24H) :
 
 | Élément | Mo |
 |---|---|
@@ -132,22 +140,28 @@ Le plafond est le **quota du compte**, pas la partition du serveur : `df -h` n'e
 | `sciences-interactives` | 323,78 |
 | Sous-dossiers cachés | 317,11 |
 | PostgreSQL | 8,11 |
+| `public/uploads` | n'existe pas |
 
-Politique : au plus **un** staging et **un** rollback ; au moins **1 024 Mo** libres au pic de la préparation et après déploiement (rollback en place) ; `node_modules` reste un lien CloudLinux vers `nodevenv` ; rien n'est supprimé hors de `sciences-interactives`. Contrôle : `ops/disk-check.sh` (quota lu par `quota` si possible, sinon fourni avec `--quota-mb` / `--used-mb` relevés dans cPanel ; refus si le quota est inconnu). Nettoyage : `ops/cleanup.sh`.
+Composition de l'application sur l'hébergement : racine 324 Mo ; `.next` 314 Mo, dont `.next/cache` 305 Mo (**97,1 % de `.next`**), tout en `cache/webpack` (305 Mo ; `eslint` 44 Ko, `swc` 0) ; `.next/server` 5,1 Mo ; `.next/static` 3,3 Mo ; `.next/types` 304 Ko ; `.next/diagnostics` 8 Ko. Le code exécutable utile représente donc environ 9 Mo.
 
-Modèle de calcul du pic (en Mo) :
+**Cache de build et cache d'exécution** : `.next/cache/webpack`, `eslint` et `swc` sont des caches de **build** : le runtime ne les lit pas, et l'artefact les exclut. Les caches d'**exécution** de Next.js (`fetch-cache`, `images`, cache incrémental) ne sont pas désactivés : ils sont créés à la demande dans `.next/cache` par le serveur lui-même. L'application n'en utilise aucun aujourd'hui (aucune route statique ni ISR, toutes les routes sont dynamiques (`ƒ` dans la sortie du build), aucun `fetch` serveur, pas de `next/image`) et l'hébergement n'en contient aucun. Le cache actuel de 305 Mo **n'est pas supprimé** : lors de la première bascule, l'ancienne `.next` (cache compris) est renommée en `.release/rollback` et libérée seulement au déploiement suivant.
 
-- préparation et bascule : occupation + artefact + version décompressée + `public/uploads` copié + nouveau `node_modules` (0 si le lock est inchangé) + marge (100) ; l'ancien rollback et l'artefact existent encore ;
-- après nettoyage : occupation + version + uploads + nouveau `node_modules` − ancien rollback − rollback.prev + marge ;
-- retour arrière : échange de noms, donc le même état que « après nettoyage ».
+Politique : au plus **un** staging et **un** rollback ; au moins **1 024 Mo** libres au pic et après déploiement (rollback en place) ; `node_modules` reste un lien CloudLinux ; `public/uploads` n'est jamais copié ni déplacé ; rien n'est supprimé hors de `sciences-interactives/.release`. Contrôle : `ops/disk-check.sh` ; nettoyage : `ops/cleanup.sh`.
 
-Exemple (version mesurée localement : archive 3,1 Mo, 11 Mo décompressée sans `.next/cache` ni `node_modules` ; uploads de production inconnus) : pic ≈ 2 969,08 + 3,1 + 11 + 100 ≈ 3 083 Mo, soit ≈ 4 085 Mo libres avant déduction des uploads. Avec un nouveau `node_modules` de 548 Mo : ≈ 3 537 Mo libres. Le disque n'est donc pas la contrainte tant que l'artefact reste léger. Il le deviendrait si l'on copiait telle quelle l'arborescence actuelle : `sciences-interactives` fait 323,78 Mo (très probablement `.next/cache`, 343 Mo mesurés localement après un build ; à confirmer avec `du -sm` sur l'hébergement), un cache de build que le runtime n'utilise pas.
+Modèle de calcul du pic (Mo) : préparation et bascule = occupation + artefact + version décompressée + nouveau `node_modules` (0 en flux A) + marge 100 ; l'ancien rollback et l'artefact existent encore. Après nettoyage = occupation + version + nouveau `node_modules` − ancien rollback − `rollback.prev` − artefact + marge. Retour arrière = échange de noms : même état. Ce qui est déjà dans l'occupation relevée n'est pas compté deux fois (`--used-includes-artifact`, `--used-includes-staging`, détectés automatiquement avec une occupation mesurée par `du`).
 
-`nodevenv` (753,62 Mo) contient déjà un `node_modules` : un second exemplaire complet de 548 Mo n'y tient qu'en conservant le quota ci-dessus ; la décision sur les dépendances (installation par cPanel ou artefact) reste à prendre.
+Estimation avec les mesures réelles (artefact 3,1 Mo, 11,0 Mo décompressé, marge 100) :
+
+| Cas | Pic | Libre au pic | Libre après déploiement |
+|---|---|---|---|
+| Flux A, premier déploiement | 3 083,18 | 4 084,82 | 4 087,92 |
+| Flux B (nouveau `node_modules` ≈ 754) | 3 837,18 | 3 330,82 | 3 333,92 |
+
+Dans les deux cas la marge de 1 024 Mo est respectée avec un large écart : le disque n'est pas la contrainte, à condition que l'artefact reste sans cache de build. Copier telle quelle l'arborescence actuelle (324 Mo) pour le staging et le rollback ajouterait ≈ 650 Mo : acceptable, mais inutile.
 
 ## Risques et limites connus
 
-1. Les images téléversées par `/api/admin/upload` sont écrites dans `public/uploads` : **elles répondent 404 jusqu'au redémarrage suivant** de l'application (mesuré avec `ops/server.js`). Un déploiement qui remplace le dossier de l'application les efface. Déplacement non approuvé : à traiter séparément.
+1. Les images téléversées par `/api/admin/upload` sont écrites dans `public/uploads` : **elles répondent 404 jusqu'au redémarrage suivant** de l'application (mesuré avec `ops/server.js`). `public/uploads` n'existe pas encore sur l'hébergement ; la disposition en versions la protège (jamais copié, jamais déplacé, jamais dans l'artefact). Le défaut d'affichage et un éventuel déplacement hors du dossier de l'application sont à traiter séparément (issue dédiée).
 2. RESTART/STOP cPanel non fiables le 2026-11-27 : voir `incident-2026-11-27.md`. Toujours vérifier avec `ops/verify.sh`.
 3. NPROC partagé avec WordPress/PHP : un pic PHP peut provoquer « Unable to fork » même avec Node à 13 threads.
 4. Tout composant dimensionné sur le nombre de CPU visibles (56) peut réintroduire le problème ; la garde ne couvre que Tokio.
