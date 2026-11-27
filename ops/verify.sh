@@ -34,7 +34,7 @@ EX=$(http "$BASE/exercices" | grep -o '/exercice/[A-Za-z0-9._~%-]*' | head -1 | 
 if [ -z "$EX" ]; then fail "aucun exercice trouvé sur /exercices"; else
   ok "exercice de test : $EX"
   g=$(http "$BASE/api/exercises/$EX?d=1")
-  seed=$(echo "$g" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).seed||"")}catch{console.log("")}})')
+  seed=$(echo "$g" | sed -n 's/.*"seed":"\([^"]*\)".*/\1/p' | head -1)
   if [ -z "$seed" ]; then fail "GET /api/exercises/$EX : réponse invalide"; else
     echo "$g" | grep -Eq '"(answer|mistakes)"' && fail "la clé de correction (answer/mistakes) est exposée au navigateur" || ok "aucune clé de correction dans la réponse publique"
     r=$(http -H 'content-type: application/json' -d "{\"seed\":\"$seed\",\"difficulty\":1,\"responses\":[]}" "$BASE/api/exercises/$EX/check")
@@ -44,8 +44,9 @@ fi
 
 echo "== 3. Authentification et administration"
 body=$(http "$BASE/admin"); echo "$body" | grep -q 'réservé aux enseignants' && ok "/admin refusé sans connexion" || fail "/admin accessible sans connexion"
+jesc() { local v=${1//\\/\\\\}; v=${v//\"/\\\"}; printf %s "$v"; }   # échappement JSON minimal (aucun Node requis sur l'hébergement)
 login() { # $1 email $2 mot de passe $3 fichier cookie → code HTTP
-  node -e 'process.stdout.write(JSON.stringify({email:process.argv[1],password:process.argv[2]}))' "$1" "$2" | http -c "$3" -o /dev/null -w '%{http_code}' -H 'content-type: application/json' --data-binary @- "$BASE/api/auth/login"; }
+  printf '{"email":"%s","password":"%s"}' "$(jesc "$1")" "$(jesc "$2")" | http -c "$3" -o /dev/null -w '%{http_code}' -H 'content-type: application/json' --data-binary @- "$BASE/api/auth/login"; }
 if [ -n "${VERIFY_STUDENT_EMAIL:-}" ] && [ -n "${VERIFY_STUDENT_PASSWORD:-}" ]; then
   [ "$(login "$VERIFY_STUDENT_EMAIL" "$VERIFY_STUDENT_PASSWORD" "$WORK/s")" = 200 ] && ok "connexion élève" || fail "connexion élève refusée"
   http -b "$WORK/s" "$BASE/api/me" | grep -q '"role":"eleve"' && ok "session élève reconnue" || fail "session élève non reconnue"
@@ -61,18 +62,18 @@ NOW=$(date +%s); DEP=""
 if [ -n "$DEPLOYED_AT" ]; then DEP=$(date -d "@$DEPLOYED_AT" +%s 2>/dev/null || date -d "$DEPLOYED_AT" +%s 2>/dev/null) || { fail "--deployed-at illisible"; DEP=""; }
 else skip "--deployed-at non fourni : impossible de distinguer les anciens processus des nouveaux"; fi
 N=0; TH=0; RS=0
-for pid in $(pgrep -u "$ME" -x -d ' ' 'node|lsnode' 2>/dev/null); do
+for pid in $(node_pids "$ME"); do
   [ "$(readlink "/proc/$pid/cwd" 2>/dev/null)" = "$APP" ] || continue
-  N=$((N+1)); ppid=$(awk '{print $4}' "/proc/$pid/stat"); age=$(ps -o etimes= -p "$pid" | tr -d ' '); start=$((NOW-age))
+  N=$((N+1)); ppid=$(ppid_of "$pid"); age=$(ps -o etimes= -p "$pid" | tr -d ' '); start=$((NOW-age))
   th=$(threads "$pid"); tk=$(tokio "$pid"); rs=$(rss_mb "$pid"); ch=$(kids "$pid"); TH=$((TH+th)); RS=$((RS+rs))
   echo "  pid=$pid ppid=$ppid age=${age}s threads=$th tokio=$tk rss=${rs}Mo enfants=$ch"
   [ "$tk" -le "$MAX_TOKIO" ] || fail "pid $pid : $tk threads Tokio (> $MAX_TOKIO)"
   [ "$th" -le "$MAX_IDLE_THREADS" ] || warn "pid $pid : $th threads (> $MAX_IDLE_THREADS ; baseline 13)"
   [ "$ch" -eq 0 ] || warn "pid $pid : $ch processus enfant (aucun n'est créé par le code de l'application)"
-  if [ -n "$DEP" ] && [ "$start" -lt "$DEP" ]; then fail "pid $pid démarré AVANT le déploiement : ancien processus encore actif${ppid:+ (PPID=$ppid)}"; fi
-  [ "$ppid" = 1 ] && { [ -n "$DEP" ] && [ "$start" -ge "$DEP" ] && warn "pid $pid a PPID=1 (réparenté) : à examiner" || fail "pid $pid orphelin (PPID=1)"; }
+  # Seul critère « ancien processus » : démarré avant le déploiement. Le PPID n'en est pas un (il passe à 1 en cours de vie sous LiteSpeed).
+  if [ -n "$DEP" ] && [ "$start" -lt "$DEP" ]; then fail "pid $pid démarré AVANT le déploiement : ancien processus encore actif"; fi
 done
-[ "$N" -gt 0 ] && info "$N processus pour $APP (pas de nombre imposé : LiteSpeed peut créer des instances valides)" || fail "aucun processus node/lsnode trouvé dans $APP"
+[ "$N" -gt 0 ] && info "$N processus pour $APP (pas de nombre imposé : LiteSpeed peut créer des instances valides ; PPID = information seulement)" || fail "aucun processus Node trouvé dans $APP"
 for p in $OLD_PIDS; do kill -0 "$p" 2>/dev/null && fail "ancien PID $p toujours vivant (aucun signal envoyé par ce script)" || ok "ancien PID $p disparu"; done
 
 echo "== 5. Ressources du compte"

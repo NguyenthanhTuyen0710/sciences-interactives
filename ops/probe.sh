@@ -31,12 +31,13 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 2
 # shellcheck source=ops/lib.sh
 . "$ROOT/ops/lib.sh"
+NODE=$(find_node 22.23.5) || { echo "Node introuvable."; exit 2; }
 
 # ---- prérequis -------------------------------------------------------------------------------
 [ "$(uname -s)" = "Linux" ] || { echo "Linux requis (/proc)."; exit 2; }
 [ -f .next/BUILD_ID ] || { echo "Build absent : lancer npm run build."; exit 2; }
 [ -n "${DATABASE_URL:-}" ] || { echo "DATABASE_URL absente."; exit 2; }
-DB_HOST=$(node -e 'try{console.log(new URL(process.env.DATABASE_URL).hostname)}catch{console.log("")}')
+DB_HOST=$("$NODE" -e 'try{console.log(new URL(process.env.DATABASE_URL).hostname)}catch{console.log("")}')
 case "$DB_HOST" in
   localhost|127.0.0.1|"[::1]"|::1) ;;
   *) echo "Refus : la base doit être locale (hôte lu : « ${DB_HOST:-illisible} »). Ce test ne doit jamais viser la production."; exit 2 ;;
@@ -49,8 +50,8 @@ cleanup() { [ -n "$SRV" ] && kill -0 "$SRV" 2>/dev/null && kill -TERM "$SRV" 2>/
 trap cleanup EXIT
 
 # Secrets jetables, propres à ce test (ils ne protègent aucune donnée réelle et ne sont jamais affichés).
-PROBE_AUTH_SECRET=$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')
-PROBE_INVITE=$(node -e 'console.log(require("crypto").randomBytes(9).toString("hex"))')
+PROBE_AUTH_SECRET=$("$NODE" -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')
+PROBE_INVITE=$("$NODE" -e 'console.log(require("crypto").randomBytes(9).toString("hex"))')
 PROBE_EMAIL=${PROBE_EMAIL:-hugo@demo.fr}
 PROBE_PASSWORD=${PROBE_PASSWORD:-demo1234}   # compte de démonstration du seed (publié dans README.md)
 
@@ -60,10 +61,9 @@ start_server() { # $1 = valeur de TOKIO_WORKER_THREADS ("" = variable absente)
   local envcmd=(env -u TOKIO_WORKER_THREADS)
   [ -n "$1" ] && envcmd=(env "TOKIO_WORKER_THREADS=$1")
   PORT=$PORT NODE_ENV=production AUTH_SECRET=$PROBE_AUTH_SECRET TEACHER_INVITE_CODE=$PROBE_INVITE \
-    "${envcmd[@]}" node "$SERVER_FILE" >"$WORK/server.log" 2>&1 &
+    "${envcmd[@]}" "$NODE" "$SERVER_FILE" >"$WORK/server.log" 2>&1 &
   SRV=$!
-  local i
-  for i in $(seq 1 120); do
+  for _ in $(seq 1 120); do
     kill -0 "$SRV" 2>/dev/null || { fail "le serveur s'est arrêté au démarrage (voir journal ci-dessous)"; tail -5 "$WORK/server.log"; SRV=""; return 1; }
     curl -s -o /dev/null --max-time 2 "http://127.0.0.1:$PORT/contact" && return 0
     sleep 0.5
@@ -73,18 +73,18 @@ start_server() { # $1 = valeur de TOKIO_WORKER_THREADS ("" = variable absente)
 
 stop_server() { # SIGTERM sur le seul PID lancé ici ; jamais de SIGKILL.
   [ -n "$SRV" ] || return 0
-  local pid=$SRV i
+  local pid=$SRV
   kill -TERM "$pid" 2>/dev/null
-  for i in $(seq 1 20); do kill -0 "$pid" 2>/dev/null || break; sleep 0.5; done
+  for _ in $(seq 1 20); do kill -0 "$pid" 2>/dev/null || break; sleep 0.5; done
   if kill -0 "$pid" 2>/dev/null; then fail "PID $pid toujours vivant 10 s après SIGTERM (aucun SIGKILL envoyé)"; else info "arrêt propre sur SIGTERM"; SRV=""; fi
 }
 
 load_round() { # $1 = numéro ; écrit le pic de connexions PostgreSQL dans $WORK/pgpeak
-  local base=$2 u r
+  local base=$2 u
   echo 0 > "$WORK/pgpeak"; touch "$WORK/sampling"
   ( while [ -f "$WORK/sampling" ]; do c=$(( $(pg_count) - base )); [ "$c" -gt "$(cat "$WORK/pgpeak")" ] && echo "$c" > "$WORK/pgpeak"; sleep 0.2; done ) &
   local sampler=$!
-  for r in 1 2 3; do for u in / /lecons /chapitres /cours /exercices /mon-espace /bac /brevet /revisions /contact; do
+  for _ in 1 2 3; do for u in / /lecons /chapitres /cours /exercices /mon-espace /bac /brevet /revisions /contact; do
     curl -s -b "$WORK/cj" -o /dev/null --max-time 20 "http://127.0.0.1:$PORT$u"; done; done
   seq 1 "$LOAD_REQS" | xargs -P "$LOAD_PAR" -I{} sh -c "curl -s -b '$WORK/cj' -o /dev/null --max-time 20 http://127.0.0.1:$PORT/mon-espace; curl -s -b '$WORK/cj' -o /dev/null --max-time 20 http://127.0.0.1:$PORT/api/me"
   rm -f "$WORK/sampling"; wait "$sampler" 2>/dev/null

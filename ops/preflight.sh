@@ -2,7 +2,9 @@
 # Contrôle AVANT déploiement ou redémarrage (lecture seule : aucun fichier modifié, aucun processus touché).
 # À lancer sur l'hébergement, dans le dossier de l'application déjà déployé/décompressé, sans le démarrer.
 #
-# Usage : ops/preflight.sh [--app-dir DIR] [--env-from-pid PID] [--ref FICHIER_server.js]
+# Usage : ops/preflight.sh [--app-dir DIR] [--node CHEMIN_NODE] [--env-from-pid PID] [--ref FICHIER_server.js]
+#   --node         : exécutable Node à utiliser (défaut : détecté sans supposer le PATH, voir find_node dans ops/lib.sh ;
+#                    sur VinaHost : /opt/alt/alt-nodejs22/root/usr/bin/node).
 #   --env-from-pid : lit les NOMS et la forme (longueur) des variables dans /proc/PID/environ du process cPanel actuel
 #                    (les variables cPanel ne sont pas visibles depuis un shell SSH). Les valeurs ne sont jamais affichées.
 #   --ref          : server.js de référence du dépôt (défaut : ops/server.js à côté de ce script, s'il existe).
@@ -15,18 +17,22 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 
 APP=$PWD; ENV_PID=""; REF="$HERE/server.js"
 while [ $# -gt 0 ]; do case "$1" in
-  --app-dir) APP=$2; shift 2;; --env-from-pid) ENV_PID=$2; shift 2;; --ref) REF=$2; shift 2;;
+  --app-dir) APP=$2; shift 2;; --node) NODE_BIN=$2; shift 2;; --env-from-pid) ENV_PID=$2; shift 2;; --ref) REF=$2; shift 2;;
   *) echo "Option inconnue : $1"; exit 1;; esac; done
 cd "$APP" || { echo "Dossier introuvable : $APP"; exit 1; }
 EXPECTED_NODE=${EXPECTED_NODE:-22.23.5}; NPROC_LIMIT=${NPROC_LIMIT:-165}; MEM_LIMIT_MB=${MEM_LIMIT_MB:-2048}; MIN_FREE_THREADS=${MIN_FREE_THREADS:-40}
 ME=$(id -un)
 
 echo "== 1. Node.js"
-NODE_V=$(node -v 2>/dev/null | sed 's/^v//')
-if [ -z "$NODE_V" ]; then fail "node introuvable dans le PATH"
-elif [ "${NODE_V%%.*}" != "${EXPECTED_NODE%%.*}" ]; then fail "Node $NODE_V : version majeure différente de $EXPECTED_NODE"
-elif [ "$NODE_V" != "$EXPECTED_NODE" ]; then warn "Node $NODE_V, version testée : $EXPECTED_NODE"
-else ok "Node $NODE_V"; fi
+NODE=$(find_node "$EXPECTED_NODE") || NODE=""
+if [ -z "$NODE" ]; then fail "aucun exécutable Node trouvé (PATH, /opt/alt/alt-nodejs*, ~/nodevenv) : utiliser --node"
+else
+  info "exécutable : $NODE (node dans le PATH : $(command -v node 2>/dev/null || echo absent — normal sur cPanel))"
+  NODE_V=$("$NODE" -v 2>/dev/null | sed 's/^v//')
+  if [ "${NODE_V%%.*}" != "${EXPECTED_NODE%%.*}" ]; then fail "Node $NODE_V : version majeure différente de $EXPECTED_NODE"
+  elif [ "$NODE_V" != "$EXPECTED_NODE" ]; then warn "Node $NODE_V, version testée : $EXPECTED_NODE"
+  else ok "Node $NODE_V"; fi
+fi
 
 echo "== 2. Artefact de build"
 for f in package.json .next/BUILD_ID .next/server node_modules/next/package.json; do [ -e "$f" ] && ok "$f" || fail "absent : $f"; done
@@ -34,10 +40,12 @@ SWC=$(ls node_modules/@next/swc-linux-x64-gnu/*.node 2>/dev/null | head -1)
 [ -n "$SWC" ] && ok "binaire natif SWC linux-x64-gnu présent" || fail "binaire natif @next/swc-linux-x64-gnu absent (artefact construit pour une autre plateforme ?)"
 if [ -f SHA256SUMS ]; then sha256sum -c --quiet SHA256SUMS >/dev/null 2>&1 && ok "SHA256SUMS conforme" || fail "SHA256SUMS : fichier(s) altéré(s) ou manquant(s)"
 else skip "SHA256SUMS absent : intégrité de l'artefact non vérifiée"; fi
-GLIBC=$(ldd --version 2>/dev/null | head -1 | grep -o '[0-9]*\.[0-9]*$')
-NEED=""; [ -n "$SWC" ] && command -v strings >/dev/null 2>&1 && NEED=$(strings "$SWC" | grep -o 'GLIBC_[0-9.]*' | sed 's/GLIBC_//' | sort -Vu | tail -1)
-info "glibc hôte : ${GLIBC:-inconnue} ; glibc requise par le binaire SWC : ${NEED:-non mesurée}"
-if [ -n "$GLIBC" ] && [ -n "$NEED" ] && [ "$(printf '%s\n%s\n' "$NEED" "$GLIBC" | sort -V | head -1)" != "$NEED" ]; then fail "glibc hôte $GLIBC < $NEED requise"; fi
+if [ -n "$NODE" ] && [ -f "$HERE/check-native.mjs" ] && [ -d node_modules ]; then
+  echo "  -- binaires natifs (glibc de l'hôte, bibliothèques dynamiques, chargement réel)"
+  NATIVE_OUT=$("$NODE" "$HERE/check-native.mjs" node_modules --load 2>&1); NATIVE_RC=$?
+  echo "$NATIVE_OUT" | sed 's/^/     /'
+  [ "$NATIVE_RC" -eq 0 ] && ok "binaires natifs compatibles avec cet hôte" || fail "binaire(s) natif(s) incompatible(s) avec cet hôte (voir ci-dessus)"
+else skip "ops/check-native.mjs, Node ou node_modules absent : compatibilité des binaires natifs non vérifiée"; fi
 
 echo "== 3. Fichier de démarrage"
 if [ -f server.js ]; then
@@ -79,10 +87,9 @@ if [ "$MFREE" -lt 400 ]; then fail "marge mémoire insuffisante : ${MFREE} Mo < 
 
 echo "== 6. Processus Node existants (pour comparaison avec ops/verify.sh après le déploiement)"
 N=0
-for pid in $(pgrep -u "$ME" -x -d ' ' 'node|lsnode' 2>/dev/null); do
-  N=$((N+1)); ppid=$(awk '{print $4}' "/proc/$pid/stat"); cwd=$(readlink "/proc/$pid/cwd" 2>/dev/null)
-  echo "  pid=$pid ppid=$ppid age=$(ps -o etimes= -p "$pid" | tr -d ' ')s threads=$(threads "$pid") tokio=$(tokio "$pid") rss=$(rss_mb "$pid")Mo cwd=${cwd:-?}"
-  [ "$ppid" = 1 ] && warn "pid $pid orphelin (PPID=1) : à examiner AVANT le déploiement (SIGTERM manuel sur PID vérifié seulement)"
+for pid in $(node_pids "$ME"); do
+  N=$((N+1)); cwd=$(readlink "/proc/$pid/cwd" 2>/dev/null)
+  echo "  pid=$pid ppid=$(ppid_of "$pid") age=$(ps -o etimes= -p "$pid" | tr -d ' ')s threads=$(threads "$pid") tokio=$(tokio "$pid") rss=$(rss_mb "$pid")Mo cwd=${cwd:-?}"
 done
-[ "$N" -gt 0 ] || info "aucun processus node/lsnode du compte (l'application démarre à la première requête)"
+[ "$N" -gt 0 ] && info "le PPID est indiqué à titre d'information : il change en cours de vie sous LiteSpeed, ce n'est pas un critère d'anomalie" || info "aucun processus Node du compte (l'application démarre à la première requête)"
 summary
