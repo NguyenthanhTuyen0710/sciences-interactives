@@ -37,7 +37,7 @@ jobs:
       - name: Tests des scripts d'espace disque, de verrou et de nettoyage (faux $HOME jetable)
         run: ops/test-disk.sh
 
-      - name: Portabilité CageFS : détection de Node, aucune dépendance à /dev/fd (/dev minimal simulé)
+      - name: "Portabilité CageFS (détection de Node, aucune dépendance à /dev/fd, /dev minimal simulé)"
         run: ops/test-portability.sh
 
       - name: Démarrage de production (garde Tokio avant tout require, aucune concurrence non bornée)
