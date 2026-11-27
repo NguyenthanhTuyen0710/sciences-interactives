@@ -8,6 +8,8 @@ Dernière mise à jour : 2026-11-27. Les valeurs de l'hébergement viennent de V
 |---|---|
 | Domaine | starluxvn.com |
 | Application | Next.js 15, `NODE_ENV=production`, Node.js 22.23.5, PostgreSQL local |
+| Système (vérifié) | Linux x86_64, GNU libc **2.34** |
+| Exécutable Node | `/opt/alt/alt-nodejs22/root/usr/bin/node` — **absent du PATH du shell par défaut** : les scripts `ops/` le détectent (`--node` ou `NODE_BIN` pour le forcer) |
 | Fichier de démarrage | `server.js` à la racine de l'application, version suivie : `ops/server.js` |
 | Quota CPU | 150 % ; 56 CPU logiques visibles (affinité 0-55) |
 | Mémoire | 2 Go pour tout le compte |
@@ -70,7 +72,9 @@ Seuils de `ops/probe.sh`. **Échec** : Tokio ≠ valeur attendue, threads > 20, 
 
 ## Ne pas supposer une seule instance
 
-LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte donc pas les instances : il contrôle chaque processus (threads, Tokio, enfants, âge, PPID) et les totaux du compte, et signale tout processus **plus ancien que le déploiement** ou **orphelin (PPID=1)**.
+LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte donc pas les instances : il contrôle chaque processus (threads, Tokio, enfants, âge) et les totaux du compte, et signale tout processus **démarré avant le déploiement**.
+
+**Le PPID n'est pas un critère.** Mesuré en production : le PID 1355617 avait le PPID 1182422 juste après le démarrage, puis le PPID 1 après 1 h 21 (même processus, 13 threads, RSS 241 → 256 Mo, soit +6 %). Le PPID=1 est donc un état normal sous LiteSpeed : il ne prouve ni un orphelin ni un processus à arrêter. Les scripts l'affichent à titre d'information, ne l'utilisent dans aucun test et n'arrêtent jamais un processus. La cause du changement de parent n'est pas établie.
 
 ## Contrôles
 
@@ -79,13 +83,37 @@ LiteSpeed peut créer plusieurs instances valides. `ops/verify.sh` ne compte don
 | Avant déploiement | `ops/preflight.sh` | Node, artefact, `server.js`, variables, marge NPROC/mémoire, processus existants (lecture seule) |
 | Après déploiement | `ops/verify.sh` | processus réels, santé HTTP, PostgreSQL, authentification, rôles, correction serveur (lecture seule) |
 | CI et local | `ops/probe.sh` | non-régression des ressources, base locale/jetable uniquement |
+| Avant déploiement et en CI | `ops/check-native.mjs` | binaires natifs : architecture, glibc exigée, bibliothèques dynamiques, chargement réel (aucun binutils requis) |
 | Pull request | `.github/workflows/runtime-resources.yml` | contrôles statiques, revue des dépendances, sonde |
 
-## Compatibilité de l'artefact (état des vérifications)
+## Compatibilité de l'artefact (glibc 2.34, Linux x86_64, Node 22.23.5)
 
-- Binaire natif SWC : `@next/swc-linux-x64-gnu` exige au plus **glibc 2.17** (mesuré sur le binaire de ce dépôt). `ops/preflight.sh` le compare à la glibc de l'hôte (pas encore mesurée sur VinaHost : à lancer).
-- Autres modules natifs : aucun dans le code de production (`bcryptjs` est du JavaScript pur ; `sharp` n'est pas utilisé). `ops/review-deps.mjs` (et la CI) signale toute nouvelle dépendance à risque.
-- **Le mécanisme de transfert de l'artefact (CI → hébergement) n'est pas décidé** : il attend `ldd --version`, l'état de `node_modules` sur l'hôte et la structure cPanel. Aucun build lourd sur l'hébergement.
+Principe : `.next` (JavaScript) ne dépend pas de la plateforme de build. Seuls les binaires natifs de `node_modules` en dépendent ; ce sont des paquets npm **précompilés** (pas compilés sur le runner) : ce qui compte est la glibc qu'ils exigent, pas celle d'`ubuntu-latest` (2.39).
+
+Binaires natifs de l'arborescence de production (`npm ci --omit=dev`), mesurés par `ops/check-native.mjs` (en-têtes ELF) :
+
+| Binaire | glibc exigée | Autres exigences | Utilisé par l'application |
+|---|---|---|---|
+| `@next/swc-linux-x64-gnu` | ≥ 2.17 | libgcc ≥ 4.2.0 | oui (runtime Next.js, source des threads Tokio) |
+| `@img/sharp-linux-x64` (`.node`) | ≥ 2.17 | GLIBCXX ≥ 3.4.21 | non (`next/image` n'est pas utilisé) ; chargé uniquement si une image est optimisée |
+| `@img/sharp-libvips-linux-x64` | ≥ 2.28 | GLIBCXX ≥ 3.4.22 | non (dépendance de sharp) |
+| variantes `musl` (swc, sharp, libvips) | — | — | non : ignorées, inutilisables avec la glibc |
+
+Tous ≤ 2.28 < 2.34 : compatibles avec VinaHost. Chargement réel (`process.dlopen`) réussi pour swc et sharp sur la machine de test (glibc 2.39). La preuve sur une vraie glibc 2.34 est le job `native-glibc234` du workflow (conteneur AlmaLinux 9, glibc 2.34). L'autorité finale reste `ops/preflight.sh` lancé sur l'hébergement avec le `node_modules` réel.
+
+Nécessaire sur l'hôte : `libstdc++.so.6` (GLIBCXX ≥ 3.4.22) et `libgcc_s.so.1` ; `ops/check-native.mjs` compare avec les bibliothèques présentes et signale l'absence.
+
+Tailles mesurées (production, `npm ci --omit=dev`) : `node_modules` ≈ 548 Mo, dont 137 Mo pour la variante musl de SWC et 19 Mo pour libvips musl, inutilisées.
+
+### Options de build (proposition, non mise en œuvre)
+
+| Option | Avantage | Inconvénient |
+|---|---|---|
+| A. Build sur `ubuntu-latest`, vérification sur AlmaLinux 9 (retenue pour l'instant) | rapide ; déjà utilisée par `pr-checks.yml` ; aucun risque glibc tant que `check-native` passe | la preuve de chargement est séparée du build |
+| B. Tout le build dans un conteneur AlmaLinux 9 | même glibc que l'hébergement, y compris pour la sonde | plus lent ; image à maintenir ; apporte peu puisque `.next` est indépendant de la plateforme |
+| C. Artefact sans `node_modules`, installé sur l'hébergement | transfert léger | `npm ci` sur l'hébergement : consomme threads et mémoire du quota, donc contraire à la règle « aucun build lourd sur l'hébergement » |
+
+Le mécanisme de transfert de l'artefact (copie, `SHA256SUMS`, élagage des variantes musl) reste **à décider** ; rien n'est déployé automatiquement.
 
 ## Risques et limites connus
 
