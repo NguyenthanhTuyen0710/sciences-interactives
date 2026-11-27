@@ -55,3 +55,19 @@ node_pids() {
 }
 # PPID d'un processus (information seulement : il change en cours de vie sous LiteSpeed, voir docs/ops/incident-2026-11-27.md).
 ppid_of() { awk '{print $4}' "/proc/$1/stat" 2>/dev/null; }
+
+# ---- espace disque : quota cPanel (jamais df : la partition du serveur n'est pas le plafond du compte) ----
+# Nombre décimal strict (point décimal, aucun séparateur de milliers) ; sinon code de retour 1.
+is_num() { [[ "$1" =~ ^[0-9]+(\.[0-9]+)?$ ]]; }
+# calc "expression" : arithmétique décimale (expressions construites par nos scripts à partir de nombres validés par is_num).
+calc() { awk "BEGIN{printf \"%.2f\", $1}"; }
+# Compare : num_lt A B → vrai si A < B.
+num_lt() { awk -v a="$1" -v b="$2" 'BEGIN{exit !(a<b)}'; }
+# Quota en Mo lu sur la sortie texte de `quota` (blocs de 1 Kio) : colonnes blocks, quota, limit ; le nom du système de fichiers peut être seul sur sa ligne.
+# Prend la limite « quota » si elle est non nulle, sinon « limit ». Affiche une valeur en Mo, ou rien si le format n'est pas reconnu.
+quota_mb_from_text() {
+  awk '
+    { n=0; for (i=1;i<=NF;i++) { t=$i; gsub(/\*/,"",t); if (t ~ /^[0-9]+$/) v[++n]=t; else if (i>1 || NF==1) { n=-1; break } }
+      if (n>=3 && !found) { q=(v[2]>0)?v[2]:v[3]; if (q>0) { printf "%.2f\n", q/1024; found=1 } } }
+    { delete v }' 
+}

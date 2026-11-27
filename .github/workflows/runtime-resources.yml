@@ -44,6 +44,9 @@ jobs:
           for f in ops/*.sh; do bash -n "$f"; done
           shellcheck -x -S warning ops/*.sh
 
+      - name: Tests des scripts d'espace disque et de nettoyage (faux $HOME jetable)
+        run: ops/test-disk.sh
+
       - name: Démarrage de production (garde Tokio avant tout require, aucune concurrence non bornée)
         run: |
           node --check ops/server.js
