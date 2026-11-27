@@ -2,7 +2,8 @@
 # Contrôle AVANT déploiement ou redémarrage (lecture seule : aucun fichier modifié, aucun processus touché).
 # À lancer sur l'hébergement, dans le dossier de l'application déjà déployé/décompressé, sans le démarrer.
 #
-# Usage : ops/preflight.sh [--app-dir DIR] [--node CHEMIN_NODE] [--env-from-pid PID] [--ref FICHIER_server.js]
+# Usage : ops/preflight.sh [--app-dir DIR] [--release-dir DIR] [--node CHEMIN_NODE] [--env-from-pid PID] [--ref FICHIER_server.js]
+#   --release-dir  : version à déployer (défaut : app-dir) ; ses dépendances (package-lock.json) sont comparées au node_modules RÉEL de app-dir.
 #   --node         : exécutable Node à utiliser (défaut : détecté sans supposer le PATH, voir find_node dans ops/lib.sh ;
 #                    sur VinaHost : /opt/alt/alt-nodejs22/root/usr/bin/node).
 #   --env-from-pid : lit les NOMS et la forme (longueur) des variables dans /proc/PID/environ du process cPanel actuel
@@ -15,13 +16,15 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 # shellcheck source=ops/lib.sh
 . "$HERE/lib.sh"
 
-APP=$PWD; ENV_PID=""; REF="$HERE/server.js"
+APP=$PWD; REL=""; ENV_PID=""; REF="$HERE/server.js"
 while [ $# -gt 0 ]; do case "$1" in
-  --app-dir) APP=$2; shift 2;; --node) NODE_BIN=$2; shift 2;; --env-from-pid) ENV_PID=$2; shift 2;; --ref) REF=$2; shift 2;;
+  --app-dir) APP=$2; shift 2;; --release-dir) REL=$2; shift 2;; --node) NODE_BIN=$2; shift 2;; --env-from-pid) ENV_PID=$2; shift 2;; --ref) REF=$2; shift 2;;
   *) echo "Option inconnue : $1"; exit 1;; esac; done
 cd "$APP" || { echo "Dossier introuvable : $APP"; exit 1; }
+[ -n "$REL" ] || REL=$APP
 EXPECTED_NODE=${EXPECTED_NODE:-22.23.5}; NPROC_LIMIT=${NPROC_LIMIT:-165}; MEM_LIMIT_MB=${MEM_LIMIT_MB:-2048}; MIN_FREE_THREADS=${MIN_FREE_THREADS:-40}
 ME=$(id -un)
+USED=$(ps -eL -u "$ME" --no-headers 2>/dev/null | wc -l); FREE=$((NPROC_LIMIT-USED))   # avant tout chargement de binaire natif (processus Node éphémères)
 
 echo "== 1. Node.js"
 NODE=$(find_node "$EXPECTED_NODE") || NODE=""
@@ -36,11 +39,21 @@ fi
 
 echo "== 2. Artefact de build"
 for f in package.json .next/BUILD_ID .next/server node_modules/next/package.json; do [ -e "$f" ] && ok "$f" || fail "absent : $f"; done
+if [ -f next.config.ts ]; then
+  [ -f node_modules/typescript/package.json ] && ok "typescript présent (requis par next.config.ts)" || fail "next.config.ts sans typescript dans node_modules : \`next start\` lancerait « npm install typescript » au démarrage (observé en test)"
+fi
 SWC=$(ls node_modules/@next/swc-linux-x64-gnu/*.node 2>/dev/null | head -1)
 [ -n "$SWC" ] && ok "binaire natif SWC linux-x64-gnu présent" || fail "binaire natif @next/swc-linux-x64-gnu absent (artefact construit pour une autre plateforme ?)"
 if [ -f SHA256SUMS ]; then sha256sum -c --quiet SHA256SUMS >/dev/null 2>&1 && ok "SHA256SUMS conforme" || fail "SHA256SUMS : fichier(s) altéré(s) ou manquant(s)"
 else skip "SHA256SUMS absent : intégrité de l'artefact non vérifiée"; fi
-if [ -n "$NODE" ] && [ -f "$HERE/check-native.mjs" ] && [ -d node_modules ]; then
+if [ -n "$NODE" ] && [ -f "$HERE/check-deps.mjs" ] && [ -f "$REL/package-lock.json" ] && [ -d node_modules ]; then
+  echo "  -- dépendances réelles : versions installées dans node_modules ou nodevenv, comparées au lock de $REL (pas seulement son hash)"
+  DEPS_OUT=$("$NODE" "$HERE/check-deps.mjs" --lock "$REL/package-lock.json" --modules node_modules 2>&1); DEPS_RC=$?
+  echo "$DEPS_OUT" | sed 's/^/     /'
+  [ "$DEPS_RC" -eq 0 ] && ok "node_modules conforme au lock : flux A possible (artefact sans node_modules)" || fail "node_modules ≠ lock : flux B (dépendances modifiées), déploiement automatique bloqué, approbation manuelle requise"
+else skip "ops/check-deps.mjs, Node, package-lock.json ou node_modules absent : dépendances réelles non vérifiées"; fi
+if [ "$FREE" -lt "$MIN_FREE_THREADS" ]; then fail "marge NPROC insuffisante ($FREE < $MIN_FREE_THREADS) : chargement des binaires natifs non effectué (il lance des processus Node éphémères)"
+elif [ -n "$NODE" ] && [ -f "$HERE/check-native.mjs" ] && [ -d node_modules ]; then
   echo "  -- binaires natifs (glibc de l'hôte, bibliothèques dynamiques, chargement réel)"
   NATIVE_OUT=$("$NODE" "$HERE/check-native.mjs" node_modules --load 2>&1); NATIVE_RC=$?
   echo "$NATIVE_OUT" | sed 's/^/     /'
@@ -65,19 +78,23 @@ envval() { # $1 = nom ; valeur lue dans l'environnement ou dans /proc/PID/enviro
 if [ -n "$ENV_PID" ] && [ ! -r "/proc/$ENV_PID/environ" ]; then fail "/proc/$ENV_PID/environ illisible (autre utilisateur ou PID inexistant)"
 else
   [ -z "$ENV_PID" ] && info "environnement du shell courant (les variables cPanel peuvent être invisibles ici : utiliser --env-from-pid)"
-  for v in DATABASE_URL AUTH_SECRET TEACHER_INVITE_CODE; do
-    if [ -n "$(envval $v)" ]; then ok "$v définie"; elif [ -n "$ENV_PID" ]; then fail "$v absente"; else skip "$v non vérifiable depuis ce shell"; fi; done
-  AS=$(envval AUTH_SECRET); [ -n "$AS" ] && [ "${#AS}" -lt 32 ] && warn "AUTH_SECRET courte (${#AS} caractères ; 32 ou plus recommandés — l'application ne refuse que l'absence ou une valeur par défaut connue)"
+  [ -n "$(envval DATABASE_URL)" ] && ok "DATABASE_URL définie" || { [ -n "$ENV_PID" ] && fail "DATABASE_URL absente" || skip "DATABASE_URL non vérifiable depuis ce shell"; }
+  # Mêmes règles que le démarrage de l'application (ops/config-rules.json) ; verdict par NOM de variable, jamais de valeur.
+  if [ -z "$NODE" ] || [ ! -f "$HERE/check-config.mjs" ]; then skip "ops/check-config.mjs ou Node absent : secrets de production non vérifiés"
+  elif [ -n "$ENV_PID" ]; then
+    CFG_OUT=$("$NODE" "$HERE/check-config.mjs" --env-from-pid "$ENV_PID" 2>&1); CFG_RC=$?
+    echo "$CFG_OUT" | sed 's/^/     /'
+    [ "$CFG_RC" -eq 0 ] && ok "AUTH_SECRET et TEACHER_INVITE_CODE : valides (règles du démarrage)" || fail "configuration refusée en production (valeur publique ou mode démonstration)"
+  else skip "AUTH_SECRET et TEACHER_INVITE_CODE non vérifiables depuis ce shell : utiliser --env-from-pid"; fi
   NE=$(envval NODE_ENV); [ "$NE" = production ] && ok "NODE_ENV=production" || { [ -n "$ENV_PID" ] && fail "NODE_ENV='${NE:-absente}' (production attendu)"; }
   TK=$(envval TOKIO_WORKER_THREADS)
   if [ -z "$TK" ]; then [ -n "$ENV_PID" ] && warn "TOKIO_WORKER_THREADS absente de l'environnement cPanel (la garde de server.js s'applique, mais la variable doit rester configurée)"
   elif ! [[ "$TK" =~ ^[0-9]+$ ]] || [ "$TK" -lt 1 ] || [ "$TK" -gt 3 ]; then fail "TOKIO_WORKER_THREADS='$TK' (1 à 3 attendu, 2 en production)"
   else ok "TOKIO_WORKER_THREADS=$TK"; fi
-  for v in ALLOW_DEMO_SECRETS INSECURE_COOKIES SHOW_DRAFTS; do [ -n "$(envval $v)" ] && fail "$v est définie : interdite en production"; done
+  for v in INSECURE_COOKIES SHOW_DRAFTS; do [ -n "$(envval $v)" ] && fail "$v est définie : interdite en production"; done
 fi
 
 echo "== 5. Marge de ressources (compte $ME)"
-USED=$(ps -eL -u "$ME" --no-headers 2>/dev/null | wc -l); FREE=$((NPROC_LIMIT-USED))
 info "NPROC : $USED threads/processus utilisés sur $NPROC_LIMIT (ulimit -u du shell : $(ulimit -u))"
 [ "$FREE" -ge "$MIN_FREE_THREADS" ] && ok "marge NPROC : $FREE (minimum $MIN_FREE_THREADS : 13 pour la nouvelle instance + 13 pour le recouvrement + réserve WordPress)" || fail "marge NPROC insuffisante : $FREE < $MIN_FREE_THREADS"
 [ "$USED" -le $((NPROC_LIMIT*60/100)) ] || warn "NPROC au-dessus de 60 % ($USED/$NPROC_LIMIT)"

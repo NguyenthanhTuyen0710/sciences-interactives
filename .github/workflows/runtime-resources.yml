@@ -1,6 +1,6 @@
-# Contrôles des ressources du runtime de production (threads, Tokio, mémoire, connexions PostgreSQL, démarrage).
-# Indépendant de pr-checks.yml ; déclenché seulement lorsque le runtime, la configuration de démarrage ou les dépendances changent.
-# Aucun secret : base PostgreSQL jetable du service CI, secrets éphémères générés par ops/probe.sh.
+# Contrôles du runtime de production : binaires natifs sur glibc 2.34, ressources (threads, Tokio, mémoire, connexions PostgreSQL) et artefact de déploiement.
+# Indépendant de pr-checks.yml. Filtré par chemins (coûteux) ; lancement manuel possible (workflow_dispatch) ; les contrôles statiques, eux, sont dans runtime-static.yml.
+# Aucun secret : base PostgreSQL jetable du service CI, secrets éphémères générés par les scripts.
 name: Runtime Resources
 
 on:
@@ -8,10 +8,11 @@ on:
     branches: [main]
     paths:
       - "ops/**"
+      - "src/app/**"
       - "src/lib/db/**"
       - "src/lib/auth.ts"
       - "src/lib/config.ts"
-      - "src/instrumentation.ts"
+      - "src/instrumentation*.ts"
       - "package.json"
       - "package-lock.json"
       - "next.config.ts"
@@ -26,47 +27,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  static:
-    name: Contrôles statiques
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22.23.5
-
-      - name: Scripts shell (syntaxe et shellcheck)
-        run: |
-          for f in ops/*.sh; do bash -n "$f"; done
-          shellcheck -x -S warning ops/*.sh
-
-      - name: Tests des scripts d'espace disque et de nettoyage (faux $HOME jetable)
-        run: ops/test-disk.sh
-
-      - name: Démarrage de production (garde Tokio avant tout require, aucune concurrence non bornée)
-        run: |
-          node --check ops/server.js
-          guard=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'TOKIO_WORKER_THREADS' | head -1 | cut -d: -f1)
-          req=$(grep -nvE '^[[:space:]]*(//|$)' ops/server.js | grep 'require(' | head -1 | cut -d: -f1)
-          [ -n "$guard" ] && [ -n "$req" ] && [ "$guard" -lt "$req" ] || { echo "::error::la garde TOKIO_WORKER_THREADS doit précéder le premier require() dans ops/server.js"; exit 1; }
-          if grep -nE "require\(['\"](cluster|worker_threads|child_process)['\"]\)|from ['\"](node:)?(cluster|worker_threads|child_process)['\"]" ops/server.js; then
-            echo "::error::cluster, worker_threads et child_process sont interdits dans le point d'entrée de production"; exit 1
-          fi
-          if grep -rnE "from ['\"](node:)?(cluster|worker_threads|child_process)['\"]|require\(['\"](node:)?(cluster|worker_threads|child_process)['\"]\)" src; then
-            echo "::error::cluster, worker_threads et child_process sont interdits dans src/ (revue obligatoire)"; exit 1
-          fi
-
-      - name: Revue des dépendances ajoutées ou modifiées
-        if: github.event_name == 'pull_request'
-        run: |
-          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-          node ops/review-deps.mjs "origin/${{ github.base_ref }}" | tee deps-review.md
-          { cat deps-review.md; } >> "$GITHUB_STEP_SUMMARY"
-
   native-glibc234:
     name: Binaires natifs sur glibc 2.34 (AlmaLinux 9, comme l'hébergement)
     runs-on: ubuntu-latest
@@ -98,9 +58,9 @@ jobs:
           { echo '### Binaires natifs (glibc 2.34)'; echo '```'; cat native.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
   runtime:
-    name: Test de ressources du runtime
+    name: Ressources du runtime et artefact de déploiement
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     services:
       postgres:
         image: postgres:16
@@ -132,8 +92,27 @@ jobs:
       - name: Migrations et données de démonstration (base CI jetable)
         run: npm run setup
 
-      - name: Sonde de ressources (3 passages par scénario)
+      - name: Sonde de ressources sur l'arborescence du dépôt (3 passages par scénario)
         run: |
           set -o pipefail
           RUNS=3 ops/probe.sh 2>&1 | tee probe.log
           { echo '### Sonde de ressources'; echo '```'; cat probe.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Artefact de déploiement (sans node_modules, sans cache de build)
+        run: ops/build-artifact.sh --out artifact
+
+      - name: Test de fumée de l'artefact décompressé dans un dossier isolé
+        run: |
+          set -o pipefail
+          ops/smoke-artifact.sh --artifact artifact/sciences-interactives-*.tar.gz --node-modules node_modules --expect-commit "$GITHUB_SHA" 2>&1 | tee smoke.log
+          { echo '### Test de fumée de l'"'"'artefact'; echo '```'; cat smoke.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Conserver l'artefact vérifié (7 jours ; aucun déploiement automatique)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sciences-interactives-${{ github.sha }}
+          path: |
+            artifact/*.tar.gz
+            artifact/*.sha256
+          retention-days: 7
+          if-no-files-found: error

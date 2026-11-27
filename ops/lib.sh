@@ -71,3 +71,14 @@ quota_mb_from_text() {
       if (n>=3 && !found) { q=(v[2]>0)?v[2]:v[3]; if (q>0) { printf "%.2f\n", q/1024; found=1 } } }
     { delete v }' 
 }
+
+# ---- verrou de déploiement : un seul déploiement, retour arrière ou nettoyage à la fois (mkdir est atomique) ----
+# Disposition des versions : toute l'activité de déploiement reste DANS le dossier de l'application ; sa racine n'est jamais renommée.
+REL_DIR=.release
+# shellcheck disable=SC2034  # lu par les scripts qui sourcent ce fichier
+REL_ITEMS=(.next package.json package-lock.json next.config.ts server.js RELEASE.json)   # unités d'une version ; public/, public/uploads et node_modules n'en font jamais partie
+lock_dir()  { echo "$1/$REL_DIR/deploy.lock"; }
+lock_try()  { mkdir -p "$1/$REL_DIR" && mkdir "$(lock_dir "$1")" 2>/dev/null || return 1
+              printf 'purpose=%s\nuser=%s\npid=%s\nstarted=%s\n' "$2" "$(id -un)" "$$" "$(date -u +%FT%TZ)" > "$(lock_dir "$1")/owner"; }
+lock_free() { rm -f "$(lock_dir "$1")/owner"; rmdir "$(lock_dir "$1")" 2>/dev/null; return 0; }
+lock_info() { cat "$(lock_dir "$1")/owner" 2>/dev/null; }

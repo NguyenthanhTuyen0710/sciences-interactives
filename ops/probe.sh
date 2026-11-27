@@ -17,7 +17,7 @@ PORT=${PORT:-3222}
 SETTLE_SECS=${SETTLE_SECS:-12}       # > idleTimeoutMillis du pool pg (10 s par défaut)
 LOAD_REQS=${LOAD_REQS:-100}
 LOAD_PAR=${LOAD_PAR:-20}
-SERVER_FILE=${SERVER_FILE:-ops/server.js}   # surcharge utile pour les tests négatifs
+SERVER_FILE=${SERVER_FILE:-}   # surcharge utile pour les tests négatifs (défaut : ops/server.js, ou server.js dans PROBE_APP_DIR)
 PG_MAX_EXPECTED=${PG_MAX_EXPECTED:-10}   # valeur actuelle de `max` dans src/lib/db/index.ts (non modifiée)
 
 # Seuils. FAIL = fait échouer le test (comportement déterministe) ; WARN = à examiner (dépend du runner ou de la charge).
@@ -28,9 +28,11 @@ WARN_RETAINED_GROWTH_PCT=25          # croissance du RSS « après retour au cal
 WARN_RETAINED_GROWTH_MB=40
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-cd "$ROOT" || exit 2
 # shellcheck source=ops/lib.sh
 . "$ROOT/ops/lib.sh"
+# PROBE_APP_DIR : lance la sonde sur un artefact déjà décompressé (voir ops/smoke-artifact.sh) au lieu de l'arborescence du dépôt.
+cd "${PROBE_APP_DIR:-$ROOT}" || exit 2
+if [ -z "$SERVER_FILE" ]; then if [ -n "${PROBE_APP_DIR:-}" ]; then SERVER_FILE=server.js; else SERVER_FILE=ops/server.js; fi; fi
 NODE=$(find_node 22.23.5) || { echo "Node introuvable."; exit 2; }
 
 # ---- prérequis -------------------------------------------------------------------------------
@@ -57,11 +59,12 @@ PROBE_PASSWORD=${PROBE_PASSWORD:-demo1234}   # compte de démonstration du seed 
 
 pg_count() { [ "$HAVE_PSQL" = 1 ] && psql "$DATABASE_URL" -Atqc "select count(*) from pg_stat_activity where datname=current_database() and pid<>pg_backend_pid()" 2>/dev/null || echo 0; }
 
-start_server() { # $1 = valeur de TOKIO_WORKER_THREADS ("" = variable absente)
+start_server() { # $1 = valeur de TOKIO_WORKER_THREADS ("" = variable absente) ; $2 = liste de CPU visibles (taskset), vide = tous
+  local pre=(); [ -n "${2:-}" ] && pre=(taskset -c "$2")
   local envcmd=(env -u TOKIO_WORKER_THREADS)
   [ -n "$1" ] && envcmd=(env "TOKIO_WORKER_THREADS=$1")
   PORT=$PORT NODE_ENV=production AUTH_SECRET=$PROBE_AUTH_SECRET TEACHER_INVITE_CODE=$PROBE_INVITE \
-    "${envcmd[@]}" "$NODE" "$SERVER_FILE" >"$WORK/server.log" 2>&1 &
+    ${pre[@]+"${pre[@]}"} "${envcmd[@]}" "$NODE" "$SERVER_FILE" >"$WORK/server.log" 2>&1 &
   SRV=$!
   for _ in $(seq 1 120); do
     kill -0 "$SRV" 2>/dev/null || { fail "le serveur s'est arrêté au démarrage (voir journal ci-dessous)"; tail -5 "$WORK/server.log"; SRV=""; return 1; }
@@ -110,12 +113,12 @@ check_after_exit() {
 
 IDLE_TH=(); IDLE_RSS=(); PEAK_RSS=(); RET1=(); RET2=(); PG_PEAKS=()
 
-run_scenario() { # $1 nom  $2 valeur TOKIO ("" = absente)  $3 attendu  $4 full|idle
+run_scenario() { # $1 nom  $2 valeur TOKIO ("" = absente)  $3 attendu  $4 full|idle  $5 CPU visibles (taskset, optionnel)
   local name=$1 val=$2 expect=$3 mode=$4 run
   for run in $(seq 1 "$RUNS"); do
     echo "== scénario $name, passage $run/$RUNS (TOKIO_WORKER_THREADS=${val:-<absente>}, attendu $expect)"
     local base; base=$(pg_count)
-    start_server "$val" || { stop_server; continue; }
+    start_server "$val" "${5:-}" || { stop_server; continue; }
     check_idle "$expect"
     if [ "$mode" = full ]; then
       rm -f "$WORK/cj"
@@ -151,11 +154,10 @@ echo "Probe ressources — CPU visibles : $NPROC_VISIBLE · passages par scénar
 run_scenario standard 2  2 full
 run_scenario override 3  3 idle
 run_scenario fallback "" 2 idle
-if [ "$NPROC_VISIBLE" -le 2 ]; then
-  warn "seulement $NPROC_VISIBLE CPU visible(s) : le scénario « fallback » ne distingue pas la garde d'un Tokio par défaut (le test ne prouve pas la garde ici)"
-else
-  info "$NPROC_VISIBLE CPU visibles contre 2 Tokio attendus : le scénario « fallback » reproduit l'écart CPU visibles / quota"
-fi
+# Un seul CPU visible : sans la garde, Tokio créerait 1 thread ; la garde en impose 2. Ce cas prouve la garde sur n'importe quel runner (même à 2 CPU).
+if command -v taskset >/dev/null 2>&1; then run_scenario fallback-1cpu "" 2 idle 0
+else warn "taskset absent : la garde n'est pas prouvée sur un runner à 2 CPU ou moins"; fi
+info "$NPROC_VISIBLE CPU visibles ; le scénario « fallback-1cpu » rend la preuve de la garde indépendante du nombre de CPU du runner"
 
 echo
 echo "== Synthèse"
