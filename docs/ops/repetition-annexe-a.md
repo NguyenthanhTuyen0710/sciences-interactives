@@ -2,7 +2,14 @@
 
 Rapport de la répétition du déploiement sur une application jetable. Procédure de référence : `docs/ops/runbook.md`.
 
-**Source des résultats.** Les commandes ont été exécutées par le propriétaire sur VinaHost ; les sorties ont été transmises à l'assistant. Les valeurs ci-dessous sont donc **communiquées par le propriétaire** (VinaHost), non rejouées par l'assistant. Certaines étapes ont été confirmées « réussies » sans transmission de la sortie brute (marquées *confirmé*). Les tests locaux et CI sont distingués.
+**Source des résultats.** L'assistant n'a pas d'accès à l'hébergement : les commandes ont été exécutées par le propriétaire sur VinaHost. Chaque ligne du tableau de la section 2 porte une étiquette :
+
+- **[S]** valeurs transmises par le propriétaire (sortie ou extraits), non rejouées par l'assistant ;
+- **[C]** succès confirmé par le propriétaire sans transmission des valeurs ;
+- **[L]** simulation locale par l'assistant, non exécutée sur l'hébergement ;
+- **[CI]** GitHub Actions.
+
+Aucun résultat [C] ni [L] n'est présenté comme vérifié de façon indépendante sur l'hébergement.
 
 ## 1. Périmètre et garanties
 
@@ -15,25 +22,25 @@ Rapport de la répétition du déploiement sur une application jetable. Procédu
 
 | Étape | Résultat | Ce que cela établit |
 |---|---|---|
-| A0 | NPROC, RAM, Node, quota relevés (*confirmé*) | Marge suffisante avant la répétition |
-| A1.1 | Sous-domaine créé, document root `drwxr-x---` hors `public_html` | — |
-| A1.2 | Application créée, **démarrée automatiquement par cPanel** ; `server.js` d'exemple de 323 octets, `public/`, `tmp/restart.txt`, `stderr.log` (0 octet) ; `nodevenv/si-repetition` créé ; pas de `node_modules` | cPanel démarre l'application dès la création |
-| A2.0 | **2 processus `lsnode`** (PID cités, ELAPSED 116 s et 106 s, NLWP 7, RSS ≈ 56 Mo) sans aucune requête HTTP du propriétaire | Plusieurs instances peuvent coexister pour une application |
-| A2.1 / A5 | STOP : 0 processus au premier relevé (93 s après T0) ; `restart.txt` mis à jour ; HTTP après STOP : **AutoIndex** (« Index of / », `cgi-bin/`, `php.ini`) ; production inchangée | STOP peut fonctionner ; la liste de répertoire apparaît quand l'application est arrêtée |
-| A4 / A4.1 | Réponses `version A, pid=…, tokio=2` ; un PID **disparaît en quelques secondes d'inactivité** (démarrage à la demande) | « 0 PID » à un instant donné ne prouve pas un STOP |
-| A6 | Échange de version **par renommage dans la racine** (`.next`, `RELEASE.json`) application arrêtée : rollback conservé (`version A`), staging vidé ; aucune requête n'a relancé l'application | Le mécanisme de l'échange fonctionne sous LiteSpeed/cPanel (cas sans `node_modules`) |
-| A7 | START : 5/5 réponses HTTP 200 `version B`, `tokio=2` (lu aussi dans `/proc/PID/environ`), même PID neuf, NLWP 7, RSS 56–57 Mo | START et activation de la nouvelle version |
-| A8.1 | **Échec** : STOP demandé ; l'interface est restée sur STOP APP/RESTART, `restart.txt` inchangé, HTTP 200 `version B` pendant 180 s d'interrogation toutes les 2 s | STOP n'a pas été appliqué ; cause **non établie** |
-| A8.1.1 | STOP sans interrogation HTTP : `.htaccess` 915 → 611 octets (7 lignes Passenger retirées), `restart.txt` mis à jour, PID 3439311 (630 s) disparu au relevé suivant (≈ 4 min), HTTP : AutoIndex | STOP effectif visible dans `.htaccess` ; la cause du A8.1 reste indéterminée (l'actualisation de l'interface s'est faite en même temps) |
-| A8.2 | Retour arrière : version A restaurée, version B conservée dans `failed/`, **pas de `RELEASE.json`** dans la racine (la version A n'en avait pas) | Le retour arrière par renommage fonctionne |
-| A8.3 | START, version A servie, nouveau PID, `tokio=2` (*confirmé*) | Cycle complet |
-| A8.5.1 | **Échec** : configuration STOP appliquée (14:52:02, 0 ligne Passenger, bouton START APP) mais le PID 3736835 vivait encore (ETIMES 1 272 s, PPID 1, démarré avant le STOP) 5 min 21 s plus tard | **STOP peut laisser un processus** |
-| A8.5.1c | SIGTERM sur ce seul PID après vérification UID/cwd/exe/cmdline/heure de démarrage : terminé (*confirmé*) ; aucun nouveau PID ; production inchangée | Le contrôle d'identité puis SIGTERM suffisent |
-| A8.5.1 (rejeu) | Page de maintenance statique créée dans le document root : servie à la place de l'AutoIndex (*confirmé*) | La page remplace la liste de répertoire à `/` |
-| A8.5.2 | START avec `index.html` présent : **maintenance servie 5/5, l'application masquée** ; un processus a bien démarré (PID 4108297, NLWP 7, RSS 58 240 Kio) | Une page statique masque l'application |
-| A9 | Retrait de la page (identité vérifiée octet pour octet) **après** START : 20 requêtes à 0,3 s : **AutoIndex = 0** ; 8 passes `version A`, `tokio=2`, NPROC 26, RSS total 332 Mo | Ordre « START puis retrait » sans AutoIndex observé |
-| DNS | Trois serveurs faisant autorité (PA Vietnam), Google DNS et Cloudflare : `si-test.starluxvn.com` **et** une étiquette aléatoire → `103.9.76.10`, TTL 3 600 | **Wildcard DNS** sur `starluxvn.com` ; non modifié |
-| A10.1–A10.6 | Archives des journaux (SHA-256 recoupé sur le poste Windows : `4c06fedb1e808a4ef86afae2f29ff097ad55fe4f830c161aaff622bec0e9a34a`) ; DESTROY (supprime `nodevenv/si-repetition`, pas la racine) ; sous-domaine retiré (document root conservé) ; suppression contrôlée de `~/si-repetition` (16 Ko), `~/si-test.starluxvn.com` (12 Ko) puis `~/si-rehearsal` | Nettoyage sûr et reproductible |
+| A0 [C] | NPROC, RAM, Node, quota relevés (*confirmé*) | Marge suffisante avant la répétition |
+| A1.1 [S] | Sous-domaine créé, document root `drwxr-x---` hors `public_html` | — |
+| A1.2 [S] | Application créée, **démarrée automatiquement par cPanel** ; `server.js` d'exemple de 323 octets, `public/`, `tmp/restart.txt`, `stderr.log` (0 octet) ; `nodevenv/si-repetition` créé ; pas de `node_modules` | cPanel démarre l'application dès la création |
+| A2.0 [S] | **2 processus `lsnode`** (PID cités, ELAPSED 116 s et 106 s, NLWP 7, RSS ≈ 56 Mo) sans aucune requête HTTP du propriétaire | Plusieurs instances peuvent coexister pour une application |
+| A2.1 / A5 [S] | STOP : 0 processus au premier relevé (93 s après T0) ; `restart.txt` mis à jour ; HTTP après STOP : **AutoIndex** (« Index of / », `cgi-bin/`, `php.ini`) ; production inchangée | STOP peut fonctionner ; la liste de répertoire apparaît quand l'application est arrêtée |
+| A4 / A4.1 [S] | Réponses `version A, pid=…, tokio=2` ; un PID **disparaît en quelques secondes d'inactivité** (démarrage à la demande) | « 0 PID » à un instant donné ne prouve pas un STOP |
+| A6 [S] | Échange de version **par renommage dans la racine** (`.next`, `RELEASE.json`) application arrêtée : rollback conservé (`version A`), staging vidé ; aucune requête n'a relancé l'application | Le mécanisme de l'échange fonctionne sous LiteSpeed/cPanel (cas sans `node_modules`) |
+| A7 [S] | START : 5/5 réponses HTTP 200 `version B`, `tokio=2` (lu aussi dans `/proc/PID/environ`), même PID neuf, NLWP 7, RSS 56–57 Mo | START et activation de la nouvelle version |
+| A8.1 [S] | **Échec** : STOP demandé ; l'interface est restée sur STOP APP/RESTART, `restart.txt` inchangé, HTTP 200 `version B` pendant 180 s d'interrogation toutes les 2 s | STOP n'a pas été appliqué ; cause **non établie** |
+| A8.1.1 [S] | STOP sans interrogation HTTP : `.htaccess` 915 → 611 octets (7 lignes Passenger retirées), `restart.txt` mis à jour, PID 3439311 (630 s) disparu au relevé suivant (≈ 4 min), HTTP : AutoIndex | STOP effectif visible dans `.htaccess` ; la cause du A8.1 reste indéterminée (l'actualisation de l'interface s'est faite en même temps) |
+| A8.2 [S] | Retour arrière : version A restaurée, version B conservée dans `failed/`, **pas de `RELEASE.json`** dans la racine (la version A n'en avait pas) | Le retour arrière par renommage fonctionne |
+| A8.3 [C] | START, version A servie, nouveau PID, `tokio=2` (*confirmé*) | Cycle complet |
+| A8.5.1 [S] | **Échec** : configuration STOP appliquée (14:52:02, 0 ligne Passenger, bouton START APP) mais le PID 3736835 vivait encore (ETIMES 1 272 s, PPID 1, démarré avant le STOP) 5 min 21 s plus tard | **STOP peut laisser un processus** |
+| A8.5.1c [C] | SIGTERM sur ce seul PID après vérification UID/cwd/exe/cmdline/heure de démarrage : terminé (*confirmé*) ; aucun nouveau PID ; production inchangée | Le contrôle d'identité puis SIGTERM suffisent |
+| A8.5.1 (rejeu) [C] | Page de maintenance statique créée dans le document root : servie à la place de l'AutoIndex (*confirmé*) | La page remplace la liste de répertoire à `/` |
+| A8.5.2 [S] | START avec `index.html` présent : **maintenance servie 5/5, l'application masquée** ; un processus a bien démarré (PID 4108297, NLWP 7, RSS 58 240 Kio) | Une page statique masque l'application |
+| A9 [S] | Retrait de la page (identité vérifiée octet pour octet) **après** START : 20 requêtes à 0,3 s : **AutoIndex = 0** ; 8 passes `version A`, `tokio=2`, NPROC 26, RSS total 332 Mo | Ordre « START puis retrait » sans AutoIndex observé |
+| DNS [S] | Trois serveurs faisant autorité (PA Vietnam), Google DNS et Cloudflare : `si-test.starluxvn.com` **et** une étiquette aléatoire → `103.9.76.10`, TTL 3 600 | **Wildcard DNS** sur `starluxvn.com` ; non modifié |
+| A10.1–A10.6 [S] ; A10.1 et A10.2 [C] | Archives des journaux (SHA-256 recoupé sur le poste Windows : `4c06fedb1e808a4ef86afae2f29ff097ad55fe4f830c161aaff622bec0e9a34a`) ; DESTROY (supprime `nodevenv/si-repetition`, pas la racine) ; sous-domaine retiré (document root conservé) ; suppression contrôlée de `~/si-repetition` (16 Ko), `~/si-test.starluxvn.com` (12 Ko) puis `~/si-rehearsal` | Nettoyage sûr et reproductible |
 
 ## 3. Constats et conséquences pour la procédure
 
@@ -52,7 +59,13 @@ Rapport de la répétition du déploiement sur une application jetable. Procédu
 
 ## 4. Vérifié, non vérifié, risques résiduels
 
-**Vérifié sur VinaHost (application jetable, serveur `http` pur)** : STOP/START par cPanel ; échange et retour arrière par renommage dans la racine ; arrêt prouvé par `.htaccess` ; SIGTERM contrôlé ; comportement de la page de maintenance (remplacement de l'AutoIndex, masquage de l'application, ordre sans AutoIndex observé) ; nettoyage ; non-impact sur la production sur toute la durée.
+**Constaté sur VinaHost** (application jetable, serveur `http` pur ; valeurs transmises par le propriétaire [S], non rejouées par l'assistant) : STOP/START par cPanel ; échange et retour arrière par renommage dans la racine ; arrêt visible dans `.htaccess` ; comportement de la page de maintenance (remplacement de l'AutoIndex, masquage de l'application, retrait après START) ; nettoyage ; non-impact sur la production sur toute la durée.
+
+**Confirmé sans valeurs [C]** : A0, A8.3, A8.5.1c (SIGTERM après contrôle d'identité par l'heure de démarrage en secondes), rejeu de A8.5.1, A10.1 et A10.2.
+
+**Simulé localement [L], jamais exécuté sur l'hébergement tel qu'écrit dans le runbook** : la fonction `sigterm_verifie` (identité par `starttime`, garde de 300 s, refus d'un processus démarré après le STOP) ; les commandes de la page de maintenance et les gardes des étapes 12 bis, 15 et 16 ; la garde de l'étape 8 (cible PostgreSQL vérifiée, essayée contre une base PostgreSQL locale jetable : cible valide acceptée ; refus si la cible est la production, si elle n'est pas vide, si l'utilisateur jetable accède à la production ou si le mot de passe est faux). L'étape A10.2 de la répétition utilisait la version `starttime` mais on ignore si un processus restait à terminer : la branche `kill` de cette version n'est donc pas établie sur l'hébergement.
+
+**CI** : artefact officiel, smoke test, binaires natifs sur glibc 2.34.
 
 **Non vérifié** (ne pas extrapoler) :
 - STOP/START de l'application **de production** (Next.js, ≈ 260 Mo, processus longue durée) ; l'échange avec le lien `node_modules` CloudLinux en place (absent de l'application jetable, jamais touché par l'échange) ; `public/uploads`.
@@ -77,3 +90,16 @@ Rapport de la répétition du déploiement sur une application jetable. Procédu
 ## 6. Conservation
 
 Les journaux de la répétition restent dans le répertoire personnel de l'hébergement : `si-rehearsal-journaux-20261127.tar.gz`, `si-rehearsal-journaux-final-20261127.tar.gz` (+ `.sha256`), `si-rehearsal-a105-journal-20261127.txt`, `si-rehearsal-a106-journal-20261127.txt` (quelques Ko). Leur suppression est une décision du propriétaire.
+
+## 7. Artefact officiel et politique d'usage
+
+| | |
+|---|---|
+| Exécution | *Runtime Resources* lancée manuellement sur `main` (run 45952328271), 2 jobs verts [CI] |
+| Commit de construction | `0673e09963cc7fed6ff20b4bb180071feec1075e` |
+| Fichier | `sciences-interactives-0673e09963cc.tar.gz`, 3 418 730 octets (≈ 3,3 Mo), 547 entrées |
+| SHA-256 | `eea2212c7b057b3e3a97ec934563073c29cc70633d5317f27b2db303baaa1bcd` (recoupé par le propriétaire sur son poste Windows) |
+| Contenu | `.next` (sans cache), `package.json`, `package-lock.json`, `next.config.ts`, `server.js` (= `ops/server.js`), `RELEASE.json` ; ni `node_modules`, ni `public/`, ni `.next/cache`, ni fichier `.env*` |
+| Expiration | **2026-12-04** sur GitHub Actions (conservation de 7 jours) |
+
+**Usage si `main` n'a reçu que de la documentation.** `docs/` et `CLAUDE.md` ne sont ni lus par le build ni inclus dans l'artefact. L'artefact reste donc valable, avec la même somme SHA-256, tant que la comparaison entre le commit de l'artefact et la pointe de `main` ne montre **aucun** fichier hors `docs/` et `CLAUDE.md` (commande de l'étape 2 du runbook). Les scripts `ops/` se récupèrent au commit de l'artefact. Tout autre changement (`ops/`, `src/`, `package*`, `next.config.ts`, `.github/`, tests) impose un nouvel artefact, donc une nouvelle somme à recontrôler. Après le 2026-12-04, l'artefact est à reconstruire dans tous les cas.

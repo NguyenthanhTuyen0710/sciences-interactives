@@ -20,8 +20,8 @@ Ce document est la **seule** procédure de déploiement et de retour arrière. I
 
 | Condition | Vérification |
 |---|---|
-| PR #72 fusionnée dans `main` par le propriétaire | page de la PR : « Merged » |
-| Aucun autre changement en attente sur `main` à déployer en même temps | `git log` de `main` |
+| PR #72 fusionnée dans `main` par le propriétaire | fait : commit de fusion `0673e09` |
+| `main` = commit de l'artefact, ou en avance sur lui par des changements de **documentation seulement** (`docs/`, `CLAUDE.md`) ; aucun autre changement en attente | étape 2 (usage de l'artefact) |
 | Fenêtre de déploiement choisie (faible trafic), propriétaire disponible 2 h, surveillance prévue 48 h | décision du propriétaire |
 | Contact VinaHost prêt (sortie des commandes de l'étape 15 à fournir) | — |
 | Décision sur les comptes de test (étape 7) | propriétaire |
@@ -30,7 +30,7 @@ Ce document est la **seule** procédure de déploiement et de retour arrière. I
 | Restauration de la sauvegarde testée dans une **base jetable**, ou décision explicite de s'en passer | étape 8 |
 | Document root de production examiné en lecture seule ; décision A/B sur la page de maintenance | étape 12 bis, propriétaire |
 | Emplacement du journal de l'application relevé | étape 18 |
-| Artefact encore valide (conservé 7 jours ; au-delà : relancer l'étape 1 et recontrôler le SHA-256) | page *Actions* |
+| Artefact encore valide (conservé 7 jours ; l'artefact officiel actuel expire le **2026-12-04** ; au-delà : relancer l'étape 1 et recontrôler le SHA-256) | page *Actions* |
 
 **Arrêt si** une condition manque.
 
@@ -42,22 +42,25 @@ Aucun workflow ne se lance sur `push` vers `main` (pas de déploiement automatiq
 2. Attendre la fin des 2 jobs (« Binaires natifs sur glibc 2.34 », « Ressources du runtime et artefact de déploiement »).
 
 Attendu : 2 jobs verts ; artefact `sciences-interactives-<SHA de main>` (≈ 3,3 Mo, conservé 7 jours).
-**Arrêt si** un job est rouge, ou si `main` a avancé depuis le lancement (relancer).
+**Arrêt si** un job est rouge, ou si `main` a avancé depuis le lancement avec autre chose que de la documentation (étape 2 : relancer l'étape 1).
 
 ## Étape 2 — Télécharger et contrôler l'artefact (poste local)
 
-Télécharger l'artefact GitHub (zip), le décompresser : il contient `sciences-interactives-<sha12>.tar.gz` et `.sha256`.
+Télécharger l'artefact GitHub (zip), le décompresser dans un dossier vide : il contient `sciences-interactives-<sha12>.tar.gz` et `.sha256`. Le commit de référence `SHA` est celui **lu dans `RELEASE.json` de l'artefact**, pas forcément la pointe actuelle de `main`.
 
 ```bash
-SHA=$(git rev-parse origin/main); S12=${SHA:0:12}; echo "$SHA"
+sha256sum -c sciences-interactives-*.tar.gz.sha256 && tar -xzOf sciences-interactives-*.tar.gz RELEASE.json | grep -E '"(commit|node|platform|next)"'
 ```
 
 ```bash
-sha256sum -c sciences-interactives-$S12.tar.gz.sha256 && tar -xzOf sciences-interactives-$S12.tar.gz RELEASE.json | grep -E '"(commit|node|platform|next)"'
+SHA=<commit lu dans RELEASE.json>; S12=${SHA:0:12}; git fetch origin main && git merge-base --is-ancestor "$SHA" origin/main && echo "le commit de l'artefact est un ancêtre de main"; echo "fichiers modifiés depuis l'artefact hors documentation : $(git diff --name-only "$SHA" origin/main | grep -cvE '^(docs/|CLAUDE\.md$)')"
 ```
 
-Attendu : `OK` ; `commit` = `$SHA` ; `node` v22.23.5 ; `platform` linux-x64.
-**Arrêt si** la somme est fausse ou si le commit n'est pas celui de `main`.
+Attendu : `OK` ; `commit` = `$SHA` ; `node` v22.23.5 ; `platform` linux-x64 ; « ancêtre de main » ; `0` fichier hors documentation.
+**Arrêt si** la somme est fausse, si le commit n'est pas un ancêtre de `main`, ou si au moins un fichier hors `docs/` et `CLAUDE.md` a changé depuis l'artefact (reconstruire l'artefact depuis la pointe de `main`, étape 1).
+
+**Usage de l'artefact lorsque `main` n'a reçu que de la documentation.** `docs/` et `CLAUDE.md` n'entrent ni dans le build ni dans l'artefact (`.next`, `package.json`, `package-lock.json`, `next.config.ts`, `server.js` = `ops/server.js`, `RELEASE.json`) : un artefact construit avant un commit de documentation reste le bon artefact et son SHA-256 reste la référence. Les scripts `ops/` se récupèrent au commit `SHA` (étape 4), pas à la pointe de `main`. Tout autre changement (`ops/`, `src/`, `package*`, `next.config.ts`, `.github/`, tests) impose un nouvel artefact.
+Artefact officiel actuel (au 2026-11-27, exécution manuelle de *Runtime Resources* sur `main`) : commit `0673e09963cc7fed6ff20b4bb180071feec1075e`, `sciences-interactives-0673e09963cc.tar.gz` de 3 418 730 octets, SHA-256 `eea2212c7b057b3e3a97ec934563073c29cc70633d5317f27b2db303baaa1bcd` (recoupé par le propriétaire sur son poste), expire le **2026-12-04** sur GitHub Actions.
 
 ## Étape 3 — Variables de session et bibliothèque de contrôle (hôte)
 
@@ -173,20 +176,24 @@ Attendu : le premier `grep -c` affiche `6` ; « archive lisible en entier » ; u
 **Test de restauration (recommandé ; sinon décision explicite du propriétaire)**, dans une base **distincte de la production** :
 
 1. cPanel → *PostgreSQL Databases* : créer une base et un utilisateur jetables (noms différents de la production, mot de passe propre). La création de bases n'est pas présumée possible.
-2. Cible et garde-fou (mot de passe saisi avec `read -s`) :
+2. Cible, saisie du mot de passe (`read -s`) et **vérification indépendante de la cible réellement jointe**. La comparaison de noms ne suffit pas : on se connecte à la cible et on contrôle la base, l'utilisateur et le fait qu'elle est vide ; on vérifie aussi que l'utilisateur jetable **ne peut pas** se connecter à la base de production.
 
 ```bash
-TEST_DB=<base_jetable>; TEST_USER=<utilisateur_jetable>; read -rs -p "Mot de passe de la base jetable : " TEST_PW; echo; [ -n "$TEST_DB" ] && [ "$TEST_DB" != "$PGDATABASE" ] && echo "cible distincte de la production" || echo "ARRET : cible absente ou identique à la production"
+TEST_DB=<base_jetable>; TEST_USER=<utilisateur_jetable>; read -rs -p "Mot de passe de la base jetable : " TEST_PW; echo; CIBLE_OK=""
+CHK=$(PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -F '|' -c "select current_database(), current_user, (select count(*) from pg_tables where schemaname='public')" 2>/dev/null)
+PROD_ACCES=$(PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -c "select 1" 2>/dev/null)
+[ -n "$TEST_DB" ] && [ -n "$TEST_USER" ] && [ "$TEST_DB" != "$PGDATABASE" ] && [ "$TEST_USER" != "$PGUSER" ] && [ "$CHK" = "$TEST_DB|$TEST_USER|0" ] && [ -z "$PROD_ACCES" ] && CIBLE_OK=1 && echo "cible vérifiée : base jetable vide, utilisateur distinct, sans accès à la base de production" || echo "ARRET : cible non vérifiée (relevé='$CHK', accès à la production='$PROD_ACCES')"
 ```
 
-3. Restauration (la variable `PGDATABASE` de la production n'est pas utilisée) puis comparaison des comptages :
+(La dernière requête s'adresse à la base de production avec les identifiants jetables : elle doit **échouer**, donc ne rien renvoyer. `$PGDATABASE`, `$PGHOST` et `$PGPORT` viennent de l'étape 8 ; ne pas les modifier.)
+3. Restauration, **uniquement** si `CIBLE_OK=1`, sans `--clean` ni `--create` (rien n'est supprimé ni recréé), puis comparaison des comptages :
 
 ```bash
-[ "$TEST_DB" != "$PGDATABASE" ] && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" pg_restore --no-owner --no-privileges --exit-on-error -d "$TEST_DB" "$B" && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -c "select 'users',count(*) from users union all select 'attempts',count(*) from attempts union all select 'custom_exercises',count(*) from custom_exercises union all select 'custom_chapters',count(*) from custom_chapters union all select 'collections',count(*) from collections union all select 'media',count(*) from media" | diff - ~/si-backups/comptages-avant-$S12.txt && echo "restauration identique"
+[ "$CIBLE_OK" = 1 ] && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" pg_restore --no-owner --no-privileges --exit-on-error -d "$TEST_DB" "$B" && PGDATABASE="$TEST_DB" PGUSER="$TEST_USER" PGPASSWORD="$TEST_PW" psql -At -c "select 'users',count(*) from users union all select 'attempts',count(*) from attempts union all select 'custom_exercises',count(*) from custom_exercises union all select 'custom_chapters',count(*) from custom_chapters union all select 'collections',count(*) from collections union all select 'media',count(*) from media" | diff - ~/si-backups/comptages-avant-$S12.txt && echo "restauration identique"
 ```
 
-4. Supprimer la base et l'utilisateur jetables dans cPanel, puis `unset TEST_PW TEST_DB TEST_USER`.
-Un écart léger est normal si des utilisateurs ont travaillé entre la sauvegarde et le comptage : l'expliquer ligne par ligne. **Arrêt si** la cible est identique à la production ou si la restauration échoue.
+4. Supprimer la base et l'utilisateur jetables dans cPanel, puis `unset TEST_PW TEST_DB TEST_USER CIBLE_OK`.
+Un écart léger est normal si des utilisateurs ont travaillé entre la sauvegarde et le comptage : l'expliquer ligne par ligne. **Arrêt si** `CIBLE_OK` n'est pas `1` (cible identique à la production, non vide, mauvais utilisateur, ou utilisateur jetable ayant accès à la production) ou si la restauration échoue. En cas d'échec de la restauration : ne rien tenter sur la base de production.
 
 ## Étape 9 — Transférer l'artefact et l'installer en préparation
 
@@ -382,7 +389,13 @@ Tant que la page est en place, l'application n'est **pas joignable** (la page la
 sleep 5; echo "processus : $(app_pids | tr '\n' ' ')"; for p in $(app_pids); do ps -o pid,ppid,etimes,rss,nlwp -p $p; done
 ```
 
-Attendu : un nouveau PID (démarré après l'étape 15), 13 threads, aucun ancien PID. L'absence de liste de répertoire entre le retrait de la page et la remise en route a été observée sur le domaine de test (20 requêtes à 0,3 s) ; ce n'est **pas une garantie** sur la production.
+Contrôle du **contenu** de la réponse (un HTTP 200 seul ne prouve pas que l'application répond : la page de maintenance, la liste de répertoire et l'application répondent tous 200 sur `/`) :
+
+```bash
+curl -sS -o "$R/p16.html" -w 'HTTP %{http_code}\n' --max-time 20 https://starluxvn.com/; echo "marqueur de maintenance : $(grep -c 'si-maintenance' "$R/p16.html") ; liste de répertoire : $(grep -c 'Index of /' "$R/p16.html")"; sleep 3; echo "processus : $(app_pids | tr '\n' ' ')"
+```
+
+Attendu : `0` et `0`, au moins un PID de l'application démarré après l'étape 15 (comparer `etimes` à `$(( $(date +%s) - T0 ))`), 13 threads, aucun ancien PID. La preuve que l'application répond est l'ensemble « contenu qui n'est ni la page de maintenance ni la liste » + « PID de l'application » + `ops/verify.sh` complet (étape 17). L'absence de liste de répertoire entre le retrait de la page et la remise en route a été observée sur le domaine de test (20 requêtes à 0,3 s) ; ce n'est **pas une garantie** sur la production.
 **Arrêt si** la page répond en erreur ou si aucun processus n'apparaît en 2 minutes après le retrait de la page : retour arrière (une erreur de configuration nomme la variable fautive dans le journal, jamais sa valeur). Si le retrait échoue, **ne pas laisser la page** : elle masque l'application ; traiter l'échec avant toute autre action.
 
 ## Étape 17 — Vérification complète (obligatoire)
@@ -391,7 +404,7 @@ Attendu : un nouveau PID (démarré après l'étape 15), 13 threads, aucun ancie
 cd "$OPS" && bash ops/verify.sh --base-url https://starluxvn.com --app-dir "$APP" --deployed-at $T0 --old-pids "$OLD_PIDS"
 ```
 
-Attendu : `0 échec(s)`, `0 contrôle(s) non effectué(s)` (comptes de test fournis) ; accueil 200 (donc PostgreSQL joignable) ; connexion élève et enseignant ; `/admin` refusé sans connexion et aux élèves ; exercice servi sans clé de correction ; correction serveur ; Tokio ≤ 3 (2 attendu), threads ≈ 13 ; aucun enfant ; anciens PID disparus ; NPROC sous 60 %.
+Attendu : `0 échec(s)`, `0 contrôle(s) non effectué(s)` (comptes de test fournis) ; accueil 200 (un 200 seul ne suffit pas : la réussite complète du script est la preuve, y compris l'exercice servi sans clé de correction) ; connexion élève et enseignant ; `/admin` refusé sans connexion et aux élèves ; exercice servi sans clé de correction ; correction serveur ; Tokio ≤ 3 (2 attendu), threads ≈ 13 ; aucun enfant ; anciens PID disparus ; NPROC sous 60 %.
 Contrôle de la configuration et des dépendances après bascule :
 
 ```bash
@@ -480,11 +493,11 @@ bash "$OPS/ops/cleanup.sh" --app-dir "$APP" --apply --verified
 
 `--verified` atteste que `ops/verify.sh` vient de réussir. `.release/rollback` est **conservé** (seul rollback gardé) ; le lien `node_modules`, `public/uploads`, WordPress, les bases et tout autre chemin ne sont jamais touchés. Supprimer ensuite le dossier `$OPS` si désiré (`rm -r "$OPS"` : décision du propriétaire) et gérer la durée de conservation de `~/si-backups`.
 
-Règle pour toute suppression de dossier ou de fichier d'exploitation (acquise lors du nettoyage de la répétition, annexe A) : chemin réel égal au chemin attendu, ni lien symbolique ni point de montage, bon propriétaire, contenu limité à des noms connus, aucun processus dont le répertoire courant s'y trouve, suppression ciblée (`rm -r --one-file-system --`, jamais `rm -rf` ni `*`). Avant de supprimer des journaux : archive créée, **somme SHA-256 recoupée sur un autre poste**, contenu comparé fichier par fichier, journal de l'étape en cours copié hors du dossier. Les sauvegardes PostgreSQL ne sont jamais supprimées par cette règle.
+Règle pour toute suppression de dossier ou de fichier d'exploitation (acquise lors du nettoyage de la répétition, annexe A) : chemin réel égal au chemin attendu, ni lien symbolique ni point de montage, bon propriétaire, contenu limité à des noms connus, aucun processus dont le répertoire courant s'y trouve, suppression ciblée (`rm -r --one-file-system --`, jamais `rm -rf` ni `*`). Avant de supprimer des journaux : archive créée, **somme SHA-256 recoupée sur un autre poste**, contenu comparé fichier par fichier, journal de l'étape en cours copié hors du dossier. **Cette procédure ne supprime jamais** les archives et journaux conservés sur l'hébergement (`si-rehearsal-*`) ni les sauvegardes PostgreSQL (`~/si-backups`) : leur suppression est une décision séparée du propriétaire, après recoupement de leur copie sur son poste.
 
 ## Annexe A — Répétition sur une application jetable (réalisée le 2026-11-27)
 
-La répétition a été faite sur VinaHost avec une application jetable (`si-repetition`, sous-domaine `si-test.starluxvn.com`, Node 22.23.5, `TOKIO_WORKER_THREADS=2` dès la création, serveur `http` pur) puis supprimée. Détail, chronologie, constats et limites : `docs/ops/repetition-annexe-a.md`. Constats qui structurent cette procédure :
+La répétition a été faite par le propriétaire sur VinaHost avec une application jetable (`si-repetition`, sous-domaine `si-test.starluxvn.com`, Node 22.23.5, `TOKIO_WORKER_THREADS=2` dès la création, serveur `http` pur) puis supprimée. Les résultats sont ceux que le propriétaire a transmis (l'assistant n'a pas d'accès à l'hébergement) ; l'étiquette de provenance de chaque étape est dans `docs/ops/repetition-annexe-a.md` (détail, chronologie, constats et limites). Constats qui structurent cette procédure :
 
 - STOP lent, parfois sans effet, parfois avec un processus qui survit : étapes 13 et 14 (quatre preuves, 300 s, SIGTERM contrôlé).
 - L'application démarre à la demande ; le PPID n'est pas un critère : règles de l'en-tête et étape 14.
@@ -495,16 +508,22 @@ La répétition a été faite sur VinaHost avec une application jetable (`si-rep
 
 ## Annexe B — Ce qui est vérifié et ce qui ne l'est pas
 
-| Élément | État |
-|---|---|
-| Artefact (contenu, SHA-256, dépendances, binaires natifs, démarrage, API, authentification, correction, ressources) | **Vérifié** en local et en CI (smoke test, glibc 2.34 en conteneur), y compris sur l'artefact officiel de `main` (run `workflow_dispatch`, SHA-256 recoupé sur le poste du propriétaire) |
-| Échange de versions et retour arrière par renommage, verrou, uploads et lien préservés | **Vérifié** sur un faux répertoire et en CI (sans LiteSpeed) |
-| Échange et retour arrière par renommage dans la racine, STOP/START cPanel, `RELEASE.json` absent après retour arrière | **Vérifié sur VinaHost** (application jetable, serveur `http` pur, sans `node_modules`) |
-| Quatre preuves d'arrêt, SIGTERM avec contrôle d'identité, page de maintenance (remplacement de la liste, masquage de l'application, retrait après START), nettoyage | **Vérifié sur VinaHost** (application jetable) |
-| Preflight, `check-config`, `disk-check`, lien `node_modules`, dimensionnement | **Vérifié par le propriétaire** sur VinaHost avec les `ops` du commit `3f566f4` |
-| STOP/START de l'application de production, échange avec le lien `node_modules` CloudLinux en place, `public/uploads` | **Non vérifié** |
-| Document root de production application arrêtée (liste de répertoire, wildcard DNS), page de maintenance en production | **Non vérifié** (étape 12 bis) |
-| Cause de l'échec de STOP/RESTART constaté lors de l'incident, et cause du STOP resté sans effet pendant la répétition (étape A8.1) | **Non établies** |
-| Sauvegarde et restauration PostgreSQL : `pg_dump`/`pg_restore`/`psql` présents, versions, sauvegarde réelle, restauration dans une base jetable | **Non vérifié** (étape 8) |
-| Emplacement du journal de l'application de production | **Non vérifié** (étape 18) |
-| Trafic réel pendant l'échange ; durée de la liste de répertoire sans page ; code HTTP de la page statique (200) | **Non vérifié / non mesuré** |
+Sources : **CI** = GitHub Actions ; **Local** = simulation par l'assistant, non exécutée sur l'hébergement ; **VinaHost (valeurs)** = valeurs transmises par le propriétaire, non rejouées par l'assistant ; **VinaHost (confirmé)** = succès confirmé par le propriétaire sans les valeurs ; **Aucune** = non vérifié.
+
+| Élément | Source | État |
+|---|---|---|
+| Artefact officiel de `main` : contenu, SHA-256, dépendances, binaires natifs (glibc 2.34 en conteneur), démarrage, API, authentification, correction, ressources | CI ; SHA-256 recoupé par le propriétaire sur son poste | Vérifié |
+| Échange de versions et retour arrière par renommage, verrou, uploads et lien préservés | Local et CI (faux répertoire, sans LiteSpeed) | Vérifié hors hébergement |
+| Échange et retour arrière par renommage dans la racine, STOP/START cPanel, `RELEASE.json` absent après retour arrière (application jetable sans `node_modules`) | VinaHost (valeurs) | Constaté |
+| STOP lent, sans effet ou laissant un processus ; `.htaccess` sans lignes Passenger après STOP ; démarrage à la demande ; liste de répertoire ; masquage de l'application par une page statique ; ordre START puis retrait de la page ; wildcard DNS | VinaHost (valeurs) | Constaté |
+| SIGTERM après contrôle d'identité par l'heure de démarrage en secondes (A8.5.1c) | VinaHost (confirmé) | Confirmé |
+| Fonction `sigterm_verifie` du runbook (identité par `starttime`, garde 300 s, refus si le processus a démarré après le STOP) | Local seulement ; A10.2 (version `starttime`) confirmé sans savoir si un processus restait à terminer | **Non exercée sur l'hébergement** |
+| Fonctions de la page de maintenance et gardes du runbook (étapes 12 bis, 15, 16), garde PostgreSQL de l'étape 8 | Local seulement (la garde PostgreSQL contre une base locale jetable) | **Non exercées sur l'hébergement** |
+| Nettoyage contrôlé de la répétition (A10.5 valeurs ; A10.1, A10.2 confirmés) | VinaHost (valeurs / confirmé) | Constaté |
+| Preflight, `check-config`, `disk-check`, lien `node_modules`, dimensionnement | VinaHost (valeurs), `ops` du commit `3f566f4` | Constaté |
+| STOP/START de l'application de production, échange avec le lien `node_modules` CloudLinux en place, `public/uploads` | Aucune | **Non vérifié** |
+| Document root de production application arrêtée (liste de répertoire, wildcard DNS), page de maintenance en production | Aucune | **Non vérifié** (étape 12 bis) |
+| Cause du STOP resté sans effet pendant la répétition (A8.1) et de l'échec de STOP/RESTART de l'incident | Aucune | **Non établies** |
+| Sauvegarde et restauration PostgreSQL : outils, versions, sauvegarde réelle, restauration dans une base jetable | Aucune | **Non vérifié** (étape 8) |
+| Emplacement du journal de l'application de production | Aucune | **Non vérifié** (étape 18) |
+| Trafic réel pendant l'échange ; durée de la liste de répertoire sans page ; code HTTP de la page statique (200) | Aucune | **Non mesuré** |

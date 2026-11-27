@@ -166,7 +166,7 @@ Dans les deux cas la marge de 1 024 Mo est respectée avec un large écart : le 
 ## Risques et limites connus
 
 1. Les images téléversées par `/api/admin/upload` sont écrites dans `public/uploads` : **elles répondent 404 jusqu'au redémarrage suivant** de l'application (mesuré avec `ops/server.js`). `public/uploads` n'existe pas encore sur l'hébergement ; la disposition en versions la protège (jamais copié, jamais déplacé, jamais dans l'artefact). Le défaut d'affichage et un éventuel déplacement hors du dossier de l'application sont à traiter séparément (issue dédiée).
-2. RESTART/STOP cPanel non fiables le 2026-11-27 : voir `incident-2026-11-27.md`. Toujours vérifier avec `ops/verify.sh`.
+2. RESTART/STOP cPanel non fiables le 2026-11-27 : voir `incident-2026-11-27.md`. Un STOP n'est jamais présumé effectif (quatre preuves avant tout déplacement de fichier, étape 13 du runbook) et un START se vérifie par `ops/verify.sh`. Constats de la répétition du 2026-11-27 sur une application jetable (STOP lent ou sans effet, processus qui survit, liste de répertoire application arrêtée, page statique qui masque l'application, wildcard DNS) : `repetition-annexe-a.md`.
 3. NPROC partagé avec WordPress/PHP : un pic PHP peut provoquer « Unable to fork » même avec Node à 13 threads.
 4. Tout composant dimensionné sur le nombre de CPU visibles (56) peut réintroduire le problème ; la garde ne couvre que Tokio.
 5. Mémoire : 515 Mo mesurés en charge extrême (60 requêtes en parallèle) sur le poste de test ; aucune limite de heap n'est imposée (non approuvé).
